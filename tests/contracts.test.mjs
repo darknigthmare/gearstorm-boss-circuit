@@ -1,8 +1,17 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import {
+  APP_RELEASE,
+  PREVIOUS_SAVE_KEY,
+  REQUIRED_GAME_SYSTEMS,
+  REQUIRED_UI_IDS,
+  SAVE_KEY,
+  SAVE_SCHEMA_VERSION,
+  validateApplicationContract,
+} from '../scripts/app-contract.mjs';
 
-const [html, css, game, readme, design, packageJson, manifest, serviceWorker, vercel, buildScript] = await Promise.all([
+const [html, css, game, readme, design, packageJson, manifest] = await Promise.all([
   readFile('index.html', 'utf8'),
   readFile('styles.css', 'utf8'),
   readFile('game.js', 'utf8'),
@@ -10,37 +19,75 @@ const [html, css, game, readme, design, packageJson, manifest, serviceWorker, ve
   readFile('DESIGN.md', 'utf8'),
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
-  readFile('sw.js', 'utf8'),
-  readFile('vercel.json', 'utf8').then(JSON.parse),
-  readFile('scripts/build.mjs', 'utf8'),
 ]);
 
-test('la marque et les six boss GEARSTORM sont présents', () => {
+test('la marque et les six boss GEARSTORM sont presents', () => {
   assert.match(html, /GEARSTORM/);
-  for (const name of ['RIVET REX', 'SKY SLICER', 'MAGNETRON', 'CHRONO MANTIS', 'FOUNDRY TITAN', 'CROWN ENGINE Ω']) {
+  for (const name of ['RIVET REX', 'SKY SLICER', 'MAGNETRON', 'CHRONO MANTIS', 'FOUNDRY TITAN', 'CROWN ENGINE \u03a9']) {
     assert.match(game, new RegExp(name));
   }
   assert.equal([...game.matchAll(/^\s+id: '(rammer|kraken|drill|mantis|cyclotron|omega)'/gm)].length, 6);
   assert.doesNotMatch(html + readme + design, /GEARGRIN|PROTOTYPE JOUABLE/);
 });
 
-test('tous les identifiants DOM utilisés par le moteur existent', () => {
-  const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]));
-  const references = [...game.matchAll(/getElementById\('([^']+)'\)/g)].map(match => match[1]);
-  assert.ok(references.length > 20);
-  for (const id of references) assert.ok(ids.has(id), `id manquant: ${id}`);
+test('le contrat applicatif v2.3 complet est respecte', () => {
+  assert.doesNotThrow(() => validateApplicationContract({ game, html, manifest, packageJson }));
+  assert.equal(packageJson.version, APP_RELEASE);
 });
 
-test('les systèmes campagne, entrées et accessibilité sont câblés', () => {
-  for (const marker of ['showUpgradeSelection', 'activateOverload', 'navigator.getGamepads', 'pointer.attack', "touchWasPressed('overload')", 'showEnding', 'gearstorm_boss_circuit_save_v2']) {
+test('tous les identifiants DOM utilises par le moteur existent et sont uniques', () => {
+  const allIds = [...html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]);
+  const ids = new Set(allIds);
+  assert.equal(ids.size, allIds.length);
+  const references = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
+  assert.ok(references.length > 30);
+  for (const id of references) assert.ok(ids.has(id), `id manquant: ${id}`);
+  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.3 manquante: ${id}`);
+});
+
+test('la sauvegarde v3 migre la v2 et porte la reprise de campagne', () => {
+  assert.match(game, new RegExp(SAVE_KEY));
+  assert.match(game, new RegExp(PREVIOUS_SAVE_KEY));
+  assert.match(game, new RegExp(`version\\s*:\\s*${SAVE_SCHEMA_VERSION}\\b`));
+  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot']) assert.match(game, new RegExp(`\\b${field}\\b`));
+  assert.match(game, /localStorage\.getItem\(PREVIOUS_SAVE_KEY\)/);
+  assert.match(game, /localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/);
+  for (const marker of ['sanitizeRushSnapshot', 'saveRushSnapshot', 'clearRushSnapshot', 'resumeRushSnapshot', 'syncContinueRun']) {
+    assert.match(game, new RegExp(`\\b${marker}\\b`));
+  }
+});
+
+test('le guidage, le codex et le recapitulatif de campagne sont cables', () => {
+  for (const marker of ['buildCodex', 'syncCombatGuidance', 'combatHints', 'codexUnlocked']) {
+    assert.match(game, new RegExp(`\\b${marker}\\b`));
+  }
+  for (const id of ['codex-screen', 'codex-grid', 'codex-progress', 'campaign-progress', 'campaign-next', 'combat-objective', 'combat-hint', 'pause-build', 'pause-objective', 'result-build', 'result-lore']) {
+    assert.match(html, new RegExp(`id=["']${id}["']`));
+  }
+  assert.match(css, /codex|combat-hint|campaign-progress/);
+});
+
+test('les rigs generes et leur diagnostic QA sont explicites', () => {
+  for (const marker of ['HERO_RIG', 'BOSS_RIGS', 'drawRigPart', 'getRigDiagnostics']) {
+    assert.match(game, new RegExp(`\\b${marker}\\b`));
+  }
+  const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
+  for (const field of ['phaseCounts', 'hitbox', 'weakPoint', 'feetLocalY', 'muzzle', 'transitionExplosionOnly']) {
+    assert.match(rigDiagnosticsBlock, new RegExp(`\\b${field}\\b`));
+  }
+  const qaBlock = game.slice(game.indexOf("Object.defineProperty(window, '__GEARSTORM_QA__'"));
+  for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'setRigDebug', 'launchMode']) {
+    assert.match(qaBlock, new RegExp(`\\b${marker}\\b`));
+  }
+  assert.match(game, /qaAllowed[\s\S]+127\.0\.0\.1[\s\S]+localhost/);
+});
+
+test('les systemes campagne, entrees et accessibilite restent cables', () => {
+  for (const marker of ['showUpgradeSelection', 'activateOverload', 'navigator.getGamepads', 'pointer.attack', "touchWasPressed('overload')", 'showEnding']) {
     assert.match(game, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
   assert.match(css, /\.upgrade-grid/);
-  assert.match(html, /id="upgrade-screen"/);
-  assert.match(html, /id="prologue-screen"/);
-  assert.ok(game.includes("document.getElementById('start-rush').addEventListener('click',()=>showScreen('prologue-screen'));"));
-  assert.ok(game.includes("document.getElementById('prologue-start')?.addEventListener('click',()=>startRun('rush',0));"));
-  assert.match(html, /id="ending-screen"/);
+  for (const id of ['upgrade-screen', 'prologue-screen', 'ending-screen']) assert.match(html, new RegExp(`id="${id}"`));
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /prefers-reduced-motion|motion-toggle/);
 });
@@ -53,33 +100,20 @@ test('les chronos, retry et sauvegardes suivent les garde-fous', () => {
   assert.match(game, /Object\.hasOwn\(DIFFICULTIES/);
   assert.match(game, /const elapsed=currentBossElapsed/);
   assert.doesNotMatch(game, /const elapsed=performance\.now/);
-  assert.match(game, /qaAllowed[\s\S]+__GEARSTORM_QA__/);
 });
 
-test('la PWA est reliée, installable et versionnée', () => {
-  assert.equal(packageJson.version, '2.2.0');
-  assert.match(html, /rel="manifest" href="manifest\.webmanifest"/);
-  assert.match(html, /property="og:image"/);
-  assert.match(game, /serviceWorker/);
-  assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
-  assert.ok(manifest.icons.some(icon => icon.purpose.includes('maskable')));
-  const keyArt = manifest.screenshots.find(screenshot => screenshot.src.includes('gearstorm-key-art.png'));
-  assert.equal(keyArt?.sizes, '1672x941');
-  assert.match(serviceWorker, /gearstorm-shell-v2\.2\.0/);
-  assert.match(serviceWorker, /gearstorm-runtime-v2\.2\.0/);
-  assert.match(serviceWorker, /assets\/generated\/v2\.2\.0\/asset-manifest\.json/);
-  const coreAssets = serviceWorker.slice(serviceWorker.indexOf('const CORE_ASSETS'), serviceWorker.indexOf('self.addEventListener'));
-  assert.doesNotMatch(coreAssets, /assets\/generated\/v2\.2\.0\/.+\.webp/);
-  assert.match(serviceWorker, /skipWaiting/);
+test('les raccourcis PWA sont routes sans demarrer un combat implicitement', () => {
+  const urls = new Set(manifest.shortcuts.map(shortcut => shortcut.url));
+  assert.ok(urls.has('./?mode=rush'));
+  assert.ok(urls.has('./?mode=practice'));
+  assert.match(game, /routeLaunchMode/);
+  assert.match(game, /URLSearchParams\(location\.search\)/);
+  assert.match(game, /get\(["']mode["']\)/);
+  assert.ok((game.match(/\brouteLaunchMode\(\)/g) || []).length >= 2, 'routeLaunchMode doit etre appele pendant l initialisation');
+  const routeBlock = game.slice(game.indexOf('function routeLaunchMode'), game.indexOf('function applySettings'));
+  assert.doesNotMatch(routeBlock, /startRun|startFight|unlockAudio/);
 });
 
-test('la chaîne Vercel publie uniquement le runtime web', () => {
-  assert.equal(vercel.buildCommand, 'npm run build');
-  assert.equal(vercel.outputDirectory, 'dist');
-  assert.match(buildScript, /const publicFiles = \['index\.html', 'styles\.css', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
-  assert.doesNotMatch(buildScript, /LANCER_LE_JEU|QA_REPORT|README\.md/);
-  assert.match(buildScript, /validateRuntimeAssets/);
-  assert.ok(vercel.headers.some(rule => rule.source === '/(.*)'));
-  const runtimeRule = vercel.headers.find(rule => rule.source === '/assets/generated/v2.2.0/(.*)');
-  assert.ok(runtimeRule?.headers.some(header => header.key === 'Cache-Control' && header.value.includes('immutable')));
+test('la liste des systemes v2.3 reste centralisee', () => {
+  for (const marker of REQUIRED_GAME_SYSTEMS) assert.match(game, new RegExp(`\\b${marker}\\b`));
 });

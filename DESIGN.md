@@ -54,6 +54,41 @@ Le total de production est de 14 masters OpenAI Image Generation intégré pour 
 - Le cache PWA peut conserver les ressources validées, tandis que le rendu procédural Canvas assure le fallback en cas d’échec.
 - La progression de chargement peut être signalée au titre ou au prologue, sans bloquer l’accès aux commandes et avec respect du contraste élevé et du mouvement réduit.
 
+## Progression narrative v2.3
+
+### Riva contre le système de Voltério
+
+Riva Spark ne traverse pas une simple liste d’arènes. Ancienne technicienne du réseau, elle comprend comment chaque infrastructure a été détournée et choisit de la remettre au service des habitants. Ses améliorations restent des adaptations de terrain : elles renforcent son autonomie sans la transformer en arme de Voltério.
+
+Cassian Voltério traite d’abord Riva comme une variable divertissante, puis comme une anomalie qu’il doit intégrer à son récit. Après chaque machine, sa maîtrise de la diffusion, de l’énergie ou des déplacements diminue. La progression doit faire sentir cette perte de contrôle avant même la Citadelle.
+
+### Les six actes du Circuit
+
+| Acte | District | Fonction détournée | Battement narratif |
+| ---: | --- | --- | --- |
+| 01 | Rocade des Rivets | Transport et couvre-feu | Riva ouvre la première voie et force Voltério à reconnaître son intervention. |
+| 02 | Couloir des Hautes-Tensions | Communications du nord | Sa voix franchit le brouillage et les habitants comprennent que le Circuit peut tomber. |
+| 03 | Fosse Ferromagnétique | Rails d’évacuation | Les spectateurs captifs disposent enfin d’une sortie réelle. |
+| 04 | Horloge de la Faille | Horloges, archives et classement | Voltério ne peut plus réécrire le temps de la révolte. |
+| 05 | Fournaise des Pistons | Énergie et production | Le spectacle perd son alimentation et la Citadelle devient vulnérable. |
+| 06 | Citadelle Voltério | Commandement de la chaîne | Riva retourne contre la Couronne les cinq technologies déjà apprises. |
+
+Le Codex dévoile ces conséquences au rythme de la sauvegarde. Il montre d’abord la silhouette, l’arène et le danger principal ; la victoire complète ensuite la lecture de la machine et son effet sur le district. Le joueur peut ainsi relire le récit sans subir une exposition pendant l’action.
+
+## Parcours UX v2.3
+
+- **Titre** : état du Circuit, prochaine cible, reprise conditionnelle et accès direct au Codex.
+- **Prologue** : objectif global, voix de Riva et itinéraire des six districts.
+- **Intro boss** : spectacle de Voltério conservé dans une plaque compacte, contrastée et placée sous le HUD.
+- **Combat** : objectif permanent, conseil contextuel court et désactivable, statut accessible distinct des valeurs animées.
+- **Pause** : objectif, build, commandes et trois sorties sans ambiguïté.
+- **Résultat** : performance, journal de Riva, conséquence locale et build avant la prochaine décision.
+- **Atelier** : choix du module replacé dans l’itinéraire de campagne.
+- **Codex** : dossiers Riva/Voltério, progression chiffrée et six entrées de machine.
+- **Épilogue** : bilan des six districts, temps, score, retries et build final.
+
+Les objectifs et conseils sont séparés : désactiver `#hints-toggle` masque `#combat-hint`, jamais `#combat-objective`. Les écrans utilisent les mêmes conventions de retour, focus et titres que les menus historiques. Les nouvelles régions restent compactes sur mobile, respectent les zones sûres et conservent un fond opaque sur les effets de fumée.
+
 ## Fin
 
 Après Crown Engine Ω, un écran d’épilogue distinct confirme la libération du Circuit, résume le temps, le score et les modules installés, puis donne accès au Laboratoire ou au menu principal.

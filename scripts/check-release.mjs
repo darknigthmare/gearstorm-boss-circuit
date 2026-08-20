@@ -1,5 +1,13 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { access, readFile, readdir, stat } from 'node:fs/promises';
+import { relative, resolve } from 'node:path';
+import {
+  APP_RELEASE,
+  DIST_BUDGET_BYTES,
+  SAVE_SCHEMA_VERSION,
+  validateApplicationContract,
+} from './app-contract.mjs';
 import {
   ASSET_BUDGET_BYTES,
   ASSET_DIRECTORY,
@@ -8,22 +16,57 @@ import {
   EXPECTED_COUNTS,
   validateRuntimeAssets,
 } from './asset-contract.mjs';
+import { validateInfrastructureContract } from './infrastructure-contract.mjs';
 
-const [packageJson, manifest, serviceWorker, vercel, sourceRuntime] = await Promise.all([
+async function listFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const nested = await Promise.all(entries.map(async entry => {
+    assert.equal(entry.isSymbolicLink(), false, `Lien symbolique interdit dans dist : ${entry.name}`);
+    const path = resolve(directory, entry.name);
+    return entry.isDirectory() ? listFiles(path) : [path];
+  }));
+  return nested.flat();
+}
+
+const [
+  packageJson,
+  packageLock,
+  html,
+  game,
+  manifest,
+  serviceWorker,
+  vercel,
+  vercelIgnore,
+  ci,
+  sourceRuntime,
+] = await Promise.all([
   readFile('package.json', 'utf8').then(JSON.parse),
+  readFile('package-lock.json', 'utf8').then(JSON.parse),
+  readFile('index.html', 'utf8'),
+  readFile('game.js', 'utf8'),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
   readFile('sw.js', 'utf8'),
   readFile('vercel.json', 'utf8').then(JSON.parse),
+  readFile('.vercelignore', 'utf8'),
+  readFile('.github/workflows/ci.yml', 'utf8'),
   validateRuntimeAssets(),
 ]);
 
-assert.equal(packageJson.version, ASSET_RELEASE);
+assert.equal(packageJson.version, APP_RELEASE);
+assert.equal(packageLock.version, APP_RELEASE);
+assert.equal(packageLock.packages?.['']?.version, APP_RELEASE);
+assert.equal(packageLock.lockfileVersion, 3);
+validateApplicationContract({ game, html, manifest, packageJson });
+validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore });
+
 assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
 assert.equal(manifest.short_name, 'GEARSTORM');
 assert.ok(['fullscreen', 'standalone'].includes(manifest.display));
+assert.equal(manifest.launch_handler?.client_mode, 'navigate-existing');
 assert.ok(manifest.icons.some(icon => icon.purpose.split(/\s+/).includes('maskable')));
 assert.ok(manifest.icons.some(icon => icon.sizes === '192x192'));
 assert.ok(manifest.icons.some(icon => icon.sizes === '512x512'));
+assert.ok(manifest.shortcuts.every(shortcut => shortcut.icons?.some(icon => icon.sizes === '192x192')));
 const keyArtScreenshot = manifest.screenshots?.find(screenshot => screenshot.src.includes('gearstorm-key-art.png'));
 assert.equal(keyArtScreenshot?.sizes, '1672x941');
 
@@ -41,7 +84,13 @@ const shellFiles = [
 ];
 for (const file of shellFiles) await access(file);
 
-const distRuntime = await validateRuntimeAssets('dist');
+const [distHtml, distGame, distManifest, distRuntime] = await Promise.all([
+  readFile('dist/index.html', 'utf8'),
+  readFile('dist/game.js', 'utf8'),
+  readFile('dist/manifest.webmanifest', 'utf8').then(JSON.parse),
+  validateRuntimeAssets('dist'),
+]);
+validateApplicationContract({ game: distGame, html: distHtml, manifest: distManifest, packageJson });
 assert.equal(distRuntime.entries.length, EXPECTED_COUNTS.runtimeFiles);
 assert.equal(distRuntime.totalBytes, sourceRuntime.totalBytes);
 assert.ok(distRuntime.totalBytes <= ASSET_BUDGET_BYTES);
@@ -54,9 +103,7 @@ assert.deepEqual((await readdir('dist/assets')).sort(), [
   'generated',
 ]);
 assert.deepEqual((await readdir('dist/assets/generated')).sort(), [ASSET_DIRECTORY]);
-
-const topLevel = (await readdir('dist')).sort();
-assert.deepEqual(topLevel, [
+assert.deepEqual((await readdir('dist')).sort(), [
   'assets',
   'build-manifest.json',
   'game.js',
@@ -65,37 +112,29 @@ assert.deepEqual(topLevel, [
   'styles.css',
   'sw.js',
 ]);
-for (const forbidden of ['README.md', 'QA_REPORT.md', 'LANCER_LE_JEU.bat', 'standalone.html']) {
-  assert.ok(!topLevel.includes(forbidden), `${forbidden} ne doit pas être publié par Vercel.`);
-}
-
-for (const asset of ['./index.html', './styles.css', './game.js', './manifest.webmanifest', './assets/gearstorm-icon.svg', './assets/gearstorm-icon-192.png', './assets/gearstorm-icon-512.png', './assets/gearstorm-key-art.png', `./${ASSET_MANIFEST_PATH}`]) {
-  assert.ok(serviceWorker.includes(asset), `Asset shell absent du cache PWA : ${asset}`);
-}
-assert.ok(serviceWorker.includes(`gearstorm-shell-v${ASSET_RELEASE}`));
-assert.ok(serviceWorker.includes(`gearstorm-runtime-v${ASSET_RELEASE}`));
-assert.match(serviceWorker, /GENERATED_RUNTIME_PREFIX/);
-assert.match(serviceWorker, /contentType[\s\S]+webp/);
-const coreAssetsBlock = serviceWorker.slice(serviceWorker.indexOf('const CORE_ASSETS'), serviceWorker.indexOf('self.addEventListener'));
-assert.doesNotMatch(coreAssetsBlock, /assets\/generated\/v2\.2\.0\/.+\.webp/);
 
 const art = await readFile('dist/assets/gearstorm-key-art.png');
-assert.ok(art.length > 100_000, 'Le key art final est absent ou trop petit.');
-assert.deepEqual([...art.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], 'Le key art doit être un PNG valide.');
+assert.ok(art.length > 100_000, 'Key art final absent ou trop petit.');
+assert.deepEqual([...art.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], 'Key art PNG invalide.');
 assert.equal(art.readUInt32BE(16), 1672);
 assert.equal(art.readUInt32BE(20), 941);
 
 const icon = await stat('dist/assets/gearstorm-icon.svg');
-assert.ok(icon.size > 500, 'L’icône PWA SVG est absente ou incomplète.');
+assert.ok(icon.size > 500, 'Icone PWA SVG absente ou incomplete.');
 for (const [file, expectedSize] of [['dist/assets/gearstorm-icon-192.png', 192], ['dist/assets/gearstorm-icon-512.png', 512]]) {
   const png = await readFile(file);
-  assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], 'Icône PNG invalide : ' + file);
+  assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], 'Icone PNG invalide : ' + file);
   assert.equal(png.readUInt32BE(16), expectedSize);
   assert.equal(png.readUInt32BE(20), expectedSize);
 }
 
 const buildManifest = JSON.parse(await readFile('dist/build-manifest.json', 'utf8'));
-assert.equal(buildManifest.version, packageJson.version);
+assert.equal(buildManifest.schemaVersion, 2);
+assert.equal(buildManifest.version, APP_RELEASE);
+assert.deepEqual(buildManifest.application, {
+  release: APP_RELEASE,
+  saveSchemaVersion: SAVE_SCHEMA_VERSION,
+});
 assert.deepEqual(buildManifest.runtimeAssets, {
   release: ASSET_RELEASE,
   files: EXPECTED_COUNTS.runtimeFiles,
@@ -104,22 +143,29 @@ assert.deepEqual(buildManifest.runtimeAssets, {
   totalBytes: sourceRuntime.totalBytes,
   budgetBytes: ASSET_BUDGET_BYTES,
 });
-assert.equal(Object.keys(buildManifest.files).length, 5 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
-for (const path of ['index.html', 'styles.css', 'game.js', 'manifest.webmanifest', 'sw.js', 'assets/gearstorm-icon.svg', 'assets/gearstorm-icon-192.png', 'assets/gearstorm-icon-512.png', 'assets/gearstorm-key-art.png', ASSET_MANIFEST_PATH]) {
-  assert.match(buildManifest.files[path]?.sha256 || '', /^[a-f0-9]{64}$/);
-  assert.ok(buildManifest.files[path].bytes > 0);
-}
-for (const asset of sourceRuntime.entries) {
-  assert.equal(buildManifest.files[asset.src]?.sha256, asset.sha256);
-  assert.equal(buildManifest.files[asset.src]?.bytes, asset.bytes);
-}
 
-assert.equal(vercel.buildCommand, 'npm run build');
-assert.equal(vercel.outputDirectory, 'dist');
-const commonHeaders = vercel.headers.find(rule => rule.source === '/(.*)')?.headers || [];
-assert.ok(commonHeaders.some(header => header.key === 'Content-Security-Policy'));
-assert.ok(commonHeaders.some(header => header.key === 'X-Content-Type-Options' && header.value === 'nosniff'));
-const generatedHeaders = vercel.headers.find(rule => rule.source === '/assets/generated/v2.2.0/(.*)')?.headers || [];
-assert.ok(generatedHeaders.some(header => header.key === 'Cache-Control' && header.value === 'public, max-age=31536000, immutable'));
+const actualFiles = (await listFiles('dist'))
+  .map(file => relative(resolve('dist'), file).replaceAll('\\', '/'))
+  .sort();
+const declaredFiles = Object.keys(buildManifest.files).sort();
+assert.deepEqual(actualFiles, [...declaredFiles, 'build-manifest.json'].sort(), 'dist et build-manifest divergent.');
+assert.equal(declaredFiles.length, 5 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
 
-console.log(`Release web ${packageJson.version} vérifiée : ${sourceRuntime.entries.length} assets WebP, ${sourceRuntime.totalBytes} octets, PWA et sécurité conformes.`);
+let distBytes = 0;
+for (const path of actualFiles) {
+  const bytes = await readFile(resolve('dist', path));
+  distBytes += bytes.length;
+  assert.ok(bytes.length > 0, `Fichier vide interdit : ${path}`);
+  assert.doesNotMatch(path, /(?:^|\/)\.(?:env|git)|\.(?:map|md|psd|py|tmp|zip)$/i);
+  assert.doesNotMatch(path, /^assets\/generated\/(?:arenas|bosses|riva|vfx)\//);
+  if (path === 'build-manifest.json') continue;
+  assert.equal(buildManifest.files[path]?.bytes, bytes.length, `Taille incoherente : ${path}`);
+  assert.equal(
+    buildManifest.files[path]?.sha256,
+    createHash('sha256').update(bytes).digest('hex'),
+    `SHA-256 incoherent : ${path}`,
+  );
+}
+assert.ok(distBytes <= DIST_BUDGET_BYTES, `Budget dist depasse : ${distBytes} / ${DIST_BUDGET_BYTES}`);
+
+console.log(`Release web ${APP_RELEASE} verifiee : assets v${ASSET_RELEASE}, ${sourceRuntime.entries.length} WebP, ${distBytes} octets publies, PWA/CI/securite conformes.`);

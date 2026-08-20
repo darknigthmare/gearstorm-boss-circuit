@@ -12,6 +12,9 @@
     "fullscreen",
     "standalone"
   ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "orientation": "landscape",
   "background_color": "#070a16",
   "theme_color": "#080b18",
@@ -53,12 +56,26 @@
     {
       "name": "Lancer le Circuit",
       "short_name": "Circuit",
-      "url": "./?mode=rush"
+      "url": "./?mode=rush",
+      "icons": [
+        {
+          "src": "assets/gearstorm-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Ouvrir le Laboratoire",
       "short_name": "Labo",
-      "url": "./?mode=practice"
+      "url": "./?mode=practice",
+      "icons": [
+        {
+          "src": "assets/gearstorm-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

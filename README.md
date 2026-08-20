@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit v2.2
+# GEARSTORM: Boss Circuit v2.3
 
 GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables du Professeur Cassian Voltério, améliore son équipement entre les combats et libère les districts emprisonnés dans le Circuit.
 
@@ -33,6 +33,36 @@ Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la r
 - Audio et musique synthétiques via Web Audio, sans dépendance distante.
 - Mouvement réduit, contraste renforcé et réglage des tremblements.
 - Cible PWA installable avec cache hors ligne et présentation sociale dédiée.
+
+## Expérience narrative et qualité de vie v2.3
+
+La v2.3 relie chaque combat à la libération d’un district et donne une place visible à la progression :
+
+- récapitulatif de campagne et prochaine cible dès l’écran titre ;
+- reprise de Circuit prévue par `#continue-run`, affichée seulement lorsqu’une progression compatible existe ;
+- briefing d’objectif lisible au-dessus du combat, avec conseil contextuel désactivable ;
+- Codex consultable pour Riva Spark, Cassian Voltério, les six machines et leurs districts ;
+- objectif, build et rappel des commandes dans la pause ;
+- journal narratif, build actif et conséquence locale sur l’écran de résultat ;
+- itinéraire des six districts au prologue et bilan de libération à l’épilogue ;
+- états compacts pour mobile, contraste renforcé et annonces non intrusives pour les technologies d’assistance.
+
+### Contrat des hooks DOM
+
+Le runtime conserve tous les IDs historiques et pilote les nouveaux hooks suivants :
+
+| Hook | Responsabilité runtime |
+| --- | --- |
+| `#continue-run` | Rester masqué sans reprise valide ; afficher la destination dans `#continue-run-detail` et reprendre sans écraser la sauvegarde. |
+| `#campaign-progress`, `#campaign-next` | Résumer les districts libérés et la prochaine machine depuis la sauvegarde normalisée. |
+| `#codex`, `#codex-screen` | Ouvrir le Codex, restaurer le focus au retour et respecter la navigation clavier/manette. |
+| `#codex-grid`, `#codex-progress` | Déverrouiller les dossiers selon la progression, mettre à jour les états et exposer un texte compréhensible sans couleur seule. |
+| `#combat-objective` | Annoncer l’objectif du boss ou de la phase sans être désactivé avec les conseils. |
+| `#combat-hint`, `#hints-toggle` | Afficher un conseil bref lors d’une nouvelle mécanique, le masquer ensuite et persister la préférence. |
+| `#pause-objective`, `#pause-build` | Reprendre l’objectif actuel et la description réelle des modules installés. |
+| `#result-lore`, `#result-build` | Résumer la conséquence narrative de la victoire et le build avant la décision suivante. |
+
+Les objectifs critiques restent disponibles même si les conseils sont coupés. Les changements d’état utilisent les régions `aria-live` existantes avec parcimonie afin de ne pas annoncer chaque frame.
 
 ## Direction artistique v2.2
 

@@ -92,15 +92,25 @@
   const RUSH_RETRY_PENALTY = 12;
   const RUSH_RETRY_SCORE_PENALTY = 750;
 
-  const SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
+  const SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
+  const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
   const LEGACY_SAVE_KEY = 'geargrin_overdrive_save';
+  const RANK_VALUES = Object.freeze({ C: 1, B: 2, A: 3, S: 4 });
+  const requestedLaunchMode = ['rush', 'practice'].includes(new URLSearchParams(location.search).get('mode'))
+    ? new URLSearchParams(location.search).get('mode')
+    : null;
   const UPGRADES = [
-    { id: 'rapid', maxStacks: 3, icon: '⚡', name: 'Cadence polarisée', description: 'Réduit de 22 % le délai entre deux tirs.', apply: build => { build.fireRate *= 0.78; } },
-    { id: 'core', maxStacks: 2, icon: '◆', name: 'Noyau auxiliaire', description: 'Ajoute deux points de vie au prochain châssis.', apply: build => { build.maxHpBonus += 2; } },
-    { id: 'dash', maxStacks: 3, icon: '➜', name: 'Ruée vectorielle', description: 'Réduit le délai de ruée et augmente son impact.', apply: build => { build.dashCooldown *= 0.78; build.dashDamage += 4; } },
-    { id: 'split', maxStacks: 1, icon: '✦', name: 'Canon bifurqué', description: 'Ajoute deux impulsions obliques à chaque salve.', apply: build => { build.multishot = Math.min(3, build.multishot + 2); } },
-    { id: 'amplifier', maxStacks: 3, icon: '⬢', name: 'Amplificateur de noyau', description: 'Augmente les dégâts des tirs de 25 %.', apply: build => { build.shotDamage *= 1.25; } },
-    { id: 'overload', maxStacks: 3, icon: '◎', name: 'Condensateur Overdrive', description: 'Charge plus vite et prolonge la surcharge.', apply: build => { build.overloadGain *= 1.35; build.overloadDuration += 1.1; } }
+    { id: 'rapid', maxStacks: 3, icon: 'electric-arcs', name: 'Cadence polarisée', description: 'Réduit de 22 % le délai entre deux tirs.', apply: build => { build.fireRate *= 0.78; } },
+    { id: 'core', maxStacks: 2, icon: 'explosion-core', name: 'Noyau auxiliaire', description: 'Ajoute deux points de vie au prochain châssis.', apply: build => { build.maxHpBonus += 2; } },
+    { id: 'dash', maxStacks: 3, icon: 'dash-shockwave', name: 'Ruée vectorielle', description: 'Réduit le délai de ruée et augmente son impact.', apply: build => { build.dashCooldown *= 0.78; build.dashDamage += 4; } },
+    { id: 'split', maxStacks: 1, icon: 'muzzle-cyan', name: 'Canon bifurqué', description: 'Ajoute deux impulsions obliques à chaque salve.', apply: build => { build.multishot = Math.min(3, build.multishot + 2); } },
+    { id: 'amplifier', maxStacks: 3, icon: 'impact-metal', name: 'Amplificateur de noyau', description: 'Augmente les dégâts des tirs de 25 %.', apply: build => { build.shotDamage *= 1.25; } },
+    { id: 'overload', maxStacks: 3, icon: 'overload-bloom', name: 'Condensateur Overdrive', description: 'Charge plus vite et prolonge la surcharge.', apply: build => { build.overloadGain *= 1.35; build.overloadDuration += 1.1; } },
+    { id: 'aegis', maxStacks: 2, icon: 'shield-hit', name: 'Égide capacitive', description: 'Absorbe gratuitement un impact par niveau et par machine.', apply: build => { build.shieldCharges += 1; } },
+    { id: 'thrusters', maxStacks: 2, icon: 'magnetic-spark', name: 'Propulseurs synchrones', description: 'Améliore accélération, vitesse maximale et impulsion de saut.', apply: build => { build.moveAccel *= 1.12; build.maxSpeed += 38; build.jumpPower += 50; } },
+    { id: 'precision', maxStacks: 2, icon: 'warning-pulse', name: 'Séquence de précision', description: 'Chaque cinquième puis quatrième impact de noyau inflige une surtension.', apply: build => { build.precisionEvery = build.precisionEvery ? Math.max(4, build.precisionEvery - 1) : 5; build.precisionBonus += 0.45; } },
+    { id: 'feedback', maxStacks: 2, icon: 'chrono-fracture', name: 'Boucle de feedback', description: 'Prolonge le combo et accélère légèrement la charge Overdrive.', apply: build => { build.comboWindow += 0.5; build.overloadGain *= 1.1; } },
+    { id: 'salvage', maxStacks: 2, icon: 'scrap-glow', name: 'Auto-réparation de phase', description: 'Restaure un noyau de Riva à chaque transformation ennemie.', apply: build => { build.phaseRepair += 1; } }
   ];
 
   function createRunBuild() {
@@ -114,23 +124,35 @@
       overloadGain: 1,
       overloadDuration: 4.2,
       moveAccel: 2350,
+      maxSpeed: 390,
+      jumpPower: 720,
+      projectileSpeed: 920,
+      shieldCharges: 0,
+      precisionEvery: 0,
+      precisionBonus: 0,
+      comboWindow: 2.15,
+      phaseRepair: 0,
       installed: []
     };
   }
 
   const DEFAULT_SAVE = {
-    version: 2,
+    version: 3,
     unlocked: 1,
     bestTimes: {},
+    bestRanks: {},
     bestRush: null,
     completed: false,
+    codexUnlocked: [],
+    rushSnapshot: null,
     settings: {
       difficulty: 'standard',
       audio: true,
       volume: 0.78,
       shake: true,
       reduceMotion: false,
-      highContrast: false
+      highContrast: false,
+      combatHints: true
     }
   };
 
@@ -168,6 +190,7 @@
   let comboTimer = 0;
   let maxCombo = 0;
   let lastUpgradeOffer = [];
+  let rigDebug = false;
 
   const keys = Object.create(null);
   const pressed = new Set();
@@ -201,6 +224,10 @@
   const mobilePlayerHp = document.querySelector('#mobile-player-hp');
   const mobileBossHp = document.querySelector('#mobile-boss-hp');
   const mobileOverload = document.querySelector('#mobile-overload');
+  const combatObjective = document.querySelector('#combat-objective');
+  const combatHint = document.querySelector('#combat-hint');
+  const pauseBuild = document.querySelector('#pause-build');
+  const resultLore = document.querySelector('#result-lore');
 
 
   const ART_MANIFEST_URL = 'assets/generated/v2.2.0/asset-manifest.json';
@@ -223,72 +250,126 @@
     initialPromise: null
   };
 
-  const HERO_ART_PRESET = {
-    'dash-trail': { x: -42, y: 4, size: 112 },
-    'overload-halo': { x: 0, y: -7, size: 122 },
-    'arm-far': { x: -15, y: -7, size: 55 },
-    legs: { x: 0, y: 22, size: 60 },
-    boots: { x: 0, y: 37, size: 58 },
-    torso: { x: 0, y: -7, size: 61 },
-    head: { x: 0, y: -42, size: 47 },
-    'arm-near': { x: 17, y: -6, size: 57 },
-    'pulse-cannon': { x: 31, y: -5, size: 58 }
-  };
+  const RIVA_RENDER_SCALE = 1.18;
+  const RIVA_FOOT_OFFSET = 36 * (RIVA_RENDER_SCALE - 1);
+  const RIVA_MUZZLE = Object.freeze({ x: 45, y: -8 });
+  const RIVA_GENERATED_MUZZLE = Object.freeze({
+    x: RIVA_MUZZLE.x * RIVA_RENDER_SCALE,
+    y: RIVA_MUZZLE.y * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET
+  });
+  const BOSS_WEAK_POINTS = Object.freeze({
+    rammer: Object.freeze({ x: 20, y: -42, r: 30, part: 'core' }),
+    kraken: Object.freeze({ x: 0, y: 5, r: 34, part: 'core' }),
+    drill: Object.freeze({ x: 0, y: -56, r: 31, part: 'core' }),
+    mantis: Object.freeze({ x: 0, y: -5, r: 31, part: 'core' }),
+    cyclotron: Object.freeze({ x: 0, y: -12, r: 34, part: 'molten-core' }),
+    omega: Object.freeze({ x: 0, y: 8, r: 39, part: 'omega-core' })
+  });
 
-  const BOSS_ART_PRESETS = {
-    rammer: {
-      parts: [
-        ['wheel', 14, 54, 124, 1], ['chassis', 0, 10, 178, 1], ['ram', -100, 18, 105, 1],
-        ['hammer-left', -49, -53, 92, 1], ['hammer-right', 54, -53, 92, 1],
-        ['rivet-pod', 76, -18, 88, 2], ['mine-seismic', 5, 66, 75, 2],
-        ['core', 21, -31, 70, 1], ['overdrive', 0, 0, 216, 3]
-      ]
-    },
-    kraken: {
-      parts: [
-        ['tail-thruster', 0, 50, 98, 1], ['wing-left', -78, 0, 145, 1], ['wing-right', 78, 0, 145, 1],
-        ['fuselage', 0, 5, 160, 1], ['cockpit', 0, -47, 78, 1],
-        ['ion-emitter', -48, 30, 82, 2], ['bomb-pod', 50, 30, 82, 2],
-        ['core', 0, 8, 68, 1], ['laser-blades', 0, 0, 225, 3]
-      ]
-    },
-    drill: {
-      parts: [
-        ['legs-rear', 0, 51, 174, 1], ['legs-front-left', -65, 38, 130, 1],
-        ['legs-front-right', 65, 38, 130, 1], ['carapace', 0, 2, 169, 1],
-        ['cockpit', 0, -55, 80, 1], ['magnetic-coil', 0, 18, 112, 2],
-        ['polarity-claws', 0, 58, 184, 2], ['core', 0, -31, 70, 1],
-        ['scrap-ring', 0, 0, 224, 3]
-      ]
-    },
-    mantis: {
-      parts: [
-        ['legs-left', -43, 54, 151, 1], ['legs-right', 43, 54, 151, 1],
-        ['torso', 0, 3, 145, 1], ['scythe-left', -76, -23, 164, 1],
-        ['scythe-right', 76, -23, 164, 1], ['cockpit', 0, -62, 74, 1],
-        ['time-emitter', 0, 13, 90, 2], ['core', 0, -7, 68, 1],
-        ['chrono-halo', 0, -18, 220, 3]
-      ]
-    },
-    cyclotron: {
-      parts: [
-        ['leg-left', -53, 61, 137, 1], ['leg-right', 53, 61, 137, 1],
-        ['furnace-torso', 0, 3, 177, 1], ['piston-left', -82, 0, 124, 1],
-        ['piston-right', 82, 0, 124, 1], ['cockpit', 0, -64, 79, 1],
-        ['stacks-hopper', 0, -77, 121, 2], ['molten-core', 0, 6, 88, 1],
-        ['overarmor', 0, 0, 229, 3]
-      ]
-    },
-    omega: {
-      parts: [
-        ['stabilizers', 0, 64, 188, 1], ['crown-hull', 0, 2, 197, 1],
-        ['battery-left', -87, 16, 124, 1], ['battery-right', 87, 16, 124, 1],
-        ['throne-cockpit', 0, -76, 94, 1], ['blade-ring', 0, 0, 226, 2],
-        ['combined-arsenal', 0, 13, 203, 2], ['omega-core', 0, 6, 92, 1],
-        ['ruptured-armor', 0, 0, 237, 3]
-      ]
-    }
-  };
+  function rigPart(name, phase, joint, pivot, scale, bbox, motion = 'static') {
+    return Object.freeze({
+      name,
+      phase,
+      joint: Object.freeze(joint),
+      pivot: Object.freeze(pivot),
+      scale,
+      bbox: Object.freeze(bbox),
+      motion
+    });
+  }
+
+  const HERO_RIG = Object.freeze({
+    'dash-trail': rigPart('dash-trail', 1, [-46, 0], [209, 169], 0.27, [0, 51, 418, 287], 'trail'),
+    'overload-halo': rigPart('overload-halo', 1, [0, -8], [182, 158], 0.3, [0, 6, 364, 309], 'halo'),
+    'arm-far': rigPart('arm-far', 1, [-8, -19], [120, 125], 0.15, [65, 88, 408, 338], 'arm'),
+    'arm-near': rigPart('arm-near', 1, [-2, -18], [110, 125], 0.15, [44, 82, 270, 394], 'arm'),
+    boots: rigPart('boots', 1, [0, 0], [183, 75], 0.126, [36, 66, 330, 361], 'feet'),
+    head: rigPart('head', 1, [0, -28], [280, 360], 0.15, [56, 70, 409, 418], 'head'),
+    legs: rigPart('legs', 1, [0, 0], [205, 45], 0.11, [53, 19, 348, 372], 'legs'),
+    'pulse-cannon': rigPart('pulse-cannon', 1, [8, -8], [80, 150], 0.11, [64, 55, 418, 237], 'weapon'),
+    torso: rigPart('torso', 1, [0, -28], [210, 100], 0.18, [57, 84, 339, 373], 'torso')
+  });
+
+  const BOSS_RIGS = Object.freeze({
+    rammer: Object.freeze({
+      parts: Object.freeze([
+        rigPart('wheel', 1, [38, 58], [226, 235], 0.27, [34, 47, 418, 418], 'spin'),
+        rigPart('ram', 1, [-70, 25], [340, 275], 0.32, [2, 128, 376, 418], 'recoil'),
+        rigPart('hammer-left', 1, [-40, -15], [330, 320], 0.2, [48, 0, 386, 355], 'limb-left'),
+        rigPart('hammer-right', 1, [40, -15], [80, 320], 0.2, [16, 62, 416, 353], 'limb-right'),
+        rigPart('chassis', 1, [0, 18], [195, 295], 0.44, [4, 172, 386, 418]),
+        rigPart('rivet-pod', 2, [70, -4], [209, 240], 0.18, [47, 0, 371, 418], 'hover'),
+        rigPart('mine-seismic', 2, [8, 58], [208, 186], 0.17, [36, 45, 381, 327], 'pulse'),
+        rigPart('overdrive', 3, [0, 4], [178, 178], 0.37, [0, 0, 355, 357], 'pulse'),
+        rigPart('core', 1, [20, -42], [225, 158], 0.13, [31, 0, 418, 315], 'core')
+      ])
+    }),
+    kraken: Object.freeze({
+      parts: Object.freeze([
+        rigPart('tail-thruster', 1, [72, 12], [231, 212], 0.25, [48, 30, 414, 395], 'hover'),
+        rigPart('wing-left', 1, [-38, 10], [218, 224], 0.28, [44, 29, 391, 418], 'limb-left'),
+        rigPart('wing-right', 1, [38, 10], [188, 218], 0.28, [21, 25, 354, 412], 'limb-right'),
+        rigPart('fuselage', 1, [0, 2], [217, 246], 0.48, [16, 152, 418, 341]),
+        rigPart('cockpit', 1, [-28, -12], [209, 249], 0.22, [0, 151, 418, 346]),
+        rigPart('ion-emitter', 2, [-46, 24], [215, 198], 0.17, [36, 0, 394, 395], 'pulse'),
+        rigPart('bomb-pod', 2, [48, 30], [195, 196], 0.18, [39, 114, 351, 277], 'hover'),
+        rigPart('laser-blades', 3, [-82, 0], [217, 191], 0.28, [16, 56, 418, 327], 'pulse'),
+        rigPart('core', 1, [0, 5], [197, 201], 0.13, [0, 11, 393, 391], 'core')
+      ])
+    }),
+    drill: Object.freeze({
+      parts: Object.freeze([
+        rigPart('legs-rear', 1, [0, 40], [195, 250], 0.34, [21, 82, 368, 418], 'legs'),
+        rigPart('legs-front-left', 1, [-48, 43], [190, 105], 0.22, [0, 74, 364, 410], 'limb-left'),
+        rigPart('legs-front-right', 1, [48, 43], [210, 95], 0.22, [42, 36, 389, 350], 'limb-right'),
+        rigPart('carapace', 1, [0, 0], [231, 241], 0.38, [44, 105, 418, 377]),
+        rigPart('cockpit', 1, [-38, -18], [174, 229], 0.22, [0, 88, 347, 370]),
+        rigPart('magnetic-coil', 2, [52, 15], [157, 210], 0.18, [19, 7, 295, 418], 'pulse'),
+        rigPart('polarity-claws', 2, [0, 40], [229, 152], 0.28, [46, 11, 411, 293], 'limb'),
+        rigPart('scrap-ring', 3, [0, 0], [204, 152], 0.42, [46, 0, 361, 304], 'spin'),
+        rigPart('core', 1, [0, -56], [166, 154], 0.16, [3, 0, 328, 308], 'core')
+      ])
+    }),
+    mantis: Object.freeze({
+      parts: Object.freeze([
+        rigPart('legs-left', 1, [-28, 0], [180, 75], 0.29, [83, 31, 265, 391], 'limb-left'),
+        rigPart('legs-right', 1, [28, 0], [135, 75], 0.29, [49, 32, 227, 391], 'limb-right'),
+        rigPart('torso', 1, [0, 0], [210, 225], 0.3, [81, 56, 339, 395]),
+        rigPart('scythe-left', 1, [-25, -25], [295, 130], 0.28, [38, 46, 381, 416], 'limb-left'),
+        rigPart('scythe-right', 1, [25, -25], [100, 130], 0.28, [35, 25, 379, 418], 'limb-right'),
+        rigPart('cockpit', 1, [0, -55], [200, 210], 0.2, [32, 36, 369, 383]),
+        rigPart('time-emitter', 2, [20, -5], [350, 180], 0.22, [0, 57, 386, 308], 'pulse'),
+        rigPart('chrono-halo', 3, [0, -10], [226, 182], 0.42, [35, 0, 418, 363], 'spin'),
+        rigPart('core', 1, [0, -5], [196, 179], 0.14, [28, 29, 363, 329], 'core')
+      ])
+    }),
+    cyclotron: Object.freeze({
+      parts: Object.freeze([
+        rigPart('leg-left', 1, [-42, 45], [240, 80], 0.26, [10, 21, 294, 385], 'limb-left'),
+        rigPart('leg-right', 1, [42, 45], [150, 80], 0.26, [59, 22, 325, 386], 'limb-right'),
+        rigPart('piston-left', 1, [-55, -5], [300, 110], 0.22, [10, 25, 365, 418], 'limb-left'),
+        rigPart('piston-right', 1, [55, -5], [110, 100], 0.22, [79, 14, 378, 418], 'limb-right'),
+        rigPart('furnace-torso', 1, [0, 0], [223, 213], 0.38, [49, 18, 397, 408]),
+        rigPart('cockpit', 1, [0, -55], [204, 239], 0.18, [52, 116, 356, 362]),
+        rigPart('stacks-hopper', 2, [45, -55], [202, 180], 0.23, [29, 0, 375, 363], 'hover'),
+        rigPart('overarmor', 3, [0, 0], [186, 185], 0.42, [0, 14, 372, 356], 'pulse'),
+        rigPart('molten-core', 1, [0, -12], [217, 184], 0.16, [15, 4, 418, 364], 'core')
+      ])
+    }),
+    omega: Object.freeze({
+      parts: Object.freeze([
+        rigPart('stabilizers', 1, [0, 55], [243, 248], 0.34, [67, 130, 418, 365], 'hover'),
+        rigPart('battery-left', 1, [-62, 12], [190, 244], 0.22, [0, 103, 379, 384], 'hover'),
+        rigPart('battery-right', 1, [62, 12], [225, 203], 0.22, [31, 75, 418, 331], 'hover'),
+        rigPart('crown-hull', 1, [0, 0], [230, 230], 0.38, [42, 51, 418, 408]),
+        rigPart('throne-cockpit', 1, [0, -58], [209, 237], 0.2, [0, 60, 418, 413]),
+        rigPart('blade-ring', 2, [0, 0], [179, 201], 0.38, [0, 25, 357, 377], 'spin'),
+        rigPart('combined-arsenal', 2, [0, 10], [229, 173], 0.32, [39, 20, 418, 326], 'pulse'),
+        rigPart('ruptured-armor', 3, [0, 0], [186, 160], 0.42, [8, 0, 363, 320], 'pulse'),
+        rigPart('omega-core', 1, [0, 8], [213, 170], 0.16, [63, 0, 362, 339], 'core')
+      ])
+    })
+  });
 
   function updateArtLoader() {
     const done = artRuntime.images.size + artRuntime.failed.size;
@@ -448,6 +529,24 @@
     return true;
   }
 
+  function drawRigPart(entry, spec, pose = {}) {
+    const image = generatedImage(entry);
+    if (!image || !spec) return false;
+    const joint = pose.joint || spec.joint;
+    const scale = spec.scale * (pose.scale ?? 1);
+    ctx.save();
+    ctx.translate(joint[0] + (pose.x || 0), joint[1] + (pose.y || 0));
+    ctx.rotate((pose.rotation || 0) + (pose.baseRotation || 0));
+    ctx.scale((pose.flipX ? -1 : 1) * scale, scale);
+    ctx.globalAlpha *= pose.alpha ?? 1;
+    ctx.imageSmoothingEnabled = true;
+    // Le carre 418 px reste intact en memoire, mais le pivot semantique compense
+    // sa marge alpha asymetrique. Aucun master ni atlas source n'est dessine.
+    ctx.drawImage(image, -spec.pivot[0], -spec.pivot[1]);
+    ctx.restore();
+    return true;
+  }
+
   function drawGeneratedArena(data) {
     const arena = artRuntime.manifest?.arenas?.[data.id];
     if (!arena) return false;
@@ -455,14 +554,17 @@
     let painted = false;
     const layers = ['far', 'mid', 'ground', 'foreground'];
     for (let index = 0; index < layers.length; index++) {
-      const layer = arena.layers?.[layers[index]];
+      const layerName = layers[index];
+      const layer = arena.layers?.[layerName];
       const image = generatedImage(layer);
       if (!image) continue;
       const speed = Number(layer.speed) || 0;
       const margin = 30 + speed * 170;
       const phase = artRuntime.parallaxTime * (0.38 + speed * 4.2) + index * 0.75;
       const shift = save.settings.reduceMotion ? 0 : Math.sin(phase) * Math.min(margin * 0.72, speed * 185);
+      const combatFade = layerName === 'foreground' && player && boss && ['fight', 'dead', 'paused'].includes(state) ? (save.settings.highContrast ? 0.18 : 0.34) : 1;
       ctx.save();
+      ctx.globalAlpha = combatFade;
       ctx.imageSmoothingEnabled = true;
       ctx.drawImage(image, -margin + shift, -margin * 0.3, W + margin * 2, H + margin * 0.6);
       ctx.restore();
@@ -473,102 +575,201 @@
 
   function heroArtReady() {
     const parts = artRuntime.manifest?.heroine?.parts;
-    return !!parts && ['head', 'torso', 'legs', 'boots', 'arm-near', 'arm-far', 'pulse-cannon']
-      .every(name => generatedImage(parts[name]));
+    const body = ['head', 'torso', 'legs', 'boots', 'arm-near', 'arm-far', 'pulse-cannon'];
+    return !!parts && body.every(name => generatedImage(parts[name]));
   }
 
   function drawGeneratedPlayer() {
     const parts = artRuntime.manifest?.heroine?.parts;
     if (!heroArtReady()) return false;
+    ctx.save();
+    // Agrandissement autour du point de contact au sol : la hitbox reste inchangée.
+    ctx.translate(0, -RIVA_FOOT_OFFSET);
+    ctx.scale(RIVA_RENDER_SCALE, RIVA_RENDER_SCALE);
     const gait = player.onGround ? Math.sin(player.anim) : 0;
-    const speedPose = Math.min(1, Math.abs(player.vx) / 330);
+    const speedPose = Math.min(1, Math.abs(player.vx) / Math.max(1, runBuild.maxSpeed));
     const airborne = player.onGround ? 0 : clamp(player.vy / 900, -0.65, 0.65);
-    const firing = player.shotCooldown > runBuild.fireRate * 0.52 ? 1 : 0;
-    const dashPose = player.dashTime > 0 ? -0.13 : 0;
-    const wholeTilt = dashPose + airborne * 0.09;
+    const firing = player.shotCooldown > runBuild.fireRate * 0.5 ? 1 : 0;
 
     if (player.dashTime > 0) {
-      const trail = HERO_ART_PRESET['dash-trail'];
-      drawGeneratedPart(parts['dash-trail'], trail.x, trail.y, trail.size, 0, 1 + speedPose * 0.12, 0.82);
+      drawRigPart(parts['dash-trail'], HERO_RIG['dash-trail'], {
+        scale: 1 + speedPose * 0.1,
+        alpha: 0.84
+      });
     }
     if (player.overloadTime > 0) {
-      const halo = HERO_ART_PRESET['overload-halo'];
-      const pulse = save.settings.reduceMotion ? 1 : 1 + Math.sin(player.anim * 2.4) * 0.06;
-      drawGeneratedPart(parts['overload-halo'], halo.x, halo.y, halo.size, 0, pulse, 0.88);
+      const pulse = save.settings.reduceMotion ? 1 : 1 + Math.sin(player.anim * 2.4) * 0.055;
+      drawRigPart(parts['overload-halo'], HERO_RIG['overload-halo'], { scale: pulse, alpha: 0.9 });
     }
 
     ctx.save();
-    ctx.rotate(wholeTilt);
-    let pose = HERO_ART_PRESET['arm-far'];
-    drawGeneratedPart(parts['arm-far'], pose.x, pose.y + gait * 1.5, pose.size, -gait * 0.11 * speedPose);
-    pose = HERO_ART_PRESET.legs;
-    drawGeneratedPart(parts.legs, pose.x, pose.y + Math.abs(gait) * 1.5, pose.size, gait * 0.045 * speedPose);
-    pose = HERO_ART_PRESET.boots;
-    drawGeneratedPart(parts.boots, pose.x + gait * 1.8 * speedPose, pose.y, pose.size, gait * 0.035 * speedPose);
-    pose = HERO_ART_PRESET.torso;
-    drawGeneratedPart(parts.torso, pose.x, pose.y, pose.size, -gait * 0.018 * speedPose);
-    pose = HERO_ART_PRESET.head;
-    drawGeneratedPart(parts.head, pose.x, pose.y, pose.size, -wholeTilt * 0.35);
-    pose = HERO_ART_PRESET['arm-near'];
-    drawGeneratedPart(parts['arm-near'], pose.x - firing * 2, pose.y, pose.size, gait * 0.08 * speedPose - firing * 0.07);
-    pose = HERO_ART_PRESET['pulse-cannon'];
-    drawGeneratedPart(parts['pulse-cannon'], pose.x - firing * 4, pose.y, pose.size, -firing * 0.045);
+    ctx.filter = save.settings.highContrast
+      ? 'drop-shadow(0px 3px 2px rgba(0,0,0,1)) drop-shadow(0px 0px 4px rgba(255,255,255,0.9))'
+      : 'drop-shadow(0px 3px 2px rgba(0,0,0,0.96)) drop-shadow(0px 0px 3px rgba(102,235,255,0.44))';
+    ctx.rotate((player.dashTime > 0 ? -0.11 : 0) + airborne * 0.065);
+    drawRigPart(parts['arm-far'], HERO_RIG['arm-far'], {
+      rotation: -gait * 0.1 * speedPose - firing * 0.035
+    });
+    drawRigPart(parts.legs, HERO_RIG.legs, {
+      rotation: gait * 0.025 * speedPose
+    });
+    drawRigPart(parts.boots, HERO_RIG.boots);
+    drawRigPart(parts.torso, HERO_RIG.torso, {
+      rotation: -gait * 0.012 * speedPose
+    });
+    drawRigPart(parts.head, HERO_RIG.head, {
+      rotation: -airborne * 0.035
+    });
+    drawRigPart(parts['arm-near'], HERO_RIG['arm-near'], {
+      rotation: gait * 0.07 * speedPose - firing * 0.055
+    });
+    drawRigPart(parts['pulse-cannon'], HERO_RIG['pulse-cannon'], {
+      x: firing ? -3 : 0,
+      rotation: firing ? -0.018 : 0
+    });
+    ctx.restore();
     ctx.restore();
     return true;
   }
 
-  function bossPartMotion(name, baseX, baseY, baseSize, index) {
+  function bossRigPose(spec, index, activeCount) {
     const t = save.settings.reduceMotion ? 0 : boss.totalTime;
-    const side = name.includes('left') ? -1 : name.includes('right') ? 1 : 0;
-    let x = baseX;
-    let y = baseY;
-    let rotation = 0;
-    let scale = 1;
-    if (/wheel|ring|halo|blade/.test(name)) rotation += t * (side || 1) * 0.42;
-    if (/hammer|scythe|wing|piston|leg/.test(name)) rotation += side * Math.sin(t * 2.7 + index) * 0.065;
-    if (/thruster|emitter|hopper|battery/.test(name)) y += Math.sin(t * 3.1 + index) * 2.4;
-    if (/core/.test(name) && boss.vulnerable) scale += (save.settings.reduceMotion ? 0.04 : 0.055 + Math.sin(t * 7) * 0.035);
-    if (boss.state === 'phaseTransition') {
-      const progress = clamp(boss.stateTime / 1.05, 0, 1);
-      const burst = Math.sin(progress * Math.PI) * (20 + index * 1.25);
-      const angle = index / 9 * TAU + 0.45;
-      x += Math.cos(angle) * burst;
-      y += Math.sin(angle) * burst;
-      rotation += Math.sin(angle) * burst * 0.012;
+    const pose = { joint: [...spec.joint], rotation: 0, scale: 1, x: 0, y: 0 };
+    if (spec.motion === 'spin') pose.rotation = t * 0.24;
+    else if (spec.motion === 'limb-left') pose.rotation = -Math.sin(t * 2.3 + index) * 0.035;
+    else if (spec.motion === 'limb-right') pose.rotation = Math.sin(t * 2.3 + index) * 0.035;
+    else if (spec.motion === 'limb' || spec.motion === 'legs') pose.rotation = Math.sin(t * 2 + index) * 0.025;
+    else if (spec.motion === 'hover') pose.y = Math.sin(t * 2.1 + index) * 1.6;
+    else if (spec.motion === 'recoil') pose.x = Math.sin(t * 1.4) * 1.5;
+    else if (spec.motion === 'pulse') pose.scale += Math.sin(t * 3.8 + index) * 0.018;
+
+    const weak = BOSS_WEAK_POINTS[boss.data.id];
+    if (spec.name === weak.part) {
+      const phaseScale = 1 + (boss.phase - 1) * 0.045;
+      pose.joint = [weak.x / phaseScale, weak.y / phaseScale];
+      if (boss.vulnerable) pose.scale += save.settings.reduceMotion ? 0.055 : 0.075 + Math.sin(t * 7) * 0.035;
     }
-    return { x, y, size: baseSize, rotation, scale };
+
+    // L'eclatement est strictement reserve a l'etat de transformation.
+    if (boss.state === 'phaseTransition') {
+      const duration = save.settings.reduceMotion ? 0.65 : 1.15;
+      const progress = clamp(boss.stateTime / duration, 0, 1);
+      const burst = Math.sin(progress * Math.PI) * (32 + index * 2.6);
+      const angle = index / Math.max(1, activeCount) * TAU + 0.35;
+      pose.x += Math.cos(angle) * burst;
+      pose.y += Math.sin(angle) * burst;
+      pose.rotation += Math.sin(angle) * burst * 0.011;
+    }
+    return pose;
   }
 
   function drawGeneratedBoss() {
-    const preset = BOSS_ART_PRESETS[boss?.data?.id];
+    const rig = BOSS_RIGS[boss?.data?.id];
     const parts = artRuntime.manifest?.bosses?.[boss?.data?.id]?.parts;
-    if (!preset || !parts) return false;
-    const active = preset.parts.filter(spec => spec[4] <= boss.phase);
-    if (!active.every(spec => generatedImage(parts[spec[0]]))) return false;
+    if (!rig || !parts) return false;
+    const active = rig.parts.filter(spec => spec.phase <= boss.phase);
+    if (!active.every(spec => generatedImage(parts[spec.name]))) return false;
+    ctx.save();
+    ctx.filter = boss.hitFlash > 0
+      ? 'brightness(2.2) saturate(0.3) drop-shadow(0px 5px 3px rgba(0,0,0,0.92))'
+      : 'drop-shadow(0px 5px 3px rgba(0,0,0,0.92)) drop-shadow(0px 0px 3px rgba(255,255,255,0.14))';
     for (let index = 0; index < active.length; index++) {
       const spec = active[index];
-      const pose = bossPartMotion(spec[0], spec[1], spec[2], spec[3], index);
-      drawGeneratedPart(parts[spec[0]], pose.x, pose.y, pose.size, pose.rotation, pose.scale);
+      drawRigPart(parts[spec.name], spec, bossRigPose(spec, index, active.length));
     }
+    ctx.restore();
     return true;
   }
 
   function drawGeneratedBossPreview(data) {
-    const preset = BOSS_ART_PRESETS[data.id];
+    const rig = BOSS_RIGS[data.id];
     const parts = artRuntime.manifest?.bosses?.[data.id]?.parts;
-    if (!preset || !parts) return false;
+    if (!rig || !parts) return false;
     void preloadGeneratedBossBundle(data.id);
-    const active = preset.parts.filter(spec => spec[4] <= 2);
-    if (!active.every(spec => generatedImage(parts[spec[0]]))) return false;
+    const active = rig.parts.filter(spec => spec.phase === 1);
+    if (!active.every(spec => generatedImage(parts[spec.name]))) return false;
     ctx.save();
-    ctx.scale(0.56, 0.56);
-    for (let index = 0; index < active.length; index++) {
-      const spec = active[index];
-      const sway = save.settings.reduceMotion ? 0 : Math.sin(artRuntime.parallaxTime * 1.7 + index) * 0.018;
-      drawGeneratedPart(parts[spec[0]], spec[1], spec[2], spec[3], sway);
-    }
+    ctx.scale(0.52, 0.52);
+    ctx.filter = 'drop-shadow(0px 6px 4px rgba(0,0,0,0.95))';
+    for (const spec of active) drawRigPart(parts[spec.name], spec);
     ctx.restore();
     return true;
+  }
+
+  function staticRigBounds(specs) {
+    const bounds = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
+    for (const spec of specs) {
+      const [left, top, right, bottom] = spec.bbox;
+      bounds.left = Math.min(bounds.left, spec.joint[0] + (left - spec.pivot[0]) * spec.scale);
+      bounds.top = Math.min(bounds.top, spec.joint[1] + (top - spec.pivot[1]) * spec.scale);
+      bounds.right = Math.max(bounds.right, spec.joint[0] + (right - spec.pivot[0]) * spec.scale);
+      bounds.bottom = Math.max(bounds.bottom, spec.joint[1] + (bottom - spec.pivot[1]) * spec.scale);
+    }
+    return Object.fromEntries(Object.entries(bounds).map(([key, value]) => [key, Math.round(value * 10) / 10]));
+  }
+
+  function getRigDiagnostics() {
+    const bodyParts = Object.values(HERO_RIG).filter(spec => !['trail', 'halo'].includes(spec.motion));
+    const boots = HERO_RIG.boots;
+    const feetLocalY = boots.joint[1] + (boots.bbox[3] - boots.pivot[1]) * boots.scale;
+    const bossHitboxes = {
+      rammer: [190, 160], kraken: [190, 160], drill: [190, 160],
+      mantis: [190, 160], cyclotron: [230, 160], omega: [190, 220]
+    };
+    const bosses = {};
+    for (const [id, rig] of Object.entries(BOSS_RIGS)) {
+      const weak = BOSS_WEAK_POINTS[id];
+      const core = rig.parts.find(spec => spec.name === weak.part);
+      bosses[id] = {
+        parts: rig.parts.length,
+        phaseCounts: [1, 2, 3].map(phase => rig.parts.filter(spec => spec.phase <= phase).length),
+        phase1Bounds: staticRigBounds(rig.parts.filter(spec => spec.phase === 1)),
+        hitbox: { width: bossHitboxes[id][0], height: bossHitboxes[id][1] },
+        corePart: weak.part,
+        coreVisualTarget: { x: weak.x, y: weak.y },
+        weakPoint: { x: weak.x, y: weak.y, radius: weak.r },
+        corePivotMeasured: core ? [...core.pivot] : null,
+        transitionExplosionOnly: true
+      };
+    }
+    return {
+      heroine: {
+        parts: Object.keys(HERO_RIG).length,
+        bodyBounds: staticRigBounds(bodyParts),
+        hitbox: { width: 42, height: 72, groundLocalY: 36 },
+        feetLocalY: Math.round(feetLocalY * 10) / 10,
+        renderScale: RIVA_RENDER_SCALE,
+        renderedFeetLocalY: Math.round((feetLocalY * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET) * 10) / 10,
+        muzzle: { ...RIVA_MUZZLE },
+        renderedMuzzle: { ...RIVA_GENERATED_MUZZLE },
+        facingMirroredAtRoot: true
+      },
+      bosses
+    };
+  }
+
+  function drawRigDebugOverlay() {
+    ctx.save();
+    ctx.setLineDash([7, 5]);
+    ctx.lineWidth = 2;
+    if (player) {
+      ctx.strokeStyle = '#70efff';
+      ctx.strokeRect(player.x - player.w / 2, player.y - player.h / 2, player.w, player.h);
+      const muzzle = playerMuzzlePosition();
+      ctx.beginPath();
+      ctx.arc(muzzle.x, muzzle.y, 7, 0, TAU);
+      ctx.stroke();
+    }
+    if (boss) {
+      ctx.strokeStyle = '#ffb14a';
+      ctx.strokeRect(boss.x - boss.w / 2, boss.y - boss.h / 2, boss.w, boss.h);
+      ctx.strokeStyle = boss.data.accent;
+      ctx.beginPath();
+      ctx.arc(boss.weakX, boss.weakY, boss.weakR, 0, TAU);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.restore();
   }
 
   function spawnGeneratedVfx(key, x, y, options = {}) {
@@ -615,9 +816,39 @@
     }
   }
 
+  function sanitizeRushSnapshot(value) {
+    if (!value || typeof value !== 'object') return null;
+    const bossIndex = Math.floor(Number(value.bossIndex));
+    if (!Number.isFinite(bossIndex) || bossIndex < 0 || bossIndex >= BOSSES.length) return null;
+    const counts = new Map();
+    const installed = [];
+    for (const rawId of Array.isArray(value.installed) ? value.installed : []) {
+      const upgrade = UPGRADES.find(entry => entry.id === rawId);
+      const count = counts.get(rawId) || 0;
+      if (!upgrade || count >= upgrade.maxStacks) continue;
+      counts.set(rawId, count + 1);
+      installed.push(rawId);
+    }
+    return {
+      version: 1,
+      bossIndex,
+      pendingUpgrade: value.pendingUpgrade === true && bossIndex < BOSSES.length - 1,
+      score: Math.max(0, Math.floor(Number(value.score) || 0)),
+      rushElapsedBeforeBoss: Math.max(0, Number(value.rushElapsedBeforeBoss) || 0),
+      rushRetryPenalty: Math.max(0, Number(value.rushRetryPenalty) || 0),
+      runRetryCount: Math.max(0, Math.floor(Number(value.runRetryCount) || 0)),
+      installed,
+      difficulty: Object.hasOwn(DIFFICULTIES, value.difficulty) ? value.difficulty : 'standard',
+      savedAt: Math.max(0, Math.floor(Number(value.savedAt) || Date.now()))
+    };
+  }
+
   function loadSave() {
     try {
-      const raw = localStorage.getItem(SAVE_KEY) ?? localStorage.getItem(LEGACY_SAVE_KEY);
+      const currentRaw = localStorage.getItem(SAVE_KEY);
+      const previousRaw = localStorage.getItem(PREVIOUS_SAVE_KEY);
+      const legacyRaw = localStorage.getItem(LEGACY_SAVE_KEY);
+      const raw = currentRaw ?? previousRaw ?? legacyRaw;
       if (!raw) return structuredClone(DEFAULT_SAVE);
       const parsed = JSON.parse(raw);
       const safe = structuredClone(DEFAULT_SAVE);
@@ -625,17 +856,29 @@
       safe.bestRush = Number.isFinite(parsed?.bestRush) && parsed.bestRush > 0 ? parsed.bestRush : null;
       safe.completed = parsed?.completed === true;
       safe.bestTimes = {};
+      safe.bestRanks = {};
       for (const entry of BOSSES) {
         const time = Number(parsed?.bestTimes?.[entry.id]);
         if (Number.isFinite(time) && time > 0) safe.bestTimes[entry.id] = time;
+        const rank = parsed?.bestRanks?.[entry.id];
+        if (Object.hasOwn(RANK_VALUES, rank)) safe.bestRanks[entry.id] = rank;
       }
+      const explicitCodex = Array.isArray(parsed?.codexUnlocked)
+        ? parsed.codexUnlocked.filter(id => BOSSES.some(entry => entry.id === id))
+        : [];
+      const migratedCodex = parsed?.completed === true
+        ? BOSSES.map(entry => entry.id)
+        : BOSSES.slice(0, Math.max(0, safe.unlocked - 1)).map(entry => entry.id);
+      safe.codexUnlocked = [...new Set([...explicitCodex, ...migratedCodex])];
+      safe.rushSnapshot = sanitizeRushSnapshot(parsed?.rushSnapshot);
       const settings = parsed?.settings && typeof parsed.settings === 'object' ? parsed.settings : {};
       safe.settings.difficulty = Object.hasOwn(DIFFICULTIES, settings.difficulty) ? settings.difficulty : 'standard';
-      for (const key of ['audio', 'shake', 'reduceMotion', 'highContrast']) {
+      for (const key of ['audio', 'shake', 'reduceMotion', 'highContrast', 'combatHints']) {
         if (typeof settings[key] === 'boolean') safe.settings[key] = settings[key];
       }
       const volume = Number(settings.volume);
       if (Number.isFinite(volume)) safe.settings.volume = clamp(volume, 0, 1);
+      if (!currentRaw) localStorage.setItem(SAVE_KEY, JSON.stringify(safe));
       return safe;
     } catch {
       return structuredClone(DEFAULT_SAVE);
@@ -645,9 +888,183 @@
   function persistSave() {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+      syncContinueRun();
     } catch {
       showToast('Sauvegarde locale indisponible');
     }
+  }
+
+  function rebuildRunBuild(installed = []) {
+    const build = createRunBuild();
+    const counts = new Map();
+    for (const id of installed) {
+      const upgrade = UPGRADES.find(entry => entry.id === id);
+      const count = counts.get(id) || 0;
+      if (!upgrade || count >= upgrade.maxStacks) continue;
+      upgrade.apply(build);
+      build.installed.push(id);
+      counts.set(id, count + 1);
+    }
+    return build;
+  }
+
+  function saveRushSnapshot(overrides = {}) {
+    if (runMode !== 'rush') return null;
+    const snapshot = sanitizeRushSnapshot({
+      bossIndex: currentBossIndex,
+      pendingUpgrade: false,
+      score,
+      rushElapsedBeforeBoss,
+      rushRetryPenalty,
+      runRetryCount,
+      installed: [...runBuild.installed],
+      difficulty: save.settings.difficulty,
+      savedAt: Date.now(),
+      ...overrides
+    });
+    save.rushSnapshot = snapshot;
+    persistSave();
+    return snapshot;
+  }
+
+  function clearRushSnapshot() {
+    save.rushSnapshot = null;
+    persistSave();
+  }
+
+  function syncContinueRun() {
+    const button = document.querySelector('#continue-run');
+    if (!button) return;
+    const snapshot = sanitizeRushSnapshot(save.rushSnapshot);
+    button.hidden = !snapshot;
+    button.disabled = !snapshot;
+    if (!snapshot) return;
+    const machine = String(snapshot.bossIndex + 1).padStart(2, '0');
+    const title = button.querySelector('.button-copy strong');
+    const detail = document.querySelector('#continue-run-detail');
+    if (title) title.textContent = snapshot.pendingUpgrade ? 'Continuer le Circuit' : 'Reprendre le Rush';
+    if (detail) {
+      detail.textContent = snapshot.pendingUpgrade
+        ? 'Choisir le module après MACHINE ' + machine
+        : 'Reprendre au début de MACHINE ' + machine;
+    }
+  }
+
+  function resumeRushSnapshot() {
+    const snapshot = sanitizeRushSnapshot(save.rushSnapshot);
+    if (!snapshot) {
+      syncContinueRun();
+      return false;
+    }
+    unlockAudio();
+    runMode = 'rush';
+    currentBossIndex = snapshot.bossIndex;
+    score = snapshot.score;
+    scoreAtBossStart = score;
+    damageTaken = 0;
+    rushStart = performance.now() / 1000;
+    rushElapsedBeforeBoss = snapshot.rushElapsedBeforeBoss;
+    rushRetryPenalty = snapshot.rushRetryPenalty;
+    runRetryCount = snapshot.runRetryCount;
+    currentBossRetries = 0;
+    lastBossRetryPenalty = 0;
+    lastUpgradeOffer = [];
+    runBuild = rebuildRunBuild(snapshot.installed);
+    save.settings.difficulty = snapshot.difficulty;
+    applySettings();
+    if (snapshot.pendingUpgrade) {
+      state = 'upgrade';
+      touchControls.classList.remove('in-game');
+      showUpgradeSelection();
+      showToast('Rush restauré · choisis le prochain module');
+    } else {
+      startFight(snapshot.bossIndex);
+      showToast('Rush restauré · MACHINE ' + String(snapshot.bossIndex + 1).padStart(2, '0'));
+    }
+    return true;
+  }
+
+  function unlockCodexEntry(id) {
+    if (!BOSSES.some(entry => entry.id === id) || save.codexUnlocked.includes(id)) return false;
+    save.codexUnlocked.push(id);
+    persistSave();
+    buildCodex();
+    return true;
+  }
+
+  function recordBestRank(id, rank) {
+    if (!Object.hasOwn(RANK_VALUES, rank)) return false;
+    const previous = save.bestRanks[id];
+    if (previous && RANK_VALUES[previous] >= RANK_VALUES[rank]) return false;
+    save.bestRanks[id] = rank;
+    persistSave();
+    return true;
+  }
+
+  function syncCampaignUi() {
+    const liberated = save.codexUnlocked.length;
+    const next = BOSSES.find(entry => !save.codexUnlocked.includes(entry.id));
+    const campaignProgress = document.querySelector('#campaign-progress');
+    const campaignNext = document.querySelector('#campaign-next');
+    const labProgress = document.querySelector('#lab-progress');
+    if (campaignProgress) campaignProgress.textContent = liberated + ' / ' + BOSSES.length + ' districts libérés';
+    if (campaignNext) {
+      campaignNext.textContent = next
+        ? 'Prochaine cible : ' + next.arena + ' · ' + next.name
+        : 'Circuit libéré · tous les dossiers sont disponibles';
+    }
+    if (labProgress) {
+      labProgress.textContent = save.unlocked + ' machine' + (save.unlocked > 1 ? 's' : '') + ' analysée' + (save.unlocked > 1 ? 's' : '') + ' sur ' + BOSSES.length + ' · ' + liberated + ' dossier' + (liberated > 1 ? 's' : '') + ' Codex.';
+    }
+  }
+
+  function buildCodex() {
+    const grid = document.querySelector('#codex-grid');
+    const progress = document.querySelector('#codex-progress');
+    const meter = document.querySelector('#codex-progress-meter');
+    const unlockedCount = save.codexUnlocked.length;
+    if (progress) progress.textContent = unlockedCount + ' / ' + BOSSES.length + ' machines identifiées';
+    if (meter) {
+      meter.max = BOSSES.length;
+      meter.value = unlockedCount;
+      meter.textContent = unlockedCount + ' sur ' + BOSSES.length;
+    }
+    if (grid) {
+      BOSSES.forEach(entry => {
+        const card = grid.querySelector('[data-boss-id="' + entry.id + '"]');
+        if (!card) return;
+        const unlocked = save.codexUnlocked.includes(entry.id);
+        card.dataset.state = unlocked ? 'available' : 'encrypted';
+        card.dataset.bestRank = save.bestRanks[entry.id] || '';
+        card.classList.toggle('locked', !unlocked);
+        const status = card.querySelector('header strong');
+        if (status) status.textContent = unlocked ? 'ACCESSIBLE' : 'CHIFFRÉE';
+        const details = card.querySelector('.codex-details');
+        if (details) details.hidden = !unlocked;
+        let record = card.querySelector('.codex-record');
+        if (!record) {
+          record = document.createElement('p');
+          record.className = 'codex-record';
+          card.appendChild(record);
+        }
+        record.hidden = !unlocked;
+        if (unlocked) record.textContent = 'Record : rang ' + (save.bestRanks[entry.id] || '—') + ' · ' + formatTime(save.bestTimes[entry.id]);
+      });
+    }
+    syncCampaignUi();
+  }
+
+  function routeLaunchMode() {
+    if (requestedLaunchMode === 'rush') {
+      showScreen('prologue-screen');
+      return 'prologue-screen';
+    }
+    if (requestedLaunchMode === 'practice') {
+      buildBossGrid();
+      showScreen('boss-select-screen');
+      return 'boss-select-screen';
+    }
+    return null;
   }
 
   function applySettings() {
@@ -658,6 +1075,9 @@
     document.getElementById('shake-toggle').checked = save.settings.shake;
     document.getElementById('motion-toggle').checked = save.settings.reduceMotion;
     document.getElementById('contrast-toggle').checked = save.settings.highContrast;
+    const hintsToggle = document.querySelector('#hints-toggle');
+    if (hintsToggle) hintsToggle.checked = save.settings.combatHints;
+    if (combatHint) combatHint.hidden = !save.settings.combatHints;
     if (volumeControl) {
       const max = Number(volumeControl.max || 1);
       volumeControl.value = String(max > 1 ? Math.round(save.settings.volume * max) : save.settings.volume);
@@ -683,17 +1103,57 @@
     announcer.textContent = '';
     requestAnimationFrame(() => { announcer.textContent = message; });
   }
+
+  function setTextIfChanged(element, value) {
+    if (element && element.textContent !== value) element.textContent = value;
+  }
+
   function syncAccessibleHud() {
     if (!player || !boss || state !== 'fight') return;
-    if (mobilePlayerHp) mobilePlayerHp.textContent = player.hp + ' / ' + player.maxHp;
-    if (mobileBossHp) mobileBossHp.textContent = Math.ceil(100 * boss.hp / boss.maxHp) + ' % · P' + boss.phase;
-    if (mobileOverload) mobileOverload.textContent = Math.round(player.overloadTime > 0 ? 100 : player.overload) + ' %';
+    setTextIfChanged(mobilePlayerHp, player.hp + ' / ' + player.maxHp + (player.barrier > 0 ? ' · Égide ' + player.barrier : ''));
+    setTextIfChanged(mobileBossHp, Math.ceil(100 * boss.hp / boss.maxHp) + ' % · P' + boss.phase);
+    setTextIfChanged(mobileOverload, Math.round(player.overloadTime > 0 ? 100 : player.overload) + ' %');
+    syncCombatGuidance();
+  }
+
+  function syncCombatGuidance() {
+    if (!player || !boss || state !== 'fight') return;
+    let objective = 'Survis au cycle et attends l’ouverture du noyau.';
+    if (boss.state === 'intro') objective = 'Analyse la machine et prépare ton premier déplacement.';
+    else if (boss.state === 'phaseTransition') objective = 'Transformation en cours · les projectiles sont neutralisés.';
+    else if (boss.vulnerable) objective = 'NOYAU OUVERT · concentre tirs et ruée sur la cible lumineuse.';
+    else if (['slamTelegraph', 'crashTelegraph', 'dashTelegraph'].includes(boss.state)) objective = 'DANGER IMMINENT · quitte la zone marquée.';
+    else if (boss.hidden) objective = 'Machine enfouie · repère le cercle d’éruption.';
+
+    const bossHints = {
+      rammer: 'Écarte-toi de sa verticale, saute l’onde puis contre-attaque.',
+      kraken: 'Lis les bandes laser avant de choisir saut ou ruée.',
+      drill: 'Sors du cercle orange avant l’éruption magnétique.',
+      mantis: 'Change de hauteur pendant le tracé chrono.',
+      cyclotron: 'Reste mobile : les mines ferment progressivement l’arène.',
+      omega: 'Traite chaque grille comme un rythme : observe, puis traverse.'
+    };
+    let hint = bossHints[boss.data.id];
+    if (player.overload >= 100 && player.overloadTime <= 0) hint = 'SURCHARGE PRÊTE · L / X pour ralentir la machine.';
+    else if (player.barrier > 0) hint = 'Égide active : ' + player.barrier + ' impact' + (player.barrier > 1 ? 's' : '') + ' absorbé' + (player.barrier > 1 ? 's' : '') + '.';
+
+    setTextIfChanged(combatObjective, objective);
+    if (combatHint) {
+      combatHint.hidden = !save.settings.combatHints;
+      if (save.settings.combatHints) setTextIfChanged(combatHint, hint);
+    }
   }
   function showToast(message) {
     toast.textContent = message;
     toast.classList.add('visible');
     toastTimer = 2.3;
     announce(message);
+  }
+
+  function hideToast() {
+    toastTimer = 0;
+    toast.classList.remove('visible');
+    toast.textContent = '';
   }
 
   function formatTime(seconds) {
@@ -743,11 +1203,12 @@
         </span>
         <span>
           <small>${unlocked ? entry.description : 'Données chiffrées par Voltério.'}</small>
-          <span class="best">${unlocked ? `Meilleur temps : ${formatTime(save.bestTimes[entry.id])}` : ''}</span>
+          <span class="best">${unlocked ? `Meilleur temps : ${formatTime(save.bestTimes[entry.id])} · Rang ${save.bestRanks[entry.id] || '—'}` : ''}</span>
         </span>`;
       if (unlocked) button.addEventListener('click', () => startRun('practice', index));
       grid.appendChild(button);
     });
+    syncCampaignUi();
   }
 
   function difficulty() {
@@ -789,6 +1250,8 @@
       dashHitLock: 0,
       overload: 0,
       overloadTime: 0,
+      barrier: runBuild.shieldCharges,
+      precisionHits: 0,
       anim: 0,
       landed: false
     };
@@ -831,6 +1294,7 @@
   function startRun(mode, index = 0) {
     unlockAudio();
     runMode = mode;
+    if (mode === 'rush') save.rushSnapshot = null;
     currentBossIndex = index;
     score = 0;
     damageTaken = 0;
@@ -865,7 +1329,10 @@
     state = 'fight';
     closeScreens();
     touchControls.classList.add('in-game');
+    const briefing = document.querySelector('#combat-briefing');
+    if (briefing) briefing.hidden = false;
     configureIntro();
+    if (runMode === 'rush' && !retry) saveRushSnapshot();
   }
 
   function retryFight() {
@@ -879,6 +1346,7 @@
     if (penalized) {
       score = Math.max(0, score - RUSH_RETRY_SCORE_PENALTY);
       scoreAtBossStart = score;
+      saveRushSnapshot();
       showToast('Retry : +' + RUSH_RETRY_PENALTY + ' s · -' + RUSH_RETRY_SCORE_PENALTY + ' pts');
     }
   }
@@ -966,6 +1434,11 @@
   function handleGamepadMenus() {
     const activeScreen = document.querySelector('.screen.active');
     if (!activeScreen) return;
+    if (activeScreen.id === 'codex-screen' && (controller.menuUpPressed || controller.menuDownPressed)) {
+      const panel = activeScreen.querySelector('.codex-panel') || activeScreen;
+      const direction = controller.menuDownPressed ? 1 : -1;
+      panel.scrollBy?.({ top: direction * Math.max(220, panel.clientHeight * 0.58), behavior: save.settings.reduceMotion ? 'auto' : 'smooth' });
+    }
     const focusables = [...activeScreen.querySelectorAll('button:not(:disabled):not([hidden]), select:not(:disabled), input:not(:disabled)')];
     if (!focusables.length) return;
     let index = focusables.indexOf(document.activeElement);
@@ -995,6 +1468,14 @@
         else if (['result-screen', 'gameover-screen', 'ending-screen'].includes(activeScreen.id)) returnToMenu();
       }
     }
+  }
+
+  function playerMuzzlePosition() {
+    const muzzle = heroArtReady() ? RIVA_GENERATED_MUZZLE : RIVA_MUZZLE;
+    return {
+      x: player.x + player.facing * muzzle.x,
+      y: player.y + muzzle.y
+    };
   }
 
   function activateOverload() {
@@ -1037,7 +1518,7 @@
     }
 
     if (jumpPress && player.jumpsLeft > 0) {
-      player.vy = -720;
+      player.vy = -runBuild.jumpPower;
       player.jumpsLeft -= 1;
       player.onGround = false;
       spawnBurst(player.x, player.y + 30, '#8defff', 8, 150);
@@ -1064,20 +1545,21 @@
     if (attackHeld && player.shotCooldown <= 0) {
       player.shotCooldown = runBuild.fireRate;
       const spread = runBuild.multishot === 1 ? [0] : [-0.11, 0, 0.11];
+      const muzzle = playerMuzzlePosition();
       for (const angle of spread) {
         playerShots.push({
-          x: player.x + player.facing * 32,
-          y: player.y - 10,
-          vx: player.facing * 920,
-          vy: angle * 920,
+          x: muzzle.x,
+          y: muzzle.y,
+          vx: player.facing * runBuild.projectileSpeed,
+          vy: angle * runBuild.projectileSpeed,
           r: 7,
           damage: runBuild.shotDamage,
           life: 1.25,
           trail: 0
         });
       }
-      spawnGeneratedVfx('muzzle-cyan', player.x + player.facing * 38, player.y - 10, {
-        size: 46,
+      spawnGeneratedVfx('muzzle-cyan', muzzle.x, muzzle.y, {
+        size: 52,
         duration: 0.16,
         rotation: player.facing < 0 ? Math.PI : 0,
         growth: 0.25
@@ -1086,7 +1568,7 @@
     }
 
     if (player.dashTime <= 0) {
-      player.vx = clamp(player.vx, -390, 390);
+      player.vx = clamp(player.vx, -runBuild.maxSpeed, runBuild.maxSpeed);
       player.vy += 1880 * dt;
     } else {
       particles.push({ x: player.x - player.facing * 24, y: player.y + rand(-20, 20), vx: -player.facing * rand(120, 280), vy: rand(-50, 50), life: 0.28, max: 0.28, size: rand(3, 8), color: '#77efff' });
@@ -1144,8 +1626,15 @@
       }
       if (boss && !boss.hidden && !boss.defeated && circleHit(shot.x, shot.y, shot.r, boss.weakX, boss.weakY, boss.weakR)) {
         if (boss.vulnerable) {
-          damageBoss(shot.damage || runBuild.shotDamage);
-          addFloatingText(shot.x, shot.y - 18, 'CORE HIT', boss.data.accent);
+          let shotDamage = shot.damage || runBuild.shotDamage;
+          let precision = false;
+          if (player && runBuild.precisionEvery > 0) {
+            player.precisionHits += 1;
+            precision = player.precisionHits % runBuild.precisionEvery === 0;
+            if (precision) shotDamage *= 1 + runBuild.precisionBonus;
+          }
+          damageBoss(shotDamage);
+          addFloatingText(shot.x, shot.y - 18, precision ? 'SURTENSION' : 'CORE HIT', precision ? '#fff39a' : boss.data.accent);
         } else {
           spawnBurst(shot.x, shot.y, '#dce5f6', 5, 115);
           spawnGeneratedVfx('shield-hit', shot.x, shot.y, { size: 64, duration: 0.28, growth: 0.42 });
@@ -1179,6 +1668,13 @@
     boss.vx = 0;
     boss.vy = 0;
     boss.attackLabel = 'TRANSFORMATION · PHASE ' + boss.phase;
+    if (player && runBuild.phaseRepair > 0 && player.hp < player.maxHp) {
+      const repaired = Math.min(runBuild.phaseRepair, player.maxHp - player.hp);
+      player.hp += repaired;
+      spawnGeneratedVfx('scrap-glow', player.x, player.y, { size: 92, duration: 0.55, growth: 0.45 });
+      addFloatingText(player.x, player.y - 54, '+' + repaired + ' NOYAU', '#8dffb2');
+      announce('Auto-réparation : ' + repaired + ' noyau restauré.');
+    }
     if (!fightClockRunning) startFightClock();
     playerShots.length = 0;
     enemyShots.length = 0;
@@ -1516,32 +2012,10 @@
   }
 
   function updateWeakPoint() {
-    const id = boss.data.id;
-    if (id === 'rammer') {
-      boss.weakX = boss.x + 20;
-      boss.weakY = boss.y - 42;
-      boss.weakR = 30;
-    } else if (id === 'kraken') {
-      boss.weakX = boss.x;
-      boss.weakY = boss.y + 5;
-      boss.weakR = 34;
-    } else if (id === 'drill') {
-      boss.weakX = boss.x;
-      boss.weakY = boss.y - 56;
-      boss.weakR = 31;
-    } else if (id === 'mantis') {
-      boss.weakX = boss.x;
-      boss.weakY = boss.y - 5;
-      boss.weakR = 31;
-    } else if (id === 'cyclotron') {
-      boss.weakX = boss.x;
-      boss.weakY = boss.y - 12;
-      boss.weakR = 34;
-    } else {
-      boss.weakX = boss.x;
-      boss.weakY = boss.y + 8;
-      boss.weakR = 39;
-    }
+    const weak = BOSS_WEAK_POINTS[boss.data.id];
+    boss.weakX = boss.x + weak.x;
+    boss.weakY = boss.y + weak.y;
+    boss.weakR = weak.r;
   }
 
   function damageBoss(amount) {
@@ -1554,7 +2028,7 @@
     const actualDamage = previousHp - boss.hp;
     if (actualDamage <= 0) return 0;
     combo = comboTimer > 0 ? combo + 1 : 1;
-    comboTimer = 2.15;
+    comboTimer = runBuild.comboWindow;
     maxCombo = Math.max(maxCombo, combo);
     if (player) player.overload = clamp(player.overload + actualDamage * 1.75 * runBuild.overloadGain, 0, 100);
     boss.hitFlash = 0.12;
@@ -1578,6 +2052,7 @@
     boss.defeated = true;
     boss.vulnerable = false;
     boss.attackLabel = 'DÉSINTÉGRATION';
+    unlockCodexEntry(boss.data.id);
     enemyShots = [];
     playerShots = [];
     transitionTimer = 2.45;
@@ -1600,6 +2075,17 @@
 
   function hurtPlayer(amount, direction = -1) {
     if (!player || player.invuln > 0 || state !== 'fight') return;
+    if (player.barrier > 0) {
+      player.barrier -= 1;
+      player.invuln = 0.78;
+      spawnBurst(player.x, player.y, '#bffaff', 12, 230);
+      spawnGeneratedVfx('shield-hit', player.x, player.y, { size: 108, duration: 0.48, growth: 0.52 });
+      addFloatingText(player.x, player.y - 50, 'ÉGIDE', '#bffaff');
+      shake(4);
+      sfx('deflect');
+      announce('Égide capacitive : impact absorbé. Charges restantes ' + player.barrier + '.');
+      return;
+    }
     player.hp -= amount;
     combo = 0;
     comboTimer = 0;
@@ -1619,6 +2105,10 @@
       state = 'dead';
       transitionTimer = 1.35;
       touchControls.classList.remove('in-game');
+      const briefing = document.querySelector('#combat-briefing');
+      if (briefing) briefing.hidden = true;
+      const gameoverHint = document.querySelector('#gameover-hint');
+      if (gameoverHint) gameoverHint.textContent = (combatHint?.textContent || 'Observe le télégraphe') + ' Repars au début de la machine sans perdre ton build.';
     }
   }
 
@@ -1782,22 +2272,37 @@
   }
 
   function showResult() {
+    hideToast();
     state = 'result';
     touchControls.classList.remove('in-game');
     const finalBoss = currentBossIndex === BOSSES.length - 1;
     const rushComplete = runMode === 'rush' && finalBoss;
     const rankedTime = lastBossTime + lastBossRetryPenalty;
     const medal = calculateRank(rankedTime, damageTaken, currentBossRetries);
+    recordBestRank(BOSSES[currentBossIndex].id, medal);
     document.getElementById('result-eyebrow').textContent = rushComplete ? 'RUSH INTÉGRAL TERMINÉ' : 'MACHINE NEUTRALISÉE';
     document.getElementById('result-title').textContent = rushComplete ? 'Crown Engine Ω est tombé' : BOSSES[currentBossIndex].name;
     document.getElementById('result-summary').textContent = BOSSES[currentBossIndex].transmission;
+    const briefing = document.querySelector('#combat-briefing');
+    if (briefing) briefing.hidden = true;
+    const resultBuild = document.querySelector('#result-build');
+    if (resultBuild) resultBuild.textContent = describeBuild();
+    if (resultLore) {
+      resultLore.textContent = 'Archive Codex récupérée · ' + BOSSES[currentBossIndex].epithet + ' · Rang record ' + (save.bestRanks[BOSSES[currentBossIndex].id] || medal) + '.';
+    }
 
     const total = runMode === 'rush' ? rushElapsedBeforeBoss + lastBossTime + rushRetryPenalty : lastBossTime;
     if (rushComplete) {
       save.completed = true;
       if (save.bestRush === null || total < save.bestRush) save.bestRush = total;
-      persistSave();
+      clearRushSnapshot();
+    } else if (runMode === 'rush') {
+      saveRushSnapshot({
+        pendingUpgrade: true,
+        rushElapsedBeforeBoss: rushElapsedBeforeBoss + lastBossTime
+      });
     }
+    buildCodex();
     const timeLabel = lastBossRetryPenalty > 0 ? formatTime(rankedTime) + ' (+' + lastBossRetryPenalty + ' s)' : formatTime(rankedTime);
     document.getElementById('result-stats').innerHTML = '<div><strong>' + timeLabel + '</strong><small>Temps classé</small></div>' + '<div><strong>' + score.toLocaleString('fr-FR') + '</strong><small>Score · combo max ×' + maxCombo + '</small></div>' + '<div><strong>' + medal + '</strong><small>Rang · ' + difficulty().name + '</small></div>';
     announce(boss.data.name + ' neutralisé. Rang ' + medal + '. Temps ' + formatTime(rankedTime) + '.');
@@ -1814,6 +2319,7 @@
     const finalBoss = currentBossIndex === BOSSES.length - 1;
     if (runMode === 'rush' && !finalBoss) {
       rushElapsedBeforeBoss += lastBossTime;
+      saveRushSnapshot({ pendingUpgrade: true });
       showUpgradeSelection();
     } else if (runMode === 'practice') {
       state = 'menu';
@@ -1849,11 +2355,15 @@
     lastUpgradeOffer = choices.map(choice => choice.id);
     const summary = document.querySelector('#upgrade-screen .result-summary');
     if (summary) summary.textContent = 'Build actuel : ' + describeBuild() + '. Choisis un module pour la prochaine machine.';
+    const upgradeProgress = document.querySelector('#upgrade-progress');
+    const upgradeBuild = document.querySelector('#upgrade-build');
+    if (upgradeProgress) upgradeProgress.textContent = 'Prochaine étape : ' + BOSSES[Math.min(currentBossIndex + 1, BOSSES.length - 1)].arena;
+    if (upgradeBuild) upgradeBuild.textContent = 'Build actuel : ' + describeBuild();
     for (const upgrade of choices) {
       const button = document.createElement('button');
       button.className = 'upgrade-card';
       const stacks = runBuild.installed.filter(id => id === upgrade.id).length;
-      button.innerHTML = '<span><span class="upgrade-icon">' + upgrade.icon + '</span><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
+      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.2.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
       button.addEventListener('click', () => installUpgrade(upgrade));
       grid.appendChild(button);
     }
@@ -1870,8 +2380,11 @@
   }
 
   function showEnding() {
+    hideToast();
     state = 'ending';
     touchControls.classList.remove('in-game');
+    const briefing = document.querySelector('#combat-briefing');
+    if (briefing) briefing.hidden = true;
     const total = rushElapsedBeforeBoss + lastBossTime + rushRetryPenalty;
     document.getElementById('ending-summary').textContent = 'Temps du Circuit : ' + formatTime(total) + ' · Score final : ' + score.toLocaleString('fr-FR') + ' · Retries : ' + runRetryCount + ' · Build : ' + describeBuild() + '.';
     announce('Circuit libéré en ' + formatTime(total) + '. Score final ' + score + '.');
@@ -1882,18 +2395,22 @@
   }
 
   function openLaboratory() {
+    hideToast();
     state = 'menu';
     buildBossGrid();
     showScreen('boss-select-screen');
   }
 
   function returnToMenu() {
+    hideToast();
     pauseFightClock();
     state = 'menu';
     boss = null;
     player = null;
     resetWorld();
     touchControls.classList.remove('in-game');
+    const briefing = document.querySelector('#combat-briefing');
+    if (briefing) briefing.hidden = true;
     bossIntro.classList.remove('visible');
     bossIntro.setAttribute('aria-hidden', 'true');
     const bestRushText = save.bestRush ? 'Meilleur Circuit : ' + formatTime(save.bestRush) : 'Progression locale activée';
@@ -1906,6 +2423,13 @@
     pauseFightClock();
     state = 'paused';
     touchControls.classList.remove('in-game');
+    const briefing = document.querySelector('#combat-briefing');
+    if (briefing) briefing.hidden = true;
+    const pauseObjective = document.querySelector('#pause-objective');
+    if (pauseObjective) pauseObjective.textContent = combatObjective?.textContent || 'Exposer le noyau après le cycle d’attaque';
+    if (pauseBuild) {
+      pauseBuild.textContent = 'Build : ' + describeBuild() + ' · Égide ' + (player?.barrier || 0) + ' · Surcharge ' + Math.round(player?.overload || 0) + ' %.';
+    }
     showScreen('pause-screen');
     announce('Jeu en pause.');
   }
@@ -1916,6 +2440,9 @@
     if (boss?.state !== 'intro') startFightClock();
     closeScreens();
     touchControls.classList.add('in-game');
+    const briefing = document.querySelector('#combat-briefing');
+    if (briefing) briefing.hidden = false;
+    syncCombatGuidance();
     lastTime = performance.now();
     announce('Combat repris.');
   }
@@ -1986,6 +2513,7 @@
       drawParticles();
       drawGeneratedEffects();
       drawFloatingTexts();
+      if (rigDebug) drawRigDebugOverlay();
       drawHUD();
     } else {
       drawAmbient();
@@ -2101,6 +2629,17 @@
   }
 
   function drawPlayer() {
+    const airborneHeight = Math.max(0, GROUND - (player.y + player.h / 2));
+    const shadowScale = clamp(1 - airborneHeight / 420, 0.48, 1);
+    ctx.save();
+    ctx.fillStyle = save.settings.highContrast ? 'rgba(0,0,0,0.88)' : 'rgba(3,8,18,0.62)';
+    ctx.strokeStyle = save.settings.highContrast ? 'rgba(122,241,255,0.75)' : 'rgba(111,231,255,0.28)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(player.x, GROUND + 2, 34 * shadowScale, 8 * shadowScale, 0, 0, TAU);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
     const blink = player.invuln > 0 && Math.floor(player.invuln * 16) % 2 === 0;
     if (blink) return;
     ctx.save();
@@ -2113,7 +2652,7 @@
       ctx.stroke();
     }
     ctx.scale(player.facing, 1);
-    const bob = player.onGround ? Math.sin(player.anim) * Math.min(3, Math.abs(player.vx) / 90) : 0;
+    const bob = heroArtReady() ? 0 : player.onGround ? Math.sin(player.anim) * Math.min(1.5, Math.abs(player.vx) / 140) : 0;
     ctx.translate(0, bob);
 
     if (player.dashTime > 0) {
@@ -2208,16 +2747,54 @@
     }
     ctx.restore();
 
-    if (boss.vulnerable && !boss.defeated) {
-      ctx.save();
+    drawWeakPointFeedback();
+  }
+
+  function drawWeakPointFeedback() {
+    if (!boss || boss.defeated || boss.hidden || ['intro', 'phaseTransition'].includes(boss.state)) return;
+    const time = save.settings.reduceMotion ? 0 : performance.now() / 1000;
+    const pulse = save.settings.reduceMotion ? 0 : Math.sin(time * 7);
+    const radius = boss.weakR + (boss.vulnerable ? 12 + pulse * 3 : 8);
+    ctx.save();
+    ctx.translate(boss.weakX, boss.weakY);
+    ctx.lineWidth = save.settings.highContrast ? 4 : 3;
+    if (boss.vulnerable) {
+      ctx.shadowColor = boss.data.accent;
+      ctx.shadowBlur = 18;
       ctx.strokeStyle = boss.data.accent;
-      ctx.lineWidth = 3;
-      ctx.globalAlpha = 0.55 + Math.sin(performance.now() / 80) * 0.2;
+      ctx.globalAlpha = 0.82;
       ctx.beginPath();
-      ctx.arc(boss.weakX, boss.weakY, boss.weakR + 12 + Math.sin(performance.now() / 100) * 4, 0, TAU);
+      ctx.arc(0, 0, radius, -Math.PI * 0.42, Math.PI * 1.42);
       ctx.stroke();
-      ctx.restore();
+      ctx.globalAlpha = 0.2;
+      ctx.fillStyle = boss.data.accent;
+      ctx.beginPath();
+      ctx.arc(0, 0, Math.max(9, boss.weakR * 0.52), 0, TAU);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 5;
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.font = '900 11px system-ui';
+      ctx.fillText('NOYAU OUVERT', 0, -radius - 10);
+    } else {
+      ctx.strokeStyle = save.settings.highContrast ? 'rgba(240,246,255,0.92)' : 'rgba(183,196,222,0.56)';
+      ctx.setLineDash([7, 7]);
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, TAU);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = save.settings.highContrast ? 0.92 : 0.68;
+      ctx.fillStyle = '#11182a';
+      ctx.strokeStyle = '#dbe6ff';
+      ctx.lineWidth = 2;
+      ctx.fillRect(-9, -1, 18, 15);
+      ctx.strokeRect(-9, -1, 18, 15);
+      ctx.beginPath();
+      ctx.arc(0, -1, 7, Math.PI, 0);
+      ctx.stroke();
     }
+    ctx.restore();
   }
 
   function drawMachineCore(x, y, r, color, open = false) {
@@ -2411,17 +2988,52 @@
 
   function drawArenaWarnings() {
     if (!boss) return;
+    const pulse = save.settings.reduceMotion ? 0.5 : 0.5 + Math.sin(performance.now() / 85) * 0.18;
     if (boss.state === 'slamTelegraph' || boss.state === 'crashTelegraph') {
+      const duration = boss.state === 'slamTelegraph' ? 0.85 : 0.82;
+      const progress = clamp(boss.stateTime / duration, 0, 1);
+      const halfWidth = 72 + progress * 18;
       ctx.save();
-      ctx.strokeStyle = 'rgba(255,187,70,0.7)';
+      const warning = save.settings.highContrast ? 0.34 : 0.18 + progress * 0.12;
+      ctx.fillStyle = `rgba(255,128,48,${warning})`;
+      ctx.fillRect(boss.x - halfWidth, boss.y + 58, halfWidth * 2, GROUND - boss.y - 38);
+      ctx.strokeStyle = `rgba(255,226,122,${0.72 + pulse * 0.2})`;
       ctx.lineWidth = 5;
-      ctx.setLineDash([16,12]);
-      ctx.beginPath(); ctx.moveTo(boss.x, boss.y+70); ctx.lineTo(boss.x, GROUND); ctx.stroke();
-      ctx.fillStyle='rgba(255,187,70,0.16)';ctx.fillRect(boss.x-80,GROUND-20,160,20);
+      ctx.setLineDash([16, 12]);
+      ctx.beginPath();
+      ctx.moveTo(boss.x - halfWidth, boss.y + 62);
+      ctx.lineTo(boss.x - halfWidth, GROUND);
+      ctx.moveTo(boss.x + halfWidth, boss.y + 62);
+      ctx.lineTo(boss.x + halfWidth, GROUND);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = `rgba(255,187,70,${0.24 + progress * 0.24})`;
+      ctx.beginPath();
+      ctx.ellipse(boss.x, GROUND - 5, halfWidth, 18, 0, 0, TAU);
+      ctx.fill();
       ctx.restore();
     }
     if (boss.state === 'dashTelegraph') {
-      ctx.save();ctx.strokeStyle='rgba(255,85,125,0.66)';ctx.lineWidth=8;ctx.setLineDash([22,14]);ctx.beginPath();ctx.moveTo(0,boss.y);ctx.lineTo(W,boss.y);ctx.stroke();ctx.restore();
+      const duration = Math.max(0.32, 0.74 - boss.phase * 0.1);
+      const progress = clamp(boss.stateTime / duration, 0, 1);
+      ctx.save();
+      ctx.fillStyle = `rgba(255,56,108,${(save.settings.highContrast ? 0.28 : 0.13) + progress * 0.11})`;
+      ctx.fillRect(0, boss.y - 42, W, 84);
+      ctx.strokeStyle = `rgba(255,231,240,${0.74 + pulse * 0.2})`;
+      ctx.lineWidth = 7;
+      ctx.setLineDash([22, 14]);
+      ctx.beginPath();
+      ctx.moveTo(0, boss.y - 42);
+      ctx.lineTo(W, boss.y - 42);
+      ctx.moveTo(0, boss.y + 42);
+      ctx.lineTo(W, boss.y + 42);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#fff';
+      ctx.font = '900 12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('TRAJECTOIRE CHRONO', W / 2, boss.y - 52);
+      ctx.restore();
     }
   }
 
@@ -2458,6 +3070,7 @@
     for(let i=0;i<player.maxHp;i++){
       const x=45+i*34;ctx.fillStyle=i<player.hp?'#73efff':'#252b3e';ctx.strokeStyle=i<player.hp?'#c5fbff':'#4a5268';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,121);ctx.lineTo(x+11,114);ctx.lineTo(x+23,121);ctx.lineTo(x+20,143);ctx.lineTo(x+3,143);ctx.closePath();ctx.fill();ctx.stroke();
     }
+    if(player.barrier>0){ctx.fillStyle='#d7f8ff';ctx.font='900 11px system-ui';ctx.textAlign='right';ctx.fillText('ÉGIDE ×'+player.barrier,330,137);ctx.textAlign='left';}
     const dashReady=1-clamp(player.dashCooldown/runBuild.dashCooldown,0,1);ctx.fillStyle='#1b2233';roundedRect(44,149,260,6,3);ctx.fill();ctx.fillStyle='#ffb24c';roundedRect(44,149,260*dashReady,6,3);ctx.fill();
     ctx.fillStyle='#9aa6c3';ctx.font='800 10px system-ui';ctx.fillText(player.overloadTime>0?'SURCHARGE ACTIVE':'SURCHARGE',44,171);
     ctx.fillStyle='#1b2233';roundedRect(44,178,260,9,4);ctx.fill();ctx.fillStyle=player.overload>=100||player.overloadTime>0?'#fff39a':'#6fe7ff';roundedRect(44,178,260*(player.overloadTime>0?1:player.overload/100),9,4);ctx.fill();
@@ -2595,7 +3208,22 @@
     }
   });
   window.addEventListener('keyup',event=>{keys[event.code]=false;});
-  window.addEventListener('blur',()=>{pointer.attack=false;if(state==='fight')pauseGame();});
+  function clearHeldInputs() {
+    Object.keys(keys).forEach(code => { keys[code] = false; });
+    Object.keys(touch).forEach(name => { touch[name] = false; });
+    pointer.attack = false;
+    controller.left = false;
+    controller.right = false;
+    controller.attack = false;
+    pressed.clear();
+    touchPressed.clear();
+  }
+  window.addEventListener('blur',()=>{clearHeldInputs();if(state==='fight')pauseGame();});
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) return;
+    clearHeldInputs();
+    if (state === 'fight') pauseGame();
+  });
   canvas.addEventListener('pointerdown',event=>{if(event.button===0){event.preventDefault();unlockAudio();pointer.attack=true;}});
   window.addEventListener('pointerup',event=>{if(event.button===0)pointer.attack=false;});
   canvas.addEventListener('contextmenu',event=>event.preventDefault());
@@ -2610,6 +3238,8 @@
   document.getElementById('start-rush').addEventListener('click',()=>showScreen('prologue-screen'));
   document.getElementById('prologue-start')?.addEventListener('click',()=>startRun('rush',0));
   document.getElementById('practice').addEventListener('click',()=>{buildBossGrid();showScreen('boss-select-screen');});
+  document.querySelector('#continue-run')?.addEventListener('click', resumeRushSnapshot);
+  document.querySelector('#codex')?.addEventListener('click',()=>{buildCodex();showScreen('codex-screen');});
   document.getElementById('how-to').addEventListener('click',()=>showScreen('how-screen'));
   document.getElementById('settings').addEventListener('click',()=>showScreen('settings-screen'));
   document.querySelectorAll('[data-back]').forEach(button=>button.addEventListener('click',()=>showScreen(button.dataset.back)));
@@ -2628,6 +3258,7 @@
   document.getElementById('shake-toggle').addEventListener('change',event=>{save.settings.shake=event.target.checked;persistSave();});
   document.getElementById('motion-toggle').addEventListener('change',event=>{save.settings.reduceMotion=event.target.checked;applySettings();persistSave();});
   document.getElementById('contrast-toggle').addEventListener('change',event=>{save.settings.highContrast=event.target.checked;applySettings();persistSave();});
+  document.querySelector('#hints-toggle')?.addEventListener('change',event=>{save.settings.combatHints=event.target.checked;applySettings();persistSave();syncCombatGuidance();});
   volumeControl?.addEventListener('input', event => {
     const max = Number(event.target.max || 1);
     save.settings.volume = clamp(Number(event.target.value) / (max > 1 ? max : 1), 0, 1);
@@ -2640,19 +3271,35 @@
   });
   document.getElementById('reset-save').addEventListener('click',()=>{
     if(!confirm('Réinitialiser les boss débloqués et tous les meilleurs temps ?'))return;
-    const settings={...save.settings};save=structuredClone(DEFAULT_SAVE);save.settings=settings;persistSave();applySettings();buildBossGrid();showToast('Progression réinitialisée');
+    const settings={...save.settings};save=structuredClone(DEFAULT_SAVE);save.settings=settings;persistSave();applySettings();buildBossGrid();buildCodex();syncContinueRun();showToast('Progression réinitialisée');
   });
 
   const qaAllowed = new URLSearchParams(location.search).get('qa') === '1' && ['127.0.0.1', 'localhost'].includes(location.hostname);
   if (qaAllowed) Object.defineProperty(window, '__GEARSTORM_QA__', {
     value: Object.freeze({
-      getState: () => ({ state, runMode, bossIndex: currentBossIndex, boss: boss?.data.name ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, installed: [...runBuild.installed], activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
+      getState: () => ({ state, runMode, launchMode: requestedLaunchMode, bossIndex: currentBossIndex, boss: boss?.data.name ?? null, bossState: boss?.state ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, barrier: player?.barrier ?? null, installed: [...runBuild.installed], rushSnapshot: sanitizeRushSnapshot(save.rushSnapshot), activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
       get art() { return getGeneratedArtState(); },
       get ready() { return artRuntime.ready; },
       get loaded() { return [...artRuntime.images.keys()]; },
       get failed() { return [...artRuntime.failed]; },
       get currentAssets() { return [...artRuntime.currentAssets]; },
       getArtState: () => getGeneratedArtState(),
+      getRigDiagnostics: () => getRigDiagnostics(),
+      getRushSnapshot: () => sanitizeRushSnapshot(save.rushSnapshot),
+      resumeRush: () => resumeRushSnapshot(),
+      protectPlayer: () => {
+        if (state !== 'fight' || !player) return false;
+        player.hp = player.maxHp;
+        player.invuln = Math.max(player.invuln, 600);
+        return true;
+      },
+      completePhaseTransition: () => {
+        if (state !== 'fight' || !boss || boss.state !== 'phaseTransition') return false;
+        boss.stateTime = 999;
+        updateBoss(0);
+        return boss.state !== 'phaseTransition';
+      },
+      setRigDebug: enabled => { rigDebug = enabled === true; return rigDebug; },
       skipIntro: () => { if (!boss || state !== 'fight') return false; introTimer = 0; bossIntro.classList.remove('visible'); bossIntro.setAttribute('aria-hidden', 'true'); if (boss.state === 'intro') boss.stateTime = 10; return true; },
       setBossHealthRatio: ratio => {
         if (!boss || boss.defeated || state !== 'fight') return false;
@@ -2694,7 +3341,10 @@
   applySettings();
   artRuntime.initialPromise = initializeGeneratedArt();
   buildBossGrid();
+  buildCodex();
+  syncContinueRun();
   const bestRushText=save.bestRush?`Meilleur Circuit : ${formatTime(save.bestRush)}`:'Progression locale activée';
   document.getElementById('save-note').textContent=bestRushText;
+  routeLaunchMode();
   requestAnimationFrame(frame);
 })();

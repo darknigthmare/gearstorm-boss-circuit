@@ -9,21 +9,42 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: gearstorm-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
 jobs:
   qa:
+    name: Node 22 / Linux release gate
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run qa
-      - run: npm audit --audit-level=high
-      - uses: actions/upload-artifact@v4
+          cache-dependency-path: package-lock.json
+      - name: Install from the locked dependency graph
+        run: npm ci --ignore-scripts
+      - name: Run the complete release gate
+        run: npm run qa
+      - name: Audit production and development dependencies
+        run: npm audit --audit-level=high
+      - name: Upload the verified static artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: gearstorm-web-build
-          path: dist
+          name: gearstorm-web-v2.3.0
+          path: dist/
           if-no-files-found: error
+          retention-days: 14

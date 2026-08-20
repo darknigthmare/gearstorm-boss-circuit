@@ -22,3 +22,8 @@ assets/generated/bosses/
 assets/generated/riva/
 assets/generated/vfx/
 assets/generated/PROVENANCE.md
+.env*
+qa-*.png
+scripts/*.py
+assets/generated/**/*.png
+assets/generated/**/*.psd

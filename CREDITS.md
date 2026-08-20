@@ -28,6 +28,14 @@ Les contraintes de production interdisent texte intégré, logo, filigrane et im
 
 Au runtime, le lazy loading privilégie le titre puis la rencontre courante. Les ressources valides peuvent rejoindre le cache PWA ; le fallback procédural reste disponible si leur chargement ou leur décodage échoue.
 
+## Écriture et expérience v2.3
+
+La progression narrative, les textes d’interface et le Codex sont des créations originales du projet. Ils relient Riva Spark, technicienne devenue pilote de libération, à Cassian Voltério, ingénieur ayant converti les infrastructures du Circuit en spectacle coercitif.
+
+Les six districts — Rocade des Rivets, Couloir des Hautes-Tensions, Fosse Ferromagnétique, Horloge de la Faille, Fournaise des Pistons et Citadelle Voltério — suivent les six machines déjà établies. Leurs conséquences narratives prolongent les transmissions du runtime sans introduire de franchise, marque ou personnage tiers.
+
+La conception UX v2.3 couvre le briefing de combat, le Codex, la reprise de progression, les récapitulatifs de build, l’aide en pause et les états accessibles/mobile. Les hooks DOM sont documentés séparément du code de gameplay afin de préserver leur stabilité.
+
 ## Fallback procédural
 
 Les silhouettes, arènes, projectiles et effets dessinés par le moteur Canvas constituent une création procédurale interne et restent disponibles comme fallback. Ils garantissent une représentation jouable lorsque le chargement d’une image échoue, sans dépendance visuelle distante.

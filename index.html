@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080b18" />
-  <meta name="description" content="GEARSTORM: Boss Circuit v2.2, un boss rush 2D original en six machines transformables. Jouable au clavier, à la manette et au tactile." />
+  <meta name="description" content="GEARSTORM: Boss Circuit v2.3, un boss rush 2D original en six machines transformables. Jouable au clavier, à la manette et au tactile." />
   <meta name="application-name" content="GEARSTORM" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,15 +12,15 @@
   <meta name="apple-mobile-web-app-title" content="GEARSTORM" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_FR" />
-  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.2" />
+  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.3" />
   <meta property="og:description" content="Riva Spark contre six machines transformables dans un boss rush 2D original." />
   <meta property="og:image" content="assets/gearstorm-key-art.png" />
   <meta property="og:image:alt" content="Riva Spark face aux machines du Circuit Voltério" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.2" />
+  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.3" />
   <meta name="twitter:description" content="Six machines. Dix-huit phases. Un Circuit à libérer." />
   <meta name="twitter:image" content="assets/gearstorm-key-art.png" />
-  <title>GEARSTORM: Boss Circuit v2.2</title>
+  <title>GEARSTORM: Boss Circuit v2.3</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="assets/gearstorm-icon.svg" />
   <link rel="apple-touch-icon" href="assets/gearstorm-icon-192.png" />
@@ -48,26 +48,38 @@
     <section id="title-screen" class="screen active title-screen" aria-labelledby="game-title" tabindex="-1">
       <div class="title-layout">
         <figure class="key-art-frame" aria-hidden="true">
-          <img class="key-art" src="assets/gearstorm-key-art.png" alt="" width="1536" height="1024" fetchpriority="high" />
+          <img class="key-art" src="assets/gearstorm-key-art.png" alt="" width="1672" height="941" fetchpriority="high" />
           <div class="key-art-vignette"></div>
         </figure>
         <div class="panel hero-panel">
           <div class="release-line">
-            <p class="eyebrow">ÉDITION CIRCUIT // V2.2</p>
+            <p class="eyebrow">ÉDITION CIRCUIT // V2.3</p>
             <span class="release-status"><span aria-hidden="true"></span> Systèmes prêts</span>
           </div>
           <h1 id="game-title"><span>GEARSTORM</span><small>BOSS CIRCUIT</small></h1>
-          <p class="tagline">Incarne Riva Spark, démantèle six machines transformables et libère le Circuit Voltério.</p>
+          <p class="tagline">Riva Spark remonte six districts asservis, brise leurs machines-gardiennes et coupe l’émission de Cassian Voltério à sa source.</p>
           <ul id="build-summary" class="build-summary" aria-label="Contenu de cette version">
-            <li><strong>6</strong><span>machines</span></li>
+            <li><strong>6</strong><span>districts</span></li>
             <li><strong>18</strong><span>phases</span></li>
             <li><strong>3</strong><span>difficultés</span></li>
           </ul>
+          <div id="campaign-recap" class="campaign-recap" aria-labelledby="campaign-recap-title">
+            <span id="campaign-recap-title" class="recap-kicker">Opération en cours</span>
+            <strong id="campaign-progress">0 / 6 districts libérés</strong>
+            <small id="campaign-next">Prochaine cible : Rocade des Rivets · Rivet Rex</small>
+          </div>
           <div class="menu-stack" role="group" aria-label="Menu principal">
-            <button id="start-rush" class="primary launch-button" aria-controls="prologue-screen">Lancer le Rush intégral <span aria-hidden="true">→</span></button>
-            <button id="practice" aria-controls="boss-select-screen">Laboratoire des boss</button>
-            <button id="how-to" aria-controls="how-screen">Commandes et règles</button>
-            <button id="settings" aria-controls="settings-screen">Options et accessibilité</button>
+            <button id="continue-run" class="primary launch-button continue-run" aria-describedby="continue-run-detail" hidden>
+              <span class="button-copy"><strong>Continuer le Circuit</strong><small id="continue-run-detail">Reprendre au dernier district sécurisé</small></span>
+              <span aria-hidden="true">→</span>
+            </button>
+            <button id="start-rush" class="primary launch-button" aria-controls="prologue-screen">Lancer un nouveau Circuit <span aria-hidden="true">→</span></button>
+            <div class="menu-grid">
+              <button id="practice" aria-controls="boss-select-screen">Laboratoire des boss</button>
+              <button id="codex" aria-controls="codex-screen">Codex du Circuit</button>
+              <button id="how-to" aria-controls="how-screen">Commandes et règles</button>
+              <button id="settings" aria-controls="settings-screen">Options et accessibilité</button>
+            </div>
           </div>
           <div class="utility-actions" role="group" aria-label="Actions de l’application">
             <button id="install-app" class="utility-button" type="button" hidden>Installer le jeu</button>
@@ -86,12 +98,20 @@
         </div>
         <p class="chapter-mark">PROLOGUE 00</p>
         <h2 id="prologue-title">Le Circuit ne doit plus tourner</h2>
-        <p class="prologue-copy">Le Professeur Cassian Voltério a verrouillé six districts derrière ses machines de spectacle. Chaque réacteur alimente le suivant. Une seule trajectoire reste ouverte : entrer dans l’arène, briser leurs cycles et atteindre la Couronne.</p>
+        <p class="prologue-copy">Le Professeur Cassian Voltério a détourné les infrastructures de six districts pour alimenter son spectacle permanent. Chaque machine verrouille les habitants, les voies d’évacuation et le réacteur du secteur suivant. Riva Spark connaît ces réseaux pour les avoir entretenus : elle suivra la seule ligne encore ouverte, brisera chaque cycle et remontera jusqu’à la Citadelle.</p>
         <blockquote>« Je ne viens pas gagner son émission. Je viens l’éteindre. » <cite>— Riva Spark</cite></blockquote>
         <div class="mission-brief" aria-label="Objectifs de mission">
-          <span>Objectif</span><strong>Neutraliser les six machines</strong>
-          <span>Directive</span><strong>Lire · Esquiver · Surcharger</strong>
+          <span>Objectif</span><strong>Libérer les six districts et couper la Couronne</strong>
+          <span>Directive</span><strong>Lire · Esquiver · Exposer le noyau · Surcharger</strong>
         </div>
+        <ol id="prologue-route" class="district-route" aria-label="Itinéraire des six districts">
+          <li class="current"><span>01</span><strong>Rocade des Rivets</strong><small>Rivet Rex</small></li>
+          <li><span>02</span><strong>Hautes-Tensions</strong><small>Sky Slicer</small></li>
+          <li><span>03</span><strong>Fosse Ferromagnétique</strong><small>Magnetron</small></li>
+          <li><span>04</span><strong>Horloge de la Faille</strong><small>Chrono Mantis</small></li>
+          <li><span>05</span><strong>Fournaise des Pistons</strong><small>Foundry Titan</small></li>
+          <li><span>06</span><strong>Citadelle Voltério</strong><small>Crown Engine Ω</small></li>
+        </ol>
         <div class="menu-stack prologue-actions">
           <button id="prologue-start" class="primary launch-button">Entrer dans le Circuit <span aria-hidden="true">→</span></button>
           <button class="back-button" data-back="title-screen">Retour au menu</button>
@@ -108,7 +128,102 @@
           </div>
           <button class="back-button" data-back="title-screen">Retour</button>
         </div>
+        <p id="lab-progress" class="screen-progress" role="status" aria-live="polite">1 machine analysée sur 6 · Les dossiers se complètent dans le Codex.</p>
         <div id="boss-grid" class="boss-grid" role="list" aria-label="Machines débloquées"></div>
+      </div>
+    </section>
+
+    <section id="codex-screen" class="screen" aria-labelledby="codex-title" tabindex="-1">
+      <div class="panel wide-panel codex-panel">
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">ARCHIVES DU CIRCUIT</p>
+            <h2 id="codex-title">Codex de Riva</h2>
+          </div>
+          <button class="back-button" data-back="title-screen">Retour</button>
+        </div>
+
+        <div class="codex-overview">
+          <article id="codex-riva" class="lore-dossier">
+            <span class="dossier-label">Pilote de maintenance</span>
+            <h3>Riva Spark</h3>
+            <p>Technicienne du réseau avant son verrouillage, Riva transforme ses bottes cinétiques et son canon d’impulsion en outils de libération. Elle connaît les voies de service que Voltério a oubliées.</p>
+          </article>
+          <article id="codex-volterio" class="lore-dossier antagonist">
+            <span class="dossier-label">Architecte du verrouillage</span>
+            <h3>Cassian Voltério</h3>
+            <p>Ingénieur devenu maître de cérémonie, il a relié six machines aux infrastructures vitales du Circuit. Chaque victoire de Riva lui retire un district, un public captif et une source d’énergie.</p>
+          </article>
+          <div class="codex-meter" aria-labelledby="codex-progress-label">
+            <span id="codex-progress-label" class="dossier-label">Dossiers déchiffrés</span>
+            <strong id="codex-progress" aria-live="polite">0 / 6 machines identifiées</strong>
+            <progress id="codex-progress-meter" max="6" value="0" aria-labelledby="codex-progress-label codex-progress">0 sur 6</progress>
+            <small>Neutraliser une machine révèle son impact sur le district suivant.</small>
+          </div>
+        </div>
+
+        <div id="codex-grid" class="codex-grid" role="list" aria-label="Dossiers des six machines" tabindex="0">
+          <article id="codex-rammer" class="codex-card" role="listitem" data-boss-id="rammer" data-state="encrypted">
+            <header><span>MACHINE 01</span><strong>CHIFFRÉE</strong></header>
+            <h3>Rivet Rex</h3>
+            <p class="codex-arena">Rocade des Rivets</p>
+            <p class="codex-lock-copy">Un bélier mono-roue conçu pour maintenir les axes de transport sous couvre-feu mécanique.</p>
+            <dl class="codex-details" hidden>
+              <dt>Lecture</dt><dd>Les charges et marteaux précèdent une brève ouverture du noyau.</dd>
+              <dt>Impact</dt><dd>Sa chute ouvre le premier verrou et révèle la présence de Riva à Voltério.</dd>
+            </dl>
+          </article>
+          <article id="codex-kraken" class="codex-card" role="listitem" data-boss-id="kraken" data-state="encrypted">
+            <header><span>MACHINE 02</span><strong>CHIFFRÉE</strong></header>
+            <h3>Sky Slicer</h3>
+            <p class="codex-arena">Couloir des Hautes-Tensions</p>
+            <p class="codex-lock-copy">Signature aérienne : drones ioniques, piqués et grilles laser.</p>
+            <dl class="codex-details" hidden>
+              <dt>Lecture</dt><dd>Le rapace expose son cœur après ses passes de bombardement.</dd>
+              <dt>Impact</dt><dd>Le signal revient vers les districts du nord.</dd>
+            </dl>
+          </article>
+          <article id="codex-drill" class="codex-card" role="listitem" data-boss-id="drill" data-state="encrypted">
+            <header><span>MACHINE 03</span><strong>CHIFFRÉE</strong></header>
+            <h3>Magnetron</h3>
+            <p class="codex-arena">Fosse Ferromagnétique</p>
+            <p class="codex-lock-copy">Signature magnétique : attraction, répulsion et ferraille orbitale.</p>
+            <dl class="codex-details" hidden>
+              <dt>Lecture</dt><dd>Changer de trajectoire avant l’inversion de polarité évite l’encerclement.</dd>
+              <dt>Impact</dt><dd>Les rails d’évacuation peuvent enfin quitter les gradins forcés.</dd>
+            </dl>
+          </article>
+          <article id="codex-mantis" class="codex-card" role="listitem" data-boss-id="mantis" data-state="encrypted">
+            <header><span>MACHINE 04</span><strong>CHIFFRÉE</strong></header>
+            <h3>Chrono Mantis</h3>
+            <p class="codex-arena">Horloge de la Faille</p>
+            <p class="codex-lock-copy">Signature temporelle : lames déphasées, ruées et ralentissements.</p>
+            <dl class="codex-details" hidden>
+              <dt>Lecture</dt><dd>Ses apparitions dessinent la ligne d’attaque avant la frappe réelle.</dd>
+              <dt>Impact</dt><dd>Les horloges civiles redémarrent et enregistrent les victoires de Riva.</dd>
+            </dl>
+          </article>
+          <article id="codex-cyclotron" class="codex-card" role="listitem" data-boss-id="cyclotron" data-state="encrypted">
+            <header><span>MACHINE 05</span><strong>CHIFFRÉE</strong></header>
+            <h3>Foundry Titan</h3>
+            <p class="codex-arena">Fournaise des Pistons</p>
+            <p class="codex-lock-copy">Signature thermique : pistons, lave et pluie de métal en fusion.</p>
+            <dl class="codex-details" hidden>
+              <dt>Lecture</dt><dd>Les zones sûres se déplacent au rythme de ses pistons.</dd>
+              <dt>Impact</dt><dd>La fonderie cesse d’alimenter la Couronne et le spectacle forcé.</dd>
+            </dl>
+          </article>
+          <article id="codex-omega" class="codex-card" role="listitem" data-boss-id="omega" data-state="encrypted">
+            <header><span>MACHINE 06</span><strong>CHIFFRÉE</strong></header>
+            <h3>Crown Engine Ω</h3>
+            <p class="codex-arena">Citadelle Voltério</p>
+            <p class="codex-lock-copy">Signature composite : l’arsenal des cinq districts réuni en trois formes.</p>
+            <dl class="codex-details" hidden>
+              <dt>Lecture</dt><dd>Chaque forme recycle une technologie déjà maîtrisée.</dd>
+              <dt>Impact</dt><dd>Briser la Couronne rend le Circuit à ceux qui y vivent.</dd>
+            </dl>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -147,6 +262,10 @@
             <p>Le Rush intégral enchaîne les six boss. Les meilleurs temps sont sauvegardés localement. Le Laboratoire permet de rejouer les machines débloquées.</p>
           </article>
         </div>
+        <aside id="onboarding-summary" class="manual-callout" aria-label="Tutoriel contextuel">
+          <strong>Apprendre en jouant, sans interrompre le combat</strong>
+          <p>Les premiers cycles affichent un conseil bref lié à la menace active. Il disparaît après lecture et peut être désactivé dans les options.</p>
+        </aside>
       </div>
     </section>
 
@@ -183,6 +302,10 @@
           <input id="shake-toggle" type="checkbox" checked />
         </label>
         <label class="setting-row toggle-row">
+          <span><strong>Conseils contextuels</strong><small>Affiche un rappel bref lors d’une nouvelle mécanique ou d’un nouvel objectif.</small></span>
+          <input id="hints-toggle" type="checkbox" checked />
+        </label>
+        <label class="setting-row toggle-row">
           <span><strong>Réduire les mouvements</strong><small>Diminue les particules, rotations et animations d’interface.</small></span>
           <input id="motion-toggle" type="checkbox" />
         </label>
@@ -198,6 +321,22 @@
       <div class="panel pause-panel">
         <p class="eyebrow">SYSTÈMES SUSPENDUS</p>
         <h2 id="pause-title">Pause</h2>
+        <div class="pause-context">
+          <article>
+            <span>Objectif actif</span>
+            <strong id="pause-objective">Exposer le noyau après le cycle d’attaque</strong>
+          </article>
+          <article>
+            <span>Build actuel</span>
+            <strong id="pause-build">Configuration d’origine</strong>
+          </article>
+        </div>
+        <div class="pause-quick-help" aria-label="Rappel des commandes">
+          <span><kbd>J</kbd><small>Tir</small></span>
+          <span><kbd>K</kbd><small>Ruée</small></span>
+          <span><kbd>L</kbd><small>Surcharge</small></span>
+          <span><kbd>Échap</kbd><small>Reprendre</small></span>
+        </div>
         <div class="menu-stack">
           <button id="resume-button" class="primary">Reprendre</button>
           <button id="retry-button">Recommencer le boss</button>
@@ -212,6 +351,16 @@
         <h2 id="result-title">Victoire</h2>
         <p id="result-summary" class="result-summary"></p>
         <div id="result-stats" class="result-stats"></div>
+        <div class="result-story">
+          <article>
+            <span>Journal de Riva</span>
+            <p id="result-lore">Le verrou du district a cédé. Une nouvelle transmission sera ajoutée au Codex.</p>
+          </article>
+          <article>
+            <span>Configuration active</span>
+            <p id="result-build">Configuration d’origine</p>
+          </article>
+        </div>
         <div class="menu-stack">
           <button id="continue-button" class="primary">Continuer</button>
           <button id="result-menu-button">Retour au menu</button>
@@ -224,6 +373,10 @@
         <p class="eyebrow">ATELIER MOBILE DE RIVA</p>
         <h2 id="upgrade-title">Choisis une amélioration</h2>
         <p class="result-summary">Une seule modification peut être installée avant la prochaine machine.</p>
+        <div class="upgrade-context" aria-label="Progression du Circuit">
+          <span id="upgrade-progress">Prochaine étape : district suivant</span>
+          <strong id="upgrade-build">Build actuel : configuration d’origine</strong>
+        </div>
         <div id="upgrade-grid" class="upgrade-grid" role="list" aria-label="Modules disponibles"></div>
       </div>
     </section>
@@ -234,6 +387,14 @@
         <h2 id="ending-title">La tempête retombe</h2>
         <p class="ending-transmission">« Ici Riva Spark. Les six réacteurs sont hors ligne. Voltério n’a plus d’arène, plus de couronne… et surtout plus de public captif. »</p>
         <p id="ending-summary" class="result-summary"></p>
+        <ol id="ending-districts" class="liberation-grid" aria-label="Districts libérés">
+          <li><span>01</span><strong>Rocade</strong></li>
+          <li><span>02</span><strong>Hautes-Tensions</strong></li>
+          <li><span>03</span><strong>Fosse</strong></li>
+          <li><span>04</span><strong>Horloge</strong></li>
+          <li><span>05</span><strong>Fournaise</strong></li>
+          <li><span>06</span><strong>Citadelle</strong></li>
+        </ol>
         <div class="menu-stack">
           <button id="ending-lab" class="primary">Ouvrir le Laboratoire</button>
           <button id="ending-menu">Retour au menu principal</button>
@@ -246,12 +407,19 @@
         <p class="eyebrow">SIGNAL CINÉTIQUE PERDU</p>
         <h2 id="gameover-title">Défaite</h2>
         <p id="gameover-text" class="result-summary">La machine a conservé son cycle d’attaque. Recalibre ta trajectoire.</p>
+        <p id="gameover-hint" class="recovery-hint">Conseil : garde la ruée pour traverser le danger, puis frappe seulement quand le noyau s’ouvre.</p>
         <div class="menu-stack">
           <button id="gameover-retry" class="primary">Réessayer</button>
           <button id="gameover-menu">Retour au menu</button>
         </div>
       </div>
     </section>
+
+    <aside id="combat-briefing" class="combat-briefing" role="status" aria-live="polite" aria-atomic="true" aria-labelledby="combat-objective" hidden>
+      <span class="combat-briefing-label">Objectif actif</span>
+      <strong id="combat-objective">Briser le cycle et exposer le noyau</strong>
+      <p id="combat-hint">Observe le télégraphe, esquive, puis contre-attaque pendant l’ouverture.</p>
+    </aside>
 
     <div id="boss-intro" class="boss-intro" aria-live="polite" aria-atomic="true" aria-hidden="true">
       <p id="intro-index"></p>

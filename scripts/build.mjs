@@ -7,6 +7,11 @@ import {
   ASSET_RELEASE,
   validateRuntimeAssets,
 } from './asset-contract.mjs';
+import {
+  APP_RELEASE,
+  SAVE_SCHEMA_VERSION,
+  validateApplicationContract,
+} from './app-contract.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
@@ -14,16 +19,18 @@ if (dirname(dist) !== root) throw new Error('Répertoire de build non sécurisé
 
 const publicFiles = ['index.html', 'styles.css', 'game.js', 'manifest.webmanifest', 'sw.js'];
 const shellAssets = ['gearstorm-icon.svg', 'gearstorm-icon-192.png', 'gearstorm-icon-512.png', 'gearstorm-key-art.png'];
-const [html, game, packageJson, runtimeAssets] = await Promise.all([
+const [html, game, manifest, packageJson, runtimeAssets] = await Promise.all([
   readFile(resolve(root, 'index.html'), 'utf8'),
   readFile(resolve(root, 'game.js'), 'utf8'),
+  readFile(resolve(root, 'manifest.webmanifest'), 'utf8').then(JSON.parse),
   readFile(resolve(root, 'package.json'), 'utf8').then(JSON.parse),
   validateRuntimeAssets(root),
 ]);
 
-if (packageJson.version !== ASSET_RELEASE) {
-  throw new Error(`Version package ${packageJson.version}, bibliothèque assets ${ASSET_RELEASE}.`);
+if (packageJson.version !== APP_RELEASE) {
+  throw new Error(`Version package ${packageJson.version}, application ${APP_RELEASE}.`);
 }
+validateApplicationContract({ game, html, manifest, packageJson });
 for (const id of [...game.matchAll(/getElementById\('([^']+)'\)/g)].map(match => match[1])) {
   if (!html.includes(`id="${id}"`)) throw new Error(`Identifiant DOM manquant : ${id}`);
 }
@@ -74,8 +81,13 @@ for (const file of emittedFiles) {
 }
 
 await writeFile(resolve(dist, 'build-manifest.json'), JSON.stringify({
+  schemaVersion: 2,
   name: 'GEARSTORM: Boss Circuit',
   version: packageJson.version,
+  application: {
+    release: APP_RELEASE,
+    saveSchemaVersion: SAVE_SCHEMA_VERSION,
+  },
   runtimeAssets: {
     release: ASSET_RELEASE,
     files: runtimeAssets.entries.length,
@@ -87,4 +99,4 @@ await writeFile(resolve(dist, 'build-manifest.json'), JSON.stringify({
   files,
 }, null, 2) + '\n', 'utf8');
 
-console.log(`Build web ${packageJson.version} prêt : ${dist} (${runtimeAssets.entries.length} assets runtime, ${runtimeAssets.totalBytes} octets)`);
+console.log(`Build web ${APP_RELEASE} prêt : ${dist} (${runtimeAssets.entries.length} assets runtime, ${runtimeAssets.totalBytes} octets)`);

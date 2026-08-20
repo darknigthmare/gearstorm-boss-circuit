@@ -19,6 +19,13 @@ const PUBLIC_SHELL_ASSETS = new Set([
   'assets/gearstorm-icon-512.png',
   'assets/gearstorm-key-art.png',
 ]);
+const REVALIDATE_FILES = new Set([
+  'index.html',
+  'styles.css',
+  'game.js',
+  'manifest.webmanifest',
+  'sw.js',
+]);
 const MIME_TYPES = {
   '.css': 'text/css; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
@@ -36,8 +43,11 @@ const SECURITY_HEADERS = {
   'Cross-Origin-Resource-Policy': 'same-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Origin-Agent-Cluster': '?1',
   'X-Content-Type-Options': 'nosniff',
+  'X-DNS-Prefetch-Control': 'off',
   'X-Frame-Options': 'DENY',
+  'X-Permitted-Cross-Domain-Policies': 'none',
 };
 
 function sendText(request, response, statusCode, message, extraHeaders = {}) {
@@ -106,7 +116,7 @@ function createGameServer(options = {}) {
       }
       const body = request.method === 'HEAD' ? null : await readFile(canonicalCandidate);
       const versionedRuntime = resolved.relative.startsWith(GENERATED_RUNTIME_PREFIX);
-      const cacheControl = resolved.relative === 'index.html' || resolved.relative === 'sw.js'
+      const cacheControl = REVALIDATE_FILES.has(resolved.relative)
         ? 'public, max-age=0, must-revalidate'
         : versionedRuntime
           ? 'public, max-age=31536000, immutable'
@@ -114,6 +124,7 @@ function createGameServer(options = {}) {
 
       response.writeHead(200, {
         ...SECURITY_HEADERS,
+        ...(resolved.relative === 'sw.js' ? { 'Service-Worker-Allowed': '/' } : {}),
         'Content-Type': MIME_TYPES[extname(canonicalCandidate).toLowerCase()] || 'application/octet-stream',
         'Content-Length': body?.length ?? info.size,
         'Cache-Control': cacheControl,
