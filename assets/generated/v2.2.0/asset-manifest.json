@@ -1,0 +1,922 @@
+{
+  "schemaVersion": 1,
+  "release": "2.2.0",
+  "generator": "OpenAI ImageGen built-in",
+  "license": "Original project artwork",
+  "arenas": {
+    "rammer": {
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.2.0/arenas/rammer/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 67854,
+          "sha256": "bf83cf33dc3e3e2d15c402b6d3e7961f5eb7d9d8ec1311f1311abaf16b6a8971",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.2.0/arenas/rammer/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 248258,
+          "sha256": "a52bacda06239c60d9b9856368f5293c3019b5b77895373d53c817dc063223c2",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.2.0/arenas/rammer/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 240196,
+          "sha256": "bb94f35faeaceee32e67702ce2446f222cf93db9647c91dc0828300ae1c579e2",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.2.0/arenas/rammer/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 286080,
+          "sha256": "6f3a3904f46e89b9c63619153b3083f14b99cd03afdafeae5c8cc41b77b66971",
+          "speed": 0.19
+        }
+      }
+    },
+    "kraken": {
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.2.0/arenas/kraken/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 84154,
+          "sha256": "d99a2b5000c74fc3df67edb712be8d94be07a3a06213f14a132b49db7159eebe",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.2.0/arenas/kraken/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 394130,
+          "sha256": "9161e65dcfe776037a2406e8fbc5ab2744a5d2ca02efd4b2bd6b53602b6ca424",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.2.0/arenas/kraken/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 222446,
+          "sha256": "e11aabfc434795eeabf6b3c37a3021b39511b1fb875a25fd455a04a64de2c82d",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.2.0/arenas/kraken/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 310718,
+          "sha256": "055cd74a70004918911a9fe254697208963b5e0ebcb3947237c35424905177fb",
+          "speed": 0.19
+        }
+      }
+    },
+    "drill": {
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.2.0/arenas/drill/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 91318,
+          "sha256": "71a18819f6551ac2fbf0d26f75420098ff1c8ecae9a439693a84bd98d43c3447",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.2.0/arenas/drill/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 311760,
+          "sha256": "c1086bd33256a9e055856f37e7841bd7b7202eed2e584fd327fe8035f181da8a",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.2.0/arenas/drill/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 207272,
+          "sha256": "f1b3f6046f64a71d27e422b8607191a811cf899ff00caee7850a3f652d05c29d",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.2.0/arenas/drill/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 220172,
+          "sha256": "df8a073fa5db2a012ee0543c6596ab510f0fd4f7fc5ef92b1f68a7604d160d25",
+          "speed": 0.19
+        }
+      }
+    },
+    "mantis": {
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.2.0/arenas/mantis/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 116954,
+          "sha256": "a1808f4a810b40dc41dedcdf05d0aed06fbabf853117bfafb993a42a1eeb9ef0",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.2.0/arenas/mantis/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 375128,
+          "sha256": "c5fd52623eb43a91f786977b039430cbbd775297272a5933cc4dc6c5977853f3",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.2.0/arenas/mantis/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 149808,
+          "sha256": "75b12a9c82cbbb712cf9dd2e955baea47644a5fb708ad2cf2b35eaf9fc9cdfa0",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.2.0/arenas/mantis/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 290332,
+          "sha256": "35eec1c51fe4b2c4917b6605346317066544d67a4ee133dcdd32aa5b273d1d5b",
+          "speed": 0.19
+        }
+      }
+    },
+    "cyclotron": {
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.2.0/arenas/cyclotron/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 78398,
+          "sha256": "9e0c51944589267608003ccbd345588542855e691565687557a0b6d37b398ea1",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.2.0/arenas/cyclotron/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 280750,
+          "sha256": "f587d22eff77846de0387e160e3fd4a5cb26000158f532083d849f92de7078f7",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.2.0/arenas/cyclotron/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 189534,
+          "sha256": "42e26115b9f15e08eaa3bdfe403c4226cc089c4b1505976bd4cf3593d3260fcc",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.2.0/arenas/cyclotron/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 254450,
+          "sha256": "d9cbea252f40f6872af692a58d0a49edc3c6a18b18ea7de62d9e68457079c085",
+          "speed": 0.19
+        }
+      }
+    },
+    "omega": {
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.2.0/arenas/omega/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 99634,
+          "sha256": "e6f88e490fee993748f1aa0d5e91fbe3c40039218edbc2ae4a7bcc8a2757c232",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.2.0/arenas/omega/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 361444,
+          "sha256": "045726385de6e993f0fc0df30b937a44d5db465fe3f26a73b0a12d942fc38719",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.2.0/arenas/omega/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 169786,
+          "sha256": "fe9f7b9310a15d5137147af2c5ecd84a490b671c76c32b88f27c53bbcf3e1240",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.2.0/arenas/omega/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 302540,
+          "sha256": "d1e72d174b07ed218bf8f0fcc06127d962a028c8698eb7348f79ff9b94e2ac7f",
+          "speed": 0.19
+        }
+      }
+    }
+  },
+  "bosses": {
+    "rammer": {
+      "parts": {
+        "wheel": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/wheel.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 185424,
+          "sha256": "5520b1ecd49eb0c7cfee173ef6f3640e56e8303ef28a85a9e8f227dc93e8c60d"
+        },
+        "chassis": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 130610,
+          "sha256": "25beaf452190811a2fc65bdce66327be2e974670447a0c082d46485e4a33fbe6"
+        },
+        "ram": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/ram.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 119160,
+          "sha256": "4da3df34ee4e46a43deae1585bcc045791089a666427f61f374f08e0ceea2ff3"
+        },
+        "hammer-left": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/hammer-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 115896,
+          "sha256": "87fa6d4a672680aad2c83c7e49058f6edac05d599f22f26c39d8cc63cc0f0652"
+        },
+        "hammer-right": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/hammer-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 109004,
+          "sha256": "54fc13a088e01afb6a898d903b03751bb1e0031ecc676c512722bf1f94fd79af"
+        },
+        "rivet-pod": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/rivet-pod.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 92106,
+          "sha256": "88d7ca98d8a7cf95c02106232c921ec72b6734b24fa808a89bf7d31a1865d3f4"
+        },
+        "mine-seismic": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/mine-seismic.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 123718,
+          "sha256": "761c782ecd9727ddaa8dca083214c0a330dc87b6716928af08e6e5860797cc44"
+        },
+        "core": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 136996,
+          "sha256": "46736cf0e2c48ef1bf116e4f15cf29091e82b93a3f7146a55f483803a6c0d6a8"
+        },
+        "overdrive": {
+          "src": "assets/generated/v2.2.0/bosses/rammer/overdrive.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 130412,
+          "sha256": "f2e27f5a23fcecbb8c92d1d2867857316278f07b4cc4893ef801060f0d38bcb4"
+        }
+      }
+    },
+    "kraken": {
+      "parts": {
+        "fuselage": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/fuselage.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 91218,
+          "sha256": "5281c16246d9df206c92d9bb751bb26cfae09ee42b7f5a3d83fb1f4d1a9bf76f"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 85668,
+          "sha256": "4cb072a75cb1e23ebe1d13c022b7313ee5c95fd4ce5e666a9c4c96ecba49fbd3"
+        },
+        "wing-left": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/wing-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 105046,
+          "sha256": "94a9e27cbc5ca5677cbd8b4840047bb317eeec853ba4d739e4e9db8891aeaa23"
+        },
+        "wing-right": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/wing-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 99650,
+          "sha256": "c36c8eba637e637281b29085254589ebd937c33dd19b9042dc9ff14bdff12971"
+        },
+        "tail-thruster": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/tail-thruster.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 108072,
+          "sha256": "037d6ce1771ee34eb4c751537860e71beeb690926efa644c06d9b37257016612"
+        },
+        "ion-emitter": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/ion-emitter.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 106346,
+          "sha256": "afb22486201e0d3187fa5abb79241399ccbf60a8384059f2d272116255e92033"
+        },
+        "bomb-pod": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/bomb-pod.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 58406,
+          "sha256": "50f93172dcddc4349adb2f919edd4b09a87bc9b78ce52a22b6732da34155b772"
+        },
+        "laser-blades": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/laser-blades.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 105154,
+          "sha256": "f98495f49f60858e770ad8eb97fe740f646dd8413fdc0858d5703d4e441306c8"
+        },
+        "core": {
+          "src": "assets/generated/v2.2.0/bosses/kraken/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 133562,
+          "sha256": "9a02a075da944cc79b600fdc3e7a59af6b066859d9ad21b91997bc65fb4b27ae"
+        }
+      }
+    },
+    "drill": {
+      "parts": {
+        "carapace": {
+          "src": "assets/generated/v2.2.0/bosses/drill/carapace.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 135648,
+          "sha256": "5fc7a2d21911986bc0da4340fcda9f14a19feee5224fed143c13b81066669f91"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.2.0/bosses/drill/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 99592,
+          "sha256": "485b83751032a1d0ed64b32a2d1b001edc231b9668fe2232b05c49eb76c55b08"
+        },
+        "legs-front-left": {
+          "src": "assets/generated/v2.2.0/bosses/drill/legs-front-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 90194,
+          "sha256": "586fe09842598db78d061cbba65c3b7dd8942031f10d98d2d24a1bf557128f89"
+        },
+        "legs-front-right": {
+          "src": "assets/generated/v2.2.0/bosses/drill/legs-front-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 82234,
+          "sha256": "0d80c698e152359e6d5115cab46e3f154d5b39164f885d69ddc9f0a2b1e70063"
+        },
+        "legs-rear": {
+          "src": "assets/generated/v2.2.0/bosses/drill/legs-rear.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 100908,
+          "sha256": "8288012b3b258b633dda82d834d85609babd8229863a0e12cc9054a555896402"
+        },
+        "magnetic-coil": {
+          "src": "assets/generated/v2.2.0/bosses/drill/magnetic-coil.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 118774,
+          "sha256": "1cac11d41961b181fe2bb457e0c35586b28c897cbfa1caaa02ad278c01d67c75"
+        },
+        "polarity-claws": {
+          "src": "assets/generated/v2.2.0/bosses/drill/polarity-claws.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 111254,
+          "sha256": "78337e62724386ac3670764cc56074a9d683467a1447750b8775e53d66d9f5e4"
+        },
+        "scrap-ring": {
+          "src": "assets/generated/v2.2.0/bosses/drill/scrap-ring.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 91162,
+          "sha256": "39228c0e64b125bcaf6962af2a493b474519d5f5bfdc9e361f531785edc1005e"
+        },
+        "core": {
+          "src": "assets/generated/v2.2.0/bosses/drill/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 142110,
+          "sha256": "fa24b11a882535ea1137fd5275bed7871da335d6e5dc551e2aa0f9472b36248c"
+        }
+      }
+    },
+    "mantis": {
+      "parts": {
+        "torso": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/torso.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 90138,
+          "sha256": "9819b9c3dc0109a34b632fef81fde491a3971a426989311858ccf0ff2f790b35"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 86956,
+          "sha256": "f0be63078edd9609590db38e78694c196e2b8353981cb03b5273016087390dcf"
+        },
+        "scythe-left": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/scythe-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 72620,
+          "sha256": "233aa77107c6a647740476b72a15821dc9b87fb37ea75ee47ee10d2106cdb076"
+        },
+        "scythe-right": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/scythe-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 69032,
+          "sha256": "70ce1016fe0ceb9d745706898029a459c1799b9dea984e2a2ac6cfaf61fbfe87"
+        },
+        "legs-left": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/legs-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 61112,
+          "sha256": "910b1f3f95154603aacecc23d25ee1d7b6af59893b5ef30c6cec9c669c9354bf"
+        },
+        "legs-right": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/legs-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 59864,
+          "sha256": "b0be9e0ce6f4fff42179b6a94fc4080b6a2276f2b0fee4dde6b95850f19d1490"
+        },
+        "chrono-halo": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/chrono-halo.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 117078,
+          "sha256": "3757aab54139a8e60ec3a1099d65a394aba886c29d9a39ad99da9da8d111731c"
+        },
+        "time-emitter": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/time-emitter.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 65110,
+          "sha256": "d8e9c9aa1c63f3e1395b75709c4e02176ca4b9e5589e1fbbc08b5b7a186a238d"
+        },
+        "core": {
+          "src": "assets/generated/v2.2.0/bosses/mantis/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 122934,
+          "sha256": "8c491ad23f2190bc0eea28d4b55667170c32cb90fda5f5665efd1f7bc0c49778"
+        }
+      }
+    },
+    "cyclotron": {
+      "parts": {
+        "furnace-torso": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/furnace-torso.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 181168,
+          "sha256": "35b93020b53769942ec8b20a014c2065f14fbaf495b0220076751b0aa9e12a38"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 95350,
+          "sha256": "873ee43d736a114e44b7bb2037c57991e66b4f3ad058f38b0065aabfcfe5a27a"
+        },
+        "piston-left": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/piston-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 135374,
+          "sha256": "cb8a8057f85256eaff5783c852fa9d159288ce0286f3277402a517ac273fcf14"
+        },
+        "piston-right": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/piston-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 109808,
+          "sha256": "2b48f3be17732bafd7022630e736c510f9ca2edde93f11fa915be714feafad7e"
+        },
+        "leg-left": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/leg-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 114372,
+          "sha256": "0ad7316b4d803bd87c1eb10c8d228db7633619d74478c8d0628db92c37dc5bac"
+        },
+        "leg-right": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/leg-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 115354,
+          "sha256": "db34e3322fb9b4a5b3effa9f17ee56e4093a35764f7e6ee536f5d6c6d853ad87"
+        },
+        "stacks-hopper": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/stacks-hopper.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 164810,
+          "sha256": "2b6457891df3dd0f053de6aa1cba93182ef9e4a20432d5502fc744d7a7745c6a"
+        },
+        "molten-core": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/molten-core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 159430,
+          "sha256": "73b28ac342bc4f24c6437094c1bed370beecdc61be87f4eee4f583c815702c80"
+        },
+        "overarmor": {
+          "src": "assets/generated/v2.2.0/bosses/cyclotron/overarmor.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 191438,
+          "sha256": "8a8edd7eb48d27e5e28904d675d185d37e9352d0cede80ee52692173850ad636"
+        }
+      }
+    },
+    "omega": {
+      "parts": {
+        "crown-hull": {
+          "src": "assets/generated/v2.2.0/bosses/omega/crown-hull.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 158484,
+          "sha256": "769546ae9db8a8618f502fb1b4730411c5ba10143a93b45e0072653e6e9fa657"
+        },
+        "throne-cockpit": {
+          "src": "assets/generated/v2.2.0/bosses/omega/throne-cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 116964,
+          "sha256": "61929dc4528594d40fbd5b786e7882f50faffd82ec08b86ea6aeb5c53eae8680"
+        },
+        "battery-left": {
+          "src": "assets/generated/v2.2.0/bosses/omega/battery-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 107404,
+          "sha256": "28dd425af48fe2e1a2fa21a1be91422913409b3fb9d5262f366f18d7eca332a3"
+        },
+        "battery-right": {
+          "src": "assets/generated/v2.2.0/bosses/omega/battery-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 95328,
+          "sha256": "a2067b04e02b2c58076bc4692224e5b29a35844153abe4897473b5c400e3c906"
+        },
+        "stabilizers": {
+          "src": "assets/generated/v2.2.0/bosses/omega/stabilizers.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 88056,
+          "sha256": "248e4e7a30db9e27ff0974af785388fbe5b0a5ad1985ee08c047283fb5eac42a"
+        },
+        "blade-ring": {
+          "src": "assets/generated/v2.2.0/bosses/omega/blade-ring.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 84884,
+          "sha256": "060c4dcf7373fc0da3a0d3ad88096805a12e5456961dd8e385ecda73067545ee"
+        },
+        "combined-arsenal": {
+          "src": "assets/generated/v2.2.0/bosses/omega/combined-arsenal.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 131106,
+          "sha256": "2872e9b7389d4a152f45132111cc1a846c7619eb38eb61beeb2b4018623e7f10"
+        },
+        "omega-core": {
+          "src": "assets/generated/v2.2.0/bosses/omega/omega-core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 117630,
+          "sha256": "5b3e423300fc180e7673827b44ae44327cf8ba029c81c0282ef4a291a2d06cd6"
+        },
+        "ruptured-armor": {
+          "src": "assets/generated/v2.2.0/bosses/omega/ruptured-armor.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 133228,
+          "sha256": "faef58818fe955411e99069b61dd9706634ad8398838b1cff008455b65872d7c"
+        }
+      }
+    }
+  },
+  "heroine": {
+    "id": "riva-spark",
+    "parts": {
+      "head": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/head.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 121258,
+        "sha256": "edbbeadd7a13a50abf7e7bd801ef36f54babc9300adffcace63e50270930de58"
+      },
+      "torso": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/torso.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 103954,
+        "sha256": "2928744ac10e5676b4da219a3957d19eb37799dcd8d1e85970fb91ed51da5d81"
+      },
+      "arm-near": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/arm-near.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 60162,
+        "sha256": "0ce1d2d4e5f9fe6c6af8b7efb0e4b001b78874041ecfe319930c15e51f90c8b7"
+      },
+      "arm-far": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/arm-far.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 67992,
+        "sha256": "cab227a8b49bb2a0321a4bcbd93b4fd02c383a5debfab398207c09d4c3615ab6"
+      },
+      "legs": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/legs.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 100160,
+        "sha256": "39ff55f6c7f6f276aea1e15f6cb4abc4309cbcbb6bbf0b755912ffe2dedc6707"
+      },
+      "boots": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/boots.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 93312,
+        "sha256": "584bc80f20c28c942dcd30e57ec82ed3eed913d6651415cf0681e93af4db7aad"
+      },
+      "pulse-cannon": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/pulse-cannon.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 68884,
+        "sha256": "8ea8472d85d1b041324d8a8afa8a3c8396147dffbdbf5d2581d5b0e6eaba315e"
+      },
+      "dash-trail": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/dash-trail.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 85410,
+        "sha256": "85d08f45735e4d089927722f63b191b3b61cf2344ed0a892a940f61f53676d64"
+      },
+      "overload-halo": {
+        "src": "assets/generated/v2.2.0/heroine/riva-spark/overload-halo.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 119228,
+        "sha256": "ec0a5e51a9eb36c6d70a65e1a6d7ef8928c77dcf928dfc58c9d6907d165780a3"
+      }
+    }
+  },
+  "vfx": {
+    "muzzle-cyan": {
+      "src": "assets/generated/v2.2.0/vfx/muzzle-cyan.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 16240,
+      "sha256": "f0aaf757696f4c7bc38d69213b226e0fa0d80c77483794214592f4b79d2519f2"
+    },
+    "impact-metal": {
+      "src": "assets/generated/v2.2.0/vfx/impact-metal.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 52946,
+      "sha256": "87485fa470580b030928981c59a77aa4d250ee842db0919d4c294685527ff1e8"
+    },
+    "shield-hit": {
+      "src": "assets/generated/v2.2.0/vfx/shield-hit.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 59256,
+      "sha256": "bd77131a53822606b1455dc72f595d59a68c1e27e8d85cfaa51013af939c01d9"
+    },
+    "magnetic-spark": {
+      "src": "assets/generated/v2.2.0/vfx/magnetic-spark.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 47844,
+      "sha256": "e27bf35d1262255417cd6186055a8e3b39359ae0e70f3095240fe8b5143c726c"
+    },
+    "smoke": {
+      "src": "assets/generated/v2.2.0/vfx/smoke.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 33962,
+      "sha256": "d8bc30895183c41eb33bd48259af0f0832157557d3078be46d75b7a7b5dfcb8a"
+    },
+    "rivet-sparks": {
+      "src": "assets/generated/v2.2.0/vfx/rivet-sparks.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 33910,
+      "sha256": "58139420eb6cba224eeb2b0bb07879ab2b9e1e021bb8ad6c80252137c917a62e"
+    },
+    "electric-arcs": {
+      "src": "assets/generated/v2.2.0/vfx/electric-arcs.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 38558,
+      "sha256": "e1921bc1401997968426a0a829296233f983cab677c2ef6e7cf0f996c40c3a1f"
+    },
+    "molten-splash": {
+      "src": "assets/generated/v2.2.0/vfx/molten-splash.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 31456,
+      "sha256": "a9ed794de0f82b079b2164116f704b3929160ce98680b7eda34eefd88fd0f26e"
+    },
+    "warning-pulse": {
+      "src": "assets/generated/v2.2.0/vfx/warning-pulse.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 54040,
+      "sha256": "4c46ed81877ed201654a3591d7f446a1391d33cf53c8acd4038badff54aa8471"
+    },
+    "dash-shockwave": {
+      "src": "assets/generated/v2.2.0/vfx/dash-shockwave.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 57924,
+      "sha256": "65a1484d7a67a0200a6d9de62e4c04a9cc4c9c00352efdc18db4da23379dbcd3"
+    },
+    "overload-bloom": {
+      "src": "assets/generated/v2.2.0/vfx/overload-bloom.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 88746,
+      "sha256": "333b758843dbd77573f5017913770b8ea588e2d124e6fd3736b43bd837871d7e"
+    },
+    "chrono-fracture": {
+      "src": "assets/generated/v2.2.0/vfx/chrono-fracture.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 75162,
+      "sha256": "c70ddd5ed20830894f9fc86abc755f31b7fee8fe297339251474d428695c3365"
+    },
+    "explosion-small": {
+      "src": "assets/generated/v2.2.0/vfx/explosion-small.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 57354,
+      "sha256": "e682f3b2f3f1848664f7c42f1b8cf0fa622b2a65a8e2b745652783633ae42606"
+    },
+    "explosion-core": {
+      "src": "assets/generated/v2.2.0/vfx/explosion-core.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 100320,
+      "sha256": "a712674fe4a362d1f70b6e79205a2d04fb639a67221c8e255862e36dc6c4aa64"
+    },
+    "explosion-final": {
+      "src": "assets/generated/v2.2.0/vfx/explosion-final.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 114294,
+      "sha256": "97eb0d43c633618394ccb0c8cad1f613ac76b071b90a3101f8d14b1c41ebcfd3"
+    },
+    "scrap-glow": {
+      "src": "assets/generated/v2.2.0/vfx/scrap-glow.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 47220,
+      "sha256": "801b9a8db052890e6be403029eee79cc9cc07a8bd17b11fa51d3f2351e7740bb"
+    }
+  },
+  "summary": {
+    "masters": 14,
+    "runtimeFiles": 103,
+    "arenaLayers": 24,
+    "bossParts": 54,
+    "heroineParts": 9,
+    "vfx": 16,
+    "totalBytes": 13136064
+  }
+}

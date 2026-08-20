@@ -17,3 +17,8 @@ QA_REPORT.md
 CHANGELOG.md
 SECURITY.md
 CREDITS.md
+assets/generated/arenas/
+assets/generated/bosses/
+assets/generated/riva/
+assets/generated/vfx/
+assets/generated/PROVENANCE.md

@@ -29,7 +29,30 @@ Les six améliorations couvrent la cadence, la résistance, la ruée, le tir mul
 
 ## Accessibilité et lisibilité
 
-Les dangers utilisent des télégraphes avant collision. Le mode mouvement réduit diminue les particules et transitions ; le contraste renforcé épaissit les repères. Le jeu accepte clavier AZERTY/QWERTY, souris, manette et tactile.
+Les dangers utilisent des télégraphes avant collision. Le mode mouvement réduit diminue les particules et transitions ; le contraste renforcé épaissit les repères. Le jeu accepte clavier AZERTY/QWERTY, souris, manette et tactile. L’indicateur de chargement artistique reste compact, annoncé par les technologies d’assistance et neutralise ses animations quand le mouvement réduit est demandé.
+
+## Direction artistique v2.2
+
+La direction privilégie des silhouettes mécaniques immédiatement reconnaissables, une matière industrielle peinte et des accents lumineux propres à chaque district. La lisibilité de l’action prime sur le détail décoratif.
+
+### Décomposition des 14 masters
+
+- Six atlases de décor 2 × 2 produisent chacun quatre couches : fond lointain opaque, plan médian, premier plan et atmosphère superposable. Total : 24 couches de parallaxe.
+- Six atlases de boss 3 × 3 produisent chacun neuf pièces articulables sur fond réellement transparent. Total : 54 pièces.
+- Un atlas Riva Spark 3 × 3 fournit neuf poses ou états cohérents à la même échelle.
+- Un atlas VFX 4 × 4 fournit seize effets isolés, sans texte et sans décor résiduel.
+
+Le total de production est de 14 masters OpenAI Image Generation intégré pour 103 assets indépendants. Les images sont originales, propres à GEARSTORM, sans logo, filigrane, texte incorporé ni reprise d’une franchise tierce.
+
+### Règles d’intégration
+
+- Les couches d’arène doivent conserver des zones de jeu lisibles et ne jamais masquer un télégraphe.
+- Les pivots des neuf pièces de chaque boss doivent permettre l’animation sans saut de silhouette.
+- Riva conserve proportions, palette et orientation entre ses neuf cellules.
+- Les VFX doivent être isolables sans bord de cellule visible.
+- Le key art et le titre sont prioritaires ; les assets de rencontre sont chargés à la demande.
+- Le cache PWA peut conserver les ressources validées, tandis que le rendu procédural Canvas assure le fallback en cas d’échec.
+- La progression de chargement peut être signalée au titre ou au prologue, sans bloquer l’accès aux commandes et avec respect du contraste élevé et du mouvement réduit.
 
 ## Fin
 

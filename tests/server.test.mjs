@@ -44,9 +44,26 @@ test('HEAD retourne les métadonnées sans corps', async () => {
   });
 });
 
-test('404, fichier privé, traversal et URL mal formée ne fuient rien', async () => {
+test('les assets runtime versionnés sont publics et immuables', async () => {
   await withServer(async origin => {
-    for (const path of ['/absent.txt', '/package.json', '/..%2Fpackage.json']) {
+    const assetPath = '/assets/generated/v2.2.0/arenas/rammer/far.webp';
+    const expectedSize = (await stat('.' + assetPath)).size;
+    const response = await fetch(origin + assetPath, { method: 'HEAD' });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('content-type'), 'image/webp');
+    assert.equal(Number(response.headers.get('content-length')), expectedSize);
+    assert.equal(response.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+
+    const catalog = await fetch(origin + '/assets/generated/v2.2.0/asset-manifest.json');
+    assert.equal(catalog.status, 200);
+    assert.match(catalog.headers.get('content-type'), /application\/json/);
+    assert.equal((await catalog.json()).summary.runtimeFiles, 103);
+  });
+});
+
+test('404, fichier privé, masters, traversal et URL mal formée ne fuient rien', async () => {
+  await withServer(async origin => {
+    for (const path of ['/absent.txt', '/package.json', '/assets/generated/arenas/rammer-parallax-openai-v1.png', '/..%2Fpackage.json']) {
       const response = await fetch(origin + path);
       assert.equal(response.status, 404, path);
       assert.equal(await response.text(), 'Introuvable');

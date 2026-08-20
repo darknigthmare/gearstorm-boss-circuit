@@ -202,6 +202,419 @@
   const mobileBossHp = document.querySelector('#mobile-boss-hp');
   const mobileOverload = document.querySelector('#mobile-overload');
 
+
+  const ART_MANIFEST_URL = 'assets/generated/v2.2.0/asset-manifest.json';
+  const artLoader = document.querySelector('#art-loader');
+  const artLoaderLabel = document.querySelector('#art-loader-label');
+  const artLoaderProgress = document.querySelector('#art-loader-progress');
+  const artRuntime = {
+    manifest: null,
+    manifestReady: false,
+    ready: false,
+    activeBossId: 'rammer',
+    images: new Map(),
+    pending: new Map(),
+    failed: new Set(),
+    requested: new Set(),
+    currentAssets: new Set(),
+    bundlePromises: new Map(),
+    effects: [],
+    parallaxTime: 0,
+    initialPromise: null
+  };
+
+  const HERO_ART_PRESET = {
+    'dash-trail': { x: -42, y: 4, size: 112 },
+    'overload-halo': { x: 0, y: -7, size: 122 },
+    'arm-far': { x: -15, y: -7, size: 55 },
+    legs: { x: 0, y: 22, size: 60 },
+    boots: { x: 0, y: 37, size: 58 },
+    torso: { x: 0, y: -7, size: 61 },
+    head: { x: 0, y: -42, size: 47 },
+    'arm-near': { x: 17, y: -6, size: 57 },
+    'pulse-cannon': { x: 31, y: -5, size: 58 }
+  };
+
+  const BOSS_ART_PRESETS = {
+    rammer: {
+      parts: [
+        ['wheel', 14, 54, 124, 1], ['chassis', 0, 10, 178, 1], ['ram', -100, 18, 105, 1],
+        ['hammer-left', -49, -53, 92, 1], ['hammer-right', 54, -53, 92, 1],
+        ['rivet-pod', 76, -18, 88, 2], ['mine-seismic', 5, 66, 75, 2],
+        ['core', 21, -31, 70, 1], ['overdrive', 0, 0, 216, 3]
+      ]
+    },
+    kraken: {
+      parts: [
+        ['tail-thruster', 0, 50, 98, 1], ['wing-left', -78, 0, 145, 1], ['wing-right', 78, 0, 145, 1],
+        ['fuselage', 0, 5, 160, 1], ['cockpit', 0, -47, 78, 1],
+        ['ion-emitter', -48, 30, 82, 2], ['bomb-pod', 50, 30, 82, 2],
+        ['core', 0, 8, 68, 1], ['laser-blades', 0, 0, 225, 3]
+      ]
+    },
+    drill: {
+      parts: [
+        ['legs-rear', 0, 51, 174, 1], ['legs-front-left', -65, 38, 130, 1],
+        ['legs-front-right', 65, 38, 130, 1], ['carapace', 0, 2, 169, 1],
+        ['cockpit', 0, -55, 80, 1], ['magnetic-coil', 0, 18, 112, 2],
+        ['polarity-claws', 0, 58, 184, 2], ['core', 0, -31, 70, 1],
+        ['scrap-ring', 0, 0, 224, 3]
+      ]
+    },
+    mantis: {
+      parts: [
+        ['legs-left', -43, 54, 151, 1], ['legs-right', 43, 54, 151, 1],
+        ['torso', 0, 3, 145, 1], ['scythe-left', -76, -23, 164, 1],
+        ['scythe-right', 76, -23, 164, 1], ['cockpit', 0, -62, 74, 1],
+        ['time-emitter', 0, 13, 90, 2], ['core', 0, -7, 68, 1],
+        ['chrono-halo', 0, -18, 220, 3]
+      ]
+    },
+    cyclotron: {
+      parts: [
+        ['leg-left', -53, 61, 137, 1], ['leg-right', 53, 61, 137, 1],
+        ['furnace-torso', 0, 3, 177, 1], ['piston-left', -82, 0, 124, 1],
+        ['piston-right', 82, 0, 124, 1], ['cockpit', 0, -64, 79, 1],
+        ['stacks-hopper', 0, -77, 121, 2], ['molten-core', 0, 6, 88, 1],
+        ['overarmor', 0, 0, 229, 3]
+      ]
+    },
+    omega: {
+      parts: [
+        ['stabilizers', 0, 64, 188, 1], ['crown-hull', 0, 2, 197, 1],
+        ['battery-left', -87, 16, 124, 1], ['battery-right', 87, 16, 124, 1],
+        ['throne-cockpit', 0, -76, 94, 1], ['blade-ring', 0, 0, 226, 2],
+        ['combined-arsenal', 0, 13, 203, 2], ['omega-core', 0, 6, 92, 1],
+        ['ruptured-armor', 0, 0, 237, 3]
+      ]
+    }
+  };
+
+  function updateArtLoader() {
+    const done = artRuntime.images.size + artRuntime.failed.size;
+    const total = artRuntime.requested.size;
+    if (artLoaderProgress) {
+      if ('max' in artLoaderProgress) artLoaderProgress.max = Math.max(1, total);
+      if ('value' in artLoaderProgress) artLoaderProgress.value = Math.min(done, Math.max(1, total));
+      artLoaderProgress.setAttribute('aria-valuemax', String(Math.max(1, total)));
+      artLoaderProgress.setAttribute('aria-valuenow', String(Math.min(done, Math.max(1, total))));
+    }
+    if (artLoaderLabel) {
+      artLoaderLabel.textContent = artRuntime.manifestReady
+        ? 'Illustrations HD ' + done + ' / ' + Math.max(done, total)
+        : (artRuntime.ready ? 'Mode vectoriel actif' : 'Chargement des illustrations...');
+    }
+    if (artLoader) {
+      artLoader.hidden = artRuntime.ready;
+      artLoader.setAttribute('aria-busy', artRuntime.ready ? 'false' : 'true');
+    }
+  }
+
+  function generatedArtCoreEntries() {
+    if (!artRuntime.manifest) return [];
+    return [
+      ...Object.values(artRuntime.manifest.heroine?.parts || {}),
+      ...Object.values(artRuntime.manifest.vfx || {})
+    ];
+  }
+
+  function generatedArtBossEntries(id) {
+    if (!artRuntime.manifest) return [];
+    const arena = artRuntime.manifest.arenas?.[id]?.layers || {};
+    const parts = artRuntime.manifest.bosses?.[id]?.parts || {};
+    return [...Object.values(arena), ...Object.values(parts)];
+  }
+
+  function loadGeneratedImage(entry) {
+    const src = entry?.src;
+    if (!src) return Promise.resolve(null);
+    artRuntime.requested.add(src);
+    updateArtLoader();
+    if (artRuntime.images.has(src)) return Promise.resolve(artRuntime.images.get(src));
+    if (artRuntime.pending.has(src)) return artRuntime.pending.get(src);
+    if (artRuntime.failed.has(src)) return Promise.resolve(null);
+
+    const pending = new Promise(resolve => {
+      const image = new Image();
+      image.decoding = 'async';
+      image.onload = () => {
+        artRuntime.images.set(src, image);
+        artRuntime.pending.delete(src);
+        updateArtLoader();
+        resolve(image);
+      };
+      image.onerror = () => {
+        artRuntime.failed.add(src);
+        artRuntime.pending.delete(src);
+        updateArtLoader();
+        resolve(null);
+      };
+      image.src = src;
+    });
+    artRuntime.pending.set(src, pending);
+    return pending;
+  }
+
+  function preloadGeneratedEntries(entries) {
+    const unique = new Map();
+    for (const entry of entries) if (entry?.src) unique.set(entry.src, entry);
+    return Promise.all([...unique.values()].map(loadGeneratedImage));
+  }
+
+  function preloadGeneratedBossBundle(id) {
+    if (!artRuntime.manifest || !id) return Promise.resolve([]);
+    if (artRuntime.bundlePromises.has(id)) return artRuntime.bundlePromises.get(id);
+    const pending = preloadGeneratedEntries(generatedArtBossEntries(id));
+    artRuntime.bundlePromises.set(id, pending);
+    return pending;
+  }
+
+  function queueGeneratedArtForBoss(id, markCurrent = true) {
+    if (id) artRuntime.activeBossId = id;
+    if (!artRuntime.manifest) return Promise.resolve([]);
+    const activeId = id || artRuntime.activeBossId || 'rammer';
+    const coreEntries = generatedArtCoreEntries();
+    const bossEntries = generatedArtBossEntries(activeId);
+    if (markCurrent) {
+      artRuntime.ready = false;
+      artRuntime.currentAssets = new Set([...coreEntries, ...bossEntries].map(entry => entry.src).filter(Boolean));
+      updateArtLoader();
+    }
+    const ready = Promise.all([
+      preloadGeneratedEntries(coreEntries),
+      preloadGeneratedBossBundle(activeId)
+    ]).then(result => {
+      if (markCurrent && artRuntime.activeBossId === activeId) {
+        artRuntime.ready = true;
+        updateArtLoader();
+        const index = BOSSES.findIndex(entry => entry.id === activeId);
+        if (index >= 0 && index + 1 < BOSSES.length) {
+          void preloadGeneratedBossBundle(BOSSES[index + 1].id);
+        }
+      }
+      return result;
+    });
+    return ready;
+  }
+
+  async function initializeGeneratedArt() {
+    updateArtLoader();
+    try {
+      const response = await fetch(ART_MANIFEST_URL, { cache: 'no-cache' });
+      if (!response.ok) throw new Error('Manifest HTTP ' + response.status);
+      const manifest = await response.json();
+      if (!manifest || !manifest.arenas || !manifest.bosses || !manifest.heroine?.parts || !manifest.vfx) {
+        throw new Error('Manifest raster invalide');
+      }
+      artRuntime.manifest = manifest;
+      artRuntime.manifestReady = true;
+      const activeId = boss?.data?.id || artRuntime.activeBossId || 'rammer';
+      await queueGeneratedArtForBoss(activeId, true);
+    } catch (error) {
+      artRuntime.failed.add(ART_MANIFEST_URL);
+      artRuntime.ready = true;
+      updateArtLoader();
+      console.warn('Illustrations GEARSTORM indisponibles, rendu vectoriel conserve.', error);
+    }
+  }
+
+  function getGeneratedArtState() {
+    return {
+      release: artRuntime.manifest?.release || null,
+      manifestReady: artRuntime.manifestReady,
+      ready: artRuntime.ready,
+      loaded: [...artRuntime.images.keys()],
+      loadedCount: artRuntime.images.size,
+      failed: [...artRuntime.failed],
+      currentAssets: [...artRuntime.currentAssets]
+    };
+  }
+
+  function generatedImage(entry) {
+    return entry?.src ? artRuntime.images.get(entry.src) || null : null;
+  }
+
+  function drawGeneratedPart(entry, x, y, size, rotation = 0, scale = 1, alpha = 1) {
+    const image = generatedImage(entry);
+    if (!image) return false;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha *= alpha;
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(image, -size / 2, -size / 2, size, size);
+    ctx.restore();
+    return true;
+  }
+
+  function drawGeneratedArena(data) {
+    const arena = artRuntime.manifest?.arenas?.[data.id];
+    if (!arena) return false;
+    void preloadGeneratedBossBundle(data.id);
+    let painted = false;
+    const layers = ['far', 'mid', 'ground', 'foreground'];
+    for (let index = 0; index < layers.length; index++) {
+      const layer = arena.layers?.[layers[index]];
+      const image = generatedImage(layer);
+      if (!image) continue;
+      const speed = Number(layer.speed) || 0;
+      const margin = 30 + speed * 170;
+      const phase = artRuntime.parallaxTime * (0.38 + speed * 4.2) + index * 0.75;
+      const shift = save.settings.reduceMotion ? 0 : Math.sin(phase) * Math.min(margin * 0.72, speed * 185);
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(image, -margin + shift, -margin * 0.3, W + margin * 2, H + margin * 0.6);
+      ctx.restore();
+      painted = true;
+    }
+    return painted;
+  }
+
+  function heroArtReady() {
+    const parts = artRuntime.manifest?.heroine?.parts;
+    return !!parts && ['head', 'torso', 'legs', 'boots', 'arm-near', 'arm-far', 'pulse-cannon']
+      .every(name => generatedImage(parts[name]));
+  }
+
+  function drawGeneratedPlayer() {
+    const parts = artRuntime.manifest?.heroine?.parts;
+    if (!heroArtReady()) return false;
+    const gait = player.onGround ? Math.sin(player.anim) : 0;
+    const speedPose = Math.min(1, Math.abs(player.vx) / 330);
+    const airborne = player.onGround ? 0 : clamp(player.vy / 900, -0.65, 0.65);
+    const firing = player.shotCooldown > runBuild.fireRate * 0.52 ? 1 : 0;
+    const dashPose = player.dashTime > 0 ? -0.13 : 0;
+    const wholeTilt = dashPose + airborne * 0.09;
+
+    if (player.dashTime > 0) {
+      const trail = HERO_ART_PRESET['dash-trail'];
+      drawGeneratedPart(parts['dash-trail'], trail.x, trail.y, trail.size, 0, 1 + speedPose * 0.12, 0.82);
+    }
+    if (player.overloadTime > 0) {
+      const halo = HERO_ART_PRESET['overload-halo'];
+      const pulse = save.settings.reduceMotion ? 1 : 1 + Math.sin(player.anim * 2.4) * 0.06;
+      drawGeneratedPart(parts['overload-halo'], halo.x, halo.y, halo.size, 0, pulse, 0.88);
+    }
+
+    ctx.save();
+    ctx.rotate(wholeTilt);
+    let pose = HERO_ART_PRESET['arm-far'];
+    drawGeneratedPart(parts['arm-far'], pose.x, pose.y + gait * 1.5, pose.size, -gait * 0.11 * speedPose);
+    pose = HERO_ART_PRESET.legs;
+    drawGeneratedPart(parts.legs, pose.x, pose.y + Math.abs(gait) * 1.5, pose.size, gait * 0.045 * speedPose);
+    pose = HERO_ART_PRESET.boots;
+    drawGeneratedPart(parts.boots, pose.x + gait * 1.8 * speedPose, pose.y, pose.size, gait * 0.035 * speedPose);
+    pose = HERO_ART_PRESET.torso;
+    drawGeneratedPart(parts.torso, pose.x, pose.y, pose.size, -gait * 0.018 * speedPose);
+    pose = HERO_ART_PRESET.head;
+    drawGeneratedPart(parts.head, pose.x, pose.y, pose.size, -wholeTilt * 0.35);
+    pose = HERO_ART_PRESET['arm-near'];
+    drawGeneratedPart(parts['arm-near'], pose.x - firing * 2, pose.y, pose.size, gait * 0.08 * speedPose - firing * 0.07);
+    pose = HERO_ART_PRESET['pulse-cannon'];
+    drawGeneratedPart(parts['pulse-cannon'], pose.x - firing * 4, pose.y, pose.size, -firing * 0.045);
+    ctx.restore();
+    return true;
+  }
+
+  function bossPartMotion(name, baseX, baseY, baseSize, index) {
+    const t = save.settings.reduceMotion ? 0 : boss.totalTime;
+    const side = name.includes('left') ? -1 : name.includes('right') ? 1 : 0;
+    let x = baseX;
+    let y = baseY;
+    let rotation = 0;
+    let scale = 1;
+    if (/wheel|ring|halo|blade/.test(name)) rotation += t * (side || 1) * 0.42;
+    if (/hammer|scythe|wing|piston|leg/.test(name)) rotation += side * Math.sin(t * 2.7 + index) * 0.065;
+    if (/thruster|emitter|hopper|battery/.test(name)) y += Math.sin(t * 3.1 + index) * 2.4;
+    if (/core/.test(name) && boss.vulnerable) scale += (save.settings.reduceMotion ? 0.04 : 0.055 + Math.sin(t * 7) * 0.035);
+    if (boss.state === 'phaseTransition') {
+      const progress = clamp(boss.stateTime / 1.05, 0, 1);
+      const burst = Math.sin(progress * Math.PI) * (20 + index * 1.25);
+      const angle = index / 9 * TAU + 0.45;
+      x += Math.cos(angle) * burst;
+      y += Math.sin(angle) * burst;
+      rotation += Math.sin(angle) * burst * 0.012;
+    }
+    return { x, y, size: baseSize, rotation, scale };
+  }
+
+  function drawGeneratedBoss() {
+    const preset = BOSS_ART_PRESETS[boss?.data?.id];
+    const parts = artRuntime.manifest?.bosses?.[boss?.data?.id]?.parts;
+    if (!preset || !parts) return false;
+    const active = preset.parts.filter(spec => spec[4] <= boss.phase);
+    if (!active.every(spec => generatedImage(parts[spec[0]]))) return false;
+    for (let index = 0; index < active.length; index++) {
+      const spec = active[index];
+      const pose = bossPartMotion(spec[0], spec[1], spec[2], spec[3], index);
+      drawGeneratedPart(parts[spec[0]], pose.x, pose.y, pose.size, pose.rotation, pose.scale);
+    }
+    return true;
+  }
+
+  function drawGeneratedBossPreview(data) {
+    const preset = BOSS_ART_PRESETS[data.id];
+    const parts = artRuntime.manifest?.bosses?.[data.id]?.parts;
+    if (!preset || !parts) return false;
+    void preloadGeneratedBossBundle(data.id);
+    const active = preset.parts.filter(spec => spec[4] <= 2);
+    if (!active.every(spec => generatedImage(parts[spec[0]]))) return false;
+    ctx.save();
+    ctx.scale(0.56, 0.56);
+    for (let index = 0; index < active.length; index++) {
+      const spec = active[index];
+      const sway = save.settings.reduceMotion ? 0 : Math.sin(artRuntime.parallaxTime * 1.7 + index) * 0.018;
+      drawGeneratedPart(parts[spec[0]], spec[1], spec[2], spec[3], sway);
+    }
+    ctx.restore();
+    return true;
+  }
+
+  function spawnGeneratedVfx(key, x, y, options = {}) {
+    const entry = artRuntime.manifest?.vfx?.[key];
+    if (!entry) return false;
+    void loadGeneratedImage(entry);
+    artRuntime.effects.push({
+      key,
+      x,
+      y,
+      age: 0,
+      duration: Math.max(0.08, options.duration || 0.34),
+      size: options.size || 86,
+      rotation: options.rotation || 0,
+      alpha: options.alpha ?? 1,
+      growth: options.growth ?? 0.45
+    });
+    return true;
+  }
+
+  function updateGeneratedEffects(dt) {
+    for (let index = artRuntime.effects.length - 1; index >= 0; index--) {
+      const effect = artRuntime.effects[index];
+      effect.age += dt;
+      if (effect.age >= effect.duration) artRuntime.effects.splice(index, 1);
+    }
+  }
+
+  function drawGeneratedEffects() {
+    for (const effect of artRuntime.effects) {
+      const entry = artRuntime.manifest?.vfx?.[effect.key];
+      const image = generatedImage(entry);
+      if (!image) continue;
+      const progress = clamp(effect.age / effect.duration, 0, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const scale = save.settings.reduceMotion ? 1 : 0.72 + eased * effect.growth;
+      ctx.save();
+      ctx.translate(effect.x, effect.y);
+      ctx.rotate(save.settings.reduceMotion ? effect.rotation : effect.rotation + progress * 0.18);
+      ctx.globalAlpha = (1 - progress) * effect.alpha;
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(image, -effect.size * scale / 2, -effect.size * scale / 2, effect.size * scale, effect.size * scale);
+      ctx.restore();
+    }
+  }
+
   function loadSave() {
     try {
       const raw = localStorage.getItem(SAVE_KEY) ?? localStorage.getItem(LEGACY_SAVE_KEY);
@@ -351,6 +764,7 @@
     flash = 0;
     timeScale = 1;
     transitionTimer = 0;
+    artRuntime.effects = [];
   }
 
   function createPlayer() {
@@ -446,6 +860,7 @@
     resetWorld();
     player = createPlayer();
     boss = createBoss(index);
+    void queueGeneratedArtForBoss(boss.data.id, true);
     currentBossStart = performance.now() / 1000;
     state = 'fight';
     closeScreens();
@@ -589,6 +1004,8 @@
     player.invuln = Math.max(player.invuln, 0.45);
     enemyShots.forEach(shot => { shot.life = Math.min(shot.life, 1.4); });
     spawnBurst(player.x, player.y, '#fff39a', 34, 430);
+    spawnGeneratedVfx('overload-bloom', player.x, player.y, { size: 174, duration: 0.62, growth: 0.72 });
+    spawnGeneratedVfx('electric-arcs', player.x, player.y, { size: 128, duration: 0.48, growth: 0.3 });
     addFloatingText(player.x, player.y - 72, 'SURCHARGE', '#fff39a');
     shake(12);
     sfx('overload');
@@ -634,6 +1051,12 @@
       player.vx = player.facing * 940;
       player.vy *= 0.25;
       spawnBurst(player.x, player.y, '#65e8ff', 14, 270);
+      spawnGeneratedVfx('dash-shockwave', player.x - player.facing * 12, player.y + 8, {
+        size: 112,
+        duration: 0.3,
+        rotation: player.facing < 0 ? Math.PI : 0,
+        growth: 0.7
+      });
       shake(5);
       sfx('dash');
     }
@@ -653,6 +1076,12 @@
           trail: 0
         });
       }
+      spawnGeneratedVfx('muzzle-cyan', player.x + player.facing * 38, player.y - 10, {
+        size: 46,
+        duration: 0.16,
+        rotation: player.facing < 0 ? Math.PI : 0,
+        growth: 0.25
+      });
       sfx('shot');
     }
 
@@ -719,6 +1148,7 @@
           addFloatingText(shot.x, shot.y - 18, 'CORE HIT', boss.data.accent);
         } else {
           spawnBurst(shot.x, shot.y, '#dce5f6', 5, 115);
+          spawnGeneratedVfx('shield-hit', shot.x, shot.y, { size: 64, duration: 0.28, growth: 0.42 });
           addFloatingText(shot.x, shot.y - 12, 'BLINDAGE', '#a9b2cc');
           sfx('deflect');
         }
@@ -1132,6 +1562,11 @@
     score += Math.round(actualDamage * 25 * comboMultiplier * difficulty().scoreMultiplier);
     shake(actualDamage >= 10 ? 8 : 3);
     spawnBurst(boss.weakX, boss.weakY, boss.data.accent, actualDamage >= 10 ? 18 : 9, actualDamage >= 10 ? 310 : 180);
+    spawnGeneratedVfx(player?.overloadTime > 0 ? 'magnetic-spark' : 'impact-metal', boss.weakX, boss.weakY, {
+      size: actualDamage >= 10 ? 98 : 68,
+      duration: actualDamage >= 10 ? 0.42 : 0.27,
+      growth: actualDamage >= 10 ? 0.66 : 0.4
+    });
     sfx(actualDamage >= 10 ? 'heavyHit' : 'hit');
     if (boss.hp <= 0) defeatBoss();
     else if (boss.hp <= floor && boss.phase < 3) beginPhaseTransition(boss.phase + 1);
@@ -1149,6 +1584,8 @@
     timeScale = save.settings.reduceMotion ? 1 : 0.35;
     flash = 0.35;
     shake(20);
+    spawnGeneratedVfx('explosion-core', boss.x, boss.y, { size: 244, duration: 0.72, growth: 0.9 });
+    spawnGeneratedVfx('explosion-final', boss.x, boss.y, { size: 350, duration: 1.25, growth: 0.85, alpha: 0.92 });
     for (let i = 0; i < 80; i++) {
       particles.push({
         x: boss.x + rand(-90,90), y: boss.y + rand(-75,75),
@@ -1173,6 +1610,7 @@
     flash = 0.08;
     shake(10);
     spawnBurst(player.x, player.y, '#ff6682', 16, 280);
+    spawnGeneratedVfx('shield-hit', player.x, player.y, { size: 88, duration: 0.4, growth: 0.5 });
     addFloatingText(player.x, player.y - 50, '-1 CORE', '#ff8398');
     sfx('hurt');
     announce('Riva : ' + Math.max(0, player.hp) + ' noyaux sur ' + player.maxHp + '.');
@@ -1222,6 +1660,7 @@
         if (s.y >= GROUND - s.r) {
           if (s.type === 'bomb') {
             spawnBurst(s.x, GROUND - 12, '#ff7a8f', 18, 300);
+            spawnGeneratedVfx('explosion-small', s.x, GROUND - 18, { size: 112, duration: 0.48, growth: 0.78 });
             spawnFan(s.x, GROUND - 25, 5, 210, Math.PI + 0.15, TAU - 0.15, 'orb');
             shake(7);
             sfx('smallExplosion');
@@ -1236,6 +1675,7 @@
           s.triggered = true;
           spawnFan(s.x, s.y - 12, 8, 185, 0, TAU, 'orb');
           spawnBurst(s.x, s.y, '#d987ff', 14, 220);
+          spawnGeneratedVfx('explosion-small', s.x, s.y, { size: 98, duration: 0.42, growth: 0.68 });
           shake(5);
           sfx('smallExplosion');
         }
@@ -1491,6 +1931,8 @@
     }
     flash = Math.max(0, flash - dt);
     screenShake = Math.max(0, screenShake - dt * 28);
+    if (!save.settings.reduceMotion && state !== 'paused') artRuntime.parallaxTime += dt;
+    if (state !== 'paused') updateGeneratedEffects(dt);
 
     if (state !== 'fight' && state !== 'dead') {
       updateAmbient(dt);
@@ -1542,11 +1984,13 @@
       drawPlayerShots();
       drawPlayer();
       drawParticles();
+      drawGeneratedEffects();
       drawFloatingTexts();
       drawHUD();
     } else {
       drawAmbient();
       drawParticles();
+      drawGeneratedEffects();
     }
 
     if (flash > 0) {
@@ -1564,7 +2008,7 @@
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, W, H);
 
-    const t = performance.now() / 1000;
+    const t = save.settings.reduceMotion ? 0 : performance.now() / 1000;
     ctx.globalAlpha = 0.25;
     ctx.fillStyle = data.color;
     for (let i = 0; i < 7; i++) {
@@ -1606,6 +2050,16 @@
     ctx.lineTo(W, GROUND - 3);
     ctx.stroke();
 
+    const generatedArena = drawGeneratedArena(data);
+    if (generatedArena) {
+      ctx.strokeStyle = hexToRgba(data.accent, 0.36);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, GROUND);
+      ctx.lineTo(W, GROUND);
+      ctx.stroke();
+    }
+
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.fillRect(0, 0, W, 52);
     ctx.font = '800 15px system-ui';
@@ -1614,12 +2068,12 @@
   }
 
   function drawAttractMachine(data) {
-    const t = performance.now() / 1000;
+    const t = save.settings.reduceMotion ? 0 : performance.now() / 1000;
     ctx.save();
     ctx.globalAlpha = 0.88;
     ctx.translate(965, 350 + Math.sin(t * 1.6) * 12);
     ctx.scale(1.65, 1.65);
-    drawGenericCogMachine(data, t);
+    if (!drawGeneratedBossPreview(data)) drawGenericCogMachine(data, t);
     ctx.restore();
     ctx.fillStyle = 'rgba(3,5,12,0.25)';
     ctx.fillRect(0, 0, W, H);
@@ -1673,6 +2127,7 @@
       ctx.globalAlpha = 1;
     }
 
+    if (!drawGeneratedPlayer()) {
     // Bottes cinétiques
     ctx.fillStyle = '#ffad4a';
     roundedRect(-19, 24, 22, 18, 6); ctx.fill();
@@ -1704,6 +2159,7 @@
     roundedRect(22, -4, 21, 12, 5); ctx.fill();
     ctx.fillStyle = '#7ef0ff';
     ctx.fillRect(38, -1, 8, 6);
+    }
     ctx.restore();
   }
 
@@ -1720,15 +2176,18 @@
       ctx.stroke();
     }
     if (boss.hitFlash > 0) ctx.filter = 'brightness(2.2) saturate(0.25)';
-    switch (boss.data.id) {
-      case 'rammer': drawRammer(); break;
-      case 'kraken': drawKraken(); break;
-      case 'drill': drawDrill(); break;
-      case 'mantis': drawMantis(); break;
-      case 'cyclotron': drawCyclotron(); break;
-      case 'omega': drawOmega(); break;
+    const generatedBoss = drawGeneratedBoss();
+    if (!generatedBoss) {
+      switch (boss.data.id) {
+        case 'rammer': drawRammer(); break;
+        case 'kraken': drawKraken(); break;
+        case 'drill': drawDrill(); break;
+        case 'mantis': drawMantis(); break;
+        case 'cyclotron': drawCyclotron(); break;
+        case 'omega': drawOmega(); break;
+      }
     }
-    if (boss.phase >= 2) {
+    if (!generatedBoss && boss.phase >= 2) {
       ctx.fillStyle = hexToRgba(boss.data.accent, 0.65);
       for (const side of [-1, 1]) {
         ctx.save();
@@ -1738,7 +2197,7 @@
         ctx.restore();
       }
     }
-    if (boss.phase >= 3) {
+    if (!generatedBoss && boss.phase >= 3) {
       ctx.strokeStyle = boss.data.accent;
       ctx.lineWidth = 4;
       ctx.setLineDash([14, 10]);
@@ -1786,7 +2245,7 @@
     ctx.strokeStyle = '#91e8ff';
     ctx.lineWidth = 3;
     ctx.beginPath(); ctx.ellipse(0,0,32,25,0,Math.PI,TAU); ctx.lineTo(30,18); ctx.lineTo(-30,18); ctx.closePath(); ctx.fill(); ctx.stroke();
-    // Silhouette du Dr Geargrin
+    // Silhouette de Cassian Voltério
     ctx.fillStyle = '#2b1835';
     ctx.beginPath(); ctx.arc(0,0,10,0,TAU); ctx.fill();
     ctx.strokeStyle = '#f7d4a4'; ctx.lineWidth = 3;
@@ -2187,7 +2646,13 @@
   const qaAllowed = new URLSearchParams(location.search).get('qa') === '1' && ['127.0.0.1', 'localhost'].includes(location.hostname);
   if (qaAllowed) Object.defineProperty(window, '__GEARSTORM_QA__', {
     value: Object.freeze({
-      getState: () => ({ state, runMode, bossIndex: currentBossIndex, boss: boss?.data.name ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, installed: [...runBuild.installed], activeScreen: document.querySelector('.screen.active')?.id ?? null }),
+      getState: () => ({ state, runMode, bossIndex: currentBossIndex, boss: boss?.data.name ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, installed: [...runBuild.installed], activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
+      get art() { return getGeneratedArtState(); },
+      get ready() { return artRuntime.ready; },
+      get loaded() { return [...artRuntime.images.keys()]; },
+      get failed() { return [...artRuntime.failed]; },
+      get currentAssets() { return [...artRuntime.currentAssets]; },
+      getArtState: () => getGeneratedArtState(),
       skipIntro: () => { if (!boss || state !== 'fight') return false; introTimer = 0; bossIntro.classList.remove('visible'); bossIntro.setAttribute('aria-hidden', 'true'); if (boss.state === 'intro') boss.stateTime = 10; return true; },
       setBossHealthRatio: ratio => {
         if (!boss || boss.defeated || state !== 'fight') return false;
@@ -2227,6 +2692,7 @@
   }
 
   applySettings();
+  artRuntime.initialPromise = initializeGeneratedArt();
   buildBossGrid();
   const bestRushText=save.bestRush?`Meilleur Circuit : ${formatTime(save.bestRush)}`:'Progression locale activée';
   document.getElementById('save-note').textContent=bestRushText;

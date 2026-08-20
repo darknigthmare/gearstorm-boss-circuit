@@ -3,6 +3,7 @@ const { readFile, realpath, stat } = require('node:fs/promises');
 const { extname, resolve, sep } = require('node:path');
 
 const PROJECT_ROOT = resolve(__dirname);
+const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.2.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
   'styles.css',
@@ -11,6 +12,12 @@ const PUBLIC_FILES = new Set([
   'sw.js',
   'favicon.ico',
   'robots.txt',
+]);
+const PUBLIC_SHELL_ASSETS = new Set([
+  'assets/gearstorm-icon.svg',
+  'assets/gearstorm-icon-192.png',
+  'assets/gearstorm-icon-512.png',
+  'assets/gearstorm-key-art.png',
 ]);
 const MIME_TYPES = {
   '.css': 'text/css; charset=utf-8',
@@ -45,6 +52,12 @@ function sendText(request, response, statusCode, message, extraHeaders = {}) {
   response.end(request.method === 'HEAD' ? undefined : body);
 }
 
+function isPublicAsset(relative) {
+  if (PUBLIC_SHELL_ASSETS.has(relative)) return true;
+  if (relative === GENERATED_RUNTIME_PREFIX + 'asset-manifest.json') return true;
+  return /^assets\/generated\/v2\.2\.0\/(?:arenas|bosses|heroine|vfx)\/[a-z0-9-]+(?:\/[a-z0-9-]+)?\.webp$/.test(relative);
+}
+
 function resolvePublicFile(rootDir, requestUrl, host) {
   let pathname;
   try {
@@ -55,10 +68,10 @@ function resolvePublicFile(rootDir, requestUrl, host) {
 
   if (pathname.includes('\0') || pathname.includes('\\')) return { error: 404 };
   const segments = pathname.split('/').filter(Boolean);
-  if (segments.includes('..')) return { error: 404 };
+  if (segments.includes('..') || segments.some(segment => segment.startsWith('.'))) return { error: 404 };
 
   const relative = pathname === '/' ? 'index.html' : segments.join('/');
-  if (!PUBLIC_FILES.has(relative) && !relative.startsWith('assets/')) return { error: 404 };
+  if (!PUBLIC_FILES.has(relative) && !isPublicAsset(relative)) return { error: 404 };
 
   const candidate = resolve(rootDir, relative);
   if (candidate !== rootDir && !candidate.startsWith(rootDir + sep)) return { error: 404 };
@@ -92,14 +105,16 @@ function createGameServer(options = {}) {
         throw new Error('symlink outside public root');
       }
       const body = request.method === 'HEAD' ? null : await readFile(canonicalCandidate);
-
-      const extension = extname(canonicalCandidate).toLowerCase();
+      const versionedRuntime = resolved.relative.startsWith(GENERATED_RUNTIME_PREFIX);
       const cacheControl = resolved.relative === 'index.html' || resolved.relative === 'sw.js'
         ? 'public, max-age=0, must-revalidate'
-        : 'public, max-age=3600, stale-while-revalidate=86400';
+        : versionedRuntime
+          ? 'public, max-age=31536000, immutable'
+          : 'public, max-age=3600, stale-while-revalidate=86400';
+
       response.writeHead(200, {
         ...SECURITY_HEADERS,
-        'Content-Type': MIME_TYPES[extension] || 'application/octet-stream',
+        'Content-Type': MIME_TYPES[extname(canonicalCandidate).toLowerCase()] || 'application/octet-stream',
         'Content-Length': body?.length ?? info.size,
         'Cache-Control': cacheControl,
       });

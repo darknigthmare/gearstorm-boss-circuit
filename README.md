@@ -1,11 +1,8 @@
-# GEARSTORM: Boss Circuit
+# GEARSTORM: Boss Circuit v2.2
 
-GEARSTORM est un boss rush 2D original conçu comme un jeu complet : Riva Spark traverse les six machines transformables du Professeur Cassian Voltério, améliore son équipement entre les combats et libère les districts emprisonnés dans le Circuit.
+GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables du Professeur Cassian Voltério, améliore son équipement entre les combats et libère les districts emprisonnés dans le Circuit.
 
-## Jouer
-
-- Jeu en ligne : https://gearstorm-boss-circuit.vercel.app
-- Dépôt GitHub : https://github.com/darknigthmare/gearstorm-boss-circuit
+## Jouer en local
 
 Prérequis pour le serveur local et les outils de validation : Node.js 22 ou plus récent.
 
@@ -14,9 +11,16 @@ npm install
 npm start
 ```
 
-Ouvrir ensuite `http://127.0.0.1:8080`. Sous Windows, `LANCER_LE_JEU.bat` lance aussi la version locale directement dans le navigateur.
+Ouvrir ensuite `http://127.0.0.1:8080`. Sous Windows, `LANCER_LE_JEU.bat` lance également la version locale dans le navigateur.
 
-La version hébergée est une PWA : après une première visite réussie, le navigateur peut l’installer et la relancer hors ligne. Le mode `file://` reste jouable, mais l’installation PWA et le cache hors ligne exigent HTTP ou HTTPS.
+Le mode `file://` reste prévu comme solution de repli, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
+
+## Cibles de publication
+
+- Dépôt GitHub prévu : https://github.com/darknigthmare/gearstorm-boss-circuit
+- URL Vercel prévue : https://gearstorm-boss-circuit.vercel.app
+
+Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la révision v2.2 est actuellement poussée ou déployée. L’état public doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
 
 ## Contenu
 
@@ -28,7 +32,23 @@ La version hébergée est une PWA : après une première visite réussie, le nav
 - Sauvegarde locale versionnée, migrée et normalisée.
 - Audio et musique synthétiques via Web Audio, sans dépendance distante.
 - Mouvement réduit, contraste renforcé et réglage des tremblements.
-- PWA installable avec cache hors ligne et présentation sociale dédiée.
+- Cible PWA installable avec cache hors ligne et présentation sociale dédiée.
+
+## Direction artistique v2.2
+
+La production v2.2 repose sur 14 masters originaux réalisés avec OpenAI Image Generation intégré, puis découpés et normalisés en 103 assets indépendants destinés au runtime.
+
+| Famille | Masters | Découpage par master | Assets indépendants |
+| --- | ---: | ---: | ---: |
+| Décors d’arène | 6 | 4 couches de parallaxe | 24 |
+| Boss | 6 | 9 pièces transparentes | 54 |
+| Riva Spark | 1 | 9 poses / états | 9 |
+| Effets visuels | 1 | grille 4 × 4 | 16 |
+| **Total** | **14** |  | **103** |
+
+Les masters sont des sources de production ; le jeu consomme les éléments exportés séparément. Les pièces de personnage, de boss et de VFX utilisent une transparence réelle, sans texte, logo ni filigrane. Les images sont des créations originales propres à GEARSTORM et ne reprennent aucun asset de franchise tierce.
+
+Le rendu procédural Canvas reste le fallback de référence si une image manque, expire, ne se décode pas ou ne peut pas être chargée. Le chargement est conçu pour être progressif : le key art et les éléments de titre sont prioritaires, puis les couches d’arène et les pièces du combat courant sont demandées à la volée. Le loader accessible du titre/prologue peut annoncer cette progression sans bloquer le menu. Sous HTTP ou HTTPS, le service worker peut ensuite mettre en cache les réponses valides selon sa stratégie PWA.
 
 ## Commandes
 
@@ -43,13 +63,13 @@ La version hébergée est une PWA : après une première visite réussie, le nav
 
 ## Qualité et build
 
+La porte de qualité prévue est :
+
 ```text
 npm run qa
 ```
 
-Cette commande vérifie la syntaxe, les contrats du moteur et de la PWA, le serveur HTTP, puis génère et contrôle le bundle web. Le dossier `dist/` ne contient que les fichiers destinés à Vercel : runtime, manifeste, service worker, assets et manifeste d’intégrité SHA-256.
-
-Commandes ciblées :
+Les contrôles ciblés restent :
 
 ```text
 npm test
@@ -57,22 +77,25 @@ npm run build
 npm run check:release
 ```
 
+Ces commandes décrivent le processus attendu ; ce document ne prétend pas qu’elles ont été exécutées sur la révision v2.2. `QA_REPORT.md` ne doit consigner que les validations réellement effectuées et n’est pas mis à jour par ce passage documentaire.
+
 ## Publication
 
-- GitHub Actions exécute `npm ci`, `npm run qa` et l’audit des dépendances.
-- `vercel.json` utilise `npm run build` et publie uniquement `dist/`.
-- Les archives ZIP sont des artefacts de release ; elles ne sont pas versionnées dans Git.
-- Les secrets Vercel ou GitHub restent dans les coffres de la plateforme et ne doivent jamais être ajoutés au dépôt.
+- GitHub Actions est configuré pour exécuter l’installation, la QA et l’audit des dépendances.
+- `vercel.json` décrit le build et la sortie publique attendus.
+- Les archives ZIP sont des artefacts de release et ne sont pas destinées au suivi Git.
+- Les secrets Vercel ou GitHub restent dans les coffres des plateformes.
+- Une publication n’est déclarée terminée qu’après commit, push, déploiement prêt et vérification HTTP de l’URL publique.
 
 ## Structure
 
 - `index.html`, `styles.css`, `game.js` : jeu et interface.
-- `assets/` : icône PWA et key art original.
+- `assets/` : key art, icônes et assets artistiques originaux.
 - `manifest.webmanifest`, `sw.js` : installation et fonctionnement hors ligne.
 - `server.js` : serveur local à surface publique restreinte.
 - `scripts/build.mjs` : bundle web reproductible et empreintes SHA-256.
 - `scripts/check-release.mjs` : garde-fous de publication.
 - `tests/` : contrats du jeu et tests HTTP.
-- `DESIGN.md` : univers et conception détaillée.
+- `DESIGN.md` et `GAME_DESIGN.md` : univers, règles et contrat de production.
 
 Projet original. Tous droits réservés.

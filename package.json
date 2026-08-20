@@ -1,6 +1,6 @@
 {
   "name": "gearstorm-boss-circuit",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "description": "Boss rush 2D original et installable, jouable dans un navigateur moderne.",
   "license": "UNLICENSED",
@@ -14,8 +14,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check game.js && node --check server.js && node --check scripts/build.mjs && node --check scripts/check-release.mjs",
-    "test": "node --test tests/contracts.test.mjs tests/server.test.mjs",
+    "check": "node --check game.js && node --check server.js && node --check scripts/asset-contract.mjs && node --check scripts/build.mjs && node --check scripts/check-release.mjs",
+    "test": "node --test tests/assets.test.mjs tests/contracts.test.mjs tests/server.test.mjs",
     "build": "node scripts/build.mjs",
     "check:release": "node scripts/check-release.mjs",
     "qa": "npm run check && npm test && npm run build && npm run check:release"

@@ -57,14 +57,19 @@ test('les chronos, retry et sauvegardes suivent les garde-fous', () => {
 });
 
 test('la PWA est reliée, installable et versionnée', () => {
-  assert.equal(packageJson.version, '2.1.0');
+  assert.equal(packageJson.version, '2.2.0');
   assert.match(html, /rel="manifest" href="manifest\.webmanifest"/);
   assert.match(html, /property="og:image"/);
   assert.match(game, /serviceWorker/);
   assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
   assert.ok(manifest.icons.some(icon => icon.purpose.includes('maskable')));
-  assert.ok(manifest.screenshots.some(screenshot => screenshot.src.includes('gearstorm-key-art.png')));
-  assert.match(serviceWorker, /gearstorm-shell-v2\.1\.0/);
+  const keyArt = manifest.screenshots.find(screenshot => screenshot.src.includes('gearstorm-key-art.png'));
+  assert.equal(keyArt?.sizes, '1672x941');
+  assert.match(serviceWorker, /gearstorm-shell-v2\.2\.0/);
+  assert.match(serviceWorker, /gearstorm-runtime-v2\.2\.0/);
+  assert.match(serviceWorker, /assets\/generated\/v2\.2\.0\/asset-manifest\.json/);
+  const coreAssets = serviceWorker.slice(serviceWorker.indexOf('const CORE_ASSETS'), serviceWorker.indexOf('self.addEventListener'));
+  assert.doesNotMatch(coreAssets, /assets\/generated\/v2\.2\.0\/.+\.webp/);
   assert.match(serviceWorker, /skipWaiting/);
 });
 
@@ -73,5 +78,8 @@ test('la chaîne Vercel publie uniquement le runtime web', () => {
   assert.equal(vercel.outputDirectory, 'dist');
   assert.match(buildScript, /const publicFiles = \['index\.html', 'styles\.css', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
   assert.doesNotMatch(buildScript, /LANCER_LE_JEU|QA_REPORT|README\.md/);
+  assert.match(buildScript, /validateRuntimeAssets/);
   assert.ok(vercel.headers.some(rule => rule.source === '/(.*)'));
+  const runtimeRule = vercel.headers.find(rule => rule.source === '/assets/generated/v2.2.0/(.*)');
+  assert.ok(runtimeRule?.headers.some(header => header.key === 'Cache-Control' && header.value.includes('immutable')));
 });

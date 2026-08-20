@@ -1,20 +1,29 @@
 import { createHash } from 'node:crypto';
-import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  ASSET_BUDGET_BYTES,
+  ASSET_RELEASE,
+  validateRuntimeAssets,
+} from './asset-contract.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
 if (dirname(dist) !== root) throw new Error('Répertoire de build non sécurisé.');
 
 const publicFiles = ['index.html', 'styles.css', 'game.js', 'manifest.webmanifest', 'sw.js'];
-const publicAssets = ['gearstorm-icon.svg', 'gearstorm-icon-192.png', 'gearstorm-icon-512.png', 'gearstorm-key-art.png'];
-const [html, game, packageJson] = await Promise.all([
+const shellAssets = ['gearstorm-icon.svg', 'gearstorm-icon-192.png', 'gearstorm-icon-512.png', 'gearstorm-key-art.png'];
+const [html, game, packageJson, runtimeAssets] = await Promise.all([
   readFile(resolve(root, 'index.html'), 'utf8'),
   readFile(resolve(root, 'game.js'), 'utf8'),
   readFile(resolve(root, 'package.json'), 'utf8').then(JSON.parse),
+  validateRuntimeAssets(root),
 ]);
 
+if (packageJson.version !== ASSET_RELEASE) {
+  throw new Error(`Version package ${packageJson.version}, bibliothèque assets ${ASSET_RELEASE}.`);
+}
 for (const id of [...game.matchAll(/getElementById\('([^']+)'\)/g)].map(match => match[1])) {
   if (!html.includes(`id="${id}"`)) throw new Error(`Identifiant DOM manquant : ${id}`);
 }
@@ -25,16 +34,25 @@ if (!/serviceWorker/.test(game)) {
   throw new Error('Le service worker PWA n’est pas enregistré par game.js.');
 }
 
-await Promise.all([
-  ...publicFiles.map(file => stat(resolve(root, file))),
-  ...publicAssets.map(file => stat(resolve(root, 'assets', file))),
-]);
+const emittedInputs = [
+  ...publicFiles,
+  ...shellAssets.map(file => `assets/${file}`),
+  ...runtimeAssets.files,
+];
+if (new Set(emittedInputs).size !== emittedInputs.length) {
+  throw new Error('Un fichier public est déclaré plusieurs fois.');
+}
 
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
-await Promise.all(publicFiles.map(file => copyFile(resolve(root, file), resolve(dist, file))));
-await mkdir(resolve(dist, 'assets'), { recursive: true });
-await Promise.all(publicAssets.map(file => copyFile(resolve(root, 'assets', file), resolve(dist, 'assets', file))));
+
+await Promise.all(emittedInputs.map(async file => {
+  const source = resolve(root, file);
+  const destination = resolve(dist, file);
+  if (!destination.startsWith(dist + '\\') && destination !== dist) throw new Error(`Destination non sécurisée : ${file}`);
+  await mkdir(dirname(destination), { recursive: true });
+  await copyFile(source, destination);
+}));
 
 async function listFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -58,7 +76,15 @@ for (const file of emittedFiles) {
 await writeFile(resolve(dist, 'build-manifest.json'), JSON.stringify({
   name: 'GEARSTORM: Boss Circuit',
   version: packageJson.version,
+  runtimeAssets: {
+    release: ASSET_RELEASE,
+    files: runtimeAssets.entries.length,
+    alpha: runtimeAssets.alphaCount,
+    opaque: runtimeAssets.opaqueCount,
+    totalBytes: runtimeAssets.totalBytes,
+    budgetBytes: ASSET_BUDGET_BYTES,
+  },
   files,
 }, null, 2) + '\n', 'utf8');
 
-console.log(`Build web ${packageJson.version} prêt : ${dist}`);
+console.log(`Build web ${packageJson.version} prêt : ${dist} (${runtimeAssets.entries.length} assets runtime, ${runtimeAssets.totalBytes} octets)`);
