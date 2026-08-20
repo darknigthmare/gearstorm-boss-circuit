@@ -28,13 +28,15 @@ Les contraintes de production interdisent texte intégré, logo, filigrane et im
 
 Au runtime, le lazy loading privilégie le titre puis la rencontre courante. Les ressources valides peuvent rejoindre le cache PWA ; le fallback procédural reste disponible si leur chargement ou leur décodage échoue.
 
-## Écriture et expérience v2.3
+## Écriture et expérience v2.4
 
-La progression narrative, les textes d’interface et le Codex sont des créations originales du projet. Ils relient Riva Spark, technicienne devenue pilote de libération, à Cassian Voltério, ingénieur ayant converti les infrastructures du Circuit en spectacle coercitif.
+L’intro, le prologue, les six actes, les interludes, l’épilogue, les transmissions, les dossiers Codex et les dix-huit contrats de maîtrise sont des créations originales du projet. Leur source structurée est `story.js`.
 
-Les six districts — Rocade des Rivets, Couloir des Hautes-Tensions, Fosse Ferromagnétique, Horloge de la Faille, Fournaise des Pistons et Citadelle Voltério — suivent les six machines déjà établies. Leurs conséquences narratives prolongent les transmissions du runtime sans introduire de franchise, marque ou personnage tiers.
+Riva Spark est la technicienne qui a conçu la ligne de maintenance manuelle M-0. Cassian Voltério, ancien architecte du réseau, a centralisé dans la Couronne les commandes des six infrastructures civiles et transformé leurs machines en spectacle coercitif. Son programme adaptatif apprend des victoires de Riva ; la contre-phase M-0 injectée dans la Fournaise permet ensuite de neutraliser son commandement sans détruire le Circuit.
 
-La conception UX v2.3 couvre le briefing de combat, le Codex, la reprise de progression, les récapitulatifs de build, l’aide en pause et les états accessibles/mobile. Les hooks DOM sont documentés séparément du code de gameplay afin de préserver leur stabilité.
+Les six districts — Rocade des Rivets, Couloir des Hautes-Tensions, Fosse Ferromagnétique, Horloge de la Faille, Fournaise des Pistons et Citadelle Voltério — suivent les six machines déjà établies. L’épilogue rend les commandes aux équipes locales, place Cassian en détention et confirme le refus de Riva de devenir une nouvelle autorité centrale.
+
+La conception UX v2.4 couvre l’ouverture narrative, les interludes de district, le briefing de combat, le Codex, les archives M-0, la reprise de progression, les récapitulatifs de build, l’aide en pause et les états accessibles/mobile. Les hooks DOM sont documentés séparément du code de gameplay afin de préserver leur stabilité.
 
 ## Fallback procédural
 

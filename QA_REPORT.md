@@ -1,49 +1,49 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.3.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.4.0
 
-Validation locale effectuée le 20 août 2026 sur le candidat de publication v2.3.0.
+Validation locale effectuée le 21 août 2026 sur le candidat de publication v2.4.0.
 
 ## Automatisation
 
-- `npm run qa` : succès intégral, 32/32 tests réussis.
-- Build v2.3.0 et `check-release` : réussis.
-- `dist/` : 16 192 421 octets.
-- Bibliothèque runtime : 103 WebP issus des assets v2.2.
-- Audit des dépendances : 0 vulnérabilité.
+- `npm run qa` : succès intégral, 42/42 tests réussis.
+- Build v2.4.0 et `check-release` : réussis.
+- `dist/` : 16 252 244 octets.
+- Bibliothèque runtime : 103 WebP versionnés issus des assets v2.2.
+- Registre narratif : introduction, prologue, six actes, six interludes, épilogue et 18 contrats de maîtrise.
+- `npm audit --audit-level=high` : 0 vulnérabilité.
 
 ## Parcours navigateur — ordinateur
 
-Chrome headless local via CDP, viewport 1440 × 900 :
+Chrome headless local via CDP, profil vierge et viewport 1440 × 900 :
 
-- campagne complète avec les six boss et leurs phases 1 à 3 ;
-- cinq améliorations installées ;
-- sauvegarde v3 et reprise de campagne confirmées après rechargement ;
-- Codex complété à 6/6 ;
-- routes `?mode=rush` et `?mode=practice` validées ;
-- `getRigDiagnostics()` validé : pieds de Riva alignés à 36/36, six rigs de boss de neuf pièces, progression des pièces selon les phases et noyaux alignés ;
-- 103/103 images chargées, 0 échec ;
-- écran final atteint sans toast résiduel ;
-- 0 erreur runtime et 0 erreur console.
+- parcours complet titre → introduction → prologue → six boss → cinq Ateliers → épilogue ;
+- résultat, interlude, Codex, Laboratoire, pause et fin contrôlés visuellement ;
+- libellés mécaniques chargés depuis `story.js`, dont les états de Foundry Titan ;
+- panneaux Pause et Résultat mesurés à 700 px et 760 px ;
+- Laboratoire validé séparément : « Simulation terminée », progression de campagne inchangée et « Rapport du Laboratoire » ;
+- 21 captures de contrôle produites localement dans le dossier d’audit ignoré par Git et Vercel.
 
 ## Parcours navigateur — mobile
 
 Chrome local via CDP :
 
-- portrait 390 × 844 : largeur du document égale au viewport, sept boutons visibles et briefing présent ;
-- paysage 844 × 390 : largeur du document égale au viewport, sept boutons visibles et briefing présent ;
-- 0 erreur runtime et 0 erreur console.
+- portrait 390 × 844 : introduction, prologue, combat, HUD, objectif, pause et sept commandes tactiles vérifiés ;
+- paysage 844 × 390 : largeur du document égale au viewport, sept commandes visibles et objectif présent ;
+- commandes portrait replacées en zone basse pour rester accessibles aux pouces ;
+- aucun débordement horizontal détecté sur les deux orientations.
 
 ## Hors ligne
 
-- service worker actif ;
-- rechargement hors ligne réussi ;
-- 103/103 images disponibles, 0 échec.
+- service worker installé et contrôleur actif après amorçage en ligne ;
+- rechargement du shell en réseau coupé réussi ;
+- écran titre et surface QA de nouveau disponibles hors ligne.
 
 ## Publication
 
-Ce rapport couvre uniquement le candidat local. Les preuves GitHub et Vercel publiques seront collectées après le commit et le déploiement.
+Ce rapport couvre le candidat local. Les preuves GitHub, CI et Vercel publiques sont collectées après le commit et le déploiement.
 
 ## Limites du passage
 
 - Aucune manette physique n’a été testée.
 - Aucun appareil tactile physique n’a été testé.
+- Aucun lecteur d’écran réel n’a été testé.
 - Le navigateur intégré était bloqué par le helper ACL Windows ; les vérifications ont été exécutées dans Chrome local via CDP.

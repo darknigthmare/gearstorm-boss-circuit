@@ -38,7 +38,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(security.get('x-frame-options') === 'DENY', 'Protection anti-frame requise.');
   invariant(security.get('content-security-policy').includes("default-src 'self'"), 'CSP same-origin requise.');
 
-  for (const source of ['/', '/index.html', '/game.js', '/styles.css', '/manifest.webmanifest', '/sw.js']) {
+  for (const source of ['/', '/index.html', '/story.js', '/game.js', '/styles.css', '/manifest.webmanifest', '/sw.js']) {
     invariant(headerValue(vercel, source, 'Cache-Control') === 'public, max-age=0, must-revalidate', `Revalidation requise : ${source}.`);
   }
   invariant(headerValue(vercel, '/sw.js', 'Service-Worker-Allowed') === '/', 'Scope du service worker absent.');
@@ -54,6 +54,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(serviceWorker.includes('canonicalRequest'), 'Normalisation des cles de cache absente.');
   invariant(serviceWorker.includes('CORE_PATHS.has(url.pathname)'), 'Le cache shell doit etre limite a la liste blanche.');
   const coreBlock = serviceWorker.slice(serviceWorker.indexOf('const CORE_ASSETS'), serviceWorker.indexOf('const CORE_PATHS'));
+  invariant(coreBlock.includes("'./story.js'"), 'Le registre narratif doit faire partie du shell PWA.');
   invariant(coreBlock.includes(`assets/generated/v\${ASSET_VERSION}/asset-manifest.json`), 'Catalogue assets absent du shell PWA.');
   invariant(!/\.webp[\x60'"]/.test(coreBlock), 'Les 103 WebP ne doivent pas etre precaches.');
 

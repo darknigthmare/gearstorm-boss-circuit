@@ -1,4 +1,4 @@
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.4.0';
 const ASSET_VERSION = '2.2.0';
 const SHELL_CACHE = `gearstorm-shell-v${APP_VERSION}`;
 const RUNTIME_CACHE = `gearstorm-runtime-v${APP_VERSION}`;
@@ -6,6 +6,7 @@ const GENERATED_RUNTIME_PREFIX = new URL(`./assets/generated/v${ASSET_VERSION}/`
 const CORE_ASSETS = [
   './index.html',
   './styles.css',
+  './story.js',
   './game.js',
   './manifest.webmanifest',
   './assets/gearstorm-icon.svg',

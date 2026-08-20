@@ -1,7 +1,7 @@
 {
   "name": "GEARSTORM: Boss Circuit",
   "short_name": "GEARSTORM",
-  "description": "Un boss rush 2D original en six machines transformables.",
+  "description": "Une campagne boss rush 2D originale en six actes, avec histoire, Codex et contrats de maîtrise.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

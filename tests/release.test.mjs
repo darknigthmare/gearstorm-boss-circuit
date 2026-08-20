@@ -4,7 +4,10 @@ import test from 'node:test';
 import {
   APP_RELEASE,
   DIST_BUDGET_BYTES,
+  MASTERY_CONTRACT_COUNT,
   SAVE_SCHEMA_VERSION,
+  STORY_CONTENT_VERSION,
+  STORY_SCHEMA_VERSION,
 } from '../scripts/app-contract.mjs';
 import {
   ASSET_BUDGET_BYTES,
@@ -23,23 +26,26 @@ const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScri
   readFile('scripts/check-release.mjs', 'utf8'),
 ]);
 
-test('la version application 2.3 est decouplee de la bibliotheque assets 2.2', () => {
+test('la version application 2.4 est decouplee de la bibliotheque assets 2.2', () => {
   assert.equal(packageJson.version, APP_RELEASE);
-  assert.equal(APP_RELEASE, '2.3.0');
+  assert.equal(APP_RELEASE, '2.4.0');
   assert.equal(ASSET_RELEASE, '2.2.0');
   assert.notEqual(APP_RELEASE, ASSET_RELEASE);
   assert.match(buildScript, /packageJson\.version !== APP_RELEASE/);
   assert.match(buildScript, /release: ASSET_RELEASE/);
   assert.match(buildScript, new RegExp(`saveSchemaVersion:\\s*SAVE_SCHEMA_VERSION`));
-  assert.equal(SAVE_SCHEMA_VERSION, 3);
+  assert.equal(SAVE_SCHEMA_VERSION, 4);
+  assert.equal(STORY_SCHEMA_VERSION, 1);
+  assert.equal(STORY_CONTENT_VERSION, '1.0.0');
+  assert.equal(MASTERY_CONTRACT_COUNT, 18);
 });
 
 test('le build reste une liste blanche reproductible et minimale', () => {
-  assert.match(buildScript, /const publicFiles = \['index\.html', 'styles\.css', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
+  assert.match(buildScript, /const publicFiles = \['index\.html', 'styles\.css', 'story\.js', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
   assert.match(buildScript, /const shellAssets = \['gearstorm-icon\.svg', 'gearstorm-icon-192\.png', 'gearstorm-icon-512\.png', 'gearstorm-key-art\.png'\]/);
   assert.match(buildScript, /\.\.\.runtimeAssets\.files/);
   assert.match(buildScript, /validateApplicationContract/);
-  assert.match(buildScript, /schemaVersion: 2/);
+  assert.match(buildScript, /schemaVersion: 3/);
   assert.doesNotMatch(buildScript, /LANCER_LE_JEU|QA_REPORT|README\.md/);
   assert.doesNotMatch(buildScript, /cp\(resolve\(root, 'assets'/);
   assert.ok(DIST_BUDGET_BYTES > ASSET_BUDGET_BYTES);
@@ -54,7 +60,8 @@ test('la PWA est installable, versionnee et ne precache pas les 103 WebP', () =>
   assert.ok(manifest.shortcuts.every(shortcut => shortcut.icons?.some(icon => icon.sizes === '192x192')));
   const keyArt = manifest.screenshots.find(screenshot => screenshot.src.includes('gearstorm-key-art.png'));
   assert.equal(keyArt?.sizes, '1672x941');
-  assert.match(serviceWorker, /const APP_VERSION = '2\.3\.0'/);
+  assert.match(serviceWorker, /const APP_VERSION = '2\.4\.0'/);
+  assert.match(serviceWorker, /'\.\/story\.js'/);
   assert.match(serviceWorker, /const ASSET_VERSION = '2\.2\.0'/);
   assert.match(serviceWorker, /cacheFirstRuntime/);
   assert.match(serviceWorker, /staleWhileRevalidateShell/);
@@ -66,7 +73,7 @@ test('la PWA est installable, versionnee et ne precache pas les 103 WebP', () =>
 test('Vercel, la CI Linux et les exclusions satisfont le contrat infrastructure', () => {
   assert.doesNotThrow(() => validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore }));
   assert.match(ci, /concurrency:[\s\S]+cancel-in-progress: true/);
-  assert.match(ci, /name: gearstorm-web-v2\.3\.0/);
+  assert.match(ci, /name: gearstorm-web-v2\.4\.0/);
   assert.match(vercelIgnore, /^\.env\*$/m);
   assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.2\.0\/$/m);
 });

@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit v2.3
+# GEARSTORM: Boss Circuit v2.4
 
 GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables du Professeur Cassian Voltério, améliore son équipement entre les combats et libère les districts emprisonnés dans le Circuit.
 
@@ -20,13 +20,13 @@ Le mode `file://` reste prévu comme solution de repli, mais l’installation PW
 - Dépôt GitHub prévu : https://github.com/darknigthmare/gearstorm-boss-circuit
 - URL Vercel prévue : https://gearstorm-boss-circuit.vercel.app
 
-Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la révision v2.2 est actuellement poussée ou déployée. L’état public doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
+Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la révision v2.4 est actuellement poussée ou déployée. L’état public doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
 
 ## Contenu
 
 - Six boss originaux, chacun structuré en trois phases lisibles.
 - Campagne complète, Laboratoire d’entraînement, trois difficultés et épilogue.
-- Choix d’améliorations entre les combats du Circuit.
+- Onze modules d’amélioration, proposés entre les combats du Circuit et cumulables selon leurs limites propres.
 - Surcharge Overdrive, ruée invulnérable, double saut et tir évolutif.
 - Clavier AZERTY/QWERTY, souris, manette standard et commandes tactiles.
 - Sauvegarde locale versionnée, migrée et normalisée.
@@ -34,17 +34,23 @@ Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la r
 - Mouvement réduit, contraste renforcé et réglage des tremblements.
 - Cible PWA installable avec cache hors ligne et présentation sociale dédiée.
 
-## Expérience narrative et qualité de vie v2.3
+## Expérience narrative et qualité de vie v2.4
 
-La v2.3 relie chaque combat à la libération d’un district et donne une place visible à la progression :
+La v2.4 raconte la reprise des six relais de sécurité qui coordonnent les services civils du Circuit. Cassian Voltério en a centralisé les commandes dans la Couronne ; Riva Spark remonte la ligne manuelle M-0 pour rendre chaque infrastructure à son district.
+
+Le parcours narratif de campagne suit la séquence **Intro → Prologue → Boss → Résultat → Interlude → Atelier**. Après Crown Engine Ω, l’interlude final mène à l’épilogue : Cassian est placé en détention et Riva refuse de remplacer une commande exclusive par une autre.
+
+La progression visible comprend :
 
 - récapitulatif de campagne et prochaine cible dès l’écran titre ;
 - reprise de Circuit prévue par `#continue-run`, affichée seulement lorsqu’une progression compatible existe ;
+- intro de la prise de contrôle, prologue de la ligne M-0 et six interludes propres aux districts ;
+- transmissions de Riva, Cassian et des canaux civils lors des changements de phase et entre les machines ;
 - briefing d’objectif lisible au-dessus du combat, avec conseil contextuel désactivable ;
-- Codex consultable pour Riva Spark, Cassian Voltério, les six machines et leurs districts ;
+- Codex consultable pour Riva Spark, Cassian Voltério, l’origine des six machines, leur détournement et leur impact civil ;
 - objectif, build et rappel des commandes dans la pause ;
 - journal narratif, build actif et conséquence locale sur l’écran de résultat ;
-- itinéraire des six districts au prologue et bilan de libération à l’épilogue ;
+- itinéraire des six relais au prologue et bilan des commandes locales à l’épilogue ;
 - états compacts pour mobile, contraste renforcé et annonces non intrusives pour les technologies d’assistance.
 
 ### Contrat des hooks DOM
@@ -53,11 +59,15 @@ Le runtime conserve tous les IDs historiques et pilote les nouveaux hooks suivan
 
 | Hook | Responsabilité runtime |
 | --- | --- |
+| `#story-screen`, `#story-dialogue` | Présenter l’intro ou un interlude sans recouvrir le combat et rendre la progression explicite. |
+| `#story-continue`, `#story-back` | Avancer dans la campagne ou revenir au menu par une action explicite. |
 | `#continue-run` | Rester masqué sans reprise valide ; afficher la destination dans `#continue-run-detail` et reprendre sans écraser la sauvegarde. |
 | `#campaign-progress`, `#campaign-next` | Résumer les districts libérés et la prochaine machine depuis la sauvegarde normalisée. |
 | `#codex`, `#codex-screen` | Ouvrir le Codex, restaurer le focus au retour et respecter la navigation clavier/manette. |
 | `#codex-grid`, `#codex-progress` | Déverrouiller les dossiers selon la progression, mettre à jour les états et exposer un texte compréhensible sans couleur seule. |
+| `#story-archive`, `#story-archive-progress` | Recenser les transmissions narratives déjà découvertes sans confondre entraînement et campagne. |
 | `#combat-objective` | Annoncer l’objectif du boss ou de la phase sans être désactivé avec les conseils. |
+| `#radio-comms`, `#radio-speaker`, `#radio-line` | Afficher les communications de phase dans une région dédiée et temporaire. |
 | `#combat-hint`, `#hints-toggle` | Afficher un conseil bref lors d’une nouvelle mécanique, le masquer ensuite et persister la préférence. |
 | `#pause-objective`, `#pause-build` | Reprendre l’objectif actuel et la description réelle des modules installés. |
 | `#result-lore`, `#result-build` | Résumer la conséquence narrative de la victoire et le build avant la décision suivante. |
@@ -107,7 +117,7 @@ npm run build
 npm run check:release
 ```
 
-Ces commandes décrivent le processus attendu ; ce document ne prétend pas qu’elles ont été exécutées sur la révision v2.2. `QA_REPORT.md` ne doit consigner que les validations réellement effectuées et n’est pas mis à jour par ce passage documentaire.
+Ces commandes décrivent le processus attendu ; ce document ne prétend pas qu’elles ont été exécutées sur la révision v2.4. `QA_REPORT.md` ne doit consigner que les validations réellement effectuées et n’est pas mis à jour par ce passage documentaire.
 
 ## Publication
 
@@ -120,6 +130,7 @@ Ces commandes décrivent le processus attendu ; ce document ne prétend pas qu�
 ## Structure
 
 - `index.html`, `styles.css`, `game.js` : jeu et interface.
+- `story.js` : registre narratif immuable des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise.
 - `assets/` : key art, icônes et assets artistiques originaux.
 - `manifest.webmanifest`, `sw.js` : installation et fonctionnement hors ligne.
 - `server.js` : serveur local à surface publique restreinte.

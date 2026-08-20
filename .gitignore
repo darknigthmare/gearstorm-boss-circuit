@@ -12,3 +12,5 @@ release/
 coverage/
 Thumbs.db
 .DS_Store
+audit-visual-v2.4/
+.audit-visual-v2.4/

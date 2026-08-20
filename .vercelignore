@@ -27,3 +27,5 @@ qa-*.png
 scripts/*.py
 assets/generated/**/*.png
 assets/generated/**/*.psd
+audit-visual-v2.4/
+.audit-visual-v2.4/

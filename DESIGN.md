@@ -15,17 +15,17 @@ Le Professeur Cassian Voltério a transformé six infrastructures du Circuit en 
 ## Les six machines
 
 1. **Rivet Rex** : bélier mono-roue, salves, mines, marteaux et impacts sismiques.
-2. **Sky Slicer** : rapace bombardier, éventails ioniques et grilles laser.
+2. **Sky Slicer** : rapace bombardier, salves ioniques et grilles laser.
 3. **Magnetron** : araignée magnétique, attraction/répulsion, ferraille et surgissements.
 4. **Chrono Mantis** : mante temporelle, ruées, engrenages et lignes de temps.
-5. **Foundry Titan** : colosse-fonderie, pistons, bombes, lave et chutes lourdes.
+5. **Foundry Titan** : colosse-fonderie, pistons, mines, métal en fusion et chutes de presse.
 6. **Crown Engine Ω** : forteresse finale combinant l’arsenal des cinq machines précédentes.
 
 Chaque boss franchit trois seuils de points de vie. Les phases augmentent la densité, modifient les timings et ajoutent des modules visuels ainsi que de nouvelles contre-attaques.
 
 ## Progression
 
-Les six améliorations couvrent la cadence, la résistance, la ruée, le tir multiple, les dégâts et la surcharge. Elles ne persistent que pendant le Circuit en cours ; les boss débloqués et meilleurs temps sont sauvegardés sur l’appareil. Le Laboratoire permet de rejouer chaque machine vaincue sans fausser la campagne.
+Onze modules couvrent la cadence, le noyau, la ruée, le tir multiple, les dégâts, la surcharge, le bouclier, la mobilité, la précision, le combo et l’auto-réparation de phase. Ils ne persistent que pendant le Circuit en cours ; leurs limites de cumul propres empêchent de dépasser le niveau prévu. Les boss débloqués, meilleurs temps et meilleurs rangs sont sauvegardés sur l’appareil. Le Laboratoire permet de rejouer chaque machine vaincue sans faire avancer les six relais de campagne.
 
 ## Accessibilité et lisibilité
 
@@ -54,41 +54,47 @@ Le total de production est de 14 masters OpenAI Image Generation intégré pour 
 - Le cache PWA peut conserver les ressources validées, tandis que le rendu procédural Canvas assure le fallback en cas d’échec.
 - La progression de chargement peut être signalée au titre ou au prologue, sans bloquer l’accès aux commandes et avec respect du contraste élevé et du mouvement réduit.
 
-## Progression narrative v2.3
+## Progression narrative v2.4
 
 ### Riva contre le système de Voltério
 
 Riva Spark ne traverse pas une simple liste d’arènes. Ancienne technicienne du réseau, elle comprend comment chaque infrastructure a été détournée et choisit de la remettre au service des habitants. Ses améliorations restent des adaptations de terrain : elles renforcent son autonomie sans la transformer en arme de Voltério.
 
-Cassian Voltério traite d’abord Riva comme une variable divertissante, puis comme une anomalie qu’il doit intégrer à son récit. Après chaque machine, sa maîtrise de la diffusion, de l’énergie ou des déplacements diminue. La progression doit faire sentir cette perte de contrôle avant même la Citadelle.
+Cassian Voltério traite d’abord Riva comme une candidate imprévue, puis transforme ses corrections de trajectoire en données d’entraînement pour la Couronne. Riva découvre ce programme adaptatif à la Fosse, retrouve l’origine du détournement M-0 à l’Horloge et injecte une fausse surcharge dans la télémétrie de la Fournaise. La Couronne apprend ainsi la contre-phase qui permettra sa propre neutralisation.
 
 ### Les six actes du Circuit
 
 | Acte | District | Fonction détournée | Battement narratif |
 | ---: | --- | --- | --- |
-| 01 | Rocade des Rivets | Transport et couvre-feu | Riva ouvre la première voie et force Voltério à reconnaître son intervention. |
-| 02 | Couloir des Hautes-Tensions | Communications du nord | Sa voix franchit le brouillage et les habitants comprennent que le Circuit peut tomber. |
-| 03 | Fosse Ferromagnétique | Rails d’évacuation | Les spectateurs captifs disposent enfin d’une sortie réelle. |
-| 04 | Horloge de la Faille | Horloges, archives et classement | Voltério ne peut plus réécrire le temps de la révolte. |
-| 05 | Fournaise des Pistons | Énergie et production | Le spectacle perd son alimentation et la Citadelle devient vulnérable. |
-| 06 | Citadelle Voltério | Commandement de la chaîne | Riva retourne contre la Couronne les cinq technologies déjà apprises. |
+| 01 | Rocade des Rivets | Transport, signalisation et convois | Riva ouvre la première voie ; Cassian identifie la technicienne de la ligne M-0. |
+| 02 | Couloir des Hautes-Tensions | Inspection aérienne, énergie et communications | Le nord retrouve son courant de secours et ses canaux civils ; Cassian collecte les trajectoires de Riva. |
+| 03 | Fosse Ferromagnétique | Fret, traction ferroviaire et évacuation | Les trains repartent ; Riva découvre le dossier adaptatif établi à son nom. |
+| 04 | Horloge de la Faille | Synchronisation, horodatage et archives | Les preuves du verrouillage planifié sont répliquées ; l’inversion du protocole M-0 est révélée. |
+| 05 | Fournaise des Pistons | Fabrication, réparation et alimentation industrielle | Riva injecte une contre-phase M-0 dans la télémétrie et coupe l’énergie externe de la Couronne. |
+| 06 | Citadelle Voltério | Coordination et commandes de sécurité | La contre-phase neutralise le commandement exclusif sans condamner les infrastructures. |
 
-Le Codex dévoile ces conséquences au rythme de la sauvegarde. Il montre d’abord la silhouette, l’arène et le danger principal ; la victoire complète ensuite la lecture de la machine et son effet sur le district. Le joueur peut ainsi relire le récit sans subir une exposition pendant l’action.
+Le registre Codex décrit pour chaque machine son origine civile, son détournement, la lecture mécanique du combat et l’impact de sa neutralisation. Les entrées se débloquent séparément de l’avancement des relais : une analyse de Laboratoire peut enrichir le Codex sans libérer artificiellement un district de campagne.
 
-## Parcours UX v2.3
+## Parcours UX v2.4
 
-- **Titre** : état du Circuit, prochaine cible, reprise conditionnelle et accès direct au Codex.
-- **Prologue** : objectif global, voix de Riva et itinéraire des six districts.
-- **Intro boss** : spectacle de Voltério conservé dans une plaque compacte, contrastée et placée sous le HUD.
-- **Combat** : objectif permanent, conseil contextuel court et désactivable, statut accessible distinct des valeurs animées.
+- **Titre** : état du Circuit, prochain relais, reprise conditionnelle et accès direct au Codex.
+- **Intro** : prise de contrôle de la Couronne et interruption des six services civils.
+- **Prologue** : activation de la ligne M-0, objectif global et itinéraire des six relais ; titre, résumé, dialogues, objectif et méthode proviennent de `story.js`, tandis que la route est dérivée de ses six actes.
+- **Intro boss** : fonction civile, silhouette et provocation de Cassian dans une plaque compacte hors de l’action centrale.
+- **Combat** : objectif permanent, noms de phase, communications brèves et conseil contextuel désactivable.
 - **Pause** : objectif, build, commandes et trois sorties sans ambiguïté.
-- **Résultat** : performance, journal de Riva, conséquence locale et build avant la prochaine décision.
-- **Atelier** : choix du module replacé dans l’itinéraire de campagne.
-- **Codex** : dossiers Riva/Voltério, progression chiffrée et six entrées de machine.
-- **Épilogue** : bilan des six districts, temps, score, retries et build final.
+- **Résultat** : performance, journal de Riva, conséquence locale et build avant la transmission.
+- **Interlude** : réponse des canaux civils, progression du plan de Cassian et décision suivante de Riva.
+- **Atelier** : choix d’un module parmi les onze disponibles, replacé dans l’itinéraire de campagne.
+- **Codex** : dossiers Riva/Voltério, six fiches civiles et archive des transmissions M-0.
+- **Épilogue** : six relais restaurés, Cassian détenu, commandes distribuées, bilan de temps, score, tentatives et build final.
 
 Les objectifs et conseils sont séparés : désactiver `#hints-toggle` masque `#combat-hint`, jamais `#combat-objective`. Les écrans utilisent les mêmes conventions de retour, focus et titres que les menus historiques. Les nouvelles régions restent compactes sur mobile, respectent les zones sûres et conservent un fond opaque sur les effets de fumée.
 
+## Contrats de maîtrise
+
+`story.js` définit trois contrats par machine, soit dix-huit objectifs : temps de référence en difficulté Ingénieur ou Overdrive, combat sans dégâts et défi propre au pattern ou au coup final. Leur définition narrative et leurs identifiants sont stables ; un contrat n’est considéré acquis que lorsque le runtime enregistre sa condition dans la sauvegarde locale. Les défis de Magnetron et Chrono Mantis exigent un cycle complet de phase 3 sans l’impact interdit ; celui de Foundry Titan interdit un impact direct de mine, pas son déclenchement automatique.
+
 ## Fin
 
-Après Crown Engine Ω, un écran d’épilogue distinct confirme la libération du Circuit, résume le temps, le score et les modules installés, puis donne accès au Laboratoire ou au menu principal.
+Après Crown Engine Ω, l’interlude de la Citadelle confirme la détention de Cassian, puis l’épilogue rend les six commandes locales aux équipes civiles. Riva refuse la Couronne au profit de six interrupteurs, six équipes et d’une ligne M-0 indépendante. L’écran final peut résumer le temps, le score, les tentatives et les modules installés avant le Laboratoire ou le menu principal.

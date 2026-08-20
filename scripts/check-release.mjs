@@ -5,7 +5,10 @@ import { relative, resolve } from 'node:path';
 import {
   APP_RELEASE,
   DIST_BUDGET_BYTES,
+  MASTERY_CONTRACT_COUNT,
   SAVE_SCHEMA_VERSION,
+  STORY_CONTENT_VERSION,
+  STORY_SCHEMA_VERSION,
   validateApplicationContract,
 } from './app-contract.mjs';
 import {
@@ -32,6 +35,7 @@ const [
   packageJson,
   packageLock,
   html,
+  story,
   game,
   manifest,
   serviceWorker,
@@ -43,6 +47,7 @@ const [
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('package-lock.json', 'utf8').then(JSON.parse),
   readFile('index.html', 'utf8'),
+  readFile('story.js', 'utf8'),
   readFile('game.js', 'utf8'),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
   readFile('sw.js', 'utf8'),
@@ -56,7 +61,7 @@ assert.equal(packageJson.version, APP_RELEASE);
 assert.equal(packageLock.version, APP_RELEASE);
 assert.equal(packageLock.packages?.['']?.version, APP_RELEASE);
 assert.equal(packageLock.lockfileVersion, 3);
-validateApplicationContract({ game, html, manifest, packageJson });
+validateApplicationContract({ game, story, html, manifest, packageJson });
 validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore });
 
 assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
@@ -73,6 +78,7 @@ assert.equal(keyArtScreenshot?.sizes, '1672x941');
 const shellFiles = [
   'dist/index.html',
   'dist/styles.css',
+  'dist/story.js',
   'dist/game.js',
   'dist/manifest.webmanifest',
   'dist/sw.js',
@@ -84,13 +90,14 @@ const shellFiles = [
 ];
 for (const file of shellFiles) await access(file);
 
-const [distHtml, distGame, distManifest, distRuntime] = await Promise.all([
+const [distHtml, distStory, distGame, distManifest, distRuntime] = await Promise.all([
   readFile('dist/index.html', 'utf8'),
+  readFile('dist/story.js', 'utf8'),
   readFile('dist/game.js', 'utf8'),
   readFile('dist/manifest.webmanifest', 'utf8').then(JSON.parse),
   validateRuntimeAssets('dist'),
 ]);
-validateApplicationContract({ game: distGame, html: distHtml, manifest: distManifest, packageJson });
+validateApplicationContract({ game: distGame, story: distStory, html: distHtml, manifest: distManifest, packageJson });
 assert.equal(distRuntime.entries.length, EXPECTED_COUNTS.runtimeFiles);
 assert.equal(distRuntime.totalBytes, sourceRuntime.totalBytes);
 assert.ok(distRuntime.totalBytes <= ASSET_BUDGET_BYTES);
@@ -109,6 +116,7 @@ assert.deepEqual((await readdir('dist')).sort(), [
   'game.js',
   'index.html',
   'manifest.webmanifest',
+  'story.js',
   'styles.css',
   'sw.js',
 ]);
@@ -129,11 +137,14 @@ for (const [file, expectedSize] of [['dist/assets/gearstorm-icon-192.png', 192],
 }
 
 const buildManifest = JSON.parse(await readFile('dist/build-manifest.json', 'utf8'));
-assert.equal(buildManifest.schemaVersion, 2);
+assert.equal(buildManifest.schemaVersion, 3);
 assert.equal(buildManifest.version, APP_RELEASE);
 assert.deepEqual(buildManifest.application, {
   release: APP_RELEASE,
   saveSchemaVersion: SAVE_SCHEMA_VERSION,
+  storySchemaVersion: STORY_SCHEMA_VERSION,
+  storyContentVersion: STORY_CONTENT_VERSION,
+  masteryContracts: MASTERY_CONTRACT_COUNT,
 });
 assert.deepEqual(buildManifest.runtimeAssets, {
   release: ASSET_RELEASE,
@@ -149,7 +160,7 @@ const actualFiles = (await listFiles('dist'))
   .sort();
 const declaredFiles = Object.keys(buildManifest.files).sort();
 assert.deepEqual(actualFiles, [...declaredFiles, 'build-manifest.json'].sort(), 'dist et build-manifest divergent.');
-assert.equal(declaredFiles.length, 5 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
+assert.equal(declaredFiles.length, 6 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
 
 let distBytes = 0;
 for (const path of actualFiles) {
@@ -168,4 +179,4 @@ for (const path of actualFiles) {
 }
 assert.ok(distBytes <= DIST_BUDGET_BYTES, `Budget dist depasse : ${distBytes} / ${DIST_BUDGET_BYTES}`);
 
-console.log(`Release web ${APP_RELEASE} verifiee : assets v${ASSET_RELEASE}, ${sourceRuntime.entries.length} WebP, ${distBytes} octets publies, PWA/CI/securite conformes.`);
+console.log(`Release web ${APP_RELEASE} verifiee : assets v${ASSET_RELEASE}, ${sourceRuntime.entries.length} WebP, ${MASTERY_CONTRACT_COUNT} contrats, ${distBytes} octets publies, PWA/CI/securite conformes.`);

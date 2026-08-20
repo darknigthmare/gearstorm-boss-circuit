@@ -7,6 +7,10 @@
   const H = 720;
   const GROUND = 620;
   const TAU = Math.PI * 2;
+  const STORY = globalThis.GEARSTORM_STORY;
+  if (!STORY || !Array.isArray(STORY.acts) || STORY.acts.length !== 6) throw new Error('Registre narratif GEARSTORM indisponible.');
+  const MASTERY_CONTRACT_IDS = new Set(Object.values(STORY.masteryContracts).flat().map(contract => contract.id));
+  const STORY_SCENE_IDS = new Set([STORY.intro.id, STORY.prologue.id, ...STORY.acts.map(act => act.id), STORY.epilogue.id]);
 
   const BOSSES = [
     {
@@ -17,7 +21,7 @@
       accent: '#fff0a6',
       hp: 120,
       arena: 'Rocade des Rivets',
-      quote: '« Riva Spark ! Trois phases, quatre marteaux et absolument aucun frein. Admire le génie de Voltério ! »',
+      quote: '« Riva Spark ! Trois phases, deux marteaux et absolument aucun frein. Admire le génie de Voltério ! »',
       description: 'Charges, marteaux, mines et impacts sismiques.',
       transmission: 'Le premier verrou du Circuit vient de céder. Voltério comprend enfin que tu n’es pas une variable de laboratoire.'
     },
@@ -30,7 +34,7 @@
       hp: 145,
       arena: 'Couloir des Hautes-Tensions',
       quote: '« Le ciel est mon laboratoire, Spark. Essaie donc d’esquiver une équation qui vole ! »',
-      description: 'Drones ioniques, piqués, bombes et grilles laser.',
+      description: 'Salves ioniques, lignes de foudre et condensateur exposé.',
       transmission: 'Le brouillage aérien est tombé. Les districts du nord reçoivent de nouveau le signal de Riva.'
     },
     {
@@ -42,7 +46,7 @@
       hp: 160,
       arena: 'Fosse Ferromagnétique',
       quote: '« Attraction, répulsion… et humiliation. La physique a déjà choisi son camp ! »',
-      description: 'Tractions magnétiques, ferraille orbitale et surgissements.',
+      description: 'Inversions de polarité, éruptions et débris magnétiques.',
       transmission: 'Les rails d’évacuation sont libérés. Les habitants commencent à quitter les gradins forcés.'
     },
     {
@@ -78,7 +82,7 @@
       hp: 280,
       arena: 'Citadelle Voltério',
       quote: '« Toutes mes inventions, un seul trône, et moi au centre. La conclusion était inévitable ! »',
-      description: 'Trois formes combinant toutes les technologies du Circuit.',
+      description: 'Trois formes mêlant roquettes, grilles laser, débris magnétiques, chrono-pièges et mines.',
       transmission: 'La Couronne est brisée. Le Circuit Voltério appartient de nouveau à ceux qui y vivent.'
     }
   ];
@@ -92,8 +96,9 @@
   const RUSH_RETRY_PENALTY = 12;
   const RUSH_RETRY_SCORE_PENALTY = 750;
 
-  const SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
-  const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
+  const SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
+  const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
+  const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
   const LEGACY_SAVE_KEY = 'geargrin_overdrive_save';
   const RANK_VALUES = Object.freeze({ C: 1, B: 2, A: 3, S: 4 });
   const requestedLaunchMode = ['rush', 'practice'].includes(new URLSearchParams(location.search).get('mode'))
@@ -137,12 +142,15 @@
   }
 
   const DEFAULT_SAVE = {
-    version: 3,
+    version: 4,
     unlocked: 1,
     bestTimes: {},
     bestRanks: {},
     bestRush: null,
     completed: false,
+    campaignCleared: [],
+    storySeen: [],
+    mastery: {},
     codexUnlocked: [],
     rushSnapshot: null,
     settings: {
@@ -191,6 +199,15 @@
   let maxCombo = 0;
   let lastUpgradeOffer = [];
   let rigDebug = false;
+  let pendingStoryAction = null;
+  let currentStoryKey = null;
+  let commsTimer = 0;
+  let currentBossFinishSource = null;
+  let currentBossOverloadFinish = false;
+  let currentBossOverloadOpening = false;
+  let currentBossHazardHits = Object.create(null);
+  let currentBossPerfectCycles = Object.create(null);
+  let currentBossCycleState = Object.create(null);
 
   const keys = Object.create(null);
   const pressed = new Set();
@@ -228,6 +245,15 @@
   const combatHint = document.querySelector('#combat-hint');
   const pauseBuild = document.querySelector('#pause-build');
   const resultLore = document.querySelector('#result-lore');
+  const resultLoreLabel = document.querySelector('#result-lore-label');
+  const resultMastery = document.querySelector('#result-mastery');
+  const radioComms = document.querySelector('#radio-comms');
+  const radioSpeaker = document.querySelector('#radio-speaker');
+  const radioLine = document.querySelector('#radio-line');
+  const storyContinue = document.querySelector('#story-continue');
+  const storyBack = document.querySelector('#story-back');
+  const storyArchive = document.querySelector('#story-archive');
+  const storyArchiveProgress = document.querySelector('#story-archive-progress');
 
 
   const ART_MANIFEST_URL = 'assets/generated/v2.2.0/asset-manifest.json';
@@ -562,7 +588,7 @@
       const margin = 30 + speed * 170;
       const phase = artRuntime.parallaxTime * (0.38 + speed * 4.2) + index * 0.75;
       const shift = save.settings.reduceMotion ? 0 : Math.sin(phase) * Math.min(margin * 0.72, speed * 185);
-      const combatFade = layerName === 'foreground' && player && boss && ['fight', 'dead', 'paused'].includes(state) ? (save.settings.highContrast ? 0.18 : 0.34) : 1;
+      const combatFade = layerName === 'foreground' && player && boss && ['fight', 'dead', 'paused'].includes(state) ? (save.settings.highContrast ? 0.1 : 0.24) : 1;
       ctx.save();
       ctx.globalAlpha = combatFade;
       ctx.imageSmoothingEnabled = true;
@@ -829,10 +855,14 @@
       counts.set(rawId, count + 1);
       installed.push(rawId);
     }
+    const checkpoint = ['fight', 'interlude', 'upgrade'].includes(value.checkpoint)
+      ? value.checkpoint
+      : value.pendingUpgrade === true ? 'upgrade' : 'fight';
     return {
-      version: 1,
+      version: 2,
       bossIndex,
-      pendingUpgrade: value.pendingUpgrade === true && bossIndex < BOSSES.length - 1,
+      checkpoint,
+      pendingUpgrade: checkpoint !== 'fight' && bossIndex < BOSSES.length - 1,
       score: Math.max(0, Math.floor(Number(value.score) || 0)),
       rushElapsedBeforeBoss: Math.max(0, Number(value.rushElapsedBeforeBoss) || 0),
       rushRetryPenalty: Math.max(0, Number(value.rushRetryPenalty) || 0),
@@ -847,8 +877,9 @@
     try {
       const currentRaw = localStorage.getItem(SAVE_KEY);
       const previousRaw = localStorage.getItem(PREVIOUS_SAVE_KEY);
+      const olderRaw = localStorage.getItem(OLDER_SAVE_KEY);
       const legacyRaw = localStorage.getItem(LEGACY_SAVE_KEY);
-      const raw = currentRaw ?? previousRaw ?? legacyRaw;
+      const raw = currentRaw ?? previousRaw ?? olderRaw ?? legacyRaw;
       if (!raw) return structuredClone(DEFAULT_SAVE);
       const parsed = JSON.parse(raw);
       const safe = structuredClone(DEFAULT_SAVE);
@@ -871,6 +902,27 @@
         : BOSSES.slice(0, Math.max(0, safe.unlocked - 1)).map(entry => entry.id);
       safe.codexUnlocked = [...new Set([...explicitCodex, ...migratedCodex])];
       safe.rushSnapshot = sanitizeRushSnapshot(parsed?.rushSnapshot);
+      const explicitCampaign = Array.isArray(parsed?.campaignCleared)
+        ? parsed.campaignCleared.filter(id => BOSSES.some(entry => entry.id === id))
+        : [];
+      const inferredCampaignCount = safe.completed
+        ? BOSSES.length
+        : safe.rushSnapshot
+          ? Math.min(BOSSES.length, safe.rushSnapshot.bossIndex + (safe.rushSnapshot.checkpoint === 'fight' ? 0 : 1))
+          : 0;
+      safe.campaignCleared = [...new Set([...explicitCampaign, ...BOSSES.slice(0, inferredCampaignCount).map(entry => entry.id)])];
+      const explicitStory = Array.isArray(parsed?.storySeen) ? parsed.storySeen.filter(id => STORY_SCENE_IDS.has(id)) : [];
+      const inferredStory = safe.campaignCleared.length
+        ? [STORY.intro.id, STORY.prologue.id, ...safe.campaignCleared.map(id => STORY.getActByBossId(id)?.id).filter(Boolean)]
+        : [];
+      if (safe.completed) inferredStory.push(STORY.epilogue.id);
+      safe.storySeen = [...new Set([...explicitStory, ...inferredStory])];
+      safe.mastery = {};
+      for (const entry of BOSSES) {
+        const allowed = new Set(STORY.getMasteryContracts(entry.id).map(contract => contract.id));
+        const earned = Array.isArray(parsed?.mastery?.[entry.id]) ? parsed.mastery[entry.id] : [];
+        safe.mastery[entry.id] = [...new Set(earned.filter(id => allowed.has(id)))];
+      }
       const settings = parsed?.settings && typeof parsed.settings === 'object' ? parsed.settings : {};
       safe.settings.difficulty = Object.hasOwn(DIFFICULTIES, settings.difficulty) ? settings.difficulty : 'standard';
       for (const key of ['audio', 'shake', 'reduceMotion', 'highContrast', 'combatHints']) {
@@ -912,7 +964,7 @@
     if (runMode !== 'rush') return null;
     const snapshot = sanitizeRushSnapshot({
       bossIndex: currentBossIndex,
-      pendingUpgrade: false,
+      checkpoint: 'fight',
       score,
       rushElapsedBeforeBoss,
       rushRetryPenalty,
@@ -942,12 +994,14 @@
     const machine = String(snapshot.bossIndex + 1).padStart(2, '0');
     const title = button.querySelector('.button-copy strong');
     const detail = document.querySelector('#continue-run-detail');
-    if (title) title.textContent = snapshot.pendingUpgrade ? 'Continuer le Circuit' : 'Reprendre le Rush';
-    if (detail) {
-      detail.textContent = snapshot.pendingUpgrade
-        ? 'Choisir le module après MACHINE ' + machine
-        : 'Reprendre au début de MACHINE ' + machine;
-    }
+    const labels = {
+      fight: ['Reprendre le Rush', 'Reprendre au début de MACHINE ' + machine],
+      interlude: ['Continuer l’histoire', 'Lire la transmission après MACHINE ' + machine],
+      upgrade: ['Continuer le Circuit', 'Choisir le module avant MACHINE ' + String(Math.min(BOSSES.length, snapshot.bossIndex + 2)).padStart(2, '0')]
+    };
+    const [heading, copy] = labels[snapshot.checkpoint] || labels.fight;
+    if (title) title.textContent = heading;
+    if (detail) detail.textContent = copy;
   }
 
   function resumeRushSnapshot() {
@@ -972,14 +1026,15 @@
     runBuild = rebuildRunBuild(snapshot.installed);
     save.settings.difficulty = snapshot.difficulty;
     applySettings();
-    if (snapshot.pendingUpgrade) {
-      state = 'upgrade';
-      touchControls.classList.remove('in-game');
+    if (snapshot.checkpoint === 'interlude') {
+      showInterlude(snapshot.bossIndex);
+      showToast('Circuit restauré · transmission sécurisée');
+    } else if (snapshot.checkpoint === 'upgrade') {
       showUpgradeSelection();
-      showToast('Rush restauré · choisis le prochain module');
+      showToast('Circuit restauré · choisis le prochain module');
     } else {
       startFight(snapshot.bossIndex);
-      showToast('Rush restauré · MACHINE ' + String(snapshot.bossIndex + 1).padStart(2, '0'));
+      showToast('Circuit restauré · MACHINE ' + String(snapshot.bossIndex + 1).padStart(2, '0'));
     }
     return true;
   }
@@ -1001,20 +1056,189 @@
     return true;
   }
 
+  function markStorySeen(id) {
+    if (!id || save.storySeen.includes(id)) return false;
+    save.storySeen.push(id);
+    persistSave();
+    buildStoryArchive();
+    return true;
+  }
+
+  function createStoryLine(line) {
+    const block = document.createElement('blockquote');
+    block.className = 'story-line';
+    block.dataset.channel = line.channel || 'radio';
+    const speaker = document.createElement('strong');
+    speaker.textContent = line.speaker;
+    const copy = document.createElement('span');
+    copy.textContent = line.text;
+    block.append(speaker, copy);
+    return block;
+  }
+
+  function renderStoryScene(scene, options = {}) {
+    const dialogue = document.querySelector('#story-dialogue');
+    const summary = document.querySelector('#story-summary');
+    const consequence = document.querySelector('#story-consequence');
+    const panel = document.querySelector('#story-panel');
+    if (!scene || !dialogue || !summary || !consequence || !panel) return false;
+    document.querySelector('#story-kicker').textContent = options.kicker || 'ARCHIVE NARRATIVE // LIGNE M-0';
+    document.querySelector('#story-chapter').textContent = scene.chapter || 'TRANSMISSION';
+    document.querySelector('#story-status').textContent = options.status || 'SIGNAL RESTAURÉ';
+    document.querySelector('#story-title').textContent = scene.title;
+    document.querySelector('#story-location').textContent = options.location || 'Réseau civil du Circuit';
+    summary.textContent = scene.summary || '';
+    dialogue.textContent = '';
+    for (const line of scene.lines || []) dialogue.appendChild(createStoryLine(line));
+    consequence.textContent = options.consequence || '';
+    consequence.hidden = !options.consequence;
+    panel.dataset.tone = options.tone || 'signal';
+    currentStoryKey = options.storyKey || scene.id;
+    pendingStoryAction = options.onContinue || null;
+    if (storyContinue) storyContinue.textContent = options.continueLabel || 'Continuer';
+    if (storyBack) storyBack.hidden = options.allowBack === false;
+    showScreen('story-screen');
+    announce((scene.chapter || 'Transmission') + '. ' + scene.title + '.');
+    return true;
+  }
+
+  function showIntroStory() {
+    return renderStoryScene(STORY.intro, {
+      kicker: 'INTRODUCTION // ÉMISSION PERMANENTE',
+      status: 'LIGNE M-0',
+      location: 'Circuit central · Minuit réseau',
+      storyKey: STORY.intro.id,
+      continueLabel: 'Ouvrir la ligne M-0 →',
+      consequence: 'Une ligne manuelle relie encore les six relais civils. Elle ne répond qu’à Riva.',
+      allowBack: true,
+      onContinue: () => {
+        markStorySeen(STORY.intro.id);
+        pendingStoryAction = null;
+        showPrologueStory();
+      }
+    });
+  }
+
+  function showPrologueStory() {
+    return renderStoryScene(STORY.prologue, {
+      kicker: STORY.prologue.kicker,
+      status: STORY.prologue.status,
+      location: STORY.prologue.location,
+      storyKey: STORY.prologue.id,
+      continueLabel: STORY.prologue.continueLabel,
+      consequence: STORY.prologue.objective + ' · ' + STORY.prologue.method,
+      tone: 'mission',
+      allowBack: true,
+      onContinue: () => {
+        markStorySeen(STORY.prologue.id);
+        pendingStoryAction = null;
+        startRun('rush', 0);
+      }
+    });
+  }
+
+  function showInterlude(index) {
+    const act = STORY.getActByOrder(index + 1);
+    if (!act) return false;
+    const scene = {
+      id: act.id,
+      chapter: 'INTERLUDE ' + String(index + 1).padStart(2, '0'),
+      title: act.district + ' · commande rendue',
+      summary: act.districtConsequence,
+      lines: act.interlude
+    };
+    return renderStoryScene(scene, {
+      kicker: 'DISTRICT RESTAURÉ // LIGNE M-0',
+      status: act.civicFunction,
+      location: act.district,
+      storyKey: act.id,
+      continueLabel: index === BOSSES.length - 1 ? 'Reprendre la Couronne →' : 'Accéder à l’atelier →',
+      consequence: act.restoration,
+      tone: index === BOSSES.length - 1 ? 'resolution' : 'district',
+      allowBack: false,
+      onContinue: () => {
+        markStorySeen(act.id);
+        pendingStoryAction = null;
+        if (index === BOSSES.length - 1) showEnding();
+        else {
+          saveRushSnapshot({ checkpoint: 'upgrade' });
+          showUpgradeSelection();
+        }
+      }
+    });
+  }
+
+  function buildStoryArchive() {
+    if (!storyArchive) return;
+    const entries = [
+      { id: STORY.intro.id, chapter: STORY.intro.chapter, title: STORY.intro.title },
+      ...STORY.acts.map((act, index) => ({
+        id: act.id,
+        chapter: 'INTERLUDE ' + String(index + 1).padStart(2, '0'),
+        title: act.restoration
+      })),
+      { id: STORY.epilogue.id, chapter: STORY.epilogue.chapter, title: STORY.epilogue.title }
+    ];
+    storyArchive.textContent = '';
+    let restored = 0;
+    for (const entry of entries) {
+      const unlocked = save.storySeen.includes(entry.id);
+      if (unlocked) restored += 1;
+      const item = document.createElement('li');
+      item.dataset.state = unlocked ? 'available' : 'locked';
+      const chapter = document.createElement('span');
+      chapter.textContent = unlocked ? entry.chapter : 'SIGNAL CHIFFRÉ';
+      const title = document.createElement('strong');
+      title.textContent = unlocked ? entry.title : 'Transmission non restaurée';
+      item.append(chapter, title);
+      storyArchive.appendChild(item);
+    }
+    if (storyArchiveProgress) storyArchiveProgress.textContent = restored + ' / ' + entries.length + ' transmissions';
+  }
+
+  function showRadioExchange(title, lines, duration = 5.2) {
+    if (!radioComms || !radioSpeaker || !radioLine || !lines?.length) return;
+    radioSpeaker.textContent = title;
+    radioLine.textContent = lines.map(line => line.speaker + ' — ' + line.text).join('  ·  ');
+    radioComms.hidden = false;
+    commsTimer = duration;
+  }
+
+  function hideRadioExchange() {
+    commsTimer = 0;
+    if (radioComms) radioComms.hidden = true;
+  }
+
+  function phaseNarrative(phase) {
+    if (runMode !== 'rush') return null;
+    const act = STORY.getActByOrder(currentBossIndex + 1);
+    const transition = act?.phaseTransitions?.find(entry => entry.toPhase === phase);
+    if (!transition) return null;
+    return { ...transition, title: act.phaseTitles?.[phase - 1] || transition.title };
+  }
+
+  function combatLabel(stateName, fallback, includePhase = false) {
+    const label = STORY.getCombatLabel?.(boss?.data?.id, stateName) || fallback;
+    return includePhase && boss ? 'PHASE ' + boss.phase + ' · ' + label : label;
+  }
+
   function syncCampaignUi() {
-    const liberated = save.codexUnlocked.length;
-    const next = BOSSES.find(entry => !save.codexUnlocked.includes(entry.id));
+    const liberated = save.campaignCleared.length;
+    const next = BOSSES.find(entry => !save.campaignCleared.includes(entry.id));
     const campaignProgress = document.querySelector('#campaign-progress');
     const campaignNext = document.querySelector('#campaign-next');
     const labProgress = document.querySelector('#lab-progress');
+    const startButton = document.querySelector('#start-rush');
     if (campaignProgress) campaignProgress.textContent = liberated + ' / ' + BOSSES.length + ' districts libérés';
     if (campaignNext) {
       campaignNext.textContent = next
         ? 'Prochaine cible : ' + next.arena + ' · ' + next.name
-        : 'Circuit libéré · tous les dossiers sont disponibles';
+        : 'Circuit libéré · les six commandes civiles répondent';
     }
+    if (startButton) startButton.firstChild.textContent = save.completed ? 'Rejouer le Circuit complet ' : 'Lancer un nouveau Circuit ';
     if (labProgress) {
-      labProgress.textContent = save.unlocked + ' machine' + (save.unlocked > 1 ? 's' : '') + ' analysée' + (save.unlocked > 1 ? 's' : '') + ' sur ' + BOSSES.length + ' · ' + liberated + ' dossier' + (liberated > 1 ? 's' : '') + ' Codex.';
+      const files = save.codexUnlocked.length;
+      labProgress.textContent = save.unlocked + ' machine' + (save.unlocked > 1 ? 's' : '') + ' analysée' + (save.unlocked > 1 ? 's' : '') + ' sur ' + BOSSES.length + ' · ' + files + ' dossier' + (files > 1 ? 's' : '') + ' Codex.';
     }
   }
 
@@ -1030,17 +1254,27 @@
       meter.textContent = unlockedCount + ' sur ' + BOSSES.length;
     }
     if (grid) {
-      BOSSES.forEach(entry => {
+      BOSSES.forEach((entry, index) => {
         const card = grid.querySelector('[data-boss-id="' + entry.id + '"]');
         if (!card) return;
+        const act = STORY.getActByOrder(index + 1);
         const unlocked = save.codexUnlocked.includes(entry.id);
+        const earned = save.mastery[entry.id] || [];
         card.dataset.state = unlocked ? 'available' : 'encrypted';
         card.dataset.bestRank = save.bestRanks[entry.id] || '';
         card.classList.toggle('locked', !unlocked);
         const status = card.querySelector('header strong');
         if (status) status.textContent = unlocked ? 'ACCESSIBLE' : 'CHIFFRÉE';
+        const lockCopy = card.querySelector('.codex-lock-copy');
+        if (lockCopy && act) lockCopy.textContent = unlocked ? act.codex.origin : act.civicFunction + ' · données chiffrées par Voltério.';
         const details = card.querySelector('.codex-details');
-        if (details) details.hidden = !unlocked;
+        if (details && act) {
+          details.hidden = !unlocked;
+          details.innerHTML = '<dt>Origine</dt><dd>' + act.codex.origin + '</dd>'
+            + '<dt>Détournement</dt><dd>' + act.codex.hijack + '</dd>'
+            + '<dt>Lecture</dt><dd>' + act.codex.reading + '</dd>'
+            + '<dt>Impact</dt><dd>' + act.codex.impact + '</dd>';
+        }
         let record = card.querySelector('.codex-record');
         if (!record) {
           record = document.createElement('p');
@@ -1048,16 +1282,20 @@
           card.appendChild(record);
         }
         record.hidden = !unlocked;
-        if (unlocked) record.textContent = 'Record : rang ' + (save.bestRanks[entry.id] || '—') + ' · ' + formatTime(save.bestTimes[entry.id]);
+        if (unlocked) {
+          record.textContent = 'Record : rang ' + (save.bestRanks[entry.id] || '—') + ' · ' + formatTime(save.bestTimes[entry.id])
+            + ' · Maîtrise ' + earned.length + '/' + (act?.masteryContracts.length || 3);
+        }
       });
     }
+    buildStoryArchive();
     syncCampaignUi();
   }
 
   function routeLaunchMode() {
     if (requestedLaunchMode === 'rush') {
-      showScreen('prologue-screen');
-      return 'prologue-screen';
+      showIntroStory();
+      return 'story-screen';
     }
     if (requestedLaunchMode === 'practice') {
       buildBossGrid();
@@ -1134,7 +1372,7 @@
       omega: 'Traite chaque grille comme un rythme : observe, puis traverse.'
     };
     let hint = bossHints[boss.data.id];
-    if (player.overload >= 100 && player.overloadTime <= 0) hint = 'SURCHARGE PRÊTE · L / X pour ralentir la machine.';
+    if (player.overload >= 100 && player.overloadTime <= 0) hint = 'SURCHARGE PRÊTE · L / X pour amplifier les dégâts et dissiper les menaces.';
     else if (player.barrier > 0) hint = 'Égide active : ' + player.barrier + ' impact' + (player.barrier > 1 ? 's' : '') + ' absorbé' + (player.barrier > 1 ? 's' : '') + '.';
 
     setTextIfChanged(combatObjective, objective);
@@ -1250,6 +1488,7 @@
       dashHitLock: 0,
       overload: 0,
       overloadTime: 0,
+      slowTime: 0,
       barrier: runBuild.shieldCharges,
       precisionHits: 0,
       anim: 0,
@@ -1317,6 +1556,13 @@
       currentBossRetries = 0;
     }
     damageTaken = 0;
+    currentBossFinishSource = null;
+    currentBossOverloadFinish = false;
+    currentBossOverloadOpening = false;
+    currentBossHazardHits = Object.create(null);
+    currentBossPerfectCycles = Object.create(null);
+    currentBossCycleState = Object.create(null);
+    hideRadioExchange();
     combo = 0;
     comboTimer = 0;
     maxCombo = 0;
@@ -1353,14 +1599,32 @@
 
   function configureIntro() {
     const data = BOSSES[currentBossIndex];
-    document.getElementById('intro-index').textContent = `${data.arena} · MACHINE ${String(currentBossIndex + 1).padStart(2, '0')}`;
+    const act = runMode === 'rush' ? STORY.getActByOrder(currentBossIndex + 1) : null;
+    document.getElementById('intro-index').textContent = data.arena + ' · MACHINE ' + String(currentBossIndex + 1).padStart(2, '0');
     document.getElementById('intro-name').textContent = data.name;
-    document.getElementById('intro-epithet').textContent = data.epithet;
-    document.getElementById('intro-quote').textContent = data.quote;
+    document.getElementById('intro-epithet').textContent = act?.civicFunction || data.epithet;
+    document.getElementById('intro-quote').textContent = act?.preFight?.map(line => line.speaker + ' — ' + line.text).join('  ·  ') || data.quote;
     bossIntro.classList.add('visible');
     bossIntro.setAttribute('aria-hidden', 'false');
-    introTimer = 2.6;
-    announce(data.name + '. ' + data.epithet);
+    introTimer = matchMedia('(max-width: 820px)').matches ? 5.2 : 3.8;
+    announce(data.name + '. ' + (act?.civicFunction || data.epithet));
+  }
+
+  function startMasteryCycle(kind) {
+    currentBossCycleState[kind] = { hits: 0 };
+  }
+
+  function finishMasteryCycle(kind) {
+    const cycle = currentBossCycleState[kind];
+    if (!cycle) return;
+    if (cycle.hits === 0) currentBossPerfectCycles[kind] = (currentBossPerfectCycles[kind] || 0) + 1;
+    delete currentBossCycleState[kind];
+  }
+
+  function noteMasteryCycleHit(source) {
+    if (!boss || boss.phase !== 3) return;
+    if (boss.data.id === 'drill' && currentBossCycleState.eruption) currentBossCycleState.eruption.hits += 1;
+    if (boss.data.id === 'mantis' && source === 'bossDash' && currentBossCycleState.dash) currentBossCycleState.dash.hits += 1;
   }
 
   function setBossState(next) {
@@ -1482,6 +1746,7 @@
     if (!player || player.overload < 100 || player.overloadTime > 0) return;
     player.overload = 0;
     player.overloadTime = runBuild.overloadDuration;
+    if (boss?.vulnerable) currentBossOverloadOpening = true;
     player.invuln = Math.max(player.invuln, 0.45);
     enemyShots.forEach(shot => { shot.life = Math.min(shot.life, 1.4); });
     spawnBurst(player.x, player.y, '#fff39a', 34, 430);
@@ -1507,12 +1772,14 @@
     player.dashTime = Math.max(0, player.dashTime - dt);
     player.dashHitLock = Math.max(0, player.dashHitLock - dt);
     player.overloadTime = Math.max(0, player.overloadTime - dt);
+    player.slowTime = Math.max(0, player.slowTime - dt);
+    const chronoFactor = player.slowTime > 0 ? 0.58 : 1;
     if (overloadPress) activateOverload();
 
     if (moveLeft !== moveRight && player.dashTime <= 0) {
       const direction = moveRight ? 1 : -1;
       player.facing = direction;
-      player.vx += direction * runBuild.moveAccel * dt;
+      player.vx += direction * runBuild.moveAccel * chronoFactor * dt;
     } else if (player.dashTime <= 0) {
       player.vx *= Math.pow(0.0008, dt);
     }
@@ -1568,7 +1835,7 @@
     }
 
     if (player.dashTime <= 0) {
-      player.vx = clamp(player.vx, -runBuild.maxSpeed, runBuild.maxSpeed);
+      player.vx = clamp(player.vx, -runBuild.maxSpeed * chronoFactor, runBuild.maxSpeed * chronoFactor);
       player.vy += 1880 * dt;
     } else {
       particles.push({ x: player.x - player.facing * 24, y: player.y + rand(-20, 20), vx: -player.facing * rand(120, 280), vy: rand(-50, 50), life: 0.28, max: 0.28, size: rand(3, 8), color: '#77efff' });
@@ -1602,13 +1869,13 @@
 
     if (boss && !boss.hidden && !boss.defeated && overlapsPlayerBoss()) {
       if (player.dashTime > 0 && boss.vulnerable && player.dashHitLock <= 0 && boss.dashHitCooldown <= 0) {
-        damageBoss(runBuild.dashDamage);
+        damageBoss(runBuild.dashDamage, 'dash');
         player.dashHitLock = 0.5;
         boss.dashHitCooldown = 0.5;
         player.vx = -player.facing * 520;
         player.vy = -320;
       } else {
-        hurtPlayer(1, player.x < boss.x ? -1 : 1);
+        hurtPlayer(1, player.x < boss.x ? -1 : 1, boss.data.id === 'mantis' && boss.state === 'dash' ? 'bossDash' : 'contact');
       }
     }
   }
@@ -1633,7 +1900,7 @@
             precision = player.precisionHits % runBuild.precisionEvery === 0;
             if (precision) shotDamage *= 1 + runBuild.precisionBonus;
           }
-          damageBoss(shotDamage);
+          damageBoss(shotDamage, 'shot');
           addFloatingText(shot.x, shot.y - 18, precision ? 'SURTENSION' : 'CORE HIT', precision ? '#fff39a' : boss.data.accent);
         } else {
           spawnBurst(shot.x, shot.y, '#dce5f6', 5, 115);
@@ -1667,7 +1934,9 @@
     boss.hidden = false;
     boss.vx = 0;
     boss.vy = 0;
-    boss.attackLabel = 'TRANSFORMATION · PHASE ' + boss.phase;
+    const narrative = phaseNarrative(boss.phase);
+    boss.attackLabel = narrative ? narrative.title : 'TRANSFORMATION · PHASE ' + boss.phase;
+    if (narrative) showRadioExchange('PHASE ' + boss.phase + ' · ' + narrative.title, narrative.lines);
     if (player && runBuild.phaseRepair > 0 && player.hp < player.maxHp) {
       const repaired = Math.min(runBuild.phaseRepair, player.maxHp - player.hp);
       player.hp += repaired;
@@ -1701,7 +1970,11 @@
       boss.x = lerp(boss.x, 930, 1 - Math.pow(0.004, dt));
       boss.y = lerp(boss.y, 350, 1 - Math.pow(0.004, dt));
       updateWeakPoint();
-      if (boss.stateTime > (save.settings.reduceMotion ? 0.65 : 1.15)) setBossState(initialStateForBoss());
+      if (boss.stateTime > (save.settings.reduceMotion ? 0.65 : 1.15)) {
+        setBossState(initialStateForBoss());
+        if (boss.phase === 3 && boss.data.id === 'drill') startMasteryCycle('eruption');
+        if (boss.phase === 3 && boss.data.id === 'mantis') startMasteryCycle('dash');
+      }
       return;
     }
 
@@ -1741,7 +2014,7 @@
 
   function updateRammer(dt) {
     if (boss.state === 'patrol') {
-      boss.attackLabel = 'PHASE ' + boss.phase + ' · SALVE DE RIVETS';
+      boss.attackLabel = combatLabel('patrol', 'SALVE DE RIVETS', true);
       boss.vulnerable = false;
       boss.x = 970 + Math.sin(boss.totalTime * 1.8) * 95;
       boss.y = 455 + Math.sin(boss.totalTime * 3.2) * 14;
@@ -1749,7 +2022,7 @@
       rocketTimings.forEach((time, index) => bossEvent('rocket' + index, time, () => spawnRocket(boss.x - 70 + index * 28, boss.y - 35 - index * 5)));
       if (boss.stateTime > 2.2 - boss.phase * 0.12) setBossState('slamTelegraph');
     } else if (boss.state === 'slamTelegraph') {
-      boss.attackLabel = 'IMPACT EN APPROCHE';
+      boss.attackLabel = combatLabel('slamTelegraph', 'IMPACT EN APPROCHE');
       const target = clamp(player.x, 520, 1110);
       boss.x = lerp(boss.x, target, 1 - Math.pow(0.002, dt));
       boss.y = lerp(boss.y, 260, 1 - Math.pow(0.002, dt));
@@ -1758,7 +2031,7 @@
         setBossState('slam');
       }
     } else if (boss.state === 'slam') {
-      boss.attackLabel = 'FERRO-IMPACT';
+      boss.attackLabel = combatLabel('slam', 'FERRO-IMPACT');
       boss.vy += (2450 + boss.phase * 260) * dt;
       boss.y += boss.vy * dt;
       if (boss.y >= 510) {
@@ -1772,7 +2045,7 @@
         setBossState('exposed');
       }
     } else if (boss.state === 'exposed') {
-      boss.attackLabel = 'RÉACTEUR OUVERT';
+      boss.attackLabel = combatLabel('exposed', 'RÉACTEUR OUVERT');
       boss.vulnerable = true;
       boss.y = 510 + Math.sin(boss.stateTime * 7) * 3;
       bossEvent('mine', 0.72, () => spawnMine(boss.x - 130, GROUND - 18));
@@ -1786,14 +2059,14 @@
 
   function updateKraken(dt) {
     if (boss.state === 'orbit') {
-      boss.attackLabel = 'PHASE ' + boss.phase + ' · ESCADRILLE IONIQUE';
+      boss.attackLabel = combatLabel('orbit', 'SALVES IONIQUES', true);
       boss.x = 890 + Math.cos(boss.totalTime * 1.15) * 165;
       boss.y = 250 + Math.sin(boss.totalTime * 1.8) * 75;
       const fanTimings = boss.phase === 1 ? [0.4, 1.25, 2.1] : boss.phase === 2 ? [0.3, 0.95, 1.6, 2.25] : [0.22, 0.75, 1.28, 1.81, 2.34];
       fanTimings.forEach((time, index) => bossEvent('fan' + index, time, () => spawnFan(boss.x, boss.y + 20, 4 + boss.phase, 220 + boss.phase * 28, 2.05, 3.82, 'orb')));
       if (boss.stateTime > 2.65) setBossState('beam');
     } else if (boss.state === 'beam') {
-      boss.attackLabel = 'GRILLE DE FOUDRE';
+      boss.attackLabel = combatLabel('beam', 'GRILLE DE FOUDRE');
       boss.x = lerp(boss.x, 970, 1 - Math.pow(0.01, dt));
       boss.y = lerp(boss.y, 230, 1 - Math.pow(0.01, dt));
       bossEvent('beam1', 0.15, () => spawnBeamV(clamp(player.x, 120, 1160), 0.75, 0.55));
@@ -1803,7 +2076,7 @@
       if (boss.phase >= 3) bossEvent('beam5', 1.62, () => spawnBeamH(GROUND - 168, 0.58, 0.46));
       if (boss.stateTime > 2.05) setBossState('exposed');
     } else if (boss.state === 'exposed') {
-      boss.attackLabel = 'CONDENSATEUR DÉPLOYÉ';
+      boss.attackLabel = combatLabel('exposed', 'CONDENSATEUR DÉPLOYÉ');
       boss.vulnerable = true;
       boss.x = lerp(boss.x, 930, 1 - Math.pow(0.003, dt));
       boss.y = lerp(boss.y, 425, 1 - Math.pow(0.003, dt));
@@ -1817,7 +2090,7 @@
 
   function updateDrill(dt) {
     if (boss.state === 'burrow') {
-      boss.attackLabel = 'PHASE ' + boss.phase + ' · POLARITÉ SOUTERRAINE';
+      boss.attackLabel = combatLabel('burrow', 'POLARITÉ SOUTERRAINE', true);
       boss.hidden = true;
       boss.vulnerable = false;
       if (boss.phase >= 2) {
@@ -1836,7 +2109,7 @@
         setBossState('erupt');
       }
     } else if (boss.state === 'erupt') {
-      boss.attackLabel = 'ÉRUPTION À MÈCHE';
+      boss.attackLabel = combatLabel('erupt', 'ÉRUPTION MAGNÉTIQUE');
       boss.vy += 1560 * dt;
       boss.y += boss.vy * dt;
       bossEvent('rocks', 0.05, () => {
@@ -1851,6 +2124,7 @@
           boss.subCount = 0;
           boss.x = 920;
           boss.y = 500;
+          if (boss.phase === 3) finishMasteryCycle('eruption');
           setBossState('exposed');
         } else {
           setBossState('burrow');
@@ -1858,7 +2132,7 @@
       }
     } else if (boss.state === 'exposed') {
       boss.hidden = false;
-      boss.attackLabel = 'FOREUSE EN SURCHAUFFE';
+      boss.attackLabel = combatLabel('exposed', 'FOREUSE EN SURCHAUFFE');
       boss.vulnerable = true;
       boss.x = lerp(boss.x, 920, 1 - Math.pow(0.003, dt));
       boss.y = lerp(boss.y, 500, 1 - Math.pow(0.003, dt));
@@ -1867,6 +2141,7 @@
       if (boss.phase >= 2) bossEvent('polarityBeam', 1.45, () => spawnBeamV(clamp(player.x, 100, 1180), 0.62, 0.42));
       if (boss.phase >= 3) bossEvent('polarityBurst', 1.9, () => spawnFan(boss.x, boss.y, 8, 190, 0, TAU, 'orb'));
       if (boss.stateTime > 2.75) {
+        if (boss.phase === 3) startMasteryCycle('eruption');
         boss.cycle++;
         setBossState('burrow');
       }
@@ -1875,15 +2150,16 @@
 
   function updateMantis(dt) {
     if (boss.state === 'dashTelegraph') {
-      boss.attackLabel = 'PHASE ' + boss.phase + ' · TRAJECTOIRE CHRONO';
+      boss.attackLabel = combatLabel('dashTelegraph', 'TRAJECTOIRE CHRONO', true);
       boss.x = boss.direction < 0 ? 1100 : 180;
       boss.y = 430 - boss.subCount * 70;
+      if (boss.phase >= 2) bossEvent('chronoField', 0.04, () => spawnChronoField(clamp(player.x, 110, 1170), GROUND - 42, boss.phase === 3 ? 112 : 92));
       if (boss.stateTime > 0.74 - boss.phase * 0.1) {
         boss.vx = boss.direction * (1120 + boss.phase * 180);
         setBossState('dash');
       }
     } else if (boss.state === 'dash') {
-      boss.attackLabel = 'LAME SUPERSONIQUE';
+      boss.attackLabel = combatLabel('dash', 'LAMES DÉPHASÉES');
       boss.x += boss.vx * dt * difficulty().enemySpeed;
       bossEvent('blade1', 0.08, () => spawnBlade(boss.x, boss.y + 15, -boss.direction * 370, -120));
       bossEvent('blade2', 0.34, () => spawnBlade(boss.x, boss.y - 25, -boss.direction * 330, 90));
@@ -1894,19 +2170,21 @@
         shake(6);
         if (boss.subCount >= 2 + boss.phase) {
           boss.subCount = 0;
+          if (boss.phase === 3) finishMasteryCycle('dash');
           setBossState('overheat');
         } else {
           setBossState('dashTelegraph');
         }
       }
     } else if (boss.state === 'overheat') {
-      boss.attackLabel = 'SERVOMOTEURS EXPOSÉS';
+      boss.attackLabel = combatLabel('overheat', 'SERVOMOTEURS EXPOSÉS');
       boss.vulnerable = true;
       boss.x = lerp(boss.x, 930, 1 - Math.pow(0.003, dt));
       boss.y = lerp(boss.y, 440, 1 - Math.pow(0.003, dt));
       bossEvent('blade', 0.9, () => spawnFan(boss.x, boss.y, 2 + boss.phase, 180 + boss.phase * 18, 2.45, 3.82, 'blade'));
       if (boss.phase >= 3) bossEvent('timeLine', 1.45, () => spawnBeamH(GROUND - 142, 0.72, 0.5));
       if (boss.stateTime > 2.65) {
+        if (boss.phase === 3) startMasteryCycle('dash');
         boss.cycle++;
         setBossState('dashTelegraph');
       }
@@ -1915,7 +2193,7 @@
 
   function updateCyclotron(dt) {
     if (boss.state === 'roll') {
-      boss.attackLabel = 'PHASE ' + boss.phase + ' · PISTONS EN MARCHE';
+      boss.attackLabel = combatLabel('roll', 'PISTONS EN MARCHE', true);
       boss.vulnerable = false;
       const speed = (260 + boss.phase * 60) * difficulty().enemySpeed;
       boss.x += boss.direction * speed * dt;
@@ -1932,7 +2210,7 @@
       if (boss.phase >= 3) bossEvent('lavaLine', 1.75, () => spawnBeamH(GROUND - 34, 0.78, 0.55));
       if (boss.stateTime > 3.3) setBossState('bombRain');
     } else if (boss.state === 'bombRain') {
-      boss.attackLabel = 'PLUIE DE CONFETTIS EXPLOSIFS';
+      boss.attackLabel = combatLabel('bombRain', 'PLUIE DE MÉTAL EN FUSION');
       boss.x = lerp(boss.x, 900, 1 - Math.pow(0.01, dt));
       boss.y = lerp(boss.y, 270, 1 - Math.pow(0.01, dt));
       for (let i = 0; i < 4 + boss.phase * 2; i++) {
@@ -1941,7 +2219,7 @@
       if (boss.phase >= 2) bossEvent('piston', 1.5, () => spawnBeamV(clamp(player.x + 180, 100, 1180), 0.65, 0.5));
       if (boss.stateTime > 2.5) setBossState('crashTelegraph');
     } else if (boss.state === 'crashTelegraph') {
-      boss.attackLabel = 'FREINAGE THÉORIQUE';
+      boss.attackLabel = combatLabel('crashTelegraph', 'CHUTE DE PRESSE EN APPROCHE');
       boss.x = lerp(boss.x, clamp(player.x, 300, 1080), 1 - Math.pow(0.006, dt));
       boss.y = lerp(boss.y, 230, 1 - Math.pow(0.006, dt));
       if (boss.stateTime > 0.82) {
@@ -1949,7 +2227,7 @@
         setBossState('crash');
       }
     } else if (boss.state === 'crash') {
-      boss.attackLabel = 'ATTRACTION FINALE';
+      boss.attackLabel = combatLabel('crash', 'CHUTE DE PRESSE');
       boss.vy += (2600 + boss.phase * 280) * dt;
       boss.y += boss.vy * dt;
       if (boss.y >= 492) {
@@ -1963,7 +2241,7 @@
         setBossState('exposed');
       }
     } else if (boss.state === 'exposed') {
-      boss.attackLabel = 'CABINE DÉVERROUILLÉE';
+      boss.attackLabel = combatLabel('exposed', 'NOYAU DE PRESSE OUVERT');
       boss.vulnerable = true;
       boss.y = 492 + Math.sin(boss.stateTime * 8) * 5;
       if (boss.stateTime > 2.55) {
@@ -1977,7 +2255,7 @@
     const speedBonus = 1 + (boss.phase - 1) * 0.12;
 
     if (boss.state === 'arsenal') {
-      boss.attackLabel = `PHASE ${boss.phase} · ARSENAL ROYAL`;
+      boss.attackLabel = combatLabel('arsenal', 'ARSENAL ROYAL', true);
       boss.x = 900 + Math.sin(boss.totalTime * 1.25 * speedBonus) * 150;
       boss.y = 245 + Math.cos(boss.totalTime * 1.9) * 55;
       const timings = boss.phase === 1 ? [0.35, 1.1, 1.85] : boss.phase === 2 ? [0.25, 0.85, 1.45, 2.05] : [0.2, 0.65, 1.1, 1.55, 2.0];
@@ -1985,9 +2263,11 @@
         if (i % 2 === 0) spawnRocket(boss.x + rand(-45,45), boss.y - 25);
         else spawnFan(boss.x, boss.y + 20, 5 + boss.phase, 230 + boss.phase * 15, 2.15, 3.8, 'orb');
       }));
+      if (boss.phase >= 2) bossEvent('magneticDebris', 0.52, () => spawnRock(player.x + rand(-120, 120), -30, rand(-65, 65), 90));
+      if (boss.phase >= 3) bossEvent('chronoTrap', 1.28, () => spawnChronoField(clamp(player.x, 120, 1160), GROUND - 42, 98));
       if (boss.stateTime > 2.55) setBossState('laserGrid');
     } else if (boss.state === 'laserGrid') {
-      boss.attackLabel = `PHASE ${boss.phase} · ÉCHIQUIER LASER`;
+      boss.attackLabel = combatLabel('laserGrid', 'ÉCHIQUIER LASER', true);
       boss.x = lerp(boss.x, 960, 1 - Math.pow(0.008, dt));
       boss.y = lerp(boss.y, 220, 1 - Math.pow(0.008, dt));
       const columns = boss.phase + 1;
@@ -1995,9 +2275,11 @@
         bossEvent(`gridv${i}`, 0.12 + i * 0.34, () => spawnBeamV(clamp(player.x + (i - columns / 2) * 170, 90, 1190), 0.62, 0.46));
       }
       bossEvent('gridh', 0.7, () => spawnBeamH(GROUND - (boss.phase === 3 ? 138 : 92), 0.68, 0.46));
+      if (boss.phase >= 2) bossEvent('roadShock', 1.05, () => spawnShockwaves(boss.x, 2));
+      if (boss.phase >= 3) bossEvent('foundryMine', 1.48, () => spawnMine(clamp(player.x + 130, 80, 1200), GROUND - 18));
       if (boss.stateTime > 1.55 + columns * 0.2) setBossState('coreOpen');
     } else if (boss.state === 'coreOpen') {
-      boss.attackLabel = `PHASE ${boss.phase} · NOYAU OMÉGA OUVERT`;
+      boss.attackLabel = combatLabel('coreOpen', 'NOYAU OMÉGA OUVERT', true);
       boss.vulnerable = true;
       boss.x = lerp(boss.x, 910, 1 - Math.pow(0.003, dt));
       boss.y = lerp(boss.y, 390, 1 - Math.pow(0.003, dt));
@@ -2018,7 +2300,7 @@
     boss.weakR = weak.r;
   }
 
-  function damageBoss(amount) {
+  function damageBoss(amount, source = 'shot') {
     if (!boss || boss.defeated || boss.state === 'phaseTransition') return 0;
     const overloadMultiplier = player?.overloadTime > 0 ? 1.65 : 1;
     const requested = Math.max(1, Math.round(amount * overloadMultiplier));
@@ -2042,8 +2324,11 @@
       growth: actualDamage >= 10 ? 0.66 : 0.4
     });
     sfx(actualDamage >= 10 ? 'heavyHit' : 'hit');
-    if (boss.hp <= 0) defeatBoss();
-    else if (boss.hp <= floor && boss.phase < 3) beginPhaseTransition(boss.phase + 1);
+    if (boss.hp <= 0) {
+      currentBossFinishSource = source;
+      currentBossOverloadFinish = player?.overloadTime > 0;
+      defeatBoss();
+    } else if (boss.hp <= floor && boss.phase < 3) beginPhaseTransition(boss.phase + 1);
     return actualDamage;
   }
 
@@ -2073,8 +2358,11 @@
     sfx('explode');
   }
 
-  function hurtPlayer(amount, direction = -1) {
+  function hurtPlayer(amount, direction = -1, source = 'unknown') {
     if (!player || player.invuln > 0 || state !== 'fight') return;
+    const phaseKey = source + ':phase' + (boss?.phase || 1);
+    currentBossHazardHits[phaseKey] = (currentBossHazardHits[phaseKey] || 0) + 1;
+    noteMasteryCycleHit(source);
     if (player.barrier > 0) {
       player.barrier -= 1;
       player.invuln = 0.78;
@@ -2169,6 +2457,9 @@
           shake(5);
           sfx('smallExplosion');
         }
+      } else if (s.type === 'chronoField') {
+        const active = s.age >= s.telegraph;
+        if (active && Math.hypot(player.x - s.x, player.y - s.y) <= s.r) player.slowTime = Math.max(player.slowTime, 0.16);
       } else if (s.type === 'beamV' || s.type === 'beamH') {
         // Position fixe : la collision n’est active qu’après le télégraphe.
       } else if (s.type === 'warningCircle') {
@@ -2176,7 +2467,7 @@
       }
 
       if (s.damage > 0 && shotHitsPlayer(s)) {
-        hurtPlayer(s.damage, player.x < (s.x || W / 2) ? -1 : 1);
+        hurtPlayer(s.damage, player.x < (s.x || W / 2) ? -1 : 1, s.type);
         if (!['beamV', 'beamH'].includes(s.type)) s.life = 0;
       }
 
@@ -2245,9 +2536,58 @@
       const rankedBossTime = lastBossTime + lastBossRetryPenalty;
       save.bestTimes[boss.data.id] = Math.min(save.bestTimes[boss.data.id] ?? Infinity, rankedBossTime);
       save.unlocked = Math.max(save.unlocked, Math.min(BOSSES.length, currentBossIndex + 2));
+      if (runMode === 'rush' && !save.campaignCleared.includes(boss.data.id)) save.campaignCleared.push(boss.data.id);
       persistSave();
       buildBossGrid();
       showResult();
+    }
+  }
+
+  function evaluateMasteryContracts(rankedTime) {
+    const act = STORY.getActByOrder(currentBossIndex + 1);
+    if (!act) return [];
+    const bossId = act.bossId;
+    const previous = new Set(save.mastery[bossId] || []);
+    const results = act.masteryContracts.map(contract => {
+      let achieved = false;
+      if (contract.metric === 'timeSeconds') achieved = save.settings.difficulty !== 'casual' && rankedTime <= contract.target;
+      else if (contract.metric === 'damageTaken') achieved = damageTaken <= contract.target;
+      else if (contract.metric === 'dashFinish') achieved = currentBossFinishSource === 'dash';
+      else if (contract.metric === 'overloadDuringOpening') achieved = currentBossOverloadOpening;
+      else if (contract.metric === 'perfectEruptionCycle') achieved = (currentBossPerfectCycles.eruption || 0) >= contract.target;
+      else if (contract.metric === 'perfectDashCycle') achieved = (currentBossPerfectCycles.dash || 0) >= contract.target;
+      else if (contract.metric === 'minesTriggered') achieved = (currentBossHazardHits['mine:phase3'] || 0) <= contract.target;
+      else if (contract.metric === 'overloadFinish') achieved = currentBossOverloadFinish;
+      const earnedNow = achieved && !previous.has(contract.id);
+      if (achieved) previous.add(contract.id);
+      return { ...contract, achieved, earnedNow };
+    });
+    const before = (save.mastery[bossId] || []).length;
+    save.mastery[bossId] = [...previous];
+    const gained = save.mastery[bossId].length - before;
+    if (gained > 0) {
+      score += gained * 500;
+      persistSave();
+    }
+    return results;
+  }
+
+  function renderMasteryResults(results) {
+    if (!resultMastery) return;
+    resultMastery.textContent = '';
+    for (const contract of results) {
+      const card = document.createElement('article');
+      card.className = 'mastery-contract';
+      const unlocked = contract.achieved || (save.mastery[BOSSES[currentBossIndex].id] || []).includes(contract.id);
+      card.dataset.earned = String(unlocked);
+      const status = document.createElement('span');
+      status.textContent = contract.earnedNow ? 'NOUVEAU · +500' : unlocked ? 'ARCHIVÉ' : 'À REFAIRE';
+      const title = document.createElement('strong');
+      title.textContent = contract.title;
+      const objective = document.createElement('small');
+      objective.textContent = contract.objective;
+      card.append(status, title, objective);
+      resultMastery.appendChild(card);
     }
   }
 
@@ -2273,67 +2613,68 @@
 
   function showResult() {
     hideToast();
+    hideRadioExchange();
     state = 'result';
     touchControls.classList.remove('in-game');
     const finalBoss = currentBossIndex === BOSSES.length - 1;
     const rushComplete = runMode === 'rush' && finalBoss;
     const rankedTime = lastBossTime + lastBossRetryPenalty;
     const medal = calculateRank(rankedTime, damageTaken, currentBossRetries);
+    const practiceResult = runMode === 'practice';
+    const act = practiceResult ? null : STORY.getActByOrder(currentBossIndex + 1);
     recordBestRank(BOSSES[currentBossIndex].id, medal);
-    document.getElementById('result-eyebrow').textContent = rushComplete ? 'RUSH INTÉGRAL TERMINÉ' : 'MACHINE NEUTRALISÉE';
+    const masteryResults = evaluateMasteryContracts(rankedTime);
+    document.getElementById('result-eyebrow').textContent = practiceResult ? 'SIMULATION TERMINÉE' : rushComplete ? 'COURONNE NEUTRALISÉE' : 'MACHINE NEUTRALISÉE';
     document.getElementById('result-title').textContent = rushComplete ? 'Crown Engine Ω est tombé' : BOSSES[currentBossIndex].name;
-    document.getElementById('result-summary').textContent = BOSSES[currentBossIndex].transmission;
+    document.getElementById('result-summary').textContent = practiceResult
+      ? 'Données de combat archivées. La progression de campagne reste inchangée.'
+      : act?.districtConsequence || BOSSES[currentBossIndex].transmission;
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = true;
     const resultBuild = document.querySelector('#result-build');
     if (resultBuild) resultBuild.textContent = describeBuild();
-    if (resultLore) {
-      resultLore.textContent = 'Archive Codex récupérée · ' + BOSSES[currentBossIndex].epithet + ' · Rang record ' + (save.bestRanks[BOSSES[currentBossIndex].id] || medal) + '.';
-    }
+    if (resultLoreLabel) resultLoreLabel.textContent = practiceResult ? 'Rapport du Laboratoire' : 'Journal de Riva';
+    if (resultLore) resultLore.textContent = practiceResult
+      ? 'Profil mécanique : ' + BOSSES[currentBossIndex].description
+      : act?.rivaJournal || BOSSES[currentBossIndex].transmission;
+    renderMasteryResults(masteryResults);
 
-    const total = runMode === 'rush' ? rushElapsedBeforeBoss + lastBossTime + rushRetryPenalty : lastBossTime;
-    if (rushComplete) {
-      save.completed = true;
-      if (save.bestRush === null || total < save.bestRush) save.bestRush = total;
-      clearRushSnapshot();
-    } else if (runMode === 'rush') {
+    if (runMode === 'rush') {
       saveRushSnapshot({
-        pendingUpgrade: true,
+        checkpoint: 'interlude',
         rushElapsedBeforeBoss: rushElapsedBeforeBoss + lastBossTime
       });
     }
     buildCodex();
     const timeLabel = lastBossRetryPenalty > 0 ? formatTime(rankedTime) + ' (+' + lastBossRetryPenalty + ' s)' : formatTime(rankedTime);
-    document.getElementById('result-stats').innerHTML = '<div><strong>' + timeLabel + '</strong><small>Temps classé</small></div>' + '<div><strong>' + score.toLocaleString('fr-FR') + '</strong><small>Score · combo max ×' + maxCombo + '</small></div>' + '<div><strong>' + medal + '</strong><small>Rang · ' + difficulty().name + '</small></div>';
+    document.getElementById('result-stats').innerHTML = '<div><strong>' + timeLabel + '</strong><small>Temps classé</small></div>'
+      + '<div><strong>' + score.toLocaleString('fr-FR') + '</strong><small>Score · combo max ×' + maxCombo + '</small></div>'
+      + '<div><strong>' + medal + '</strong><small>Rang · ' + difficulty().name + '</small></div>';
     announce(boss.data.name + ' neutralisé. Rang ' + medal + '. Temps ' + formatTime(rankedTime) + '.');
 
     const continueButton = document.getElementById('continue-button');
-    if (runMode === 'rush' && !finalBoss) continueButton.textContent = 'Installer une amélioration';
-    else if (runMode === 'practice') continueButton.textContent = 'Retour au Laboratoire';
-    else continueButton.textContent = 'Voir l’épilogue';
+    continueButton.textContent = runMode === 'practice' ? 'Retour au Laboratoire' : 'Lire la transmission';
     continueButton.hidden = false;
     showScreen('result-screen');
   }
 
   function continueAfterResult() {
-    const finalBoss = currentBossIndex === BOSSES.length - 1;
-    if (runMode === 'rush' && !finalBoss) {
+    if (runMode === 'rush') {
       rushElapsedBeforeBoss += lastBossTime;
-      saveRushSnapshot({ pendingUpgrade: true });
-      showUpgradeSelection();
-    } else if (runMode === 'practice') {
+      saveRushSnapshot({ checkpoint: 'interlude', rushElapsedBeforeBoss });
+      showInterlude(currentBossIndex);
+    } else {
       state = 'menu';
       player = null;
       boss = null;
       buildBossGrid();
       showScreen('boss-select-screen');
-    } else {
-      showEnding();
     }
   }
 
   function showUpgradeSelection() {
     state = 'upgrade';
+    if (runMode === 'rush') saveRushSnapshot({ checkpoint: 'upgrade' });
     player = null;
     boss = null;
     resetWorld();
@@ -2381,12 +2722,38 @@
 
   function showEnding() {
     hideToast();
+    hideRadioExchange();
     state = 'ending';
     touchControls.classList.remove('in-game');
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = true;
-    const total = rushElapsedBeforeBoss + lastBossTime + rushRetryPenalty;
-    document.getElementById('ending-summary').textContent = 'Temps du Circuit : ' + formatTime(total) + ' · Score final : ' + score.toLocaleString('fr-FR') + ' · Retries : ' + runRetryCount + ' · Build : ' + describeBuild() + '.';
+    const total = rushElapsedBeforeBoss + rushRetryPenalty;
+    save.completed = true;
+    if (save.bestRush === null || total < save.bestRush) save.bestRush = total;
+    if (!save.storySeen.includes(STORY.epilogue.id)) save.storySeen.push(STORY.epilogue.id);
+    save.rushSnapshot = null;
+    persistSave();
+    buildCodex();
+
+    document.getElementById('ending-title').textContent = STORY.epilogue.title;
+    const transmission = document.querySelector('.ending-transmission');
+    if (transmission) transmission.textContent = STORY.epilogue.lines.map(line => line.speaker + ' — ' + line.text).join('  ·  ');
+    const resolution = document.querySelector('.ending-resolution');
+    if (resolution) {
+      resolution.innerHTML = '<article><span>Citadelle</span><strong>' + STORY.epilogue.cassianFate + '</strong></article>'
+        + '<article><span>Choix de Riva</span><strong>' + STORY.epilogue.rivaChoice + '</strong></article>';
+    }
+    const districts = document.querySelector('#ending-districts');
+    if (districts) {
+      districts.textContent = '';
+      STORY.epilogue.districtRestorations.forEach((entry, index) => {
+        const item = document.createElement('li');
+        item.innerHTML = '<span>' + String(index + 1).padStart(2, '0') + '</span><strong>' + entry.district + '</strong><small>' + entry.restoration + '</small>';
+        districts.appendChild(item);
+      });
+    }
+    document.getElementById('ending-summary').textContent = 'Temps du Circuit : ' + formatTime(total)
+      + ' · Score final : ' + score.toLocaleString('fr-FR') + ' · Tentatives relancées : ' + runRetryCount + ' · Build : ' + describeBuild() + '.';
     announce('Circuit libéré en ' + formatTime(total) + '. Score final ' + score + '.');
     player = null;
     boss = null;
@@ -2418,6 +2785,15 @@
     showScreen('title-screen');
   }
 
+  function syncPauseHelp() {
+    const help = document.querySelector('.pause-quick-help');
+    if (!help) return;
+    const touchLayout = matchMedia('(pointer: coarse), (max-width: 640px)').matches;
+    help.innerHTML = touchLayout
+      ? '<span><kbd>TIR</kbd><small>Attaque</small></span><span><kbd>RUÉE</kbd><small>Esquive</small></span><span><kbd>SURCH.</kbd><small>Overdrive</small></span><span><kbd>Ⅱ</kbd><small>Reprendre</small></span>'
+      : '<span><kbd>J</kbd><small>Tir</small></span><span><kbd>K</kbd><small>Ruée</small></span><span><kbd>L</kbd><small>Surcharge</small></span><span><kbd>Échap</kbd><small>Reprendre</small></span>';
+  }
+
   function pauseGame() {
     if (state !== 'fight' || boss?.defeated) return;
     pauseFightClock();
@@ -2425,6 +2801,10 @@
     touchControls.classList.remove('in-game');
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = true;
+    bossIntro.classList.remove('visible');
+    bossIntro.setAttribute('aria-hidden', 'true');
+    hideRadioExchange();
+    syncPauseHelp();
     const pauseObjective = document.querySelector('#pause-objective');
     if (pauseObjective) pauseObjective.textContent = combatObjective?.textContent || 'Exposer le noyau après le cycle d’attaque';
     if (pauseBuild) {
@@ -2448,6 +2828,10 @@
   }
 
   function update(dt) {
+    if (commsTimer > 0) {
+      commsTimer -= dt;
+      if (commsTimer <= 0) hideRadioExchange();
+    }
     if (toastTimer > 0) {
       toastTimer -= dt;
       if (toastTimer <= 0) toast.classList.remove('visible');
@@ -2968,6 +3352,20 @@
         const pulse = 1 + Math.sin(s.pulse*10)*0.12;
         ctx.translate(s.x,s.y);ctx.scale(pulse,pulse);ctx.fillStyle='#42284e';ctx.strokeStyle='#d987ff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,s.r,0,TAU);ctx.fill();ctx.stroke();
         for(let i=0;i<6;i++){ctx.save();ctx.rotate(i/6*TAU);ctx.fillRect(s.r-2,-3,12,6);ctx.restore();}
+      } else if (s.type === 'chronoField') {
+        const active = s.age >= s.telegraph;
+        const pulse = 0.94 + Math.sin(s.age * 9) * 0.05;
+        ctx.translate(s.x, s.y);
+        ctx.fillStyle = active ? 'rgba(255,79,123,0.16)' : 'rgba(255,208,220,0.07)';
+        ctx.strokeStyle = active ? 'rgba(255,112,150,0.92)' : 'rgba(255,208,220,0.6)';
+        ctx.lineWidth = active ? 5 : 3;
+        ctx.setLineDash(active ? [] : [12, 10]);
+        ctx.beginPath(); ctx.arc(0, 0, s.r * pulse, 0, TAU); ctx.fill(); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(255,230,238,0.82)';
+        ctx.font = '900 18px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText(active ? 'TEMPS DÉPHASÉ' : 'CHAMP CHRONO', 0, 6);
       } else if (s.type === 'beamV') {
         const active = s.age >= s.telegraph;
         ctx.fillStyle = active ? 'rgba(106,239,255,0.72)' : 'rgba(106,239,255,0.17)';
@@ -3063,6 +3461,7 @@
   }
 
   function drawHUD() {
+    if (matchMedia('(orientation: portrait) and (max-width: 820px)').matches) return;
     ctx.save();
     // Player core
     panelRect(24,72,330,122);
@@ -3108,6 +3507,7 @@
     if(count>1)enemyShots.push({type:'shock',x:x+50,y:GROUND-22,vx:390,r:24,age:0,life:4,damage:1});
   }
   function spawnMine(x,y){enemyShots.push({type:'mine',x:clamp(x,60,W-60),y,r:22,age:0,life:2.5,damage:1,pulse:0,triggered:false});}
+  function spawnChronoField(x,y,r=96){enemyShots.push({type:'chronoField',x:clamp(x,r,W-r),y,r,age:0,life:2.25,telegraph:0.58,damage:0});sfx('warning');}
   function spawnBlade(x,y,vx,vy){enemyShots.push({type:'blade',x,y,vx,vy,r:22,age:0,life:4,damage:1,rotation:0,gravity:70});}
   function spawnRock(x,y,vx,vy){enemyShots.push({type:'rock',x,y,vx,vy,r:rand(14,25),age:0,life:5,damage:1,rotation:rand(0,TAU),gravity:900});}
   function spawnBomb(x,y){enemyShots.push({type:'bomb',x,y,vx:rand(-35,35),vy:120,r:20,age:0,life:5,damage:1,rotation:0,gravity:760});}
@@ -3235,8 +3635,10 @@
     button.addEventListener('pointerdown',down);button.addEventListener('pointerup',up);button.addEventListener('pointercancel',up);button.addEventListener('pointerleave',up);
   });
 
-  document.getElementById('start-rush').addEventListener('click',()=>showScreen('prologue-screen'));
-  document.getElementById('prologue-start')?.addEventListener('click',()=>startRun('rush',0));
+  document.getElementById('start-rush').addEventListener('click', showIntroStory);
+  document.getElementById('prologue-start')?.addEventListener('click',()=>{markStorySeen(STORY.prologue.id);startRun('rush',0);});
+  storyContinue?.addEventListener('click',()=>{const action=pendingStoryAction; if(action) action();});
+  storyBack?.addEventListener('click',()=>{pendingStoryAction=null;currentStoryKey=null;showScreen('title-screen');});
   document.getElementById('practice').addEventListener('click',()=>{buildBossGrid();showScreen('boss-select-screen');});
   document.querySelector('#continue-run')?.addEventListener('click', resumeRushSnapshot);
   document.querySelector('#codex')?.addEventListener('click',()=>{buildCodex();showScreen('codex-screen');});

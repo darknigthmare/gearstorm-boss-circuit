@@ -40,7 +40,7 @@ test('le serveur livre le jeu avec la politique de securite complete', async () 
 
 test('les fichiers shell non versions sont toujours revalides', async () => {
   await withServer(async origin => {
-    for (const path of ['/game.js?release=2.3.0', '/styles.css', '/manifest.webmanifest']) {
+    for (const path of ['/story.js?release=2.4.0', '/game.js?release=2.4.0', '/styles.css', '/manifest.webmanifest']) {
       const response = await fetch(origin + path, { method: 'HEAD' });
       assert.equal(response.status, 200, path);
       assert.equal(response.headers.get('cache-control'), 'public, max-age=0, must-revalidate', path);
@@ -64,7 +64,7 @@ test('HEAD retourne les metadonnees exactes sans corps', async () => {
   });
 });
 
-test('les assets runtime v2.2 restent publics, types et immuables sous app v2.3', async () => {
+test('les assets runtime v2.2 restent publics, types et immuables sous app v2.4', async () => {
   await withServer(async origin => {
     const assetPath = '/assets/generated/v2.2.0/arenas/rammer/far.webp';
     const expectedSize = (await stat('.' + assetPath)).size;

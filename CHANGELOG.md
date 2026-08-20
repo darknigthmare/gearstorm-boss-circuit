@@ -1,5 +1,19 @@
 # Historique des versions
 
+## 2.4.0 — La dernière émission
+
+- Ajout de `story.js`, registre narratif immuable pour l’intro, le prologue, six actes, six interludes, l’épilogue, les dossiers Codex et les contrats de maîtrise.
+- Nouvelle ouverture : Cassian Voltério centralise les services civils des six districts dans la Couronne ; Riva Spark réactive la ligne manuelle M-0.
+- Campagne structurée selon **Intro → Prologue → Boss → Résultat → Interlude → Atelier**, avec résolution finale après Crown Engine Ω.
+- Chaque machine reçoit trois titres de phase, deux échanges de transformation, un journal de Riva, une conséquence de district et une restauration civile.
+- Arc de campagne complété : Cassian entraîne sa Couronne sur les solutions de Riva ; Riva injecte une contre-phase M-0 avant la Citadelle.
+- Épilogue clarifié : les six relais et leurs commandes locales sont restaurés, Cassian est détenu et Riva refuse une nouvelle centralisation.
+- Vocabulaire corrigé pour distinguer les six relais de sécurité, les six infrastructures civiles et les onze modules d’amélioration disponibles.
+- Sauvegarde v4 préparée pour séparer les victoires de campagne, les scènes découvertes, le Codex et les contrats de maîtrise des sessions d’entraînement.
+- Le registre définit dix-huit contrats de maîtrise, trois par machine ; cette entrée ne certifie pas leur validation en navigateur.
+- Ajout des surfaces narratives, des archives M-0 et des communications de phase dans l’interface responsive.
+- Aucun statut de QA, commit, push ou déploiement n’est affirmé par cette entrée.
+
 ## 2.3.0 — Liberation Protocol
 
 - Progression narrative structurée autour de Riva Spark, Cassian Voltério et des six districts reliés aux machines.

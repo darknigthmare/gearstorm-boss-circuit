@@ -11,9 +11,10 @@ import {
   validateApplicationContract,
 } from '../scripts/app-contract.mjs';
 
-const [html, css, game, readme, design, packageJson, manifest] = await Promise.all([
+const [html, css, story, game, readme, design, packageJson, manifest] = await Promise.all([
   readFile('index.html', 'utf8'),
   readFile('styles.css', 'utf8'),
+  readFile('story.js', 'utf8'),
   readFile('game.js', 'utf8'),
   readFile('README.md', 'utf8'),
   readFile('DESIGN.md', 'utf8'),
@@ -30,8 +31,16 @@ test('la marque et les six boss GEARSTORM sont presents', () => {
   assert.doesNotMatch(html + readme + design, /GEARGRIN|PROTOTYPE JOUABLE/);
 });
 
-test('le contrat applicatif v2.3 complet est respecte', () => {
-  assert.doesNotThrow(() => validateApplicationContract({ game, html, manifest, packageJson }));
+test('les libelles de contenu restent alignes aux mecaniques jouables', () => {
+  assert.doesNotMatch(html + game + readme + design, /drones ioniques|ferraille orbitale|quatre marteaux|six réacteurs|toutes les technologies du Circuit/i);
+  for (const label of ['SALVES IONIQUES', 'ÉRUPTION MAGNÉTIQUE', 'LAMES DÉPHASÉES', 'PLUIE DE MÉTAL EN FUSION', 'CHUTE DE PRESSE']) {
+    assert.match(story, new RegExp(label));
+  }
+  assert.match(game, /STORY\.getCombatLabel/);
+});
+
+test('le contrat applicatif v2.4 complet est respecte', () => {
+  assert.doesNotThrow(() => validateApplicationContract({ game, story, html, manifest, packageJson }));
   assert.equal(packageJson.version, APP_RELEASE);
 });
 
@@ -42,14 +51,14 @@ test('tous les identifiants DOM utilises par le moteur existent et sont uniques'
   const references = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   assert.ok(references.length > 30);
   for (const id of references) assert.ok(ids.has(id), `id manquant: ${id}`);
-  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.3 manquante: ${id}`);
+  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.4 manquante: ${id}`);
 });
 
-test('la sauvegarde v3 migre la v2 et porte la reprise de campagne', () => {
+test('la sauvegarde v4 migre les v3 et v2 et porte la reprise narrative', () => {
   assert.match(game, new RegExp(SAVE_KEY));
   assert.match(game, new RegExp(PREVIOUS_SAVE_KEY));
   assert.match(game, new RegExp(`version\\s*:\\s*${SAVE_SCHEMA_VERSION}\\b`));
-  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot']) assert.match(game, new RegExp(`\\b${field}\\b`));
+  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'campaignCleared', 'storySeen', 'mastery']) assert.match(game, new RegExp(`\\b${field}\\b`));
   assert.match(game, /localStorage\.getItem\(PREVIOUS_SAVE_KEY\)/);
   assert.match(game, /localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/);
   for (const marker of ['sanitizeRushSnapshot', 'saveRushSnapshot', 'clearRushSnapshot', 'resumeRushSnapshot', 'syncContinueRun']) {
@@ -87,6 +96,9 @@ test('les systemes campagne, entrees et accessibilite restent cables', () => {
     assert.match(game, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
   assert.match(css, /\.upgrade-grid/);
+  assert.match(css, /#result-screen \.result-panel/);
+  assert.match(css, /#pause-screen \.pause-panel/);
+  assert.doesNotMatch(css, /\.result-screen \.result-panel|\.pause-screen \.pause-panel/);
   for (const id of ['upgrade-screen', 'prologue-screen', 'ending-screen']) assert.match(html, new RegExp(`id="${id}"`));
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /prefers-reduced-motion|motion-toggle/);
@@ -114,6 +126,34 @@ test('les raccourcis PWA sont routes sans demarrer un combat implicitement', () 
   assert.doesNotMatch(routeBlock, /startRun|startFight|unlockAudio/);
 });
 
-test('la liste des systemes v2.3 reste centralisee', () => {
+test('la liste des systemes v2.4 reste centralisee', () => {
   for (const marker of REQUIRED_GAME_SYSTEMS) assert.match(game, new RegExp(`\\b${marker}\\b`));
+});
+
+test('le récit de campagne reste distinct du Laboratoire', () => {
+  const openingFlow = game.slice(game.indexOf('function showIntroStory'), game.indexOf('function showInterlude'));
+  assert.match(openingFlow, /showPrologueStory/);
+  assert.match(openingFlow, /renderStoryScene\(STORY\.prologue/);
+
+  const phaseBlock = game.slice(game.indexOf('function phaseNarrative'), game.indexOf('function syncCampaignUi'));
+  assert.match(phaseBlock, /runMode !== 'rush'/);
+
+  const introBlock = game.slice(game.indexOf('function configureIntro'), game.indexOf('function startMasteryCycle'));
+  assert.match(introBlock, /runMode === 'rush'/);
+  assert.match(introBlock, /civicFunction/);
+
+  const resultBlock = game.slice(game.indexOf('function showResult'), game.indexOf('function continueAfterResult'));
+  assert.match(resultBlock, /practiceResult/);
+  assert.match(resultBlock, /progression de campagne reste inchangée/);
+});
+
+test('les contrats de cycle mesurent un cycle terminé et les finitions réelles', () => {
+  for (const marker of ['startMasteryCycle', 'finishMasteryCycle', 'noteMasteryCycleHit', 'currentBossPerfectCycles']) {
+    assert.match(game, new RegExp(`\\b${marker}\\b`));
+  }
+  assert.match(game, /damageBoss\(runBuild\.dashDamage, 'dash'\)/);
+  assert.match(game, /finishMasteryCycle\('eruption'\)[\s\S]+setBossState\('exposed'\)/);
+  assert.match(game, /finishMasteryCycle\('dash'\)[\s\S]+setBossState\('overheat'\)/);
+  assert.match(game, /currentBossPerfectCycles\.eruption/);
+  assert.match(game, /currentBossPerfectCycles\.dash/);
 });

@@ -7,6 +7,7 @@ const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.2.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
   'styles.css',
+  'story.js',
   'game.js',
   'manifest.webmanifest',
   'sw.js',
@@ -22,6 +23,7 @@ const PUBLIC_SHELL_ASSETS = new Set([
 const REVALIDATE_FILES = new Set([
   'index.html',
   'styles.css',
+  'story.js',
   'game.js',
   'manifest.webmanifest',
   'sw.js',

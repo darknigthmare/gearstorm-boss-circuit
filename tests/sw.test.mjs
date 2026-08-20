@@ -112,9 +112,10 @@ test('installation PWA precache uniquement le shell et le petit catalogue', asyn
   await dispatchExtendable(worker.handlers.get('install'));
   assert.equal(worker.counters.skips, 1);
   const keys = await worker.caches.keys();
-  assert.deepEqual(keys, ['gearstorm-shell-v2.3.0']);
+  assert.deepEqual(keys, ['gearstorm-shell-v2.4.0']);
   const shell = worker.stores.get(keys[0]);
-  assert.equal(shell.entries.size, 9);
+  assert.equal(shell.entries.size, 10);
+  assert.ok([...shell.entries.keys()].some(key => key.endsWith('/story.js')));
   assert.ok([...shell.entries.keys()].some(key => key.endsWith('/assets/generated/v2.2.0/asset-manifest.json')));
   assert.ok([...shell.entries.keys()].every(key => !key.endsWith('.webp')));
 });
@@ -127,7 +128,7 @@ test('activation supprime les anciens caches GEARSTORM seulement', async () => {
   await worker.caches.open('cache-unrelated');
   await dispatchExtendable(worker.handlers.get('activate'));
   assert.equal(worker.counters.claims, 1);
-  assert.deepEqual((await worker.caches.keys()).sort(), ['cache-unrelated', 'gearstorm-shell-v2.3.0']);
+  assert.deepEqual((await worker.caches.keys()).sort(), ['cache-unrelated', 'gearstorm-shell-v2.4.0']);
 });
 
 test('les WebP versionnes utilisent un cache-first canonique sans variantes de query', async () => {
@@ -145,7 +146,7 @@ test('les WebP versionnes utilisent un cache-first canonique sans variantes de q
   assert.equal(first.body, 'webp');
   assert.equal(second.body, 'webp');
   assert.equal(fetches, 1);
-  assert.ok((await worker.caches.keys()).includes('gearstorm-runtime-v2.3.0'));
+  assert.ok((await worker.caches.keys()).includes('gearstorm-runtime-v2.4.0'));
 });
 
 test('une reponse non WebP ne pollue jamais le cache runtime', async () => {
@@ -175,7 +176,7 @@ test('le shell est servi immediatement puis revalide en arriere-plan', async () 
   const served = await dispatchFetch(worker.handlers.get('fetch'), new Request(url));
   assert.match(served.body, /styles\.css$/);
   assert.equal(fetches, 1);
-  const shell = worker.stores.get('gearstorm-shell-v2.3.0');
+  const shell = worker.stores.get('gearstorm-shell-v2.4.0');
   assert.equal((await shell.match(new Request(url))).body, 'fresh-css');
 });
 
