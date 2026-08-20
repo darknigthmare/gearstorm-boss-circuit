@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#080b18" />
+  <meta name="description" content="GEARSTORM: Boss Circuit v2.1, un boss rush 2D original en six machines transformables. Jouable au clavier, à la manette et au tactile." />
+  <meta name="application-name" content="GEARSTORM" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GEARSTORM" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.1" />
+  <meta property="og:description" content="Riva Spark contre six machines transformables dans un boss rush 2D original." />
+  <meta property="og:image" content="assets/gearstorm-key-art.png" />
+  <meta property="og:image:alt" content="Riva Spark face aux machines du Circuit Voltério" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.1" />
+  <meta name="twitter:description" content="Six machines. Dix-huit phases. Un Circuit à libérer." />
+  <meta name="twitter:image" content="assets/gearstorm-key-art.png" />
+  <title>GEARSTORM: Boss Circuit v2.1</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="assets/gearstorm-icon.svg" />
+  <link rel="apple-touch-icon" href="assets/gearstorm-icon-192.png" />
+  <link rel="preload" href="assets/gearstorm-key-art.png" as="image" type="image/png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#app">Aller directement au jeu</a>
+  <main id="app" tabindex="-1" aria-label="GEARSTORM: Boss Circuit">
+    <div class="game-stage" role="region" aria-label="Scène de combat">
+      <canvas id="game" width="1280" height="720" role="img" aria-label="Zone de jeu GEARSTORM" aria-describedby="canvas-description">
+        Votre navigateur ne prend pas en charge Canvas. Utilisez un navigateur récent pour jouer à GEARSTORM.
+      </canvas>
+      <p id="canvas-description" class="sr-only">Jeu d’action en deux dimensions. Esquivez les attaques, attendez l’ouverture du noyau ennemi, puis tirez ou utilisez la ruée. Les informations essentielles sont reproduites dans le statut accessible.</p>
+    </div>
+
+    <section id="title-screen" class="screen active title-screen" aria-labelledby="game-title" tabindex="-1">
+      <div class="title-layout">
+        <figure class="key-art-frame" aria-hidden="true">
+          <img class="key-art" src="assets/gearstorm-key-art.png" alt="" width="1536" height="1024" fetchpriority="high" />
+          <div class="key-art-vignette"></div>
+        </figure>
+        <div class="panel hero-panel">
+          <div class="release-line">
+            <p class="eyebrow">ÉDITION CIRCUIT // V2.1</p>
+            <span class="release-status"><span aria-hidden="true"></span> Systèmes prêts</span>
+          </div>
+          <h1 id="game-title"><span>GEARSTORM</span><small>BOSS CIRCUIT</small></h1>
+          <p class="tagline">Incarne Riva Spark, démantèle six machines transformables et libère le Circuit Voltério.</p>
+          <ul id="build-summary" class="build-summary" aria-label="Contenu de cette version">
+            <li><strong>6</strong><span>machines</span></li>
+            <li><strong>18</strong><span>phases</span></li>
+            <li><strong>3</strong><span>difficultés</span></li>
+          </ul>
+          <div class="menu-stack" role="group" aria-label="Menu principal">
+            <button id="start-rush" class="primary launch-button" aria-controls="prologue-screen">Lancer le Rush intégral <span aria-hidden="true">→</span></button>
+            <button id="practice" aria-controls="boss-select-screen">Laboratoire des boss</button>
+            <button id="how-to" aria-controls="how-screen">Commandes et règles</button>
+            <button id="settings" aria-controls="settings-screen">Options et accessibilité</button>
+          </div>
+          <div class="utility-actions" role="group" aria-label="Actions de l’application">
+            <button id="install-app" class="utility-button" type="button" hidden>Installer le jeu</button>
+            <button id="fullscreen-toggle" class="utility-button" type="button" aria-pressed="false">Plein écran</button>
+          </div>
+          <p class="save-note" id="save-note">Progression locale activée</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="prologue-screen" class="screen prologue-screen" aria-labelledby="prologue-title" tabindex="-1">
+      <div class="panel prologue-panel">
+        <div class="transmission-header">
+          <span class="transmission-signal" aria-hidden="true"></span>
+          <p class="eyebrow">TRANSMISSION PRIORITAIRE // RIVA SPARK</p>
+        </div>
+        <p class="chapter-mark">PROLOGUE 00</p>
+        <h2 id="prologue-title">Le Circuit ne doit plus tourner</h2>
+        <p class="prologue-copy">Le Professeur Cassian Voltério a verrouillé six districts derrière ses machines de spectacle. Chaque réacteur alimente le suivant. Une seule trajectoire reste ouverte : entrer dans l’arène, briser leurs cycles et atteindre la Couronne.</p>
+        <blockquote>« Je ne viens pas gagner son émission. Je viens l’éteindre. » <cite>— Riva Spark</cite></blockquote>
+        <div class="mission-brief" aria-label="Objectifs de mission">
+          <span>Objectif</span><strong>Neutraliser les six machines</strong>
+          <span>Directive</span><strong>Lire · Esquiver · Surcharger</strong>
+        </div>
+        <div class="menu-stack prologue-actions">
+          <button id="prologue-start" class="primary launch-button">Entrer dans le Circuit <span aria-hidden="true">→</span></button>
+          <button class="back-button" data-back="title-screen">Retour au menu</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="boss-select-screen" class="screen" aria-labelledby="boss-select-title" tabindex="-1">
+      <div class="panel wide-panel">
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">MODE ENTRAÎNEMENT</p>
+            <h2 id="boss-select-title">Laboratoire des boss</h2>
+          </div>
+          <button class="back-button" data-back="title-screen">Retour</button>
+        </div>
+        <div id="boss-grid" class="boss-grid" role="list" aria-label="Machines débloquées"></div>
+      </div>
+    </section>
+
+    <section id="how-screen" class="screen" aria-labelledby="how-title" tabindex="-1">
+      <div class="panel wide-panel text-panel">
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">MANUEL DE COMBAT</p>
+            <h2 id="how-title">Lire, esquiver, frapper</h2>
+          </div>
+          <button class="back-button" data-back="title-screen">Retour</button>
+        </div>
+        <div class="manual-grid">
+          <article>
+            <h3>Déplacement</h3>
+            <p><kbd>Q</kbd>/<kbd>D</kbd>, <kbd>A</kbd>/<kbd>D</kbd> ou <kbd>←</kbd>/<kbd>→</kbd> pour courir. <kbd>Espace</kbd>, <kbd>W</kbd> ou <kbd>↑</kbd> pour effectuer jusqu’à deux sauts.</p>
+          </article>
+          <article>
+            <h3>Attaque</h3>
+            <p><kbd>J</kbd>, <kbd>Z</kbd>, <kbd>C</kbd> ou clic gauche tire une impulsion. Les blindages repoussent les tirs : frappe le noyau uniquement lorsqu’il est exposé.</p>
+          </article>
+          <article>
+            <h3>Ruée cinétique</h3>
+            <p><kbd>Maj</kbd> ou <kbd>K</kbd> déclenche une ruée invulnérable très brève. Une ruée dans un noyau ouvert inflige de lourds dégâts.</p>
+          </article>
+          <article>
+            <h3>Surcharge</h3>
+            <p>Remplis la jauge en touchant les noyaux, puis utilise <kbd>L</kbd> ou <kbd>X</kbd> pour ralentir les menaces et amplifier les dégâts.</p>
+          </article>
+          <article>
+            <h3>Manette et pause</h3>
+            <p>Stick gauche, A pour sauter, X pour tirer, B pour la ruée et Y pour la surcharge. <kbd>Échap</kbd> ou <kbd>P</kbd> met en pause.</p>
+          </article>
+          <article>
+            <h3>Objectif</h3>
+            <p>Le Rush intégral enchaîne les six boss. Les meilleurs temps sont sauvegardés localement. Le Laboratoire permet de rejouer les machines débloquées.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings-screen" class="screen" aria-labelledby="settings-title" tabindex="-1">
+      <div class="panel settings-panel">
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">CONFIGURATION</p>
+            <h2 id="settings-title">Options et accessibilité</h2>
+          </div>
+          <button class="back-button" data-back="title-screen">Retour</button>
+        </div>
+        <label class="setting-row">
+          <span><strong>Difficulté</strong><small>Modifie la vitesse, la résistance et les points de vie.</small></span>
+          <select id="difficulty-select">
+            <option value="casual">Pilote — accessible</option>
+            <option value="standard">Ingénieur — standard</option>
+            <option value="overdrive">Overdrive — difficile</option>
+          </select>
+        </label>
+        <label class="setting-row volume-row">
+          <span><strong>Volume général</strong><small>Ajuste la musique et les effets du Circuit.</small></span>
+          <span class="range-control">
+            <input id="master-volume" type="range" min="0" max="100" step="5" value="80" aria-describedby="master-volume-value" />
+            <output id="master-volume-value" for="master-volume">80 %</output>
+          </span>
+        </label>
+        <label class="setting-row toggle-row">
+          <span><strong>Audio synthétique</strong><small>Musique et effets sonores générés en temps réel.</small></span>
+          <input id="audio-toggle" type="checkbox" checked />
+        </label>
+        <label class="setting-row toggle-row">
+          <span><strong>Tremblement de caméra</strong><small>Impacts, explosions et destructions.</small></span>
+          <input id="shake-toggle" type="checkbox" checked />
+        </label>
+        <label class="setting-row toggle-row">
+          <span><strong>Réduire les mouvements</strong><small>Diminue les particules, rotations et animations d’interface.</small></span>
+          <input id="motion-toggle" type="checkbox" />
+        </label>
+        <label class="setting-row toggle-row">
+          <span><strong>Contraste renforcé</strong><small>Augmente les contours et la lisibilité des dangers.</small></span>
+          <input id="contrast-toggle" type="checkbox" />
+        </label>
+        <button id="reset-save" class="danger-button">Réinitialiser la progression</button>
+      </div>
+    </section>
+
+    <section id="pause-screen" class="screen compact" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1">
+      <div class="panel pause-panel">
+        <p class="eyebrow">SYSTÈMES SUSPENDUS</p>
+        <h2 id="pause-title">Pause</h2>
+        <div class="menu-stack">
+          <button id="resume-button" class="primary">Reprendre</button>
+          <button id="retry-button">Recommencer le boss</button>
+          <button id="quit-button">Quitter vers le menu</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen compact" role="dialog" aria-modal="true" aria-labelledby="result-title" tabindex="-1">
+      <div class="panel result-panel">
+        <p id="result-eyebrow" class="eyebrow">MACHINE NEUTRALISÉE</p>
+        <h2 id="result-title">Victoire</h2>
+        <p id="result-summary" class="result-summary"></p>
+        <div id="result-stats" class="result-stats"></div>
+        <div class="menu-stack">
+          <button id="continue-button" class="primary">Continuer</button>
+          <button id="result-menu-button">Retour au menu</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="upgrade-screen" class="screen" aria-labelledby="upgrade-title" tabindex="-1">
+      <div class="panel wide-panel upgrade-panel">
+        <p class="eyebrow">ATELIER MOBILE DE RIVA</p>
+        <h2 id="upgrade-title">Choisis une amélioration</h2>
+        <p class="result-summary">Une seule modification peut être installée avant la prochaine machine.</p>
+        <div id="upgrade-grid" class="upgrade-grid" role="list" aria-label="Modules disponibles"></div>
+      </div>
+    </section>
+
+    <section id="ending-screen" class="screen" aria-labelledby="ending-title" tabindex="-1">
+      <div class="panel ending-panel">
+        <p class="eyebrow">ÉPILOGUE — CIRCUIT LIBÉRÉ</p>
+        <h2 id="ending-title">La tempête retombe</h2>
+        <p class="ending-transmission">« Ici Riva Spark. Les six réacteurs sont hors ligne. Voltério n’a plus d’arène, plus de couronne… et surtout plus de public captif. »</p>
+        <p id="ending-summary" class="result-summary"></p>
+        <div class="menu-stack">
+          <button id="ending-lab" class="primary">Ouvrir le Laboratoire</button>
+          <button id="ending-menu">Retour au menu principal</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameover-screen" class="screen compact" role="dialog" aria-modal="true" aria-labelledby="gameover-title" tabindex="-1">
+      <div class="panel pause-panel">
+        <p class="eyebrow">SIGNAL CINÉTIQUE PERDU</p>
+        <h2 id="gameover-title">Défaite</h2>
+        <p id="gameover-text" class="result-summary">La machine a conservé son cycle d’attaque. Recalibre ta trajectoire.</p>
+        <div class="menu-stack">
+          <button id="gameover-retry" class="primary">Réessayer</button>
+          <button id="gameover-menu">Retour au menu</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="boss-intro" class="boss-intro" aria-live="polite" aria-atomic="true" aria-hidden="true">
+      <p id="intro-index"></p>
+      <h2 id="intro-name">Transmission du Circuit</h2>
+      <p id="intro-epithet"></p>
+      <blockquote id="intro-quote"></blockquote>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <nav id="touch-controls" aria-label="Commandes tactiles de combat">
+      <div class="touch-left">
+        <button data-touch="left" aria-label="Aller à gauche">◀</button>
+        <button data-touch="right" aria-label="Aller à droite">▶</button>
+      </div>
+      <div class="touch-right">
+        <button data-touch="jump" aria-label="Sauter">SAUT</button>
+        <button data-touch="dash" aria-label="Ruée">RUÉE</button>
+        <button data-touch="attack" aria-label="Attaquer">TIR</button>
+        <button data-touch="overload" aria-label="Activer la surcharge">SURCH.</button>
+      </div>
+      <button id="touch-pause" class="touch-pause" type="button" aria-label="Mettre le jeu en pause" aria-controls="pause-screen">Ⅱ</button>
+    </nav>
+
+    <aside id="mobile-hud" class="mobile-hud" aria-label="État du combat">
+      <div class="hud-chip"><span>Riva</span><strong id="mobile-player-hp">—</strong></div>
+      <div class="hud-chip boss-chip"><span>Boss</span><strong id="mobile-boss-hp">—</strong></div>
+      <div class="hud-chip overload-chip"><span>Surcharge</span><strong id="mobile-overload">0 %</strong></div>
+      <p id="game-status" class="game-status" role="status" aria-live="polite" aria-atomic="true">Menu principal. Prêt à entrer dans le Circuit.</p>
+    </aside>
+
+    <aside id="orientation-hint" class="orientation-hint" aria-label="Conseil d’orientation">
+      <span aria-hidden="true">↻</span>
+      <p><strong>Passez en paysage</strong><small>La lecture des télégraphes sera plus confortable.</small></p>
+    </aside>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
