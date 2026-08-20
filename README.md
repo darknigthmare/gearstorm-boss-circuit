@@ -4,6 +4,9 @@ GEARSTORM est un boss rush 2D original conçu comme un jeu complet : Riva Spark 
 
 ## Jouer
 
+- Jeu en ligne : https://gearstorm-boss-circuit.vercel.app
+- Dépôt GitHub : https://github.com/darknigthmare/gearstorm-boss-circuit
+
 Prérequis pour le serveur local et les outils de validation : Node.js 22 ou plus récent.
 
 ```text

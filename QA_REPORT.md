@@ -12,6 +12,15 @@ Validation locale effectuée le 20 août 2026 sur le candidat de publication.
 - Contrôle de release : manifeste, service worker, icônes, key art, en-têtes de sécurité et configuration Vercel validés.
 - `npm audit` : 0 vulnérabilité.
 
+## Production Vercel
+
+- Alias public : https://gearstorm-boss-circuit.vercel.app
+- Déploiement dpl_21LTp7MgKVKLfuzjpNz6GCgvAhd5 confirmé READY.
+- Page, manifeste, moteur et key art : HTTP 200 avec les en-têtes de sécurité attendus.
+- Tests et documentation internes : HTTP 404, donc absents du bundle public.
+- Parcours navigateur en production : menu, prologue, combat et pause validés, sans erreur runtime.
+- Service worker actif en production ; le hook QA reste absent hors localhost.
+
 ## Parcours navigateur — ordinateur
 
 Viewport 1440 × 900 :
