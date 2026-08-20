@@ -26,11 +26,11 @@ const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScri
   readFile('scripts/check-release.mjs', 'utf8'),
 ]);
 
-test('la version application 2.4 est decouplee de la bibliotheque assets 2.2', () => {
+test('les versions application et assets 2.5 restent declarees separement', () => {
   assert.equal(packageJson.version, APP_RELEASE);
-  assert.equal(APP_RELEASE, '2.4.0');
-  assert.equal(ASSET_RELEASE, '2.2.0');
-  assert.notEqual(APP_RELEASE, ASSET_RELEASE);
+  assert.equal(APP_RELEASE, '2.5.0');
+  assert.equal(ASSET_RELEASE, '2.5.0');
+  assert.notEqual(APP_RELEASE, STORY_CONTENT_VERSION);
   assert.match(buildScript, /packageJson\.version !== APP_RELEASE/);
   assert.match(buildScript, /release: ASSET_RELEASE/);
   assert.match(buildScript, new RegExp(`saveSchemaVersion:\\s*SAVE_SCHEMA_VERSION`));
@@ -60,9 +60,9 @@ test('la PWA est installable, versionnee et ne precache pas les 103 WebP', () =>
   assert.ok(manifest.shortcuts.every(shortcut => shortcut.icons?.some(icon => icon.sizes === '192x192')));
   const keyArt = manifest.screenshots.find(screenshot => screenshot.src.includes('gearstorm-key-art.png'));
   assert.equal(keyArt?.sizes, '1672x941');
-  assert.match(serviceWorker, /const APP_VERSION = '2\.4\.0'/);
+  assert.match(serviceWorker, /const APP_VERSION = '2\.5\.0'/);
   assert.match(serviceWorker, /'\.\/story\.js'/);
-  assert.match(serviceWorker, /const ASSET_VERSION = '2\.2\.0'/);
+  assert.match(serviceWorker, /const ASSET_VERSION = '2\.5\.0'/);
   assert.match(serviceWorker, /cacheFirstRuntime/);
   assert.match(serviceWorker, /staleWhileRevalidateShell/);
   assert.match(serviceWorker, /networkFirstNavigation/);
@@ -73,9 +73,9 @@ test('la PWA est installable, versionnee et ne precache pas les 103 WebP', () =>
 test('Vercel, la CI Linux et les exclusions satisfont le contrat infrastructure', () => {
   assert.doesNotThrow(() => validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore }));
   assert.match(ci, /concurrency:[\s\S]+cancel-in-progress: true/);
-  assert.match(ci, /name: gearstorm-web-v2\.4\.0/);
+  assert.match(ci, /name: gearstorm-web-v2\.5\.0/);
   assert.match(vercelIgnore, /^\.env\*$/m);
-  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.2\.0\/$/m);
+  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.5\.0\/$/m);
 });
 
 test('les scripts npm couvrent syntaxe, tests, build et verification release', () => {

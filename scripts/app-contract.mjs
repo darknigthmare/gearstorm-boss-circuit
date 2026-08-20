@@ -1,6 +1,6 @@
 import vm from 'node:vm';
 
-export const APP_RELEASE = '2.4.0';
+export const APP_RELEASE = '2.5.0';
 export const SAVE_SCHEMA_VERSION = 4;
 export const SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
 export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
@@ -112,7 +112,7 @@ export function validateApplicationContract({ game, story, html, manifest, packa
   const storyContract = validateStoryContract(story);
 
   const ids = htmlIds(html);
-  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.4 : #${id} absent.`);
+  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.5 : #${id} absent.`);
   const domReferences = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   for (const id of domReferences) invariant(ids.has(id), `Contrat DOM : #${id} reference par game.js mais absent.`);
 
@@ -133,7 +133,7 @@ export function validateApplicationContract({ game, story, html, manifest, packa
   invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v4.');
 
   for (const marker of REQUIRED_GAME_SYSTEMS) {
-    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.4 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.5 absent : ${marker}.`);
   }
 
   invariant(/new URLSearchParams\(location\.search\)/.test(game), 'Le routeur de lancement doit lire la query string.');
@@ -144,7 +144,7 @@ export function validateApplicationContract({ game, story, html, manifest, packa
   const shortcuts = new Set((manifest?.shortcuts || []).map(shortcut => shortcut.url));
   for (const url of ['./?mode=rush', './?mode=practice']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
 
-  invariant(html.includes('GEARSTORM: Boss Circuit v2.4'), 'Metadonnees HTML v2.4 absentes.');
+  invariant(html.includes('GEARSTORM: Boss Circuit v2.5'), 'Metadonnees HTML v2.5 absentes.');
   invariant(!/GEARSTORM: Boss Circuit v2\.[23]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
   invariant(/qaAllowed[\s\S]+__GEARSTORM_QA__/.test(game), 'Surface QA locale absente ou non protegee.');
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
@@ -153,7 +153,7 @@ export function validateApplicationContract({ game, story, html, manifest, packa
   }
   const qaBlock = game.slice(game.indexOf("Object.defineProperty(window, '__GEARSTORM_QA__'"));
   for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'setRigDebug', 'launchMode']) {
-    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.4 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.5 absent : ${marker}.`);
   }
 
   return {

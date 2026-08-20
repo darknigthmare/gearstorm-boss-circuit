@@ -256,7 +256,7 @@
   const storyArchiveProgress = document.querySelector('#story-archive-progress');
 
 
-  const ART_MANIFEST_URL = 'assets/generated/v2.2.0/asset-manifest.json';
+  const ART_MANIFEST_URL = 'assets/generated/v2.5.0/asset-manifest.json';
   const artLoader = document.querySelector('#art-loader');
   const artLoaderLabel = document.querySelector('#art-loader-label');
   const artLoaderProgress = document.querySelector('#art-loader-progress');
@@ -292,7 +292,7 @@
     omega: Object.freeze({ x: 0, y: 8, r: 39, part: 'omega-core' })
   });
 
-  function rigPart(name, phase, joint, pivot, scale, bbox, motion = 'static') {
+  function rigPart(name, phase, joint, pivot, scale, bbox, motion = 'static', sourceRect = null) {
     return Object.freeze({
       name,
       phase,
@@ -300,15 +300,17 @@
       pivot: Object.freeze(pivot),
       scale,
       bbox: Object.freeze(bbox),
-      motion
+      motion,
+      sourceRect: sourceRect ? Object.freeze(sourceRect) : null
     });
   }
 
   const HERO_RIG = Object.freeze({
     'dash-trail': rigPart('dash-trail', 1, [-46, 0], [209, 169], 0.27, [0, 51, 418, 287], 'trail'),
     'overload-halo': rigPart('overload-halo', 1, [0, -8], [182, 158], 0.3, [0, 6, 364, 309], 'halo'),
-    'arm-far': rigPart('arm-far', 1, [-8, -19], [120, 125], 0.15, [65, 88, 408, 338], 'arm'),
-    'arm-near': rigPart('arm-near', 1, [-2, -18], [110, 125], 0.15, [44, 82, 270, 394], 'arm'),
+    // Le torse porte deja le bras arriere. Cette piece OpenAI v3 est uniquement
+    // l'avant-bras de tir, ancre au coude et glisse sous le canon separe.
+    'arm-near': rigPart('arm-near', 1, [9, -7], [105, 203], 0.13, [79, 158, 339, 260], 'forearm'),
     boots: rigPart('boots', 1, [0, 0], [183, 75], 0.126, [36, 66, 330, 361], 'feet'),
     head: rigPart('head', 1, [0, -28], [280, 360], 0.15, [56, 70, 409, 418], 'head'),
     legs: rigPart('legs', 1, [0, 0], [205, 45], 0.11, [53, 19, 348, 372], 'legs'),
@@ -568,7 +570,12 @@
     ctx.imageSmoothingEnabled = true;
     // Le carre 418 px reste intact en memoire, mais le pivot semantique compense
     // sa marge alpha asymetrique. Aucun master ni atlas source n'est dessine.
-    ctx.drawImage(image, -spec.pivot[0], -spec.pivot[1]);
+    if (spec.sourceRect) {
+      const [sx, sy, sw, sh] = spec.sourceRect;
+      ctx.drawImage(image, sx, sy, sw, sh, sx - spec.pivot[0], sy - spec.pivot[1], sw, sh);
+    } else {
+      ctx.drawImage(image, -spec.pivot[0], -spec.pivot[1]);
+    }
     ctx.restore();
     return true;
   }
@@ -601,7 +608,7 @@
 
   function heroArtReady() {
     const parts = artRuntime.manifest?.heroine?.parts;
-    const body = ['head', 'torso', 'legs', 'boots', 'arm-near', 'arm-far', 'pulse-cannon'];
+    const body = ['head', 'torso', 'legs', 'boots', 'arm-near', 'pulse-cannon'];
     return !!parts && body.every(name => generatedImage(parts[name]));
   }
 
@@ -633,9 +640,6 @@
       ? 'drop-shadow(0px 3px 2px rgba(0,0,0,1)) drop-shadow(0px 0px 4px rgba(255,255,255,0.9))'
       : 'drop-shadow(0px 3px 2px rgba(0,0,0,0.96)) drop-shadow(0px 0px 3px rgba(102,235,255,0.44))';
     ctx.rotate((player.dashTime > 0 ? -0.11 : 0) + airborne * 0.065);
-    drawRigPart(parts['arm-far'], HERO_RIG['arm-far'], {
-      rotation: -gait * 0.1 * speedPose - firing * 0.035
-    });
     drawRigPart(parts.legs, HERO_RIG.legs, {
       rotation: gait * 0.025 * speedPose
     });
@@ -647,7 +651,7 @@
       rotation: -airborne * 0.035
     });
     drawRigPart(parts['arm-near'], HERO_RIG['arm-near'], {
-      rotation: gait * 0.07 * speedPose - firing * 0.055
+      rotation: gait * 0.025 * speedPose - firing * 0.018
     });
     drawRigPart(parts['pulse-cannon'], HERO_RIG['pulse-cannon'], {
       x: firing ? -3 : 0,
@@ -768,6 +772,7 @@
         renderedFeetLocalY: Math.round((feetLocalY * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET) * 10) / 10,
         muzzle: { ...RIVA_MUZZLE },
         renderedMuzzle: { ...RIVA_GENERATED_MUZZLE },
+        visibleArmSources: Object.freeze({ rearArm: 'torso', firingForearm: 'arm-near:openai-v3', cannon: 'pulse-cannon', excluded: 'arm-far' }),
         facingMirroredAtRoot: true
       },
       bosses
@@ -1324,7 +1329,12 @@
   }
 
   function showScreen(id) {
-    screens.forEach(screen => screen.classList.toggle('active', screen.id === id));
+    screens.forEach(screen => {
+      const active = screen.id === id;
+      screen.classList.toggle('active', active);
+      screen.inert = !active;
+      screen.setAttribute('aria-hidden', String(!active));
+    });
     requestAnimationFrame(() => {
       const active = document.getElementById(id);
       const focused = active?.querySelector('button:not(:disabled):not([hidden]), select:not(:disabled), input:not(:disabled)');
@@ -1333,7 +1343,11 @@
   }
 
   function closeScreens() {
-    screens.forEach(screen => screen.classList.remove('active'));
+    screens.forEach(screen => {
+      screen.classList.remove('active');
+      screen.inert = true;
+      screen.setAttribute('aria-hidden', 'true');
+    });
   }
 
   function announce(message) {
@@ -1531,6 +1545,12 @@
   }
 
   function startRun(mode, index = 0) {
+    if (mode === 'rush' && sanitizeRushSnapshot(save.rushSnapshot)
+      && !confirm('Un Circuit est déjà en cours. Lancer une nouvelle campagne remplacera ce point de reprise. Continuer ?')) {
+      showScreen('title-screen');
+      syncContinueRun();
+      return false;
+    }
     unlockAudio();
     runMode = mode;
     if (mode === 'rush') save.rushSnapshot = null;
@@ -1546,6 +1566,7 @@
     lastBossRetryPenalty = 0;
     lastUpgradeOffer = [];
     startFight(index);
+    return true;
   }
 
   function startFight(index, { retry = false } = {}) {
@@ -1577,7 +1598,7 @@
     touchControls.classList.add('in-game');
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = false;
-    configureIntro();
+    configureIntro(retry);
     if (runMode === 'rush' && !retry) saveRushSnapshot();
   }
 
@@ -1597,7 +1618,7 @@
     }
   }
 
-  function configureIntro() {
+  function configureIntro(retry = false) {
     const data = BOSSES[currentBossIndex];
     const act = runMode === 'rush' ? STORY.getActByOrder(currentBossIndex + 1) : null;
     document.getElementById('intro-index').textContent = data.arena + ' · MACHINE ' + String(currentBossIndex + 1).padStart(2, '0');
@@ -1606,7 +1627,7 @@
     document.getElementById('intro-quote').textContent = act?.preFight?.map(line => line.speaker + ' — ' + line.text).join('  ·  ') || data.quote;
     bossIntro.classList.add('visible');
     bossIntro.setAttribute('aria-hidden', 'false');
-    introTimer = matchMedia('(max-width: 820px)').matches ? 5.2 : 3.8;
+    introTimer = retry ? 1.25 : (matchMedia('(max-width: 820px)').matches ? 5.2 : 3.8);
     announce(data.name + '. ' + (act?.civicFunction || data.epithet));
   }
 
@@ -1983,7 +2004,7 @@
       boss.x = 990 + Math.sin(boss.totalTime * 2) * 12;
       boss.y = 330 + Math.sin(boss.totalTime * 2.8) * 9;
       updateWeakPoint();
-      if (boss.stateTime > 2.45) {
+      if (introTimer <= 0) {
         setBossState(initialStateForBoss());
         startFightClock();
       }
@@ -2535,8 +2556,10 @@
       lastBossRetryPenalty = runMode === 'rush' ? currentBossRetries * RUSH_RETRY_PENALTY : 0;
       const rankedBossTime = lastBossTime + lastBossRetryPenalty;
       save.bestTimes[boss.data.id] = Math.min(save.bestTimes[boss.data.id] ?? Infinity, rankedBossTime);
-      save.unlocked = Math.max(save.unlocked, Math.min(BOSSES.length, currentBossIndex + 2));
-      if (runMode === 'rush' && !save.campaignCleared.includes(boss.data.id)) save.campaignCleared.push(boss.data.id);
+      if (runMode === 'rush') {
+        save.unlocked = Math.max(save.unlocked, Math.min(BOSSES.length, currentBossIndex + 2));
+        if (!save.campaignCleared.includes(boss.data.id)) save.campaignCleared.push(boss.data.id);
+      }
       persistSave();
       buildBossGrid();
       showResult();
@@ -2704,7 +2727,7 @@
       const button = document.createElement('button');
       button.className = 'upgrade-card';
       const stacks = runBuild.installed.filter(id => id === upgrade.id).length;
-      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.2.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
+      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.5.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
       button.addEventListener('click', () => installUpgrade(upgrade));
       grid.appendChild(button);
     }
@@ -2820,6 +2843,10 @@
     if (boss?.state !== 'intro') startFightClock();
     closeScreens();
     touchControls.classList.add('in-game');
+    if (boss?.state === 'intro' && introTimer > 0) {
+      bossIntro.classList.add('visible');
+      bossIntro.setAttribute('aria-hidden', 'false');
+    }
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = false;
     syncCombatGuidance();
@@ -2836,7 +2863,7 @@
       toastTimer -= dt;
       if (toastTimer <= 0) toast.classList.remove('visible');
     }
-    if (introTimer > 0) {
+    if (introTimer > 0 && state !== 'paused') {
       introTimer -= dt;
       if (introTimer <= 0) { bossIntro.classList.remove('visible'); bossIntro.setAttribute('aria-hidden', 'true'); }
     }
@@ -2861,6 +2888,10 @@
     updateTransition(dt);
 
     if (state === 'dead' || !boss || boss.defeated) return;
+    if (boss.state === 'intro') {
+      updateBoss(scaled);
+      return;
+    }
     updatePlayer(scaled);
     updatePlayerShots(scaled);
     if (boss.defeated) return;
@@ -3747,6 +3778,6 @@
   syncContinueRun();
   const bestRushText=save.bestRush?`Meilleur Circuit : ${formatTime(save.bestRush)}`:'Progression locale activée';
   document.getElementById('save-note').textContent=bestRushText;
-  routeLaunchMode();
+  if (!routeLaunchMode()) showScreen("title-screen");
   requestAnimationFrame(frame);
 })();

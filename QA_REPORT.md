@@ -1,41 +1,41 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.4.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.5.0
 
-Validation locale effectuée le 21 août 2026 sur le candidat de publication v2.4.0.
+Validation locale effectuée le 21 août 2026 sur le candidat v2.5.0.
 
 ## Automatisation
 
-- `npm run qa` : succès intégral, 42/42 tests réussis.
-- Build v2.4.0 et `check-release` : réussis.
-- `dist/` : 16 252 244 octets.
-- Bibliothèque runtime : 103 WebP versionnés issus des assets v2.2.
+- `npm run qa` : succès intégral, 44/44 tests réussis.
+- Build v2.5.0 et `check-release` : réussis.
+- `dist/` : 16 233 987 octets.
+- Bibliothèque runtime : 103 WebP v2.5.0, 13 113 368 octets, dérivés de 17 sources OpenAI documentées.
 - Registre narratif : introduction, prologue, six actes, six interludes, épilogue et 18 contrats de maîtrise.
 - `npm audit --audit-level=high` : 0 vulnérabilité.
 
-## Parcours navigateur — ordinateur
+## Parcours navigateur v2.5 — ordinateur
 
-Chrome headless local via CDP, profil vierge et viewport 1440 × 900 :
+Chrome local via CDP, viewport 1440 × 900 et DPR 2 pour le combat :
 
-- parcours complet titre → introduction → prologue → six boss → cinq Ateliers → épilogue ;
-- résultat, interlude, Codex, Laboratoire, pause et fin contrôlés visuellement ;
-- libellés mécaniques chargés depuis `story.js`, dont les états de Foundry Titan ;
-- panneaux Pause et Résultat mesurés à 700 px et 760 px ;
-- Laboratoire validé séparément : « Simulation terminée », progression de campagne inchangée et « Rapport du Laboratoire » ;
-- 21 captures de contrôle produites localement dans le dossier d’audit ignoré par Git et Vercel.
+- parcours titre → introduction → prologue → Rivet Rex confirmé avec le manifeste v2.5.0 ;
+- `art.ready = true`, liste d’échecs vide et 103 assets déclarés ;
+- silhouette de Riva inspectée plein cadre puis en agrandissement : deux membres lisibles, aucun troisième bras, avant-bras flottant, coude surnuméraire ou chevauchement grotesque ;
+- le torse fournit le bras arrière, `arm-near:openai-v3` l’avant-bras de tir et `pulse-cannon` le canon ;
+- titre et prologue contrôlés à 1440 × 900 : pas de débordement, recadrage, CTA masqué ni texte illisible ;
+- captures courantes : `audit-visual-v2.5/accepted-jpg/01-riva-combat.jpg`, `04-title-desktop.jpg` et `05-prologue-desktop.jpg`.
 
-## Parcours navigateur — mobile
+## Corrections responsive et accessibilité
 
-Chrome local via CDP :
+- les communications portrait sont placées après le canvas afin de ne plus masquer Riva, le sol ou un télégraphe ;
+- l’objectif paysage compact est recentré en haut et son aide secondaire est masquée ;
+- les toasts évitent désormais les commandes tactiles en portrait et paysage ;
+- la route du prologue reste visible sous 480 px ;
+- radio, HUD, commandes tactiles, toast et conseil d’orientation reçoivent le contraste renforcé ;
+- les écrans inactifs deviennent `inert` et `aria-hidden`, avec restauration du focus sur l’écran actif.
 
-- portrait 390 × 844 : introduction, prologue, combat, HUD, objectif, pause et sept commandes tactiles vérifiés ;
-- paysage 844 × 390 : largeur du document égale au viewport, sept commandes visibles et objectif présent ;
-- commandes portrait replacées en zone basse pour rester accessibles aux pouces ;
-- aucun débordement horizontal détecté sur les deux orientations.
+## Gameplay et progression
 
-## Hors ligne
-
-- service worker installé et contrôleur actif après amorçage en ligne ;
-- rechargement du shell en réseau coupé réussi ;
-- écran titre et surface QA de nouveau disponibles hors ligne.
+- l’introduction bloque maintenant l’IA, les tirs et le chronomètre jusqu’à disparition réelle de la plaque, y compris après pause ;
+- une victoire en Laboratoire ne débloque plus la machine suivante et ne modifie pas la progression de campagne ;
+- lancer un nouveau Circuit avec une reprise valide exige une confirmation explicite.
 
 ## Publication
 
@@ -43,7 +43,7 @@ Ce rapport couvre le candidat local. Les preuves GitHub, CI et Vercel publiques 
 
 ## Limites du passage
 
-- Aucune manette physique n’a été testée.
-- Aucun appareil tactile physique n’a été testé.
-- Aucun lecteur d’écran réel n’a été testé.
-- Le navigateur intégré était bloqué par le helper ACL Windows ; les vérifications ont été exécutées dans Chrome local via CDP.
+- La nouvelle capture mobile paysage et la nouvelle capture Résultat n’ont pas été produites : Chrome/CDP s’est suspendu pendant ces deux parcours et l’instance locale a été arrêtée proprement.
+- La campagne complète des six boss n’a pas été rejouée manuellement après les changements v2.5 ; les contrats automatisés et le parcours ciblé couvrent cette passe.
+- Aucune manette physique, aucun appareil tactile physique et aucun lecteur d’écran réel n’ont été testés.
+- Le navigateur intégré est resté bloqué par le helper ACL Windows ; les vérifications visuelles réussies ont été exécutées dans Chrome local via CDP.

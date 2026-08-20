@@ -18,7 +18,7 @@ from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "assets" / "generated"
-OUTPUT_ROOT = SOURCE_ROOT / "v2.2.0"
+OUTPUT_ROOT = SOURCE_ROOT / "v2.5.0"
 MANIFEST_PATH = OUTPUT_ROOT / "asset-manifest.json"
 
 BOSSES = ("rammer", "kraken", "drill", "mantis", "cyclotron", "omega")
@@ -113,13 +113,27 @@ def save_runtime(image: Image.Image, relative_path: str, alpha: bool) -> dict:
         width, height = check.size
         has_alpha = "A" in check.getbands()
     return {
-        "src": f"assets/generated/v2.2.0/{relative_path}",
+        "src": f"assets/generated/v2.5.0/{relative_path}",
         "width": width,
         "height": height,
         "alpha": has_alpha,
         "bytes": len(data),
         "sha256": sha256(data).hexdigest(),
     }
+
+
+def normalize_sprite(image: Image.Image, max_extent: int) -> Image.Image:
+    """Extract a generated cutout and center it on the 418 px rig canvas."""
+    rgba = extract_alpha(image)
+    bounds = rgba.getbbox()
+    if not bounds:
+        raise ValueError("Generated sprite contains no visible pixels")
+    crop = rgba.crop(bounds)
+    crop.thumbnail((max_extent, max_extent), Image.Resampling.LANCZOS)
+    canvas = Image.new("RGBA", (418, 418), (0, 0, 0, 0))
+    position = ((418 - crop.width) // 2, (418 - crop.height) // 2)
+    canvas.alpha_composite(crop, position)
+    return canvas
 
 
 def source(path: Path) -> Image.Image:
@@ -131,7 +145,7 @@ def source(path: Path) -> Image.Image:
 def main() -> None:
     manifest: dict = {
         "schemaVersion": 1,
-        "release": "2.2.0",
+        "release": "2.5.0",
         "generator": "OpenAI ImageGen built-in",
         "license": "Original project artwork",
         "arenas": {},
@@ -167,6 +181,15 @@ def main() -> None:
         crop = extract_alpha(hero.crop(cell_box(hero.size, 3, 3, index)))
         manifest["heroine"]["parts"][part] = save_runtime(crop, f"heroine/riva-spark/{part}.webp", True)
 
+    # The v1 sheet contains two complete arms while the torso already carries
+    # the rear sleeve. A dedicated OpenAI forearm avoids triple-arm overlap.
+    corrected_forearm = source(SOURCE_ROOT / "riva" / "riva-forearm-near-openai-v3.png")
+    manifest["heroine"]["parts"]["arm-near"] = save_runtime(
+        normalize_sprite(corrected_forearm, 260),
+        "heroine/riva-spark/arm-near.webp",
+        True,
+    )
+
     vfx = source(SOURCE_ROOT / "vfx" / "circuit-vfx-openai-v1.png")
     for index, effect in enumerate(VFX):
         crop = extract_alpha(vfx.crop(cell_box(vfx.size, 4, 4, index)))
@@ -180,7 +203,7 @@ def main() -> None:
     entries.extend(manifest["heroine"]["parts"].values())
     entries.extend(manifest["vfx"].values())
     manifest["summary"] = {
-        "masters": 14,
+        "masters": 17,
         "runtimeFiles": len(entries),
         "arenaLayers": 24,
         "bossParts": 54,

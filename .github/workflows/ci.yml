@@ -44,7 +44,7 @@ jobs:
       - name: Upload the verified static artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gearstorm-web-v2.4.0
+          name: gearstorm-web-v2.5.0
           path: dist/
           if-no-files-found: error
           retention-days: 14

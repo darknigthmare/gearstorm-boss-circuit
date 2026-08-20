@@ -131,7 +131,7 @@
       ]
     },
     {
-      "source": "/assets/generated/v2.2.0/(.*)",
+      "source": "/assets/generated/v2.5.0/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

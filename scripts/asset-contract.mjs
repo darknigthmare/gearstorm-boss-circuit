@@ -2,9 +2,9 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 
-export const ASSET_RELEASE = '2.2.0';
+export const ASSET_RELEASE = '2.5.0';
 export const ASSET_DIRECTORY = `v${ASSET_RELEASE}`;
-export const ASSET_MANIFEST_PATH = 'assets/generated/v2.2.0/asset-manifest.json';
+export const ASSET_MANIFEST_PATH = 'assets/generated/v2.5.0/asset-manifest.json';
 export const ASSET_BUDGET_BYTES = 20 * 1024 * 1024;
 export const EXPECTED_COUNTS = Object.freeze({
   runtimeFiles: 103,
@@ -14,7 +14,7 @@ export const EXPECTED_COUNTS = Object.freeze({
   vfx: 16,
   alpha: 97,
   opaque: 6,
-  masters: 14,
+  masters: 17,
 });
 export const CATEGORY_BUDGETS = Object.freeze({
   arena: 512 * 1024,
@@ -162,7 +162,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd()) {
   for (const entry of entries) {
     invariant(!ids.has(entry.id), `Identifiant dupliqué: ${entry.id}`);
     ids.add(entry.id);
-    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.2\.0\/.+\.webp$/.test(entry.src), `${entry.id}: chemin runtime invalide`);
+    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.5\.0\/.+\.webp$/.test(entry.src), `${entry.id}: chemin runtime invalide`);
     invariant(!entry.src.includes('..') && !entry.src.includes('\\'), `${entry.id}: chemin non sécurisé`);
     invariant(!sources.has(entry.src), `Source dupliquée: ${entry.src}`);
     sources.add(entry.src);

@@ -1913,3 +1913,69 @@ body.high-contrast .boss-intro {
 .ending-panel .liberation-grid li { padding: 0.55rem 0.65rem; }
 .ending-panel .ending-legacy { margin: 0.65rem 0; }
 .ending-panel .menu-stack { gap: 0.45rem; }
+
+/* Passe responsive combat v2.5 : les overlays restent hors des zones d'action. */
+body.high-contrast :is(.radio-comms, .hud-chip, #touch-controls button, .toast, .orientation-hint) {
+  border: 2px solid white;
+  background: #050914;
+  color: white;
+  backdrop-filter: none;
+}
+
+body:has(.screen[aria-modal="true"].active) .skip-link { display: none; }
+
+@media (prefers-contrast: more) {
+  :is(.radio-comms, .hud-chip, #touch-controls button, .toast, .orientation-hint) {
+    border: 2px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    backdrop-filter: none;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 820px) {
+  .radio-comms {
+    top: calc(var(--safe-top) + 9.55rem + 56.25vw + 0.5rem);
+    max-height: 5rem;
+    overflow: auto;
+  }
+
+  .combat-briefing {
+    max-height: none;
+    overflow: visible;
+  }
+
+  #combat-hint {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  #app:has(#touch-controls.in-game) .toast {
+    bottom: calc(var(--safe-bottom) + 9.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .prologue-screen .district-route {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .combat-briefing {
+    top: calc(var(--safe-top) + 3.25rem);
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #combat-hint { display: none; }
+
+  #app:has(#touch-controls.in-game) .toast {
+    bottom: calc(var(--safe-bottom) + 4.75rem);
+  }
+}

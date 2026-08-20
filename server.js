@@ -3,7 +3,7 @@ const { readFile, realpath, stat } = require('node:fs/promises');
 const { extname, resolve, sep } = require('node:path');
 
 const PROJECT_ROOT = resolve(__dirname);
-const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.2.0/';
+const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.5.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
   'styles.css',
@@ -67,7 +67,7 @@ function sendText(request, response, statusCode, message, extraHeaders = {}) {
 function isPublicAsset(relative) {
   if (PUBLIC_SHELL_ASSETS.has(relative)) return true;
   if (relative === GENERATED_RUNTIME_PREFIX + 'asset-manifest.json') return true;
-  return /^assets\/generated\/v2\.2\.0\/(?:arenas|bosses|heroine|vfx)\/[a-z0-9-]+(?:\/[a-z0-9-]+)?\.webp$/.test(relative);
+  return /^assets\/generated\/v2\.5\.0\/(?:arenas|bosses|heroine|vfx)\/[a-z0-9-]+(?:\/[a-z0-9-]+)?\.webp$/.test(relative);
 }
 
 function resolvePublicFile(rootDir, requestUrl, host) {

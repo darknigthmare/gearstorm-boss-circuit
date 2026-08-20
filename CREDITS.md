@@ -28,6 +28,10 @@ Les contraintes de production interdisent texte intégré, logo, filigrane et im
 
 Au runtime, le lazy loading privilégie le titre puis la rencontre courante. Les ressources valides peuvent rejoindre le cache PWA ; le fallback procédural reste disponible si leur chargement ou leur décodage échoue.
 
+## Correction du rig de Riva v2.5
+
+Trois sources OpenAI supplémentaires documentent la recherche de pose des bras. Les deux études v2 restent des références de production non publiées au runtime. Seul `riva-forearm-near-openai-v3.png`, conçu comme un avant-bras et une main sans épaule ni biceps, remplace la pièce avant de Riva dans le catalogue v2.5. Le détourage, le cadrage et l’encodage WebP sont déterministes ; aucun asset tiers n’est incorporé.
+
 ## Écriture et expérience v2.4
 
 L’intro, le prologue, les six actes, les interludes, l’épilogue, les transmissions, les dossiers Codex et les dix-huit contrats de maîtrise sont des créations originales du projet. Leur source structurée est `story.js`.

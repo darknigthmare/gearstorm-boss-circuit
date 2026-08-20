@@ -1,5 +1,14 @@
 # Historique des versions
 
+## 2.5.0 — Forge des machines
+
+- Remplacement du membre avant de Riva par un avant-bras OpenAI dédié, sans épaule ni bras complet dupliqué ; le torse fournit le bras arrière et le canon reste le membre de tir.
+- Nouveau runtime artistique immuable `assets/generated/v2.5.0/`, dérivé de 17 sources OpenAI et limité aux 103 WebP réellement consommés par le jeu.
+- Synchronisation de l’introduction de combat : l’IA, les projectiles et le chronomètre restent arrêtés tant que la plaque d’introduction est visible.
+- Ajout d’un contrat de forge pour étendre le Circuit à 30 machines originales, fondé sur des verbes de gameplay et sans reprendre noms, silhouettes ou assets d’une franchise tierce.
+- Renforcement des contrats de non-régression pour le rig de Riva, l’introduction et la chaîne PWA v2.5.
+
+
 ## 2.4.0 — La dernière émission
 
 - Ajout de `story.js`, registre narratif immuable pour l’intro, le prologue, six actes, six interludes, l’épilogue, les dossiers Codex et les contrats de maîtrise.

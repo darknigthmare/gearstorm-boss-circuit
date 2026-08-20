@@ -12,7 +12,7 @@ import {
 
 const runtimePromise = validateRuntimeAssets();
 
-test('le catalogue v2.2 contient exactement les 103 assets attendus', async () => {
+test('le catalogue v2.5 contient exactement les 103 assets attendus', async () => {
   const runtime = await runtimePromise;
   assert.equal(runtime.manifest.release, ASSET_RELEASE);
   assert.equal(runtime.entries.length, EXPECTED_COUNTS.runtimeFiles);
@@ -26,7 +26,7 @@ test('le catalogue v2.2 contient exactement les 103 assets attendus', async () =
 
 test('dimensions, alpha, signatures, tailles et SHA-256 sont vérifiés', async () => {
   const runtime = await runtimePromise;
-  assert.equal(runtime.totalBytes, 13_136_064);
+  assert.equal(runtime.totalBytes, 13_113_368);
   assert.ok(runtime.totalBytes <= ASSET_BUDGET_BYTES);
   assert.equal(runtime.alphaCount, EXPECTED_COUNTS.alpha);
   assert.equal(runtime.opaqueCount, EXPECTED_COUNTS.opaque);
@@ -38,7 +38,7 @@ test('dimensions, alpha, signatures, tailles et SHA-256 sont vérifiés', async 
 test('seul le runtime versionné est déclaré, jamais les masters OpenAI', async () => {
   const runtime = await runtimePromise;
   assert.ok(runtime.files.includes(ASSET_MANIFEST_PATH));
-  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.2.0/')));
+  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.5.0/')));
   assert.ok(runtime.entries.every(entry => entry.src.endsWith('.webp')));
   assert.ok(runtime.entries.every(entry => !/assets\/generated\/(?:arenas|bosses|riva|vfx)\//.test(entry.src)));
   const sources = runtime.entries.map(entry => entry.src);

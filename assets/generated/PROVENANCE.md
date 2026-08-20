@@ -1,6 +1,6 @@
 # GEARSTORM OpenAI art provenance
 
-Generated on 2026-08-20 with the built-in OpenAI ImageGen tool for this original project. The 14 PNG files beside this document are immutable master sheets; `v2.2.0/` contains deterministic runtime crops produced by `scripts/process-openai-art.py`.
+Generated on 2026-08-20 and extended on 2026-08-21 with the built-in OpenAI ImageGen tool for this original project. The 17 PNG source files beside this document are immutable production sources; `v2.5.0/` contains deterministic runtime crops produced by `scripts/process-openai-art.py`.
 
 No franchise art, stock image, external logo, or third-party game asset was supplied as a source. The established GEARSTORM key art was used only as the project’s internal style direction.
 
@@ -21,6 +21,9 @@ No franchise art, stock image, external logo, or third-party game asset was supp
 | `bosses/cyclotron-parts-openai-v1.png` | Foundry Titan: furnace, cockpit, piston arms, legs, stacks, molten core, overarmor | 9 parts |
 | `bosses/omega-parts-openai-v1.png` | Crown Engine: crown hull, throne, batteries, stabilizers, blade ring, arsenal, core, rupture | 9 parts |
 | `riva/riva-parts-openai-v1.png` | Riva Spark: head, torso, independent arms, legs, boots, cannon, dash, overload halo | 9 parts |
+| `riva/riva-arm-near-openai-v2.png` | Full front-arm pose study matching Riva, retained as provenance and not published at runtime | 0 parts |
+| `riva/riva-arm-far-openai-v2.png` | Full support-arm pose study matching Riva, retained as provenance and not published at runtime | 0 parts |
+| `riva/riva-forearm-near-openai-v3.png` | Production forearm only: elbow coupling, short armored forearm and trigger glove, no shoulder or upper arm | 1 override |
 | `vfx/circuit-vfx-openai-v1.png` | Cyan, orange, violet and chronal impacts, warnings, movement and explosions | 16 effects |
 
 ## Shared generation constraints
@@ -35,4 +38,4 @@ No franchise art, stock image, external logo, or third-party game asset was supp
 
 The generator rendered a visual transparency checker into RGB masters. A direct ImageGen transparency edit was attempted, but the local image reference could not pass the sandbox reader. The deterministic processor therefore performs only these mechanical operations: crop the requested cells, remove large connected near-neutral checker regions, add feathered alpha, encode WebP, and record dimensions, byte size, and SHA-256. It does not repaint or invent pixels.
 
-`assets/generated/v2.2.0/asset-manifest.json` is the runtime source of truth: 24 arena layers, 54 boss modules, 9 Riva modules, and 16 VFX files.
+`assets/generated/v2.5.0/asset-manifest.json` is the runtime source of truth: 24 arena layers, 54 boss modules, 9 Riva modules, and 16 VFX files. The v3 forearm overrides only `heroine/riva-spark/arm-near.webp`; the two full-arm studies never enter the public bundle.

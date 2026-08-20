@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit v2.4
+# GEARSTORM: Boss Circuit v2.5
 
 GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables du Professeur Cassian Voltério, améliore son équipement entre les combats et libère les districts emprisonnés dans le Circuit.
 
@@ -20,7 +20,7 @@ Le mode `file://` reste prévu comme solution de repli, mais l’installation PW
 - Dépôt GitHub prévu : https://github.com/darknigthmare/gearstorm-boss-circuit
 - URL Vercel prévue : https://gearstorm-boss-circuit.vercel.app
 
-Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la révision v2.4 est actuellement poussée ou déployée. L’état public doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
+Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la révision v2.5 est actuellement poussée ou déployée. L’état public doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
 
 ## Contenu
 
@@ -74,9 +74,9 @@ Le runtime conserve tous les IDs historiques et pilote les nouveaux hooks suivan
 
 Les objectifs critiques restent disponibles même si les conseils sont coupés. Les changements d’état utilisent les régions `aria-live` existantes avec parcimonie afin de ne pas annoncer chaque frame.
 
-## Direction artistique v2.2
+## Direction artistique v2.5
 
-La production v2.2 repose sur 14 masters originaux réalisés avec OpenAI Image Generation intégré, puis découpés et normalisés en 103 assets indépendants destinés au runtime.
+La production v2.5 repose sur 17 sources originales réalisées avec OpenAI Image Generation intégré. Les 14 masters historiques fournissent les six arènes, les six boss, Riva et les VFX ; trois études supplémentaires ont permis de corriger le membre avant de Riva. Le jeu ne publie que 103 assets indépendants normalisés pour le runtime.
 
 | Famille | Masters | Découpage par master | Assets indépendants |
 | --- | ---: | ---: | ---: |
@@ -84,9 +84,10 @@ La production v2.2 repose sur 14 masters originaux réalisés avec OpenAI Image 
 | Boss | 6 | 9 pièces transparentes | 54 |
 | Riva Spark | 1 | 9 poses / états | 9 |
 | Effets visuels | 1 | grille 4 × 4 | 16 |
-| **Total** | **14** |  | **103** |
+| Études de correction du rig de Riva | 3 | avant-bras de production + études de pose | inclus dans les 9 pièces de Riva |
+| **Total des sources** | **17** |  | **103 assets runtime** |
 
-Les masters sont des sources de production ; le jeu consomme les éléments exportés séparément. Les pièces de personnage, de boss et de VFX utilisent une transparence réelle, sans texte, logo ni filigrane. Les images sont des créations originales propres à GEARSTORM et ne reprennent aucun asset de franchise tierce.
+Les sources sont des fichiers de production ; le jeu consomme les éléments exportés séparément. L’avant-bras v3 de Riva est une pièce anatomique isolée, raccordée à la manche déjà peinte dans son torse, ce qui évite de superposer trois bras complets. Les pièces de personnage, de boss et de VFX utilisent une transparence réelle, sans texte, logo ni filigrane. Les images sont des créations originales propres à GEARSTORM et ne reprennent aucun asset de franchise tierce.
 
 Le rendu procédural Canvas reste le fallback de référence si une image manque, expire, ne se décode pas ou ne peut pas être chargée. Le chargement est conçu pour être progressif : le key art et les éléments de titre sont prioritaires, puis les couches d’arène et les pièces du combat courant sont demandées à la volée. Le loader accessible du titre/prologue peut annoncer cette progression sans bloquer le menu. Sous HTTP ou HTTPS, le service worker peut ensuite mettre en cache les réponses valides selon sa stratégie PWA.
 
@@ -117,7 +118,7 @@ npm run build
 npm run check:release
 ```
 
-Ces commandes décrivent le processus attendu ; ce document ne prétend pas qu’elles ont été exécutées sur la révision v2.4. `QA_REPORT.md` ne doit consigner que les validations réellement effectuées et n’est pas mis à jour par ce passage documentaire.
+Ces commandes décrivent le processus attendu ; `QA_REPORT.md` ne consigne que les validations réellement exécutées sur le candidat courant.
 
 ## Publication
 
@@ -138,5 +139,6 @@ Ces commandes décrivent le processus attendu ; ce document ne prétend pas qu�
 - `scripts/check-release.mjs` : garde-fous de publication.
 - `tests/` : contrats du jeu et tests HTTP.
 - `DESIGN.md` et `GAME_DESIGN.md` : univers, règles et contrat de production.
+- `BOSS_EXPANSION.md` : forge IP-safe des 24 prochaines machines et architecture nécessaire à un roster de 30 boss.
 
 Projet original. Tous droits réservés.
