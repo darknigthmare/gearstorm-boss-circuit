@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { copyFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
-import { dirname, relative, resolve } from 'node:path';
+import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   ASSET_BUDGET_BYTES,
@@ -49,7 +49,7 @@ await mkdir(dist, { recursive: true });
 await Promise.all(emittedInputs.map(async file => {
   const source = resolve(root, file);
   const destination = resolve(dist, file);
-  if (!destination.startsWith(dist + '\\') && destination !== dist) throw new Error(`Destination non sécurisée : ${file}`);
+  if (!destination.startsWith(dist + sep) && destination !== dist) throw new Error(`Destination non sécurisée : ${file}`);
   await mkdir(dirname(destination), { recursive: true });
   await copyFile(source, destination);
 }));
