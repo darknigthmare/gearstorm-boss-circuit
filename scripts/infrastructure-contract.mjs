@@ -42,12 +42,13 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     invariant(headerValue(vercel, source, 'Cache-Control') === 'public, max-age=0, must-revalidate', `Revalidation requise : ${source}.`);
   }
   invariant(headerValue(vercel, '/sw.js', 'Service-Worker-Allowed') === '/', 'Scope du service worker absent.');
+  invariant(headerValue(vercel, '/pwa-update-v2.8.0.js', 'Cache-Control') === 'public, max-age=31536000, immutable', 'Bootstrap PWA versionne non immutable.');
   invariant(headerValue(vercel, `/assets/generated/v${ASSET_RELEASE}/(.*)`, 'Cache-Control') === 'public, max-age=31536000, immutable', 'Cache immutable assets absent.');
 
   invariant(serviceWorker.includes(`const APP_VERSION = '${APP_RELEASE}'`), 'Version application du service worker incoherente.');
   invariant(serviceWorker.includes(`const ASSET_VERSION = '${ASSET_RELEASE}'`), 'Version assets du service worker incoherente.');
   invariant(serviceWorker.includes('gearstorm-shell-v${APP_VERSION}'), 'Cache shell non versionne.');
-  invariant(serviceWorker.includes('gearstorm-runtime-v${APP_VERSION}'), 'Cache runtime non versionne.');
+  invariant(serviceWorker.includes('gearstorm-runtime-v${ASSET_VERSION}'), 'Cache runtime non versionne.');
   invariant(serviceWorker.includes('cacheFirstRuntime'), 'Strategie cache-first des WebP absente.');
   invariant(serviceWorker.includes('staleWhileRevalidateShell'), 'Strategie stale-while-revalidate du shell absente.');
   invariant(serviceWorker.includes('networkFirstNavigation'), 'Fallback navigation hors ligne absent.');
@@ -57,8 +58,13 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(coreBlock.includes("'./story.js'"), 'Le registre narratif doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./expansion-story.js'"), 'Le registre narratif Forge doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./boss-roster.js'"), 'Le roster des 30 boss doit faire partie du shell PWA.');
+  invariant(coreBlock.includes("'./pwa-update-v2.8.0.js'"), 'Le bootstrap de migration PWA doit faire partie du shell.');
   invariant(coreBlock.includes(`assets/generated/v\${ASSET_VERSION}/asset-manifest.json`), 'Catalogue assets absent du shell PWA.');
   invariant(!/\.webp[\x60'"]/.test(coreBlock), 'Les 225 WebP ne doivent pas etre precaches.');
+  const installBlock = serviceWorker.slice(serviceWorker.indexOf("self.addEventListener('install'"), serviceWorker.indexOf("self.addEventListener('activate'"));
+  invariant(!installBlock.includes('skipWaiting'), 'Une mise a jour PWA ne doit pas etre activee sans consentement.');
+  const messageBlock = serviceWorker.slice(serviceWorker.indexOf("self.addEventListener('message'"), serviceWorker.indexOf('function canonicalRequest'));
+  invariant(messageBlock.includes('SKIP_WAITING') && messageBlock.includes('skipWaiting'), 'Activation PWA explicite absente.');
 
   const ignored = new Set(vercelIgnore.split(/\r?\n/).map(line => line.trim()).filter(Boolean));
   for (const pattern of [
@@ -90,7 +96,9 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     'npx playwright install --with-deps chromium',
     'npm run test:e2e',
     'npm audit --audit-level=high',
-    'actions/upload-artifact@v4',
+    'actions/checkout@v6',
+    'actions/setup-node@v6',
+    'actions/upload-artifact@v7',
     'persist-credentials: false',
     'contents: read',
   ]) {

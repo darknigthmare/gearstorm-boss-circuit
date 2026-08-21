@@ -1,5 +1,16 @@
 # Historique des versions
 
+## 2.8.0 — Circuit fiable
+
+- ENDURANCE ENGINE déroule désormais ses six manches : les seuils de phase exigent les manches 2, 4 puis 6, ce qui empêche un haut DPS de court-circuiter son épreuve.
+- Les checkpoints de campagne et du Circuit Forge conservent le nombre de nouvelles tentatives du boss courant ; un checkpoint Atelier conserve aussi exactement l’offre de modules affichée afin qu’une reprise ne la relance pas.
+- Ajout de contrôles d’export JSON v5 normalisé et d’import limité à 1 Mio. L’import passe par la migration/normalisation existante avant persistance et resynchronisation ; le runtime reste tolérant si ces hooks DOM ne sont pas rendus.
+- Une sauvegarde réellement neuve initialise mouvement réduit et contraste renforcé depuis les préférences du système ; une sauvegarde existante ou migrée garde toujours les choix de la joueuse.
+- Les cartes déverrouillées de la Forge peuvent afficher une miniature décorative issue des pièces WebP réelles, sans remplacer leur nom ni leur libellé accessible.
+- Le runtime PWA détecte un service worker en attente et ne lui demande `SKIP_WAITING` qu’après une action explicite sur le hook de mise à jour ; la première installation reste silencieuse et un seul rechargement suit le changement de contrôleur.
+- Le pack artistique reste le manifeste immuable 2.7.0 : 26 masters de provenance et 225 WebP runtime. La sauvegarde reste en schéma v5 ; le contenu reste fixé à 30 boss, 90 phases et 90 contrats de maîtrise.
+- Les parcours Playwright Chromium couvrent aussi le focus clavier, les cibles de 44 CSS px, l’export JSON, l’import normalisé, les préférences système au premier lancement, une Gamepad API simulée et le rechargement hors ligne. Le consentement d’un worker réellement `waiting` reste couvert par contrats Node ; Firefox et WebKit sont configurés en opt-in mais aucune exécution n’est revendiquée ici. Cette entrée ne certifie ni QA finale, ni test matériel, ni commit, ni push, ni déploiement public.
+
 ## 2.7.0 — Les quatre anneaux
 
 - Ajout du Circuit Forge séquentiel des machines 07 à 30 : quatre vagues de six combats, choix de module entre les boss et écran de restauration final.

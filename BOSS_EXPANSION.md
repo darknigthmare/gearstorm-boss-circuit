@@ -1,16 +1,16 @@
 # GEARSTORM — Contrat d’expansion des boss
 
-Statut du document : implémentation Forge v2.7 livrée et feuille de raffinement
+Statut du document : implémentation Forge v2.8 livrée et feuille de raffinement
 
 Portée : 30 boss originaux jouables, dont 6 en campagne et 24 dans la Forge libre ou le Circuit Forge
 
-Référence technique actuelle : GEARSTORM v2.7, sauvegarde v5, manifeste d’assets générés 2.7.0
+Référence technique actuelle : GEARSTORM v2.8.0, sauvegarde v5, manifeste d’assets générés 2.7.0
 
 ## 1. Objet et limites
 
 Ce document transforme l’étude des grandes mécaniques de boss de la série Sonic en une feuille de route originale pour GEARSTORM. Il décrit des verbes de jeu, des structures d’arène et des méthodes de production. Il n’autorise ni la copie d’une apparence, ni la reprise d’un nom, d’une silhouette, d’un personnage, d’un décor ou d’un asset Sega.
 
-La v2.7 intègre les vingt-quatre boss des vagues 1 à 4 dans une Forge séparée de la campagne. Les trente machines sont sélectionnables et combattables, possèdent trois phases, des télégraphes, des valeurs propres, un objectif et une fiche narrative. Le Circuit Forge enchaîne 07 à 30 en quatre vagues, propose des améliorations entre les boss, sauvegarde sa reprise en v5 et se conclut par une restauration dédiée.
+La v2.8 intègre les vingt-quatre boss des vagues 1 à 4 dans une Forge séparée de la campagne. Les trente machines sont sélectionnables et combattables, possèdent trois phases, des télégraphes, des valeurs propres, un objectif et une fiche narrative. Le Circuit Forge enchaîne 07 à 30 en quatre vagues, propose des améliorations entre les boss, sauvegarde sa reprise en v5 et se conclut par une restauration dédiée.
 
 Les 24 profils Forge possèdent 24 `mechanicId` et 72 signatures d’état uniques. Ces signatures enrichissent huit familles de mécaniques communes : elles ne constituent pas vingt-quatre IA entièrement indépendantes. Chaque machine charge quatre pièces OpenAI et un backdrop propre ; les animations secondaires, hazards et transitions restent composés par le moteur partagé, et les backdrops Forge ne sont pas des décors parallaxe à quatre couches. La campagne, ses six relais et son épilogue restent volontairement séparés.
 
@@ -150,7 +150,7 @@ Objectif : introduire des changements de genre courts, un gauntlet, une adaptati
 | 29 | ADAPTIVE ARCHIVIST | Forge jouable | Archives Réactives | Observe la fréquence de tir, saut et ruée puis change une seule réponse | L’adaptation est locale au combat, visible dans l’interface et remise à zéro à chaque tentative. |
 | 30 | NULL CROWN | Forge jouable | Trône Zéro | Prototype secret composite clôturant le Circuit Forge, combinant renvoi, modules et rupture | Trois phases avec checkpoint d’entraînement ; aucune phase ne copie l’apparence ou l’ordre d’un final de franchise existant. |
 
-Dans la v2.7, le statut secret de NULL CROWN est narratif : FORGE 30 reste accessible dans la sélection libre et conclut le Circuit Forge avec sauvegarde, Codex et épilogue dédiés. Toute future condition de déblocage devra être migrée et documentée avant activation.
+Dans la v2.8, le statut secret de NULL CROWN est narratif : FORGE 30 reste accessible dans la sélection libre et conclut le Circuit Forge avec sauvegarde, Codex et épilogue dédiés. Toute future condition de déblocage devra être migrée et documentée avant activation.
 
 ## 5. Architecture moteur livrée et cible
 
@@ -577,7 +577,7 @@ Un concept trop proche est rejeté puis reconstruit depuis sa fonction industrie
 - libération des bitmaps d’un boss quitté, sauf bundle explicitement conservé ;
 - possibilité de réduire particules et secousses sans modifier la difficulté.
 
-## 11. Limites et backlog après v2.7
+## 11. Limites et backlog après v2.8
 
 La base jouable, narrative, artistique et télémétrique est livrée ; les limites restantes sont explicites :
 
@@ -616,7 +616,7 @@ Les sources servent à inventorier les jeux et à comprendre des familles géné
 
 ## 13. État livré des 30 boss
 
-Le contrat de base est atteint dans la v2.7 :
+Le contrat de base est atteint dans la v2.8 :
 
 - six boss de campagne et vingt-quatre boss Forge sont présents dans le registre ;
 - les trente rencontres totalisent quatre-vingt-dix phases et sont lançables depuis l’interface ;

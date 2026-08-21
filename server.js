@@ -6,6 +6,7 @@ const PROJECT_ROOT = resolve(__dirname);
 const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.7.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
+  'pwa-update-v2.8.0.js',
   'styles.css',
   'story.js',
   'expansion-story.js',
@@ -16,6 +17,7 @@ const PUBLIC_FILES = new Set([
   'favicon.ico',
   'robots.txt',
 ]);
+const VERSIONED_SHELL_FILES = new Set(['pwa-update-v2.8.0.js']);
 const PUBLIC_SHELL_ASSETS = new Set([
   'assets/gearstorm-icon.svg',
   'assets/gearstorm-icon-192.png',
@@ -124,9 +126,10 @@ function createGameServer(options = {}) {
       }
       const body = request.method === 'HEAD' ? null : await readFile(canonicalCandidate);
       const versionedRuntime = resolved.relative.startsWith(GENERATED_RUNTIME_PREFIX);
+      const versionedShell = VERSIONED_SHELL_FILES.has(resolved.relative);
       const cacheControl = REVALIDATE_FILES.has(resolved.relative)
         ? 'public, max-age=0, must-revalidate'
-        : versionedRuntime
+        : versionedRuntime || versionedShell
           ? 'public, max-age=31536000, immutable'
           : 'public, max-age=3600, stale-while-revalidate=86400';
 

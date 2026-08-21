@@ -1,10 +1,10 @@
-# GEARSTORM: Boss Circuit v2.7
+# GEARSTORM: Boss Circuit v2.8.0
 
-GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables de la campagne de Cassian Voltério, puis peut affronter vingt-quatre profils supplémentaires dans la Forge, soit trente boss jouables et quatre-vingt-dix phases.
+GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables de la campagne de Cassian Voltério, puis affronte vingt-quatre profils supplémentaires dans la Forge : 30 boss jouables, 90 phases et 90 contrats de maîtrise.
 
 ## Jouer en local
 
-Prérequis pour le serveur local et les outils de validation : Node.js 22 ou plus récent.
+Prérequis pour le serveur local et les outils de validation : Node.js 22.x.
 
 ```text
 npm install
@@ -13,78 +13,76 @@ npm start
 
 Ouvrir ensuite `http://127.0.0.1:8080`. Sous Windows, `LANCER_LE_JEU.bat` lance également la version locale dans le navigateur.
 
-Le mode `file://` reste prévu comme solution de repli, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
+Le mode `file://` reste un repli jouable, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
 
 ## Cibles de publication
 
 - Dépôt GitHub prévu : https://github.com/darknigthmare/gearstorm-boss-circuit
 - URL Vercel prévue : https://gearstorm-boss-circuit.vercel.app
 
-Ces identifiants décrivent les cibles du projet. L’état public de la révision v2.7 doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
+Ces identifiants décrivent les cibles du projet. Ce document ne confirme ni l’état Git distant, ni un déploiement Vercel, ni la disponibilité publique du candidat v2.8.0.
 
 ## Contenu
 
-- Trente boss originaux jouables, chacun structuré en trois phases lisibles : six actes de campagne et vingt-quatre simulations Forge.
-- Campagne complète, Laboratoire d’entraînement, Forge libre des 30 boss et Circuit Forge séquentiel 07–30, trois difficultés et deux fins de parcours.
-- Onze modules d’amélioration, proposés entre les combats du Circuit et cumulables selon leurs limites propres.
+- Campagne complète de six boss, chacun en trois phases, avec intro, prologue, interludes, Atelier et deux fins de parcours.
+- Laboratoire d’entraînement, Forge libre des 30 boss et Circuit Forge séquentiel 07–30.
+- Circuit Forge composé de quatre vagues de six rencontres ; ENDURANCE ENGINE possède en plus six manches internes.
+- Onze modules d’amélioration cumulables selon leurs limites propres.
 - Surcharge Overdrive, ruée invulnérable, double saut et tir évolutif.
+- Trois difficultés, score, rangs, chronomètres et reprises séparées de campagne et de Forge.
 - Clavier AZERTY/QWERTY, souris, manette standard et commandes tactiles.
-- Sauvegarde locale v5 versionnée, migrée et normalisée, avec reprise séparée des Circuits campagne et Forge.
+- Sauvegarde locale v5 versionnée, migrée et normalisée.
 - Audio et musique synthétiques via Web Audio, sans dépendance distante.
 - Mouvement réduit, contraste renforcé et réglage des tremblements.
-- Cible PWA installable avec cache hors ligne et présentation sociale dédiée.
+- PWA installable avec cache hors ligne et fallback Canvas.
 
-## Circuit Forge v2.7
+## Correctifs de fiabilité v2.8.0
 
-Le Circuit Forge enchaîne les machines 07 à 30 en quatre vagues de six rencontres. Une sauvegarde v5 conserve le prochain boss, le checkpoint `fight`, `upgrade` ou `ending`, le temps cumulé, les pénalités, le score et le build installé. La reprise rend donc le joueur au bon combat, au choix de module ou à la restauration finale sans modifier les six relais de campagne.
+### ENDURANCE ENGINE
 
-Les vingt-quatre profils Forge exposent vingt-quatre `mechanicId` distincts et soixante-douze signatures d’état uniques, trois par boss. Ces signatures enrichissent honnêtement huit familles moteur communes — renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et puzzle/endgame — plutôt que vingt-quatre moteurs de combat sans code partagé.
+Ses six manches font désormais partie de la condition de victoire. Les passages de phase exigent les manches 2 puis 4, et la destruction finale exige la manche 6. Un build à fort DPS ne peut donc plus sauter l’épreuve d’endurance en traversant seulement les seuils de points de vie.
 
-Les soixante-douze contrats Forge sont instrumentés et évaluables. Chaque réussite repose sur la télémétrie réelle du combat et n’est enregistrée qu’après validation ; une métrique inconnue n’accorde jamais un contrat par défaut. Le mode Forge libre reste disponible pour sélectionner une machine et lancer une tentative indépendante sans avancer le Circuit Forge.
+### Checkpoints déterministes
 
-## Expérience narrative et qualité de vie
+Les reprises de campagne et de Circuit Forge conservent le nombre de nouvelles tentatives du boss courant. La pénalité et le rang sont ainsi recalculés à partir du même état après rechargement.
 
-La v2.4 raconte la reprise des six relais de sécurité qui coordonnent les services civils du Circuit. Cassian Voltério en a centralisé les commandes dans la Couronne ; Riva Spark remonte la ligne manuelle M-0 pour rendre chaque infrastructure à son district.
+Lorsqu’un checkpoint est sauvegardé à l’Atelier, les trois modules proposés sont également conservés. Reprendre une partie ne relance plus l’offre et ne permet plus de chercher un tirage plus favorable.
 
-Le parcours narratif de campagne suit la séquence **Intro → Prologue → Boss → Résultat → Interlude → Atelier**. Après Crown Engine Ω, l’interlude final mène à l’épilogue : Cassian est placé en détention et Riva refuse de remplacer une commande exclusive par une autre.
+### Sauvegarde de secours
 
-La progression visible comprend :
+Le runtime sait exporter la sauvegarde courante sous forme d’un fichier JSON v5 déjà normalisé. L’import refuse les fichiers de plus de 1 Mio, parse le JSON, puis fait passer les données exclusivement par la migration et la normalisation existantes avant de persister et resynchroniser progression, Codex et reprises.
 
-- récapitulatif de campagne et prochaine cible dès l’écran titre ;
-- reprise de Circuit prévue par `#continue-run`, affichée seulement lorsqu’une progression compatible existe ;
-- intro de la prise de contrôle, prologue de la ligne M-0 et six interludes propres aux districts ;
-- transmissions de Riva, Cassian et des canaux civils lors des changements de phase et entre les machines ;
-- briefing d’objectif lisible au-dessus du combat, avec conseil contextuel désactivable ;
-- Codex consultable pour Riva Spark, Cassian Voltério, l’origine des six machines, leur détournement et leur impact civil ;
-- objectif, build et rappel des commandes dans la pause ;
-- journal narratif, build actif et conséquence locale sur l’écran de résultat ;
-- itinéraire des six relais au prologue et bilan des commandes locales à l’épilogue ;
-- états compacts pour mobile, contraste renforcé et annonces non intrusives pour les technologies d’assistance.
+Les contrôles `#export-save` et `#import-save` sont rendus dans les options. `#import-save-file` reste un input fichier masqué, limité au JSON et doté d’un libellé accessible ; il n’est activé qu’après l’action explicite d’import.
 
-### Contrat des hooks DOM
+### Préférences système au premier lancement
 
-Le runtime conserve tous les IDs historiques et pilote les nouveaux hooks suivants :
+Une sauvegarde réellement neuve initialise `reduceMotion` depuis `prefers-reduced-motion: reduce` et `highContrast` depuis `prefers-contrast: more`. Cette détection ne remplace jamais les choix d’une sauvegarde existante ou migrée.
 
-| Hook | Responsabilité runtime |
-| --- | --- |
-| `#story-screen`, `#story-dialogue` | Présenter l’intro ou un interlude sans recouvrir le combat et rendre la progression explicite. |
-| `#story-continue`, `#story-back` | Avancer dans la campagne ou revenir au menu par une action explicite. |
-| `#continue-run` | Rester masqué sans reprise valide ; afficher la destination dans `#continue-run-detail` et reprendre sans écraser la sauvegarde. |
-| `#campaign-progress`, `#campaign-next` | Résumer les districts libérés et la prochaine machine depuis la sauvegarde normalisée. |
-| `#codex`, `#codex-screen` | Ouvrir le Codex, restaurer le focus au retour et respecter la navigation clavier/manette. |
-| `#codex-grid`, `#codex-progress` | Déverrouiller les dossiers selon la progression, mettre à jour les états et exposer un texte compréhensible sans couleur seule. |
-| `#story-archive`, `#story-archive-progress` | Recenser les transmissions narratives déjà découvertes sans confondre entraînement et campagne. |
-| `#combat-objective` | Annoncer l’objectif du boss ou de la phase sans être désactivé avec les conseils. |
-| `#radio-comms`, `#radio-speaker`, `#radio-line` | Afficher les communications de phase dans une région dédiée et temporaire. |
-| `#combat-hint`, `#hints-toggle` | Afficher un conseil bref lors d’une nouvelle mécanique, le masquer ensuite et persister la préférence. |
-| `#pause-objective`, `#pause-build` | Reprendre l’objectif actuel et la description réelle des modules installés. |
-| `#result-lore`, `#result-build` | Résumer la conséquence narrative de la victoire et le build avant la décision suivante. |
+### Cartes de boss
 
-Les objectifs critiques restent disponibles même si les conseils sont coupés. Les changements d’état utilisent les régions `aria-live` existantes avec parcimonie afin de ne pas annoncer chaque frame.
+Les cartes déverrouillées utilisent maintenant une miniature décorative provenant de la pièce WebP réelle du boss. Les cartes verrouillées n’exposent pas l’image ; le nom, l’état et le libellé accessible restent indépendants de la miniature.
 
-## Direction artistique v2.7
+### Mise à jour PWA consentie
 
-La production v2.7 repose sur vingt-six masters originaux réalisés avec OpenAI Image Generation intégré. Le bundle public contient 225 WebP normalisés, versionnés et contrôlés par SHA-256 ; les masters restent réservés à la provenance et ne sont pas chargés par le jeu.
+Le runtime écoute `waiting` et `updatefound`. Le bouton `#update-app` est rendu masqué : pour une version déjà contrôlée, un worker en attente le révèle et seule l’action de la joueuse envoie `{ type: 'SKIP_WAITING' }`. Le premier install reste silencieux et `controllerchange` ne déclenche qu’un seul rechargement.
+
+## Circuit Forge
+
+Le Circuit Forge enchaîne les machines 07 à 30 en quatre vagues de six rencontres. La sauvegarde v5 conserve le boss courant, le checkpoint `fight`, `upgrade` ou `ending`, le temps cumulé, les pénalités, le score, la difficulté, les tentatives et le build installé. La reprise ne modifie jamais les six relais de campagne.
+
+Les vingt-quatre profils Forge exposent vingt-quatre `mechanicId` et soixante-douze signatures d’état uniques, trois par boss. Ces signatures enrichissent huit familles moteur partagées — renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et puzzle/endgame — et ne sont pas présentées comme vingt-quatre moteurs indépendants.
+
+Les 72 contrats Forge sont instrumentés par la télémétrie réelle du combat. Une métrique inconnue échoue fermement ; aucun contrat n’est acquis par défaut. Avec les 18 contrats de campagne, le jeu totalise 90 contrats.
+
+## Narration
+
+La campagne suit **Intro → Prologue → Boss → Résultat → Interlude → Atelier**. Voltério a centralisé six services civils dans la Couronne ; Riva réactive la ligne manuelle M-0 et rend chaque relais à son district sans devenir une nouvelle autorité centrale.
+
+Le Codex sépare la connaissance de la progression : une victoire de Laboratoire peut documenter une machine, mais ne libère jamais son relais. La Forge libre et le Circuit Forge ont eux aussi leur progression propre et n’altèrent pas la campagne.
+
+## Direction artistique
+
+La version applicative est v2.8.0, mais le pack artistique reste volontairement immuable en **v2.7.0**. Vingt-six masters originaux produits avec OpenAI Image Generation alimentent **225 WebP runtime** :
 
 | Famille | Masters | Assets runtime |
 | --- | ---: | ---: |
@@ -96,11 +94,9 @@ La production v2.7 repose sur vingt-six masters originaux réalisés avec OpenAI
 | Effets visuels de combat | 1 | 16 |
 | **Total** | **26** | **225** |
 
-Le corps de production de Riva réunit poitrine, taille, bassin, jambes et bottes dans une silhouette cohérente. Son pivot de semelles est recalé sur le plancher logique : les pieds ne flottent plus et le torse n’est plus doublé par d’anciens fragments. Le bras de tir est une pièce indépendante raccordée au socket d’épaule, avec une petite ombre de contact au sol.
+Le rig de Riva compose une seule fois le corps, raccorde un bras-canon indépendant au socket d’épaule et aligne le pivot des semelles sur le plancher logique. Chaque machine Forge possède quatre pièces et un backdrop ; les transformations secondaires restent pilotées par les huit familles communes et les arènes Forge ne sont pas revendiquées comme des décors parallaxe multicouches.
 
-Les vingt-quatre profils Forge reçoivent chacun quatre pièces OpenAI originales — châssis, noyau et deux appendices — ainsi qu’un backdrop propre. Chaque profil possède trois phases, ses valeurs, ses télégraphes, son objectif, son journal et ses résultats. Les transformations secondaires restent pilotées par le moteur commun et le backdrop Forge reste une couche unique : ces packs ne sont donc pas présentés comme vingt-quatre rigs ou décors parallaxe entièrement sur mesure.
-
-Le rendu Canvas conserve un fallback si un asset manque, ne se décode pas ou ne peut pas être mis en cache. Le service worker ne précache pas les 225 WebP : il garde le shell et le manifeste v2.7, puis stocke à la demande les ressources utiles. Les images sont des créations originales propres à GEARSTORM, sans texte, logo, filigrane ni asset d’une franchise tierce.
+Le rendu Canvas reste disponible si une image manque ou ne se décode pas. Le service worker garde le shell et le manifeste artistique, puis met les WebP utiles en cache à la demande au lieu de précacher les 225 fichiers.
 
 ## Commandes
 
@@ -113,6 +109,31 @@ Le rendu Canvas conserve un fallback si un asset manque, ne se décode pas ou ne
 | Surcharge | `L`, `X` | Y |
 | Pause | `Échap`, `P` | Menu |
 
+Sur mobile portrait, le jeu affiche un conseil d’orientation : le paysage reste recommandé pour conserver la largeur tactique de l’arène.
+
+## Accessibilité et preuves automatisées présentes
+
+Le CSS contient les variantes `prefers-reduced-motion` et `prefers-contrast`, des cibles tactiles et une recommandation paysage en portrait. Le runtime garde aussi des réglages manuels prioritaires.
+
+Le dépôt contient un workflow CI Node 22.x. Playwright exécute par défaut Chromium desktop et un profil mobile tactile ; Firefox et WebKit sont configurés en opt-in, sans exécution revendiquée dans cette revue.
+
+Le fichier `tests/e2e/forge.spec.mjs` couvre :
+
+- l’ouverture du menu et de la Forge, la grille de 30 cartes et l’absence de débordement horizontal ;
+- les diagnostics de contact au sol et de composition des bras de Riva ;
+- les 24 boss Forge lancés dans leurs trois phases, soit 72 états de démarrage ;
+- le démarrage du Circuit Forge et la création de son premier checkpoint.
+
+Le fichier `tests/e2e/accessibility.spec.mjs` couvre en Chromium :
+
+- l’ouverture des options au clavier, l’ordre du focus et les cibles de 44 CSS px ;
+- le téléchargement de l’export JSON v5 et l’import d’un JSON normalisé ;
+- l’initialisation mouvement réduit/contraste renforcé sur une sauvegarde neuve ;
+- la navigation de menu par Gamepad API simulée ;
+- le rechargement hors ligne d’un shell déjà installé.
+
+Ces fichiers décrivent une couverture automatisée, pas une QA finale. Ils ne remplacent pas les tests matériels de manette, tactile, lecteur d’écran ou mobile bas de gamme. Le consentement face à un worker réellement `waiting` reste couvert par les contrats Node, pas par un E2E navigateur ; les six manches complètes d’ENDURANCE ENGINE ne sont pas encore parcourues en E2E. Firefox et WebKit restent configurés mais non exécutés dans cette revue.
+
 ## Qualité et build
 
 La porte de qualité prévue est :
@@ -121,37 +142,31 @@ La porte de qualité prévue est :
 npm run qa
 ```
 
-Les contrôles ciblés restent :
+La matrice Chromium prévue est :
 
 ```text
-npm test
-npm run build
-npm run check:release
+npm run test:e2e
 ```
 
-Ces commandes décrivent le processus attendu ; `QA_REPORT.md` ne consigne que les validations réellement exécutées sur le candidat courant.
+La matrice Firefox/WebKit reste opt-in :
 
-## Publication
+```text
+npm run test:e2e:cross-browser
+```
 
-- GitHub Actions est configuré pour exécuter l’installation, la QA et l’audit des dépendances.
-- `vercel.json` décrit le build et la sortie publique attendus.
-- Les archives ZIP sont des artefacts de release et ne sont pas destinées au suivi Git.
-- Les secrets Vercel ou GitHub restent dans les coffres des plateformes.
-- Une publication n’est déclarée terminée qu’après commit, push, déploiement prêt et vérification HTTP de l’URL publique.
+Les contrôles ciblés restent `npm test`, `npm run build` et `npm run check:release`. `QA_REPORT.md` est réservé aux validations réellement exécutées ; ce README ne certifie ni QA finale ni déploiement.
 
 ## Structure
 
 - `index.html`, `styles.css`, `game.js` : jeu et interface.
-- `story.js` : campagne narrative immuable des six districts.
+- `story.js` : campagne narrative des six districts.
 - `expansion-story.js` : quatre vagues Forge, journaux, objectifs et 72 contrats instrumentés.
-- `boss-roster.js` : registre jouable des 30 machines, 24 `mechanicId`, 72 états Forge et huit familles de mécaniques enrichies.
-- `assets/` : key art, icônes et assets artistiques originaux.
+- `boss-roster.js` : registre des 30 machines, 24 `mechanicId`, 72 états Forge et huit familles partagées.
+- `assets/generated/v2.7.0/` : pack runtime immuable de 225 WebP.
 - `manifest.webmanifest`, `sw.js` : installation et fonctionnement hors ligne.
 - `server.js` : serveur local à surface publique restreinte.
-- `scripts/build.mjs` : bundle web reproductible et empreintes SHA-256.
-- `scripts/check-release.mjs` : garde-fous de publication.
-- `tests/` : contrats du jeu et tests HTTP.
-- `DESIGN.md` et `GAME_DESIGN.md` : univers, règles et contrat de production.
-- `BOSS_EXPANSION.md` : contrat IP-safe livré des 24 machines Forge et backlog de raffinement du roster de 30 boss.
+- `scripts/` : build, contrats et garde-fous de release.
+- `tests/` : contrats Node et parcours Playwright.
+- `DESIGN.md`, `GAME_DESIGN.md` et `GAME_AUDIT.md` : règles, intégration et audit courant.
 
 Projet original. Tous droits réservés.

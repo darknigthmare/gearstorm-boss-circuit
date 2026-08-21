@@ -98,7 +98,7 @@ test('tous les identifiants DOM utilises par le moteur existent et sont uniques'
   const references = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   assert.ok(references.length > 30);
   for (const id of references) assert.ok(ids.has(id), `id manquant: ${id}`);
-  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.7 manquante: ${id}`);
+  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.8 manquante: ${id}`);
 });
 
 test('la sauvegarde v5 migre v4 a v2 et porte les deux reprises', () => {
@@ -286,6 +286,80 @@ test('le Circuit Forge enchaine 07 a 30 avec vagues, modules, reprise et epilogu
   assert.match(game, /enduranceRounds\.add\(6\)/);
 });
 
+test('les checkpoints conservent retries et offre atelier sans reroll', () => {
+  const rushSanitizer = game.slice(game.indexOf('function sanitizeRushSnapshot'), game.indexOf('function sanitizeForgeRushSnapshot'));
+  const forgeSanitizer = game.slice(game.indexOf('function sanitizeForgeRushSnapshot'), game.indexOf('function createDefaultSave'));
+  for (const block of [rushSanitizer, forgeSanitizer]) {
+    assert.match(block, /currentBossRetries/);
+    assert.match(block, /sanitizeUpgradeOffer\(value\.upgradeOffer, installed\)/);
+  }
+  const campaignResume = game.slice(game.indexOf('function resumeRushSnapshot'), game.indexOf('function resumeForgeRushSnapshot'));
+  const forgeResume = game.slice(game.indexOf('function resumeForgeRushSnapshot'), game.indexOf('function getForgeRunState'));
+  for (const block of [campaignResume, forgeResume]) {
+    assert.match(block, /currentBossRetries = snapshot\.currentBossRetries/);
+    assert.match(block, /lastBossRetryPenalty = currentBossRetries \* RUSH_RETRY_PENALTY/);
+    assert.match(block, /startFight\(snapshot\.bossIndex, \{ preserveRetries: true \}\)/);
+  }
+  const startFightBlock = game.slice(game.indexOf('function startFight'), game.indexOf('function retryFight'));
+  assert.match(startFightBlock, /preserveRetries = false/);
+  assert.match(startFightBlock, /if \(!preserveRetries\) currentBossRetries = 0/);
+  const workshop = game.slice(game.indexOf('function showUpgradeSelection'), game.indexOf('function installUpgrade'));
+  assert.match(workshop, /persistedOffer/);
+  assert.match(workshop, /upgradeOffer: \[\.\.\.lastUpgradeOffer\]/);
+  assert.match(workshop, /BUILD MAXIMAL/);
+});
+
+test('Endurance Engine impose bien ses six manches avant les planchers de phase', () => {
+  const floorBlock = game.slice(game.indexOf('function enduranceRoundGateOpen'), game.indexOf('function beginPhaseTransition'));
+  assert.match(floorBlock, /enduranceRounds\.has\(phase \* 2\)/);
+  assert.match(floorBlock, /1: 5 \/ 6, 2: 1 \/ 2, 3: 1 \/ 6/);
+  const transitionBlock = game.slice(game.indexOf('function beginPhaseTransition'), game.indexOf('function updateBoss'));
+  assert.match(transitionBlock, /boss\.data\.id === 'endurance-engine'/);
+  assert.match(transitionBlock, /boss\.runtime\.signatureCycle = 0/);
+  assert.match(transitionBlock, /boss\.runtime\.roundGateAnnounced = false/);
+  const createBossBlock = game.slice(game.indexOf('function createBoss'), game.indexOf('function isSequentialRun'));
+  assert.match(createBossBlock, /const firstRound = \(phase - 1\) \* 2 \+ 1/);
+  assert.match(createBossBlock, /runtime\.round = clamp/);
+  assert.match(createBossBlock, /runtime\.signatureCycle = runtime\.round - firstRound/);
+  const retryBlock = game.slice(game.indexOf('function retryFight'), game.indexOf('function configureIntro'));
+  assert.match(retryBlock, /endurancePractice/);
+  assert.match(retryBlock, /phase: retryPhase, checkpoint: retryCheckpoint/);
+  const damageBlock = game.slice(game.indexOf('function damageBoss'), game.indexOf('function defeatBoss'));
+  assert.match(damageBlock, /const phaseGateOpen = enduranceRoundGateOpen\(\)/);
+  assert.match(damageBlock, /boss\.phase < 3 && phaseGateOpen/);
+  assert.match(damageBlock, /MANCHE ' \+ \(boss\.phase \* 2\) \+ ' REQUISE/);
+});
+
+test('la sauvegarde portable reste normalisee et respecte les preferences systeme au premier lancement', () => {
+  const normalizer = game.slice(game.indexOf('function createDefaultSave'), game.indexOf('function persistSave'));
+  assert.match(normalizer, /prefers-reduced-motion: reduce/);
+  assert.match(normalizer, /prefers-contrast: more/);
+  assert.match(normalizer, /function normalizeSaveData/);
+  assert.match(normalizer, /if \(!raw\) return createDefaultSave\(true\)/);
+  const portability = game.slice(game.indexOf('function exportSaveFile'), game.indexOf('function rebuildRunBuild'));
+  assert.match(portability, /JSON\.stringify\(normalizeSaveData\(save\), null, 2\)/);
+  assert.match(portability, /normalizeSaveData\(JSON\.parse\(await file\.text\(\)\)\)/);
+  assert.match(portability, /file\.size > 1024 \* 1024/);
+  assert.match(portability, /if \(!persistSave\(\)\)/);
+  assert.match(portability, /save = previousSave/);
+  assert.doesNotMatch(portability, /innerHTML|insertAdjacentHTML/);
+});
+
+test('les cartes boss utilisent les vrais sprites et la PWA attend une validation utilisateur', () => {
+  assert.match(game, /class="boss-card-art"/);
+  assert.match(game, /aria-hidden="true"/);
+  for (const part of ['chassis', 'fuselage', 'carapace', 'torso', 'furnace-torso', 'crown-hull']) assert.match(game, new RegExp(`['"]${part}['"]`));
+  const pwaStart = game.indexOf('function registerGearstormServiceWorker');
+  const pwa = game.slice(pwaStart, game.indexOf('  applySettings();', pwaStart));
+  assert.match(pwa, /updatefound/);
+  assert.match(pwa, /registration\.waiting/);
+  assert.match(pwa, /navigator\.serviceWorker\.controller/);
+  assert.match(pwa, /postMessage\(\{ type: 'SKIP_WAITING' \}\)/);
+  assert.match(pwa, /controllerchange/);
+  assert.match(pwa, /updateAccepted = true/);
+  assert.match(pwa, /if \(!updateAccepted \|\| refreshing\) return/);
+});
+
 test('le combat ne demarre jamais sous la plaque d introduction', () => {
   assert.match(game, /configureIntro\(retry\)/);
   assert.match(game, /introTimer = retry \? 1\.25/);
@@ -305,6 +379,12 @@ test('les systemes campagne, entrees et accessibilite restent cables', () => {
   for (const id of ['upgrade-screen', 'prologue-screen', 'ending-screen']) assert.match(html, new RegExp(`id="${id}"`));
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /prefers-reduced-motion|motion-toggle/);
+  const gamepadBlock = game.slice(game.indexOf('function pollGamepad'), game.indexOf('function playerMuzzlePosition'));
+  assert.match(gamepadBlock, /Array\.from\(navigator\.getGamepads/);
+  assert.match(gamepadBlock, /\.find\(Boolean\)/);
+  assert.match(gamepadBlock, /:not\(\[type=\"hidden\"\]\)/);
+  assert.match(gamepadBlock, /active\.type === 'range'/);
+  assert.match(gamepadBlock, /dispatchEvent\(new Event\('input'/);
   assert.match(game, /screen\.inert = !active/);
   assert.match(css, /body:has\(\.screen\[aria-modal="true"\]\.active\) \.skip-link/);
   assert.match(css, /top: calc\(var\(--safe-top\) \+ 9\.55rem \+ 56\.25vw \+ 0\.5rem\)/);
@@ -312,9 +392,9 @@ test('les systemes campagne, entrees et accessibilite restent cables', () => {
 
 test('les chronos, retry et sauvegardes suivent les garde-fous', () => {
   assert.match(game, /lastBossTime = currentBossElapsed/);
-  assert.match(game, /startFight\(currentBossIndex, \{ retry: true \}\)/);
+  assert.match(game, /startFight\(currentBossIndex, \{ retry: true, phase: retryPhase, checkpoint: retryCheckpoint \}\)/);
   assert.match(game, /if \(boss\.defeated\) return/);
-  assert.match(game, /Number\.isFinite\(parsed\?\.bestRush\)/);
+  assert.match(game, /Number\.isFinite\(parsed\.bestRush\)/);
   assert.match(game, /Object\.hasOwn\(DIFFICULTIES/);
   const startRunStart = game.indexOf('function startRun');
   const startRunBlock = game.slice(startRunStart, game.indexOf('function startFight(', startRunStart));

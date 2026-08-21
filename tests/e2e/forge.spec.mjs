@@ -54,6 +54,22 @@ test('les 24 boss Forge ont un système propre et démarrent dans leurs trois ph
     expect(launch.state.phase).toBe(launch.phase);
     expect(launch.state.mechanicId).toBe(launch.mechanicId);
   }
+
+  const endurance = await page.evaluate(() => {
+    const launched = window.__GEARSTORM_QA__.launchBossPhase('endurance-engine', 2, 4);
+    const before = window.__GEARSTORM_QA__.getState();
+    const retried = window.__GEARSTORM_QA__.retryCurrentFight();
+    const after = window.__GEARSTORM_QA__.getState();
+    return { launched, retried, before, after };
+  });
+  expect(endurance.launched).toBe(true);
+  expect(endurance.before.phase).toBe(2);
+  expect(endurance.before.enduranceRound).toBe(4);
+  expect(endurance.before.signatureCycle).toBe(1);
+  expect(endurance.retried).toBe(true);
+  expect(endurance.after.phase).toBe(2);
+  expect(endurance.after.enduranceRound).toBe(4);
+  expect(endurance.after.currentBossRetries).toBe(1);
 });
 
 test('le Circuit Forge démarre avec un checkpoint reprenable', async ({ page }) => {
@@ -64,9 +80,21 @@ test('le Circuit Forge démarre avec un checkpoint reprenable', async ({ page })
   await page.waitForFunction(() => window.__GEARSTORM_QA__.getState().bossId === 'bastion-ricochet');
   await page.evaluate(() => window.__GEARSTORM_QA__.skipIntro());
 
+  expect(await page.evaluate(() => window.__GEARSTORM_QA__.retryCurrentFight())).toBe(true);
   const run = await page.evaluate(() => window.__GEARSTORM_QA__.getForgeRunState());
   expect(run.active).toBe(true);
   expect(run.bossId).toBe('bastion-ricochet');
   expect(run.wave).toBe(1);
   expect(run.completed).toBe(0);
+  expect(run.snapshot.currentBossRetries).toBe(1);
+
+  await page.reload();
+  await waitForQa(page);
+  expect(await page.evaluate(() => window.__GEARSTORM_QA__.resumeForgeRush())).toBe(true);
+  const restored = await page.evaluate(() => ({
+    state: window.__GEARSTORM_QA__.getState(),
+    run: window.__GEARSTORM_QA__.getForgeRunState()
+  }));
+  expect(restored.state.currentBossRetries).toBe(1);
+  expect(restored.run.snapshot.currentBossRetries).toBe(1);
 });

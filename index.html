@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080b18" />
-  <meta name="description" content="GEARSTORM: Boss Circuit v2.7, une campagne boss rush 2D originale en six actes et une Forge de 24 machines supplémentaires." />
+  <meta name="description" content="GEARSTORM: Boss Circuit v2.8, une campagne boss rush 2D originale en six actes et une Forge de 24 machines supplémentaires." />
   <meta name="application-name" content="GEARSTORM" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,15 +12,15 @@
   <meta name="apple-mobile-web-app-title" content="GEARSTORM" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_FR" />
-  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.7" />
+  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.8" />
   <meta property="og:description" content="Riva Spark remonte la ligne fantôme M-0 et libère les six districts du Circuit." />
   <meta property="og:image" content="assets/gearstorm-key-art.png" />
   <meta property="og:image:alt" content="Riva Spark face aux machines du Circuit Voltério" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.7" />
+  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.8" />
   <meta name="twitter:description" content="Trente machines jouables. Quatre-vingt-dix phases. Campagne narrative et Forge d’entraînement." />
   <meta name="twitter:image" content="assets/gearstorm-key-art.png" />
-  <title>GEARSTORM: Boss Circuit v2.7</title>
+  <title>GEARSTORM: Boss Circuit v2.8</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="assets/gearstorm-icon.svg" />
   <link rel="apple-touch-icon" href="assets/gearstorm-icon-192.png" />
@@ -53,7 +53,7 @@
         </figure>
         <div class="panel hero-panel">
           <div class="release-line">
-            <p class="eyebrow">ÉDITION FORGE // V2.7</p>
+            <p class="eyebrow">ÉDITION FORGE // V2.8</p>
             <span class="release-status"><span aria-hidden="true"></span> Systèmes prêts</span>
           </div>
           <h1 id="game-title"><span>GEARSTORM</span><small>BOSS CIRCUIT</small></h1>
@@ -88,6 +88,7 @@
           </div>
           <div class="utility-actions" role="group" aria-label="Actions de l’application">
             <button id="install-app" class="utility-button" type="button" hidden>Installer le jeu</button>
+            <button id="update-app" class="utility-button update-button" type="button" hidden>Mettre à jour le jeu</button>
             <button id="fullscreen-toggle" class="utility-button" type="button" aria-pressed="false">Plein écran</button>
           </div>
           <p class="save-note" id="save-note">Progression locale activée</p>
@@ -373,7 +374,16 @@
           <span><strong>Contraste renforcé</strong><small>Augmente les contours et la lisibilité des dangers.</small></span>
           <input id="contrast-toggle" type="checkbox" />
         </label>
-        <button id="reset-save" class="danger-button">Réinitialiser la progression</button>
+        <fieldset class="save-tools">
+          <legend>Sauvegarde et transfert</legend>
+          <p>Conserve une copie JSON de ta progression locale ou restaure-la sur cet appareil.</p>
+          <div class="save-tool-actions" role="group" aria-label="Actions de sauvegarde">
+            <button id="export-save" type="button">Exporter la sauvegarde</button>
+            <button id="import-save" type="button">Importer une sauvegarde</button>
+            <input id="import-save-file" type="file" accept=".json,application/json" aria-label="Choisir un fichier de sauvegarde JSON" hidden />
+          </div>
+        </fieldset>
+        <button id="reset-save" class="danger-button" type="button">Réinitialiser la progression</button>
       </div>
     </section>
 
@@ -553,6 +563,7 @@
     </aside>
   </main>
 
+  <script src="pwa-update-v2.8.0.js"></script>
   <script src="story.js"></script>
   <script src="expansion-story.js"></script>
   <script src="boss-roster.js"></script>

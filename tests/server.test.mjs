@@ -40,7 +40,7 @@ test('le serveur livre le jeu avec la politique de securite complete', async () 
 
 test('les fichiers shell non versions sont toujours revalides', async () => {
   await withServer(async origin => {
-    for (const path of ['/story.js?release=2.7.0', '/expansion-story.js?release=2.7.0', '/boss-roster.js?release=2.7.0', '/game.js?release=2.7.0', '/styles.css', '/manifest.webmanifest']) {
+    for (const path of ['/story.js?release=2.8.0', '/expansion-story.js?release=2.8.0', '/boss-roster.js?release=2.8.0', '/game.js?release=2.8.0', '/styles.css', '/manifest.webmanifest']) {
       const response = await fetch(origin + path, { method: 'HEAD' });
       assert.equal(response.status, 200, path);
       assert.equal(response.headers.get('cache-control'), 'public, max-age=0, must-revalidate', path);
@@ -50,6 +50,18 @@ test('les fichiers shell non versions sont toujours revalides', async () => {
     assert.equal(worker.status, 200);
     assert.equal(worker.headers.get('service-worker-allowed'), '/');
     assert.equal(worker.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
+  });
+});
+
+test('le bootstrap PWA versionne est public et immutable', async () => {
+  await withServer(async origin => {
+    const expectedSize = (await stat('pwa-update-v2.8.0.js')).size;
+    const response = await fetch(origin + '/pwa-update-v2.8.0.js', { method: 'HEAD' });
+    assert.equal(response.status, 200);
+    assert.equal(Number(response.headers.get('content-length')), expectedSize);
+    assert.match(response.headers.get('content-type'), /text\/javascript/);
+    assert.equal(response.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+    assert.equal(await response.text(), '');
   });
 });
 
@@ -64,7 +76,7 @@ test('HEAD retourne les metadonnees exactes sans corps', async () => {
   });
 });
 
-test('les 225 assets runtime v2.7 restent publics, types et immuables sous app v2.7', async () => {
+test('les 225 assets runtime v2.7 restent publics, types et immuables sous app v2.8', async () => {
   await withServer(async origin => {
     const assetPath = '/assets/generated/v2.7.0/arenas/rammer/far.webp';
     const expectedSize = (await stat('.' + assetPath)).size;

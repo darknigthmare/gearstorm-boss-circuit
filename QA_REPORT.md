@@ -1,75 +1,111 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.7.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.8.0
 
-Validation locale effectuée le 21 août 2026 sur le candidat v2.7.0.
+Validation locale effectuée le 21 août 2026 sur le candidat v2.8.0. Ce rapport consigne uniquement les preuves observées localement ; le déploiement de production reste en attente.
 
-## Gates de release
+## Environnement vérifié
 
-- `npm run qa` : réussi.
-- Syntaxe Node : réussie sur le moteur, les registres, le serveur, le service worker et les scripts de release.
-- Tests automatisés : 61/61 réussis.
-- Build et `check-release` : réussis.
-- Bundle public : 21 697 935 octets.
-- Catalogue graphique : 225 WebP v2.7.0, 18 248 604 octets, dérivés de 26 masters OpenAI documentés ; les masters sont exclus de `dist/`.
-- Contenu livré : 30 boss, 90 phases et 90 contrats de maîtrise.
-- `npm audit --audit-level=high` : 0 vulnérabilité.
+- Cible projet et CI : Node.js 22.x. Les gates locales ci-dessous ont tourné sous Node.js 24.15.0 ; npm ci a réussi avec l’avertissement attendu lié à cette différence de version.
+- Navigateurs automatisés : Google Chrome 151, Firefox 153 et WebKit 26.5 via Playwright.
+- Viewport desktop contrôlé : 1440 × 900.
+- Viewport mobile contrôlé : 390 × 844, avec émulation tactile Chromium.
+- Firefox desktop et WebKit desktop ont été exécutés dans la matrice opt-in après installation des moteurs Playwright correspondants.
 
-## QA navigateur
+## Gates locales de release
 
-La QA a utilisé Google Chrome local via Playwright, le navigateur intégré étant indisponible dans cette session à cause de l’ACL Windows. Les tests sont reproductibles avec `npm run test:e2e`.
+| Gate | Résultat observé |
+| --- | --- |
+| Vérification syntaxique et contrats applicatifs | Réussie |
+| Tests Node | **69/69 réussis** |
+| E2E Chromium | **13 réussis, 1 ignoré volontairement** |
+| E2E Firefox desktop | **7/7 réussis** |
+| E2E WebKit desktop | **6 réussis, 1 ignoré (limite du runner hors ligne)** |
+| Lot E2E accessibilité | **8/8 réussis sous Chromium**, **4/4 sous Firefox**, **3/4 sous WebKit + 1 ignoré** |
+| Build et contrôle de release | Réussis |
+| Taille de `dist/` | **21 708 298 octets** |
+| Catalogue graphique runtime | **225 WebP**, **18 248 604 octets** |
+| Audit npm | **0 vulnérabilité** |
 
-Résultat E2E : 5 tests réussis, 1 test volontairement ignoré. La matrice lourde de 72 lancements (24 boss Forge × 3 phases) tourne une fois sur Chromium desktop ; les parcours menu, Forge, rig de Riva et reprise du Circuit tournent aussi en émulation tactile mobile.
+Le test Chromium ignoré correspond au checkpoint Forge réservé au desktop. Sous WebKit, seul le rechargement hors ligne est ignoré car le runner Windows échoue avant la résolution du service worker ; la même logique passe sous Chromium et Firefox.
 
-Parcours contrôlés :
+## QA navigateur Chromium
 
-- titre, navigation, Laboratoire, Forge intégrale et absence de débordement horizontal ;
-- 30 cartes de boss et 24 signatures `mechanicId` distinctes ;
-- lancement des 24 boss Forge dans chacune de leurs trois phases ;
-- démarrage et checkpoint reprenable du Circuit Forge ;
-- traversée accélérée des 24 victoires, choix d’améliorations et véritable écran de fin ;
-- rendu représentatif des quatre vagues : Bastion Ricochet, Floodline Leviathan, Carrier Cathedral et Null Crown ;
-- viewport desktop 1440 × 900, portrait tactile 390 × 844 et HUD tactile.
+Les parcours E2E vérifiés couvrent :
 
-## Audit visuel
+- le titre, la navigation, le Laboratoire, la Forge et l’absence de débordement horizontal ;
+- la grille complète des 30 boss et les miniatures issues des vrais assets WebP ;
+- le rig de Riva, le contact des semelles avec le plancher logique et la séparation cohérente du corps et du bras-canon ;
+- les 24 profils Forge lancés dans chacune de leurs trois phases, soit 72 états de départ ;
+- le démarrage et la reprise du premier checkpoint du Circuit Forge ;
+- un parcours réel accéléré des **24 boss Forge**, avec victoires, offres d’amélioration, progression des quatre vagues et arrivée sur le véritable écran de fin ;
+- l’affichage desktop 1440 × 900 et mobile 390 × 844.
 
-Dix captures ont été générées, dont une de la production publique sous `audit-visual-v27/`. Aucun visuel de référence externe pixel-perfect n’existait ; la comparaison a donc porté sur le système visuel du jeu, les ancres logiques 1280 × 720 et les contrats de rig.
+Sur les captures acceptées, les contrôles n’ont relevé :
 
-Constats validés :
+- aucun débordement de page ;
+- aucune erreur console ;
+- aucune erreur de page ;
+- aucune erreur de requête.
 
-- les semelles de Riva et son ombre touchent le plancher logique ;
-- le corps composite sépare lisiblement tête, buste, taille et jambes ; aucun troisième bras ni avant-bras flottant n’est visible ;
-- le bras-canon rejoint le socket d’épaule sans doublonner le torse ;
-- les boss Forge assemblent quatre pièces manifestées, gardent leur noyau sur la hitbox et projettent désormais une ombre au sol lorsqu’ils sont en hauteur ;
-- les backdrops Forge respectent le plancher à `GROUND = 620`, le HUD conserve son contraste et les télégraphes restent visibles ;
-- le menu, la grille Forge, le combat mobile et l’épilogue ne débordent pas ;
-- le bilan Forge affiche cinq statistiques équilibrées sans détruire la structure DOM accessible.
+Le scénario hors ligne est traité séparément : il vérifie volontairement le rechargement du shell déjà installé sans réseau.
 
-## Contenu et progression
+## Lot accessibilité et qualité de vie
 
-- La campagne historique reste distincte du Laboratoire.
-- Le Circuit Forge enchaîne les machines 07 à 30 en quatre vagues, conserve le build, sauvegarde entre les victoires et se termine sur l’épilogue « Protocole sans couronne ».
-- La sauvegarde v5 migre les schémas v4, v3 et v2.
-- Les 24 boss ont 24 signatures et 72 états de phase uniques, bâtis sur huit familles moteur éprouvées.
-- Les 72 contrats Forge sont instrumentés ; avec les 18 contrats de campagne, le jeu en expose 90.
-- Les assets disposent d’un fallback procédural et le cache PWA ne précache pas les 225 WebP d’un seul bloc.
+Le fichier `tests/e2e/accessibility.spec.mjs` a réussi ses quatre parcours sous Chromium desktop/mobile et Firefox desktop ; trois passent sous WebKit, avec le rechargement hors ligne ignoré pour la limite documentée du runner Windows :
 
-## Limites de validation
+1. ouverture des options et navigation au clavier, ordre de focus cohérent et cibles interactives d’au moins 44 CSS px ;
+2. téléchargement réel d’un export `gearstorm-save-v5-AAAA-MM-JJ.json`, puis import d’un JSON v5 passé par la normalisation et application de ses réglages ;
+3. initialisation de mouvement réduit et contraste renforcé depuis les préférences système sur une sauvegarde neuve ;
+4. navigation de menu par Gamepad API simulée et rechargement hors ligne d’un shell PWA déjà installé.
 
-- Aucun test matériel n’a été effectué avec une manette physique, un écran tactile réel ou un lecteur d’écran.
-- L’émulation mobile Chromium ne remplace pas les performances d’un appareil bas de gamme.
-- Firefox, Safari/WebKit et le comportement de quota PWA extrême ne sont pas couverts par ce passage.
-- Les 24 backdrops sont des tableaux monocouche : ils sont uniques et cohérents, mais moins profonds que les six arènes historiques à quatre plans parallaxes.
-- Les signatures propres aux 24 boss reposent volontairement sur huit familles de simulation communes ; elles ne constituent pas 24 moteurs physiques indépendants.
+Les tests Node simulent durablement la migration d’un ancien worker v2.7 vers v2.8 : consentement explicite, un seul message `SKIP_WAITING`, un seul rechargement, ainsi qu’un premier install silencieux. Le cycle avec un worker réellement `waiting` n’a pas été exécuté en navigateur.
+
+## Audit visuel v2.8
+
+Les captures desktop et mobile acceptées confirment les améliorations suivantes :
+
+- les cartes déverrouillées de la Forge affichent une miniature décorative issue de la pièce WebP réelle du boss, sans remplacer son nom ni son libellé accessible ;
+- les cartes verrouillées restent lisibles et n’exposent pas de miniature prématurée ;
+- le corps de Riva ne double pas le torse, le bras-canon rejoint le socket d’épaule et les pieds touchent le plancher logique ;
+- les 24 boss Forge conservent leur silhouette, leur noyau, leurs pièces articulées et leur ancrage au sol ;
+- le HUD, les télégraphes, les panneaux d’objectif et les contrôles tactiles restent lisibles dans les viewports acceptés ;
+- les options d’export/import ont un focus visible et des cibles suffisantes ;
+- le bouton de mise à jour PWA reste discret et masqué tant qu’aucune mise à jour n’est disponible ;
+- la grille des 30 boss, les récapitulatifs de vague et l’écran final Forge ne produisent aucun overflow sur les captures retenues.
+
+Le pack artistique reste celui du manifeste immuable v2.7.0 : 225 WebP runtime pour 18 248 604 octets, dérivés des 26 masters OpenAI documentés. La version applicative est 2.8.0 et la sauvegarde reste en schéma v5.
+
+## Contenu et progression vérifiés
+
+- 30 boss jouables, 90 phases et 90 contrats de maîtrise.
+- Six boss et 18 contrats pour la campagne ; 24 boss et 72 contrats pour la Forge.
+- Circuit Forge composé de quatre vagues de six rencontres.
+- Parcours accéléré validé de FORGE 07 à FORGE 30 avec améliorations et fin dédiée.
+- ENDURANCE ENGINE impose ses six manches ; le checkpoint de manche 4, le retry et la conservation de la pénalité sont validés en E2E.
+- Les checkpoints conservent le retry du boss courant et l’offre d’amélioration déjà proposée.
+- La sauvegarde v5 migre et normalise les données anciennes, puis sépare campagne et Forge.
+- Les assets disposent d’un fallback procédural et le cache PWA ne précache pas les 225 WebP en un seul bloc.
+
+## Limites honnêtes de validation
+
+- Aucune manette physique n’a été testée ; la couverture Gamepad utilise une simulation de l’API standard.
+- Aucun écran tactile physique n’a été testé ; le mobile 390 × 844 est une émulation Chromium.
+- Aucun lecteur d’écran réel n’a été testé.
+- Le rechargement hors ligne WebKit est le seul parcours cross-browser ignoré, en raison d’une erreur interne du runner Playwright Windows ; il passe sous Chromium et Firefox.
+- L’émulation mobile ne mesure pas les performances d’un appareil bas de gamme.
+- Le combat en portrait reste contraint ; l’interface recommande le paysage pour préserver la largeur tactique.
+- Le consentement face à un service worker réellement `waiting` reste couvert par simulation VM/contrats Node, pas par un parcours navigateur complet.
+- Les 24 backdrops Forge sont des tableaux monocouche, moins profonds que les six arènes historiques à quatre plans de parallaxe.
+- Les 24 profils Forge spécialisent huit familles de simulation partagées ; ils ne constituent pas 24 moteurs physiques indépendants.
+- Les records locaux ne sont pas encore segmentés par mode, difficulté et version d’équilibrage.
 
 ## Vérification de production
 
-Le commit c063fa7 a passé le gate GitHub Actions Node 22/Linux puis a été promu sur Vercel. Le déploiement est READY sur https://gearstorm-boss-circuit.vercel.app.
+**Statut : en attente.**
 
-- page publique : HTTP 200 avec CSP, HSTS, COOP et politique de permissions ;
-- build-manifest.json : application 2.7.0, sauvegarde v5, 30 boss, 90 phases, 90 contrats et 225 assets ;
-- asset Forge : HTTP 200, image/webp, cache public 1 an immutable ;
-- service worker : HTTP 200, portée racine et revalidation immédiate ;
-- parcours Chrome public : titre chargé, Forge ouverte, 30 cartes présentes, aucune erreur console.
+Aucun commit distant, workflow GitHub Actions, déploiement Vercel, statut `READY` ou réponse HTTP publique v2.8.0 n’est certifié par ce rapport local. La publication ne devra être déclarée terminée qu’après commit, push, gate distant, déploiement prêt et vérification HTTP de l’URL publique.
 
-## Verdict final
+## Verdict local
 
-GEARSTORM 2.7.0 est publié et vérifié. La release, la sécurité, la CI Linux, les 30 boss, les 90 phases, les 90 contrats et les parcours navigateur contrôlés sont verts, dans les limites matérielles et multi-navigateurs listées ci-dessus.
+Le candidat local GEARSTORM 2.8.0 satisfait les gates automatisées observées : 69/69 tests Node, 13 E2E Chromium réussis avec 1 test volontairement ignoré, 7/7 Firefox, 6/7 WebKit avec 1 limite runner documentée, parcours accéléré des 24 boss jusqu’à la fin, build de 21 708 298 octets et audit npm sans vulnérabilité.
+
+Cette conclusion vaut pour l’environnement local et les limites ci-dessus. Le déploiement de production reste en attente.

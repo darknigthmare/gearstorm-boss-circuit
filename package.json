@@ -1,6 +1,6 @@
 {
   "name": "gearstorm-boss-circuit",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "private": true,
   "description": "Boss rush 2D original et installable : campagne de 6 boss et Forge de 24 machines.",
   "license": "UNLICENSED",
@@ -9,18 +9,19 @@
     "url": "https://github.com/darknigthmare/gearstorm-boss-circuit.git"
   },
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check story.js && node --check expansion-story.js && node --check boss-roster.js && node --check game.js && node --check server.js && node --check sw.js && node --check scripts/asset-contract.mjs && node --check scripts/app-contract.mjs && node --check scripts/infrastructure-contract.mjs && node --check scripts/build.mjs && node --check scripts/check-release.mjs",
-    "test": "node --test tests/assets.test.mjs tests/contracts.test.mjs tests/story.test.mjs tests/expansion-story.test.mjs tests/release.test.mjs tests/server.test.mjs tests/sw.test.mjs",
-    "test:e2e": "playwright test",
+    "check": "node --check story.js && node --check expansion-story.js && node --check boss-roster.js && node --check game.js && node --check server.js && node --check pwa-update-v2.8.0.js && node --check sw.js && node --check scripts/asset-contract.mjs && node --check scripts/app-contract.mjs && node --check scripts/infrastructure-contract.mjs && node --check scripts/build.mjs && node --check scripts/check-release.mjs",
+    "test": "node --test tests/assets.test.mjs tests/contracts.test.mjs tests/story.test.mjs tests/expansion-story.test.mjs tests/release.test.mjs tests/server.test.mjs tests/sw.test.mjs tests/pwa-update.test.mjs",
+    "test:e2e": "playwright test --project=chromium-desktop --project=chromium-mobile",
     "build": "node scripts/build.mjs",
     "check:release": "node scripts/check-release.mjs",
     "qa": "npm run check && npm test && npm run build && npm run check:release",
-    "qa:ci": "npm run qa && npm run test:e2e"
+    "qa:ci": "npm run qa && npm run test:e2e",
+    "test:e2e:cross-browser": "playwright test --project=firefox-desktop --project=webkit-desktop"
   },
   "homepage": "https://gearstorm-boss-circuit.vercel.app",
   "bugs": {

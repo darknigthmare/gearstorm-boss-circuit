@@ -89,6 +89,7 @@ assert.equal(keyArtScreenshot?.sizes, '1672x941');
 
 const shellFiles = [
   'dist/index.html',
+  'dist/pwa-update-v2.8.0.js',
   'dist/styles.css',
   'dist/story.js',
   'dist/expansion-story.js',
@@ -104,8 +105,9 @@ const shellFiles = [
 ];
 for (const file of shellFiles) await access(file);
 
-const [distHtml, distStory, distExpansionStory, distBossRoster, distGame, distManifest, distRuntime] = await Promise.all([
+const [distHtml, distPwaBootstrap, distStory, distExpansionStory, distBossRoster, distGame, distManifest, distRuntime] = await Promise.all([
   readFile('dist/index.html', 'utf8'),
+  readFile('dist/pwa-update-v2.8.0.js', 'utf8'),
   readFile('dist/story.js', 'utf8'),
   readFile('dist/expansion-story.js', 'utf8'),
   readFile('dist/boss-roster.js', 'utf8'),
@@ -114,6 +116,10 @@ const [distHtml, distStory, distExpansionStory, distBossRoster, distGame, distMa
   validateRuntimeAssets('dist', { validateMasters: false }),
 ]);
 validateApplicationContract({ game: distGame, story: distStory, expansionStory: distExpansionStory, bossRoster: distBossRoster, html: distHtml, manifest: distManifest, packageJson });
+assert.match(distPwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_8__/);
+assert.match(distPwaBootstrap, /registration\.waiting/);
+assert.match(distPwaBootstrap, /SKIP_WAITING/);
+assert.match(distPwaBootstrap, /controllerchange/);
 assert.equal(distRuntime.entries.length, EXPECTED_COUNTS.runtimeFiles);
 assert.equal(distRuntime.totalBytes, sourceRuntime.totalBytes);
 assert.ok(distRuntime.totalBytes <= ASSET_BUDGET_BYTES);
@@ -134,6 +140,7 @@ assert.deepEqual((await readdir('dist')).sort(), [
   'game.js',
   'index.html',
   'manifest.webmanifest',
+  'pwa-update-v2.8.0.js',
   'story.js',
   'styles.css',
   'sw.js',
@@ -186,7 +193,7 @@ const actualFiles = (await listFiles('dist'))
   .sort();
 const declaredFiles = Object.keys(buildManifest.files).sort();
 assert.deepEqual(actualFiles, [...declaredFiles, 'build-manifest.json'].sort(), 'dist et build-manifest divergent.');
-assert.equal(declaredFiles.length, 8 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
+assert.equal(declaredFiles.length, 9 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
 
 let distBytes = 0;
 for (const path of actualFiles) {

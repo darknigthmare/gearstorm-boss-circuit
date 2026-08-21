@@ -1,6 +1,6 @@
 import vm from 'node:vm';
 
-export const APP_RELEASE = '2.7.0';
+export const APP_RELEASE = '2.8.0';
 export const SAVE_SCHEMA_VERSION = 5;
 export const SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
 export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
@@ -29,6 +29,10 @@ export const FORGE_BOSS_IDS = Object.freeze([
 export const PLAYABLE_BOSS_IDS = Object.freeze([...CAMPAIGN_BOSS_IDS, ...FORGE_BOSS_IDS]);
 
 export const REQUIRED_UI_IDS = Object.freeze([
+  'export-save',
+  'import-save',
+  'import-save-file',
+  'update-app',
   'continue-run',
   'continue-forge',
   'forge-circuit-card',
@@ -64,6 +68,12 @@ export const REQUIRED_UI_IDS = Object.freeze([
 ]);
 
 export const REQUIRED_GAME_SYSTEMS = Object.freeze([
+  'normalizeSaveData',
+  'exportSaveFile',
+  'importSaveFile',
+  'registerGearstormServiceWorker',
+  'sanitizeUpgradeOffer',
+  'enduranceRoundGateOpen',
   'sanitizeRushSnapshot',
   'sanitizeForgeRushSnapshot',
   'saveForgeRushSnapshot',
@@ -234,14 +244,16 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const bossRosterContract = hasForgeSources ? validateBossRosterContract(bossRoster) : {};
 
   const ids = htmlIds(html);
-  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.7 : #${id} absent.`);
+  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.8 : #${id} absent.`);
   const domReferences = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   for (const id of domReferences) invariant(ids.has(id), `Contrat DOM : #${id} reference par game.js mais absent.`);
 
+  const pwaBootstrapTag = html.search(/<script\s+src=["']pwa-update-v2\.8\.0\.js["'][^>]*><\/script>/i);
   const storyTag = html.search(/<script\s+src=["']story\.js["'][^>]*><\/script>/i);
   const expansionStoryTag = html.search(/<script\s+src=["']expansion-story\.js["'][^>]*><\/script>/i);
   const bossRosterTag = html.search(/<script\s+src=["']boss-roster\.js["'][^>]*><\/script>/i);
   const gameTag = html.search(/<script\s+src=["']game\.js["'][^>]*><\/script>/i);
+  invariant(pwaBootstrapTag >= 0 && pwaBootstrapTag < storyTag, 'Le bootstrap PWA versionne doit etre charge avant le runtime.');
   invariant(storyTag >= 0 && gameTag > storyTag, 'story.js doit etre charge avant game.js.');
   if (hasForgeSources) {
     invariant(expansionStoryTag > storyTag && bossRosterTag > expansionStoryTag && gameTag > bossRosterTag, 'Ordre shell requis : story, expansion-story, boss-roster, game.');
@@ -265,7 +277,7 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v5.');
 
   for (const marker of REQUIRED_GAME_SYSTEMS) {
-    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.7 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.8 absent : ${marker}.`);
   }
 
   invariant(/new URLSearchParams\(location\.search\)/.test(game), 'Le routeur de lancement doit lire la query string.');
@@ -276,16 +288,16 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const shortcuts = new Set((manifest?.shortcuts || []).map(shortcut => shortcut.url));
   for (const url of ['./?mode=rush', './?mode=practice', './?mode=forge', './?mode=forgeRush']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
 
-  invariant(html.includes('GEARSTORM: Boss Circuit v2.7'), 'Metadonnees HTML v2.7 absentes.');
-  invariant(!/GEARSTORM: Boss Circuit v2\.[2-6]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
+  invariant(html.includes('GEARSTORM: Boss Circuit v2.8'), 'Metadonnees HTML v2.8 absentes.');
+  invariant(!/GEARSTORM: Boss Circuit v2\.[2-7]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
   invariant(/qaAllowed[\s\S]+__GEARSTORM_QA__/.test(game), 'Surface QA locale absente ou non protegee.');
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
   for (const field of ['phaseCounts', 'hitbox', 'weakPoint', 'feetLocalY', 'muzzle', 'transitionExplosionOnly']) {
     invariant(new RegExp(`\\b${field}\\b`).test(rigDiagnosticsBlock), `Diagnostic de rig incomplet : ${field}.`);
   }
   const qaBlock = game.slice(game.indexOf("Object.defineProperty(window, '__GEARSTORM_QA__'"));
-  for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'getForgeRunState', 'getForgeContractCoverage', 'startForgeRush', 'resumeForgeRush', 'setRigDebug', 'launchMode']) {
-    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.7 absent : ${marker}.`);
+  for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'getForgeRunState', 'getForgeContractCoverage', 'processGamepad', 'startForgeRush', 'resumeForgeRush', 'setRigDebug', 'launchMode']) {
+    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.8 absent : ${marker}.`);
   }
 
   return {

@@ -94,6 +94,14 @@
   const FORGE_START_INDEX = CAMPAIGN_BOSSES.length;
   const FORGE_FINAL_INDEX = BOSSES.length - 1;
   const LEGACY_BOSS_IDS = new Set(BOSS_REGISTRY?.legacyIds || LEGACY_BOSSES.map(entry => entry.id));
+  const LEGACY_CARD_ART_PARTS = Object.freeze({
+    rammer: 'chassis',
+    kraken: 'fuselage',
+    drill: 'carapace',
+    mantis: 'torso',
+    cyclotron: 'furnace-torso',
+    omega: 'crown-hull'
+  });
 
   const DIFFICULTIES = {
     casual: { enemySpeed: 0.82, bossHealth: 0.86, playerHealth: 8, scoreMultiplier: 0.82, parMultiplier: 1.18, name: 'Pilote' },
@@ -982,6 +990,19 @@
     }
   }
 
+  function sanitizeUpgradeOffer(value, installed = []) {
+    const installedCounts = new Map();
+    for (const id of installed) installedCounts.set(id, (installedCounts.get(id) || 0) + 1);
+    const choices = [];
+    for (const rawId of Array.isArray(value) ? value : []) {
+      const upgrade = UPGRADES.find(entry => entry.id === rawId);
+      if (!upgrade || choices.includes(rawId) || (installedCounts.get(rawId) || 0) >= upgrade.maxStacks) continue;
+      choices.push(rawId);
+      if (choices.length === 3) break;
+    }
+    return choices;
+  }
+
   function sanitizeRushSnapshot(value) {
     if (!value || typeof value !== 'object') return null;
     const bossIndex = Math.floor(Number(value.bossIndex));
@@ -998,6 +1019,7 @@
     const checkpoint = ['fight', 'interlude', 'upgrade'].includes(value.checkpoint)
       ? value.checkpoint
       : value.pendingUpgrade === true ? 'upgrade' : 'fight';
+    const upgradeOffer = checkpoint === 'upgrade' ? sanitizeUpgradeOffer(value.upgradeOffer, installed) : [];
     return {
       version: 2,
       bossIndex,
@@ -1007,7 +1029,9 @@
       rushElapsedBeforeBoss: Math.max(0, Number(value.rushElapsedBeforeBoss) || 0),
       rushRetryPenalty: Math.max(0, Number(value.rushRetryPenalty) || 0),
       runRetryCount: Math.max(0, Math.floor(Number(value.runRetryCount) || 0)),
+      currentBossRetries: Math.max(0, Math.floor(Number(value.currentBossRetries) || 0)),
       installed,
+      upgradeOffer,
       difficulty: Object.hasOwn(DIFFICULTIES, value.difficulty) ? value.difficulty : 'standard',
       savedAt: Math.max(0, Math.floor(Number(value.savedAt) || Date.now()))
     };
@@ -1032,6 +1056,7 @@
       0,
       EXPANDED_BOSSES.length
     );
+    const upgradeOffer = checkpoint === 'upgrade' ? sanitizeUpgradeOffer(value.upgradeOffer, installed) : [];
     return {
       version: 1,
       bossIndex,
@@ -1042,10 +1067,86 @@
       rushElapsedBeforeBoss: Math.max(0, Number(value.rushElapsedBeforeBoss) || 0),
       rushRetryPenalty: Math.max(0, Number(value.rushRetryPenalty) || 0),
       runRetryCount: Math.max(0, Math.floor(Number(value.runRetryCount) || 0)),
+      currentBossRetries: Math.max(0, Math.floor(Number(value.currentBossRetries) || 0)),
       installed,
+      upgradeOffer,
       difficulty: Object.hasOwn(DIFFICULTIES, value.difficulty) ? value.difficulty : 'standard',
       savedAt: Math.max(0, Math.floor(Number(value.savedAt) || Date.now()))
     };
+  }
+
+  function createDefaultSave(useSystemPreferences = false) {
+    const fresh = structuredClone(DEFAULT_SAVE);
+    if (useSystemPreferences) {
+      fresh.settings.reduceMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+      fresh.settings.highContrast = globalThis.matchMedia?.('(prefers-contrast: more)')?.matches === true;
+    }
+    return fresh;
+  }
+
+  function normalizeSaveData(parsed) {
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new TypeError('Sauvegarde GEARSTORM invalide.');
+    const safe = createDefaultSave();
+    safe.unlocked = Math.floor(clamp(Number(parsed.unlocked) || 1, 1, CAMPAIGN_BOSSES.length));
+    safe.bestRush = Number.isFinite(parsed.bestRush) && parsed.bestRush > 0 ? parsed.bestRush : null;
+    safe.completed = parsed.completed === true;
+    safe.bestForgeRush = Number.isFinite(parsed.bestForgeRush) && parsed.bestForgeRush > 0 ? parsed.bestForgeRush : null;
+    safe.forgeCompleted = parsed.forgeCompleted === true;
+    safe.forgeRushSnapshot = sanitizeForgeRushSnapshot(parsed.forgeRushSnapshot);
+    const explicitForgeCleared = Array.isArray(parsed.forgeCleared)
+      ? parsed.forgeCleared.filter(id => EXPANDED_BOSSES.some(entry => entry.id === id))
+      : [];
+    safe.forgeCleared = safe.forgeCompleted
+      ? EXPANDED_BOSSES.map(entry => entry.id)
+      : [...new Set(explicitForgeCleared)];
+    safe.bestTimes = {};
+    safe.bestRanks = {};
+    for (const entry of BOSSES) {
+      const time = Number(parsed.bestTimes?.[entry.id]);
+      if (Number.isFinite(time) && time > 0) safe.bestTimes[entry.id] = time;
+      const rank = parsed.bestRanks?.[entry.id];
+      if (Object.hasOwn(RANK_VALUES, rank)) safe.bestRanks[entry.id] = rank;
+    }
+    const explicitCodex = Array.isArray(parsed.codexUnlocked)
+      ? parsed.codexUnlocked.filter(id => BOSSES.some(entry => entry.id === id))
+      : [];
+    const migratedCodex = safe.completed
+      ? CAMPAIGN_BOSSES.map(entry => entry.id)
+      : CAMPAIGN_BOSSES.slice(0, Math.max(0, safe.unlocked - 1)).map(entry => entry.id);
+    safe.codexUnlocked = [...new Set([...explicitCodex, ...migratedCodex, ...safe.forgeCleared])];
+    safe.rushSnapshot = sanitizeRushSnapshot(parsed.rushSnapshot);
+    const explicitCampaign = Array.isArray(parsed.campaignCleared)
+      ? parsed.campaignCleared.filter(id => LEGACY_BOSS_IDS.has(id))
+      : [];
+    const inferredCampaignCount = safe.completed
+      ? CAMPAIGN_BOSSES.length
+      : safe.rushSnapshot
+        ? Math.min(CAMPAIGN_BOSSES.length, safe.rushSnapshot.bossIndex + (safe.rushSnapshot.checkpoint === 'fight' ? 0 : 1))
+        : 0;
+    safe.campaignCleared = [...new Set([...explicitCampaign, ...CAMPAIGN_BOSSES.slice(0, inferredCampaignCount).map(entry => entry.id)])];
+    const explicitStory = Array.isArray(parsed.storySeen) ? parsed.storySeen.filter(id => STORY_SCENE_IDS.has(id)) : [];
+    const inferredStory = safe.campaignCleared.length
+      ? [STORY.intro.id, STORY.prologue.id, ...safe.campaignCleared.map(id => STORY.getActByBossId(id)?.id).filter(Boolean)]
+      : [];
+    if (safe.completed) inferredStory.push(STORY.epilogue.id);
+    safe.storySeen = [...new Set([...explicitStory, ...inferredStory])];
+    safe.mastery = {};
+    for (const entry of BOSSES) {
+      const contracts = LEGACY_BOSS_IDS.has(entry.id)
+        ? STORY.getMasteryContracts(entry.id)
+        : EXPANSION_STORY?.getMasteryContracts?.(entry.id) || entry.masteryContracts || [];
+      const allowed = new Set(contracts.map(contract => contract.id));
+      const earned = Array.isArray(parsed.mastery?.[entry.id]) ? parsed.mastery[entry.id] : [];
+      safe.mastery[entry.id] = [...new Set(earned.filter(id => allowed.has(id)))];
+    }
+    const settings = parsed.settings && typeof parsed.settings === 'object' ? parsed.settings : {};
+    safe.settings.difficulty = Object.hasOwn(DIFFICULTIES, settings.difficulty) ? settings.difficulty : 'standard';
+    for (const key of ['audio', 'shake', 'reduceMotion', 'highContrast', 'combatHints']) {
+      if (typeof settings[key] === 'boolean') safe.settings[key] = settings[key];
+    }
+    const volume = Number(settings.volume);
+    if (Number.isFinite(volume)) safe.settings.volume = clamp(volume, 0, 1);
+    return safe;
   }
 
   function loadSave() {
@@ -1056,79 +1157,73 @@
       const v2Raw = localStorage.getItem(V2_SAVE_KEY);
       const legacyRaw = localStorage.getItem(LEGACY_SAVE_KEY);
       const raw = currentRaw ?? previousRaw ?? olderRaw ?? v2Raw ?? legacyRaw;
-      if (!raw) return structuredClone(DEFAULT_SAVE);
-      const parsed = JSON.parse(raw);
-      const safe = structuredClone(DEFAULT_SAVE);
-      safe.unlocked = Math.floor(clamp(Number(parsed?.unlocked) || 1, 1, CAMPAIGN_BOSSES.length));
-      safe.bestRush = Number.isFinite(parsed?.bestRush) && parsed.bestRush > 0 ? parsed.bestRush : null;
-      safe.completed = parsed?.completed === true;
-      safe.bestForgeRush = Number.isFinite(parsed?.bestForgeRush) && parsed.bestForgeRush > 0 ? parsed.bestForgeRush : null;
-      safe.forgeCompleted = parsed?.forgeCompleted === true;
-      safe.forgeRushSnapshot = sanitizeForgeRushSnapshot(parsed?.forgeRushSnapshot);
-      safe.forgeCleared = Array.isArray(parsed?.forgeCleared)
-        ? [...new Set(parsed.forgeCleared.filter(id => EXPANDED_BOSSES.some(entry => entry.id === id)))]
-        : [];
-      safe.bestTimes = {};
-      safe.bestRanks = {};
-      for (const entry of BOSSES) {
-        const time = Number(parsed?.bestTimes?.[entry.id]);
-        if (Number.isFinite(time) && time > 0) safe.bestTimes[entry.id] = time;
-        const rank = parsed?.bestRanks?.[entry.id];
-        if (Object.hasOwn(RANK_VALUES, rank)) safe.bestRanks[entry.id] = rank;
-      }
-      const explicitCodex = Array.isArray(parsed?.codexUnlocked)
-        ? parsed.codexUnlocked.filter(id => BOSSES.some(entry => entry.id === id))
-        : [];
-      const migratedCodex = parsed?.completed === true
-        ? CAMPAIGN_BOSSES.map(entry => entry.id)
-        : CAMPAIGN_BOSSES.slice(0, Math.max(0, safe.unlocked - 1)).map(entry => entry.id);
-      safe.codexUnlocked = [...new Set([...explicitCodex, ...migratedCodex])];
-      safe.rushSnapshot = sanitizeRushSnapshot(parsed?.rushSnapshot);
-      const explicitCampaign = Array.isArray(parsed?.campaignCleared)
-        ? parsed.campaignCleared.filter(id => LEGACY_BOSS_IDS.has(id))
-        : [];
-      const inferredCampaignCount = safe.completed
-        ? CAMPAIGN_BOSSES.length
-        : safe.rushSnapshot
-          ? Math.min(CAMPAIGN_BOSSES.length, safe.rushSnapshot.bossIndex + (safe.rushSnapshot.checkpoint === 'fight' ? 0 : 1))
-          : 0;
-      safe.campaignCleared = [...new Set([...explicitCampaign, ...CAMPAIGN_BOSSES.slice(0, inferredCampaignCount).map(entry => entry.id)])];
-      const explicitStory = Array.isArray(parsed?.storySeen) ? parsed.storySeen.filter(id => STORY_SCENE_IDS.has(id)) : [];
-      const inferredStory = safe.campaignCleared.length
-        ? [STORY.intro.id, STORY.prologue.id, ...safe.campaignCleared.map(id => STORY.getActByBossId(id)?.id).filter(Boolean)]
-        : [];
-      if (safe.completed) inferredStory.push(STORY.epilogue.id);
-      safe.storySeen = [...new Set([...explicitStory, ...inferredStory])];
-      safe.mastery = {};
-      for (const entry of BOSSES) {
-        const contracts = LEGACY_BOSS_IDS.has(entry.id)
-          ? STORY.getMasteryContracts(entry.id)
-          : EXPANSION_STORY?.getMasteryContracts?.(entry.id) || entry.masteryContracts || [];
-        const allowed = new Set(contracts.map(contract => contract.id));
-        const earned = Array.isArray(parsed?.mastery?.[entry.id]) ? parsed.mastery[entry.id] : [];
-        safe.mastery[entry.id] = [...new Set(earned.filter(id => allowed.has(id)))];
-      }
-      const settings = parsed?.settings && typeof parsed.settings === 'object' ? parsed.settings : {};
-      safe.settings.difficulty = Object.hasOwn(DIFFICULTIES, settings.difficulty) ? settings.difficulty : 'standard';
-      for (const key of ['audio', 'shake', 'reduceMotion', 'highContrast', 'combatHints']) {
-        if (typeof settings[key] === 'boolean') safe.settings[key] = settings[key];
-      }
-      const volume = Number(settings.volume);
-      if (Number.isFinite(volume)) safe.settings.volume = clamp(volume, 0, 1);
+      if (!raw) return createDefaultSave(true);
+      const safe = normalizeSaveData(JSON.parse(raw));
       if (!currentRaw) localStorage.setItem(SAVE_KEY, JSON.stringify(safe));
       return safe;
     } catch {
-      return structuredClone(DEFAULT_SAVE);
+      return createDefaultSave(true);
     }
   }
 
   function persistSave() {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-      syncContinueRun();
-      syncContinueForge();
     } catch {
       showToast('Sauvegarde locale indisponible');
+      return false;
+    }
+    syncContinueRun();
+    syncContinueForge();
+    return true;
+  }
+
+  function exportSaveFile() {
+    try {
+      const payload = JSON.stringify(normalizeSaveData(save), null, 2);
+      const url = URL.createObjectURL(new Blob([payload], { type: 'application/json' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'gearstorm-save-v5-' + new Date().toISOString().slice(0, 10) + '.json';
+      link.hidden = true;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+      showToast('SAUVEGARDE EXPORTÉE · JSON V5');
+      return true;
+    } catch {
+      showToast('Export de sauvegarde impossible');
+      return false;
+    }
+  }
+
+  async function importSaveFile(file) {
+    if (!file) return false;
+    try {
+      if (file.size > 1024 * 1024) throw new RangeError('Fichier trop volumineux.');
+      const imported = normalizeSaveData(JSON.parse(await file.text()));
+      const previousSave = save;
+      save = imported;
+      if (!persistSave()) {
+        save = previousSave;
+        showToast('IMPORT ANNULE - STOCKAGE LOCAL INDISPONIBLE');
+        announce('Import valide, mais stockage local indisponible. Progression inchangee.');
+        return false;
+      }
+      applySettings();
+      buildBossGrid(selectionMode);
+      buildCodex();
+      buildStoryArchive();
+      syncContinueRun();
+      syncContinueForge();
+      showToast('SAUVEGARDE IMPORTÉE · DONNÉES VALIDÉES');
+      announce('Sauvegarde GEARSTORM importée et validée.');
+      return true;
+    } catch {
+      showToast('IMPORT REFUSÉ · FICHIER INVALIDE');
+      announce('Import refusé. Le fichier de sauvegarde est invalide.');
+      return false;
     }
   }
 
@@ -1155,6 +1250,7 @@
       rushElapsedBeforeBoss,
       rushRetryPenalty,
       runRetryCount,
+      currentBossRetries,
       installed: [...runBuild.installed],
       difficulty: save.settings.difficulty,
       savedAt: Date.now(),
@@ -1180,6 +1276,7 @@
       rushElapsedBeforeBoss,
       rushRetryPenalty,
       runRetryCount,
+      currentBossRetries,
       installed: [...runBuild.installed],
       difficulty: save.settings.difficulty,
       savedAt: Date.now(),
@@ -1266,9 +1363,9 @@
     rushElapsedBeforeBoss = snapshot.rushElapsedBeforeBoss;
     rushRetryPenalty = snapshot.rushRetryPenalty;
     runRetryCount = snapshot.runRetryCount;
-    currentBossRetries = 0;
-    lastBossRetryPenalty = 0;
-    lastUpgradeOffer = [];
+    currentBossRetries = snapshot.currentBossRetries;
+    lastBossRetryPenalty = currentBossRetries * RUSH_RETRY_PENALTY;
+    lastUpgradeOffer = snapshot.checkpoint === 'upgrade' ? [...snapshot.upgradeOffer] : [];
     runBuild = rebuildRunBuild(snapshot.installed);
     save.settings.difficulty = snapshot.difficulty;
     applySettings();
@@ -1279,7 +1376,7 @@
       showUpgradeSelection();
       showToast('Circuit restauré · choisis le prochain module');
     } else {
-      startFight(snapshot.bossIndex);
+      startFight(snapshot.bossIndex, { preserveRetries: true });
       showToast('Circuit restauré · MACHINE ' + String(snapshot.bossIndex + 1).padStart(2, '0'));
     }
     return true;
@@ -1302,9 +1399,9 @@
     rushElapsedBeforeBoss = snapshot.rushElapsedBeforeBoss;
     rushRetryPenalty = snapshot.rushRetryPenalty;
     runRetryCount = snapshot.runRetryCount;
-    currentBossRetries = 0;
-    lastBossRetryPenalty = 0;
-    lastUpgradeOffer = [];
+    currentBossRetries = snapshot.currentBossRetries;
+    lastBossRetryPenalty = currentBossRetries * RUSH_RETRY_PENALTY;
+    lastUpgradeOffer = snapshot.checkpoint === 'upgrade' ? [...snapshot.upgradeOffer] : [];
     runBuild = rebuildRunBuild(snapshot.installed);
     save.settings.difficulty = snapshot.difficulty;
     applySettings();
@@ -1315,7 +1412,7 @@
       showUpgradeSelection();
       showToast('Circuit Forge restauré · choisis le prochain module');
     } else {
-      startFight(snapshot.bossIndex);
+      startFight(snapshot.bossIndex, { preserveRetries: true });
       showToast('Circuit Forge restauré · ' + BOSSES[snapshot.bossIndex].name);
     }
     syncContinueForge();
@@ -1791,7 +1888,11 @@
       button.setAttribute('aria-label', unlocked
         ? number + ' · ' + entry.name + ' · ' + objective
         : 'Machine ' + String(visibleIndex + 1).padStart(2, '0') + ' verrouillée');
-      button.innerHTML = '<span><span class="boss-number">' + (unlocked ? number + status : 'VERROUILLÉE') + '</span>'
+      const artPart = LEGACY_CARD_ART_PARTS[entry.id] || 'chassis';
+      const artMarkup = unlocked
+        ? '<img class="boss-card-art" src="assets/generated/v2.7.0/bosses/' + entry.id + '/' + artPart + '.webp" alt="" aria-hidden="true" width="192" height="192" loading="lazy" decoding="async" draggable="false">'
+        : '';
+      button.innerHTML = artMarkup + '<span><span class="boss-number">' + (unlocked ? number + status : 'VERROUILLÉE') + '</span>'
         + '<strong>' + (unlocked ? entry.name : 'SIGNATURE INCONNUE') + '</strong>'
         + '<em>' + (unlocked ? entry.arena : 'Termine la machine précédente') + '</em></span>'
         + '<span><small>' + (unlocked ? cardCopy : 'Données chiffrées par Voltério.') + '</small>'
@@ -1873,6 +1974,12 @@
     const phase = clamp(Math.floor(Number(initialPhase) || 1), 1, 3);
     const startingHp = phase === 1 ? maxHp : phase === 2 ? Math.ceil(maxHp * 2 / 3) : Math.ceil(maxHp / 3);
     const expanded = data.engine === 'expanded';
+    const runtime = expanded && BOSS_REGISTRY ? BOSS_REGISTRY.createRuntime(data.id, { phase, checkpoint, attempt: currentBossRetries }) : null;
+    if (data.id === 'endurance-engine' && runtime) {
+      const firstRound = (phase - 1) * 2 + 1;
+      runtime.round = clamp(Math.floor(Number(checkpoint) || firstRound), firstRound, firstRound + 1);
+      runtime.signatureCycle = runtime.round - firstRound;
+    }
     return {
       data,
       x: 960,
@@ -1901,7 +2008,7 @@
       phase,
       dashHitCooldown: 0,
       collisionEnabled: true,
-      runtime: expanded && BOSS_REGISTRY ? BOSS_REGISTRY.createRuntime(data.id, { phase, checkpoint, attempt: currentBossRetries }) : null,
+      runtime,
       defeated: false
     };
   }
@@ -1946,12 +2053,12 @@
     return true;
   }
 
-  function startFight(index, { retry = false, phase = selectedPracticePhase, checkpoint = selectedPracticeCheckpoint } = {}) {
+  function startFight(index, { retry = false, preserveRetries = false, phase = selectedPracticePhase, checkpoint = selectedPracticeCheckpoint } = {}) {
     currentBossIndex = index;
     if (retry) score = scoreAtBossStart;
     else {
       scoreAtBossStart = score;
-      currentBossRetries = 0;
+      if (!preserveRetries) currentBossRetries = 0;
     }
     damageTaken = 0;
     currentBossFinishSource = null;
@@ -1984,12 +2091,18 @@
 
   function retryFight() {
     const penalized = isSequentialRun();
+    const endurancePractice = !penalized && boss?.data.id === 'endurance-engine' && boss.runtime;
+    const retryPhase = endurancePractice ? boss.phase : selectedPracticePhase;
+    const firstRound = endurancePractice ? (retryPhase - 1) * 2 + 1 : selectedPracticeCheckpoint;
+    const retryCheckpoint = endurancePractice
+      ? clamp(Math.floor(Number(boss.runtime.round) || firstRound), firstRound, firstRound + 1)
+      : selectedPracticeCheckpoint;
     currentBossRetries += 1;
     if (penalized) {
       runRetryCount += 1;
       rushRetryPenalty += RUSH_RETRY_PENALTY;
     }
-    startFight(currentBossIndex, { retry: true });
+    startFight(currentBossIndex, { retry: true, phase: retryPhase, checkpoint: retryCheckpoint });
     if (penalized) {
       score = Math.max(0, score - RUSH_RETRY_SCORE_PENALTY);
       scoreAtBossStart = score;
@@ -2072,7 +2185,7 @@
   }
 
   function pollGamepad() {
-    const pad = navigator.getGamepads?.()[0];
+    const pad = Array.from(navigator.getGamepads?.() || []).find(Boolean);
     if (!pad) {
       controller.left = controller.right = controller.attack = false;
       controller.jumpPressed = controller.dashPressed = controller.overloadPressed = controller.pausePressed = false;
@@ -2110,7 +2223,7 @@
       const direction = controller.menuDownPressed ? 1 : -1;
       panel.scrollBy?.({ top: direction * Math.max(220, panel.clientHeight * 0.58), behavior: save.settings.reduceMotion ? 'auto' : 'smooth' });
     }
-    const focusables = [...activeScreen.querySelectorAll('button:not(:disabled):not([hidden]), select:not(:disabled), input:not(:disabled)')];
+    const focusables = [...activeScreen.querySelectorAll('button:not(:disabled):not([hidden]), select:not(:disabled):not([hidden]), input:not(:disabled):not([hidden]):not([type="hidden"])')];
     if (!focusables.length) return;
     let index = focusables.indexOf(document.activeElement);
     if (index < 0) index = 0;
@@ -2119,6 +2232,14 @@
     if (horizontal && active instanceof HTMLSelectElement) {
       const direction = controller.menuRightPressed ? 1 : -1;
       active.selectedIndex = clamp(active.selectedIndex + direction, 0, active.options.length - 1);
+      active.dispatchEvent(new Event('change', { bubbles: true }));
+    } else if (horizontal && active instanceof HTMLInputElement && active.type === 'range') {
+      const direction = controller.menuRightPressed ? 1 : -1;
+      const minimum = Number(active.min) || 0;
+      const maximum = Number(active.max) || 100;
+      const step = Number(active.step) || 1;
+      active.value = String(clamp(Number(active.value) + direction * step, minimum, maximum));
+      active.dispatchEvent(new Event('input', { bubbles: true }));
       active.dispatchEvent(new Event('change', { bubbles: true }));
     } else if (controller.menuUpPressed || controller.menuLeftPressed) {
       focusables[(index - 1 + focusables.length) % focusables.length].focus({ preventScroll: true });
@@ -3048,14 +3169,15 @@
     }
   }
 
+  function enduranceRoundGateOpen(phase = boss?.phase ?? 1) {
+    return boss?.data.id !== 'endurance-engine' || currentForgeTelemetry.enduranceRounds.has(phase * 2);
+  }
+
   function phaseHealthFloor(phase = boss?.phase ?? 1) {
     if (!boss) return 0;
-    if (boss.data.id === 'endurance-engine') {
-      const requiredRound = phase * 2;
-      if (!currentForgeTelemetry.enduranceRounds.has(requiredRound)) {
-        const trainingFloors = { 1: 5 / 6, 2: 1 / 2, 3: 1 / 6 };
-        return Math.ceil(boss.maxHp * trainingFloors[phase]);
-      }
+    if (boss.data.id === 'endurance-engine' && !enduranceRoundGateOpen(phase)) {
+      const trainingFloors = { 1: 5 / 6, 2: 1 / 2, 3: 1 / 6 };
+      return Math.ceil(boss.maxHp * trainingFloors[phase]);
     }
     if (phase >= 3) return 0;
     return phase === 1 ? Math.ceil(boss.maxHp * 2 / 3) : Math.ceil(boss.maxHp / 3);
@@ -3068,6 +3190,10 @@
     boss.stateTime = 0;
     boss.events = Object.create(null);
     boss.vulnerable = false;
+    if (boss.data.id === 'endurance-engine' && boss.runtime) {
+      boss.runtime.signatureCycle = 0;
+      boss.runtime.roundGateAnnounced = false;
+    }
     boss.hidden = false;
     boss.vx = 0;
     boss.vy = 0;
@@ -3445,9 +3571,17 @@
     const requested = Math.max(1, Math.round(amount * overloadMultiplier));
     const previousHp = boss.hp;
     const floor = phaseHealthFloor();
+    const phaseGateOpen = enduranceRoundGateOpen();
     boss.hp = Math.max(floor, boss.hp - requested);
     const actualDamage = previousHp - boss.hp;
-    if (actualDamage <= 0) return 0;
+    if (actualDamage <= 0) {
+      if (!phaseGateOpen && boss.state === 'vulnerable' && !boss.runtime?.roundGateAnnounced) {
+        boss.runtime.roundGateAnnounced = true;
+        showToast('ENDURANCE · MANCHE ' + (boss.phase * 2) + ' REQUISE');
+        announce('Endurance Engine : termine la seconde manche de cette phase.');
+      }
+      return 0;
+    }
     if (isExpandedBoss() && player) {
       if (expandedFamily() === 'vertical-lane') currentForgeTelemetry.laneHits.add(Math.min(2, Math.floor(player.x / (W / 3))));
       if (expandedFamily() === 'gravity-weather') {
@@ -3474,7 +3608,7 @@
       currentBossFinishSource = source;
       currentBossOverloadFinish = player?.overloadTime > 0;
       defeatBoss();
-    } else if (boss.hp <= floor && boss.phase < 3) beginPhaseTransition(boss.phase + 1);
+    } else if (boss.hp <= floor && boss.phase < 3 && phaseGateOpen) beginPhaseTransition(boss.phase + 1);
     return actualDamage;
   }
 
@@ -4020,12 +4154,9 @@
 
   function showUpgradeSelection() {
     state = 'upgrade';
-    if (runMode === 'rush') saveRushSnapshot({ checkpoint: 'upgrade' });
-    if (runMode === 'forgeRush') saveForgeRushSnapshot({
-      checkpoint: 'upgrade',
-      completedBosses: currentBossIndex - FORGE_START_INDEX + 1,
-      rushElapsedBeforeBoss
-    });
+    const checkpointSnapshot = runMode === 'rush'
+      ? sanitizeRushSnapshot(save.rushSnapshot)
+      : runMode === 'forgeRush' ? sanitizeForgeRushSnapshot(save.forgeRushSnapshot) : null;
     player = null;
     boss = null;
     resetWorld();
@@ -4033,18 +4164,36 @@
     grid.textContent = '';
     const eligible = UPGRADES.filter(upgrade => runBuild.installed.filter(id => id === upgrade.id).length < upgrade.maxStacks);
     const pool = [...eligible];
-    for (let i = pool.length - 1; i > 0; i--) {
-      const random = globalThis.crypto?.getRandomValues
-        ? globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296
-        : Math.random();
-      const index = Math.floor(random * (i + 1));
-      [pool[i], pool[index]] = [pool[index], pool[i]];
-    }
-    const choices = pool.slice(0, 3);
-    if (lastUpgradeOffer.length === choices.length && choices.every(choice => lastUpgradeOffer.includes(choice.id)) && pool.length > 3) {
-      choices[2] = pool[3];
+    const persistedOffer = checkpointSnapshot?.checkpoint === 'upgrade'
+      ? sanitizeUpgradeOffer(checkpointSnapshot.upgradeOffer, runBuild.installed)
+      : [];
+    let choices = persistedOffer.map(id => eligible.find(upgrade => upgrade.id === id)).filter(Boolean);
+    if (!choices.length) {
+      for (let i = pool.length - 1; i > 0; i--) {
+        const random = globalThis.crypto?.getRandomValues
+          ? globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296
+          : Math.random();
+        const index = Math.floor(random * (i + 1));
+        [pool[i], pool[index]] = [pool[index], pool[i]];
+      }
+      choices = pool.slice(0, 3);
+      if (lastUpgradeOffer.length === choices.length && choices.every(choice => lastUpgradeOffer.includes(choice.id)) && pool.length > 3) {
+        choices[2] = pool[3];
+      }
     }
     lastUpgradeOffer = choices.map(choice => choice.id);
+    if (!choices.length) {
+      showToast('BUILD MAXIMAL · PROCHAINE MACHINE');
+      startFight(currentBossIndex + 1);
+      return;
+    }
+    if (runMode === 'rush') saveRushSnapshot({ checkpoint: 'upgrade', upgradeOffer: [...lastUpgradeOffer] });
+    if (runMode === 'forgeRush') saveForgeRushSnapshot({
+      checkpoint: 'upgrade',
+      completedBosses: currentBossIndex - FORGE_START_INDEX + 1,
+      rushElapsedBeforeBoss,
+      upgradeOffer: [...lastUpgradeOffer]
+    });
     const summary = document.querySelector('#upgrade-screen .result-summary');
     const nextBoss = BOSSES[Math.min(currentBossIndex + 1, BOSSES.length - 1)];
     const waveChanged = runMode === 'forgeRush' && nextBoss?.wave > BOSSES[currentBossIndex]?.wave;
@@ -5216,6 +5365,16 @@
     event.preventDefault();
     if (state === 'fight') pauseGame();
   });
+  const exportSaveButton = document.querySelector('#export-save');
+  const importSaveButton = document.querySelector('#import-save');
+  const importSaveInput = document.querySelector('#import-save-file');
+  exportSaveButton?.addEventListener('click', exportSaveFile);
+  importSaveButton?.addEventListener('click', () => importSaveInput?.click());
+  importSaveInput?.addEventListener('change', async event => {
+    const file = event.currentTarget.files?.[0] || null;
+    event.currentTarget.value = '';
+    await importSaveFile(file);
+  });
   document.getElementById('reset-save').addEventListener('click',()=>{
     if(!confirm('Réinitialiser les boss débloqués et tous les meilleurs temps ?'))return;
     const settings={...save.settings};save=structuredClone(DEFAULT_SAVE);save.settings=settings;persistSave();applySettings();buildBossGrid();buildCodex();syncContinueRun();syncContinueForge();showToast('Progression réinitialisée');
@@ -5244,16 +5403,26 @@
   const qaAllowed = new URLSearchParams(location.search).get('qa') === '1' && ['127.0.0.1', 'localhost'].includes(location.hostname);
   if (qaAllowed) Object.defineProperty(window, '__GEARSTORM_QA__', {
     value: Object.freeze({
-      getState: () => ({ state, runMode, launchMode: requestedLaunchMode, bossIndex: currentBossIndex, bossId: boss?.data.id ?? null, boss: boss?.data.name ?? null, bossState: boss?.state ?? null, bossFamily: boss?.runtime?.family ?? null, mechanicId: boss?.runtime?.mechanicId ?? null, signatureState: boss?.runtime?.signatureState ?? null, mechanicProgress: boss?.runtime?.mechanicProgress ?? null, mechanicTarget: boss?.runtime?.mechanicTarget ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, barrier: player?.barrier ?? null, installed: [...runBuild.installed], rushSnapshot: sanitizeRushSnapshot(save.rushSnapshot), forgeRushSnapshot: sanitizeForgeRushSnapshot(save.forgeRushSnapshot), activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
+      getState: () => ({ state, runMode, launchMode: requestedLaunchMode, bossIndex: currentBossIndex, bossId: boss?.data.id ?? null, boss: boss?.data.name ?? null, bossState: boss?.state ?? null, currentBossRetries, enduranceRound: boss?.runtime?.round ?? null, signatureCycle: boss?.runtime?.signatureCycle ?? null, bossFamily: boss?.runtime?.family ?? null, mechanicId: boss?.runtime?.mechanicId ?? null, signatureState: boss?.runtime?.signatureState ?? null, mechanicProgress: boss?.runtime?.mechanicProgress ?? null, mechanicTarget: boss?.runtime?.mechanicTarget ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, barrier: player?.barrier ?? null, installed: [...runBuild.installed], rushSnapshot: sanitizeRushSnapshot(save.rushSnapshot), forgeRushSnapshot: sanitizeForgeRushSnapshot(save.forgeRushSnapshot), activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
       getBossRoster: () => BOSSES.map(entry => ({ id: entry.id, name: entry.name, engine: entry.engine, family: entry.family, wave: entry.wave, mechanicId: entry.signature?.mechanicId || null, phaseStates: entry.signature?.phaseStates ? [...entry.signature.phaseStates] : [] })),
       getForgeTelemetry: () => forgeTelemetrySnapshot(),
       getForgeRunState: () => getForgeRunState(),
       getForgeRushSnapshot: () => sanitizeForgeRushSnapshot(save.forgeRushSnapshot),
       getForgeContractCoverage: () => forgeContractCoverage(),
+      processGamepad: () => {
+        pollGamepad();
+        handleGamepadMenus();
+        return document.activeElement?.id || null;
+      },
       startForgeRush: (options = {}) => startRun('forgeRush', FORGE_START_INDEX, { ...options, force: true }),
       resumeForgeRush: () => resumeForgeRushSnapshot(),
       launchBoss: (id, options = {}) => launchForgeBoss(id, options),
       launchBossPhase: (id, phase = 1, checkpoint = 1) => launchForgeBoss(id, { phase, checkpoint }),
+      retryCurrentFight: () => {
+        if (state !== 'fight' || !boss) return false;
+        retryFight();
+        return true;
+      },
       get art() { return getGeneratedArtState(); },
       get ready() { return artRuntime.ready; },
       get loaded() { return [...artRuntime.images.keys()]; },
@@ -5322,13 +5491,48 @@
     })
   });
 
-  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {
-        console.warn('Service worker GEARSTORM indisponible.');
+  function registerGearstormServiceWorker() {
+    if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+    const marker = '__GEARSTORM_PWA_UPDATE_V2_8__';
+    if (globalThis[marker]) return;
+    globalThis[marker] = true;
+    const updateButton = document.querySelector('#update-app');
+    let refreshing = false;
+    let updateAccepted = false;
+    let activeRegistration = null;
+    const revealUpdate = registration => {
+      if (!registration?.waiting || !navigator.serviceWorker.controller || !updateButton) return;
+      activeRegistration = registration;
+      updateButton.hidden = false;
+      updateButton.disabled = false;
+    };
+    updateButton?.addEventListener('click', () => {
+      const waiting = activeRegistration?.waiting;
+      if (!waiting) return;
+      updateAccepted = true;
+      updateButton.disabled = true;
+      updateButton.textContent = 'Mise à jour…';
+      waiting.postMessage({ type: 'SKIP_WAITING' });
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!updateAccepted || refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+    navigator.serviceWorker.register('./sw.js').then(registration => {
+      if (registration.waiting) revealUpdate(registration);
+      registration.addEventListener('updatefound', () => {
+        const installing = registration.installing;
+        installing?.addEventListener('statechange', () => {
+          if (installing.state === 'installed') revealUpdate(registration);
+        });
       });
-    }, { once: true });
+    }).catch(() => {
+      console.warn('Service worker GEARSTORM indisponible.');
+    });
   }
+
+  window.addEventListener('load', registerGearstormServiceWorker, { once: true });
 
   applySettings();
   artRuntime.initialPromise = initializeGeneratedArt();

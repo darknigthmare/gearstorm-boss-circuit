@@ -21,7 +21,7 @@ import {
 } from '../scripts/asset-contract.mjs';
 import { validateInfrastructureContract } from '../scripts/infrastructure-contract.mjs';
 
-const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScript, releaseScript] = await Promise.all([
+const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScript, releaseScript, pwaBootstrap, indexHtml] = await Promise.all([
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
   readFile('sw.js', 'utf8'),
@@ -30,11 +30,13 @@ const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScri
   readFile('.github/workflows/ci.yml', 'utf8'),
   readFile('scripts/build.mjs', 'utf8'),
   readFile('scripts/check-release.mjs', 'utf8'),
+  readFile('pwa-update-v2.8.0.js', 'utf8'),
+  readFile('index.html', 'utf8'),
 ]);
 
-test('les versions application et assets 2.7 restent declarees separement', () => {
+test('la version application 2.8 reste separee des assets immuables 2.7', () => {
   assert.equal(packageJson.version, APP_RELEASE);
-  assert.equal(APP_RELEASE, '2.7.0');
+  assert.equal(APP_RELEASE, '2.8.0');
   assert.equal(ASSET_RELEASE, '2.7.0');
   assert.notEqual(APP_RELEASE, STORY_CONTENT_VERSION);
   assert.match(buildScript, /packageJson\.version !== APP_RELEASE/);
@@ -53,7 +55,7 @@ test('les versions application et assets 2.7 restent declarees separement', () =
 });
 
 test('le build reste une liste blanche reproductible et minimale', () => {
-  assert.match(buildScript, /const publicFiles = \['index\.html', 'styles\.css', 'story\.js', 'expansion-story\.js', 'boss-roster\.js', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
+  assert.match(buildScript, /const publicFiles = \['index\.html', 'pwa-update-v2\.8\.0\.js', 'styles\.css', 'story\.js', 'expansion-story\.js', 'boss-roster\.js', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
   assert.match(buildScript, /const shellAssets = \['gearstorm-icon\.svg', 'gearstorm-icon-192\.png', 'gearstorm-icon-512\.png', 'gearstorm-key-art\.png'\]/);
   assert.match(buildScript, /\.\.\.runtimeAssets\.files/);
   assert.match(buildScript, /validateApplicationContract/);
@@ -74,22 +76,28 @@ test('la PWA est installable, versionnee et ne precache pas les 225 WebP', () =>
   assert.equal(keyArt?.sizes, '1672x941');
   assert.ok(manifest.shortcuts.some(shortcut => shortcut.url === './?mode=forge'));
   assert.ok(manifest.shortcuts.some(shortcut => shortcut.url === './?mode=forgeRush'));
-  assert.match(serviceWorker, /const APP_VERSION = '2\.7\.0'/);
+  assert.match(serviceWorker, /const APP_VERSION = '2\.8\.0'/);
   assert.match(serviceWorker, /'\.\/story\.js'/);
   assert.match(serviceWorker, /'\.\/expansion-story\.js'/);
   assert.match(serviceWorker, /'\.\/boss-roster\.js'/);
+  assert.match(serviceWorker, /'\.\/pwa-update-v2\.8\.0\.js'/);
   assert.match(serviceWorker, /const ASSET_VERSION = '2\.7\.0'/);
   assert.match(serviceWorker, /cacheFirstRuntime/);
   assert.match(serviceWorker, /staleWhileRevalidateShell/);
   assert.match(serviceWorker, /networkFirstNavigation/);
   const coreAssets = serviceWorker.slice(serviceWorker.indexOf('const CORE_ASSETS'), serviceWorker.indexOf('const CORE_PATHS'));
   assert.doesNotMatch(coreAssets, /\.webp/);
+  assert.ok(indexHtml.indexOf('pwa-update-v2.8.0.js') < indexHtml.indexOf('game.js'));
+  assert.match(pwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_8__/);
+  assert.match(pwaBootstrap, /registration\.waiting/);
+  assert.match(pwaBootstrap, /SKIP_WAITING/);
+  assert.match(pwaBootstrap, /controllerchange/);
 });
 
 test('Vercel, la CI Linux et les exclusions satisfont le contrat infrastructure', () => {
   assert.doesNotThrow(() => validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore }));
   assert.match(ci, /concurrency:[\s\S]+cancel-in-progress: true/);
-  assert.match(ci, /name: gearstorm-web-v2\.7\.0/);
+  assert.match(ci, /name: gearstorm-web-v2\.8\.0/);
   assert.match(vercelIgnore, /^\.env\*$/m);
   assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.7\.0\/$/m);
 });
@@ -97,14 +105,18 @@ test('Vercel, la CI Linux et les exclusions satisfont le contrat infrastructure'
 test('les scripts npm couvrent syntaxe, tests, build et verification release', () => {
   assert.match(packageJson.scripts.check, /node --check expansion-story\.js/);
   assert.match(packageJson.scripts.check, /node --check boss-roster\.js/);
+  assert.match(packageJson.scripts.check, /node --check pwa-update-v2\.8\.0\.js/);
   assert.match(packageJson.scripts.check, /node --check sw\.js/);
   assert.match(packageJson.scripts.check, /scripts\/app-contract\.mjs/);
   assert.match(packageJson.scripts.check, /scripts\/infrastructure-contract\.mjs/);
   assert.match(packageJson.scripts.test, /tests\/expansion-story\.test\.mjs/);
   assert.match(packageJson.scripts.test, /tests\/release\.test\.mjs/);
   assert.match(packageJson.scripts.test, /tests\/sw\.test\.mjs/);
+  assert.match(packageJson.scripts.test, /tests\/pwa-update\.test\.mjs/);
   assert.equal(packageJson.scripts.qa, 'npm run check && npm test && npm run build && npm run check:release');
-  assert.equal(packageJson.scripts['test:e2e'], 'playwright test');
+  assert.equal(packageJson.scripts['test:e2e'], 'playwright test --project=chromium-desktop --project=chromium-mobile');
+  assert.equal(packageJson.scripts['test:e2e:cross-browser'], 'playwright test --project=firefox-desktop --project=webkit-desktop');
+  assert.equal(packageJson.engines.node, '22.x');
   assert.equal(packageJson.scripts['qa:ci'], 'npm run qa && npm run test:e2e');
   assert.match(ci, /playwright install --with-deps chromium/);
   assert.match(ci, /npm run test:e2e/);

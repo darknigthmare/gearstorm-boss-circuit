@@ -4,6 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
 const systemChrome = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const localExecutable = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
   || (process.platform === 'win32' && existsSync(systemChrome) ? systemChrome : undefined);
+const chromiumLaunch = localExecutable ? { launchOptions: { executablePath: localExecutable } } : {};
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -18,7 +19,6 @@ export default defineConfig({
     : 'line',
   use: {
     baseURL: 'http://127.0.0.1:8087',
-    launchOptions: localExecutable ? { executablePath: localExecutable } : undefined,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure'
@@ -31,7 +31,10 @@ export default defineConfig({
     timeout: 120_000
   },
   projects: [
-    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'chromium-mobile', use: { ...devices['Pixel 7'], isMobile: false, hasTouch: true } }
+    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'], ...chromiumLaunch } },
+    { name: 'chromium-mobile', use: { ...devices['Pixel 7'], isMobile: false, hasTouch: true, ...chromiumLaunch } },
+    // Opt-in via npm run test:e2e:cross-browser; the default script selects Chromium only.
+    { name: 'firefox-desktop', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit-desktop', use: { ...devices['Desktop Safari'] } }
   ]
 });
