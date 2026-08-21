@@ -1,41 +1,50 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.5.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.6.0
 
-Validation locale effectuée le 21 août 2026 sur le candidat v2.5.0.
+Validation locale effectuée le 21 août 2026 sur le candidat v2.6.0.
 
 ## Automatisation
 
-- `npm run qa` : succès intégral, 44/44 tests réussis.
-- Build v2.5.0 et `check-release` : réussis.
-- `dist/` : 16 233 987 octets.
-- Bibliothèque runtime : 103 WebP v2.5.0, 13 113 368 octets, dérivés de 17 sources OpenAI documentées.
-- Registre narratif : introduction, prologue, six actes, six interludes, épilogue et 18 contrats de maîtrise.
+- `npm run qa` : succès intégral, 55/55 tests réussis.
+- Build v2.6.0 et `check-release` : réussis.
+- `dist/` : 20 364 880 octets.
+- Registre : 30 boss jouables, 90 phases et 90 contrats de maîtrise déclarés.
+- Bibliothèque runtime : 129 WebP v2.6.0, 17 088 342 octets, dérivés de 20 sources OpenAI documentées.
 - `npm audit --audit-level=high` : 0 vulnérabilité.
 
-## Parcours navigateur v2.5 — ordinateur
+## Parcours navigateur v2.6 — ordinateur
 
-Chrome local via CDP, viewport 1440 × 900 et DPR 2 pour le combat :
+Chrome local via `agent-browser 0.34.0`, viewport 1440 × 900 :
 
-- parcours titre → introduction → prologue → Rivet Rex confirmé avec le manifeste v2.5.0 ;
-- `art.ready = true`, liste d’échecs vide et 103 assets déclarés ;
-- silhouette de Riva inspectée plein cadre puis en agrandissement : deux membres lisibles, aucun troisième bras, avant-bras flottant, coude surnuméraire ou chevauchement grotesque ;
-- le torse fournit le bras arrière, `arm-near:openai-v3` l’avant-bras de tir et `pulse-cannon` le canon ;
-- titre et prologue contrôlés à 1440 × 900 : pas de débordement, recadrage, CTA masqué ni texte illisible ;
-- captures courantes : `audit-visual-v2.5/accepted-jpg/01-riva-combat.jpg`, `04-title-desktop.jpg` et `05-prologue-desktop.jpg`.
+- titre v2.6 et Forge intégrale chargés sans erreur console ;
+- manifeste v2.6.0 prêt, 129/129 assets chargés et aucune ressource en échec ;
+- 30 cartes Forge exactes et 24/24 boss étendus lancés en mode `fight`, avec leur ID, leur phase 1 et leur sprite OpenAI ;
+- un représentant de chacune des huit familles a franchi la transition phase 1 → phase 2 ;
+- Bastion Ricochet a confirmé la transition 150 → 100 PV ;
+- Riva v4 a été inspectée en combat : silhouette complète, taille/buste/pelvis séparés, deux jambes lisibles et semelles alignées sur le plan du pont ;
+- les statistiques de carte sont désormais séparées du descriptif, sans collision de texte.
 
-## Corrections responsive et accessibilité
+Captures courantes :
 
-- les communications portrait sont placées après le canvas afin de ne plus masquer Riva, le sol ou un télégraphe ;
-- l’objectif paysage compact est recentré en haut et son aide secondaire est masquée ;
-- les toasts évitent désormais les commandes tactiles en portrait et paysage ;
-- la route du prologue reste visible sous 480 px ;
-- radio, HUD, commandes tactiles, toast et conseil d’orientation reçoivent le contraste renforcé ;
-- les écrans inactifs deviennent `inert` et `aria-hidden`, avec restauration du focus sur l’écran actif.
+- `qa-gearstorm-v26-browser/01-title-desktop.png` ;
+- `qa-gearstorm-v26-browser/02-forge-grid-desktop.png` ;
+- `qa-gearstorm-v26-browser/03-bastion-phase1-desktop.png` ;
+- `qa-gearstorm-v26-browser/06-riva-ground-contact-desktop.png`.
 
-## Gameplay et progression
+## Mobile et accessibilité
 
-- l’introduction bloque maintenant l’IA, les tirs et le chronomètre jusqu’à disparition réelle de la plaque, y compris après pause ;
-- une victoire en Laboratoire ne débloque plus la machine suivante et ne modifie pas la progression de campagne ;
-- lancer un nouveau Circuit avec une reprise valide exige une confirmation explicite.
+- titre et Forge vérifiés à 390 × 844, sans débordement horizontal ;
+- navigation, boutons et cartes restent entièrement accessibles par défilement ;
+- audit axe de la Forge mobile : 0 violation confirmée ;
+- 21 contrôles de contraste restent indéterminés automatiquement à cause des gradients et pseudo-éléments et ont donc été relus visuellement ;
+- captures : `04-title-mobile-390x844.png` et `05-forge-mobile-390x844.png`.
+
+## Gameplay, contenu et progression
+
+- la campagne conserve ses six relais et reste distincte de la Forge ;
+- le Laboratoire n’affiche que les six machines de campagne, tandis que la Forge expose les 30 profils ;
+- les 24 boss étendus utilisent huit familles de contrôleurs data-driven, chacune avec télégraphes, boucle et trois phases ;
+- histoire, objectifs, journaux et résultats Forge proviennent du registre narratif intégré ;
+- 64/72 métriques de maîtrise Forge sont mesurées ; les huit mécaniques non instrumentées restent explicitement « NON ÉVALUÉE » et ne peuvent pas être acquises par défaut.
 
 ## Publication
 
@@ -43,7 +52,7 @@ Ce rapport couvre le candidat local. Les preuves GitHub, CI et Vercel publiques 
 
 ## Limites du passage
 
-- La nouvelle capture mobile paysage et la nouvelle capture Résultat n’ont pas été produites : Chrome/CDP s’est suspendu pendant ces deux parcours et l’instance locale a été arrêtée proprement.
-- La campagne complète des six boss n’a pas été rejouée manuellement après les changements v2.5 ; les contrats automatisés et le parcours ciblé couvrent cette passe.
+- Les 24 boss Forge partagent huit familles de comportement et une arène procédurale ; ils ne possèdent pas encore chacun une IA, une arène et un rig multipartite uniques.
+- Les 24 combats ont été lancés et leurs transitions de famille validées, mais leurs 72 phases n’ont pas toutes été terminées manuellement de bout en bout.
 - Aucune manette physique, aucun appareil tactile physique et aucun lecteur d’écran réel n’ont été testés.
-- Le navigateur intégré est resté bloqué par le helper ACL Windows ; les vérifications visuelles réussies ont été exécutées dans Chrome local via CDP.
+- Le navigateur intégré était bloqué par le helper ACL Windows ; le fallback autorisé a utilisé Chrome local avec `agent-browser`.

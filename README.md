@@ -1,6 +1,6 @@
-# GEARSTORM: Boss Circuit v2.5
+# GEARSTORM: Boss Circuit v2.6
 
-GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables du Professeur Cassian Voltério, améliore son équipement entre les combats et libère les districts emprisonnés dans le Circuit.
+GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables de la campagne de Cassian Voltério, puis peut affronter vingt-quatre profils supplémentaires dans la Forge, soit trente boss jouables et quatre-vingt-dix phases.
 
 ## Jouer en local
 
@@ -20,12 +20,12 @@ Le mode `file://` reste prévu comme solution de repli, mais l’installation PW
 - Dépôt GitHub prévu : https://github.com/darknigthmare/gearstorm-boss-circuit
 - URL Vercel prévue : https://gearstorm-boss-circuit.vercel.app
 
-Ces identifiants décrivent les cibles du projet. Ils ne certifient pas que la révision v2.5 est actuellement poussée ou déployée. L’état public doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
+Ces identifiants décrivent les cibles du projet. L’état public de la révision v2.6 doit être confirmé par les contrôles Git, le statut Vercel et une requête HTTP au moment de la release.
 
 ## Contenu
 
-- Six boss originaux, chacun structuré en trois phases lisibles.
-- Campagne complète, Laboratoire d’entraînement, trois difficultés et épilogue.
+- Trente boss originaux jouables, chacun structuré en trois phases lisibles : six actes de campagne et vingt-quatre simulations Forge.
+- Campagne complète, Laboratoire d’entraînement, Forge intégrale des 30 boss, trois difficultés et épilogue.
 - Onze modules d’amélioration, proposés entre les combats du Circuit et cumulables selon leurs limites propres.
 - Surcharge Overdrive, ruée invulnérable, double saut et tir évolutif.
 - Clavier AZERTY/QWERTY, souris, manette standard et commandes tactiles.
@@ -74,22 +74,24 @@ Le runtime conserve tous les IDs historiques et pilote les nouveaux hooks suivan
 
 Les objectifs critiques restent disponibles même si les conseils sont coupés. Les changements d’état utilisent les régions `aria-live` existantes avec parcimonie afin de ne pas annoncer chaque frame.
 
-## Direction artistique v2.5
+## Direction artistique v2.6
 
-La production v2.5 repose sur 17 sources originales réalisées avec OpenAI Image Generation intégré. Les 14 masters historiques fournissent les six arènes, les six boss, Riva et les VFX ; trois études supplémentaires ont permis de corriger le membre avant de Riva. Le jeu ne publie que 103 assets indépendants normalisés pour le runtime.
+La production v2.6 repose sur vingt sources originales réalisées avec OpenAI Image Generation intégré. Le bundle public contient uniquement 129 WebP normalisés, versionnés et contrôlés par SHA-256.
 
-| Famille | Masters | Découpage par master | Assets indépendants |
-| --- | ---: | ---: | ---: |
-| Décors d’arène | 6 | 4 couches de parallaxe | 24 |
-| Boss | 6 | 9 pièces transparentes | 54 |
-| Riva Spark | 1 | 9 poses / états | 9 |
-| Effets visuels | 1 | grille 4 × 4 | 16 |
-| Études de correction du rig de Riva | 3 | avant-bras de production + études de pose | inclus dans les 9 pièces de Riva |
-| **Total des sources** | **17** |  | **103 assets runtime** |
+| Famille | Sources | Assets runtime |
+| --- | ---: | ---: |
+| Six décors de campagne, quatre couches de parallaxe chacun | 6 | 24 |
+| Six boss de campagne, neuf pièces articulables chacun | 6 | 54 |
+| Vingt-quatre boss Forge, un sprite transparent contrôlé chacun | 4 planches | 24 |
+| Riva Spark : atlas historique, corps cohérent v4 et bras-canon v4 | 3 | 11 |
+| Effets visuels de combat | 1 | 16 |
+| **Total** | **20** | **129** |
 
-Les sources sont des fichiers de production ; le jeu consomme les éléments exportés séparément. L’avant-bras v3 de Riva est une pièce anatomique isolée, raccordée à la manche déjà peinte dans son torse, ce qui évite de superposer trois bras complets. Les pièces de personnage, de boss et de VFX utilisent une transparence réelle, sans texte, logo ni filigrane. Les images sont des créations originales propres à GEARSTORM et ne reprennent aucun asset de franchise tierce.
+Le nouveau corps de Riva possède une poitrine, une taille, un bassin, deux jambes et des bottes dans une seule silhouette cohérente. Son pivot est placé sous les semelles : le moteur aligne donc réellement ses pieds sur le plancher logique du pont. Le bras de tir est une seule pièce indépendante, raccordée au socket d’épaule ; les anciens fragments anatomiques restent uniquement comme repli et ne sont plus superposés dans le rig de production.
 
-Le rendu procédural Canvas reste le fallback de référence si une image manque, expire, ne se décode pas ou ne peut pas être chargée. Le chargement est conçu pour être progressif : le key art et les éléments de titre sont prioritaires, puis les couches d’arène et les pièces du combat courant sont demandées à la volée. Le loader accessible du titre/prologue peut annoncer cette progression sans bloquer le menu. Sous HTTP ou HTTPS, le service worker peut ensuite mettre en cache les réponses valides selon sa stratégie PWA.
+Les vingt-quatre profils Forge reçoivent chacun une silhouette OpenAI originale et transparente. Ils utilisent huit familles de mécaniques partagées et pilotées par données : renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et séquence finale. Chaque profil possède trois phases, ses valeurs, ses télégraphes, son objectif, son journal et ses résultats. Les arènes Forge et l’animation interne restent procédurales ; ces vingt-quatre silhouettes ne sont pas présentées comme des rigs multipièces sur mesure.
+
+Le rendu Canvas conserve un fallback si un asset manque, ne se décode pas ou ne peut pas être mis en cache. Le service worker ne précache pas les 129 WebP : il garde le shell et le catalogue, puis stocke à la demande le boss courant. Les images sont des créations originales propres à GEARSTORM, sans texte, logo, filigrane ni asset d’une franchise tierce.
 
 ## Commandes
 
@@ -131,7 +133,9 @@ Ces commandes décrivent le processus attendu ; `QA_REPORT.md` ne consigne que l
 ## Structure
 
 - `index.html`, `styles.css`, `game.js` : jeu et interface.
-- `story.js` : registre narratif immuable des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise.
+- `story.js` : campagne narrative immuable des six districts.
+- `expansion-story.js` : quatre vagues Forge, journaux, objectifs et 72 contrats déclarés.
+- `boss-roster.js` : registre jouable des 30 machines, trois phases et huit familles de mécaniques.
 - `assets/` : key art, icônes et assets artistiques originaux.
 - `manifest.webmanifest`, `sw.js` : installation et fonctionnement hors ligne.
 - `server.js` : serveur local à surface publique restreinte.

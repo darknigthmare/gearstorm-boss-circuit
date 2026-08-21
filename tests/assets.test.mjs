@@ -6,13 +6,15 @@ import {
   ASSET_MANIFEST_PATH,
   ASSET_RELEASE,
   BOSS_IDS,
+  CORE_BOSS_IDS,
+  EXPANSION_BOSS_IDS,
   EXPECTED_COUNTS,
   validateRuntimeAssets,
 } from '../scripts/asset-contract.mjs';
 
 const runtimePromise = validateRuntimeAssets();
 
-test('le catalogue v2.5 contient exactement les 103 assets attendus', async () => {
+test('le catalogue v2.6 contient exactement les 129 assets attendus', async () => {
   const runtime = await runtimePromise;
   assert.equal(runtime.manifest.release, ASSET_RELEASE);
   assert.equal(runtime.entries.length, EXPECTED_COUNTS.runtimeFiles);
@@ -20,13 +22,16 @@ test('le catalogue v2.5 contient exactement les 103 assets attendus', async () =
   assert.equal(runtime.entries.filter(entry => entry.kind === 'boss').length, EXPECTED_COUNTS.bossParts);
   assert.equal(runtime.entries.filter(entry => entry.kind === 'heroine').length, EXPECTED_COUNTS.heroineParts);
   assert.equal(runtime.entries.filter(entry => entry.kind === 'vfx').length, EXPECTED_COUNTS.vfx);
-  assert.deepEqual(Object.keys(runtime.manifest.arenas), [...BOSS_IDS]);
+  assert.deepEqual(Object.keys(runtime.manifest.arenas), [...CORE_BOSS_IDS]);
   assert.deepEqual(Object.keys(runtime.manifest.bosses), [...BOSS_IDS]);
+  for (const bossId of EXPANSION_BOSS_IDS) assert.deepEqual(Object.keys(runtime.manifest.bosses[bossId].parts), ['sprite']);
+  assert.ok(runtime.manifest.heroine.parts['body-core']);
+  assert.ok(runtime.manifest.heroine.parts['firing-arm']);
 });
 
 test('dimensions, alpha, signatures, tailles et SHA-256 sont vérifiés', async () => {
   const runtime = await runtimePromise;
-  assert.equal(runtime.totalBytes, 13_113_368);
+  assert.equal(runtime.totalBytes, 17_088_342);
   assert.ok(runtime.totalBytes <= ASSET_BUDGET_BYTES);
   assert.equal(runtime.alphaCount, EXPECTED_COUNTS.alpha);
   assert.equal(runtime.opaqueCount, EXPECTED_COUNTS.opaque);
@@ -38,7 +43,7 @@ test('dimensions, alpha, signatures, tailles et SHA-256 sont vérifiés', async 
 test('seul le runtime versionné est déclaré, jamais les masters OpenAI', async () => {
   const runtime = await runtimePromise;
   assert.ok(runtime.files.includes(ASSET_MANIFEST_PATH));
-  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.5.0/')));
+  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.6.0/')));
   assert.ok(runtime.entries.every(entry => entry.src.endsWith('.webp')));
   assert.ok(runtime.entries.every(entry => !/assets\/generated\/(?:arenas|bosses|riva|vfx)\//.test(entry.src)));
   const sources = runtime.entries.map(entry => entry.src);

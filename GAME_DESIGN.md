@@ -1,6 +1,6 @@
-# GEARSTORM: Boss Circuit — conception 2.4
+# GEARSTORM: Boss Circuit — conception 2.6
 
-`DESIGN.md` reste la source de vérité des règles et `story.js` celle des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise. Ce document fixe leur intégration de production, de narration interactive et d’UX pour la version 2.4.
+`DESIGN.md` reste la source de vérité des règles et `story.js` celle des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise. `expansion-story.js` et `boss-roster.js` étendent ce contrat à la Forge. Ce document fixe leur intégration de production, de narration interactive et d’UX pour la version 2.6.
 
 ## Invariants de jeu
 
@@ -12,6 +12,15 @@
 - Le rendu procédural reste une voie valide et jouable, pas un écran d’erreur.
 - L’objectif critique demeure visible même lorsque les conseils contextuels sont désactivés.
 - Une victoire de Laboratoire peut enrichir le Codex, mais ne libère jamais un relais de campagne.
+
+## Extension Forge v2.6
+
+- Le roster total contient exactement trente identifiants stables et quatre-vingt-dix phases.
+- Les vingt-quatre extensions sont jouables uniquement dans la Forge ; elles ne libèrent aucun district.
+- Huit familles mécaniques mutualisent le moteur sans prétendre fournir vingt-quatre IA entièrement sur mesure.
+- Chaque profil charge son sprite v2.6 à la demande et conserve un fallback procédural.
+- Toute maîtrise non mesurable est signalée « NON ÉVALUÉE », jamais réussie implicitement.
+- Le corps de Riva touche le plancher logique par son pivot de semelles ; l’ombre sert uniquement de contact.
 
 ## Progression narrative des six districts
 
@@ -30,7 +39,7 @@ Riva Spark reste la technicienne de maintenance qui a conçu la ligne manuelle M
 
 ## Parcours d’un jeu complet
 
-1. Le titre expose l’état de campagne, le prochain relais et les entrées Circuit, reprise, Laboratoire, Codex, manuel et options.
+1. Le titre expose l’état de campagne, le prochain relais et les entrées Circuit, reprise, Laboratoire, Forge, Codex, manuel et options.
 2. L’intro montre la prise de contrôle de la Couronne et l’interruption des six services civils.
 3. Le prologue active la ligne M-0, fixe l’objectif des six relais et présente l’itinéraire.
 4. L’intro de machine présente sa fonction civile, le district, la silhouette et les voix de Cassian et Riva.
@@ -44,7 +53,7 @@ Riva Spark reste la technicienne de maintenance qui a conçu la ligne manuelle M
 
 ## Contrat des hooks UX
 
-Tous les IDs historiques sont conservés. Les hooks v2.4 complètent les écrans sans modifier leur sémantique par CSS.
+Tous les IDs historiques sont conservés. Les hooks v2.6 complètent les écrans sans modifier leur sémantique par CSS.
 
 | Hook | État initial | Comportement requis |
 | --- | --- | --- |
@@ -86,19 +95,20 @@ Les hooks complémentaires `#continue-run-detail`, `#lab-progress`, `#upgrade-pr
 - Le contraste renforcé et `prefers-contrast` durcissent les bordures et les fonds ; le mouvement réduit neutralise les animations non essentielles.
 - Les petits écrans réorganisent le Codex, les récapitulatifs et les commandes en une colonne sans réduire les cibles sous 44 × 44 CSS px.
 
-## Contrat artistique v2.2
+## Contrat artistique v2.6
 
-Quatorze masters originaux, produits avec OpenAI Image Generation intégré, alimentent 103 assets indépendants.
+Vingt sources originales produites avec OpenAI Image Generation intégré alimentent 129 assets indépendants.
 
-| Famille | Contrat du master | Nombre de masters | Assets runtime |
+| Famille | Contrat de production | Sources | Assets runtime |
 | --- | --- | ---: | ---: |
-| Arènes | atlas 2 × 2 : fond lointain, plan médian, premier plan, atmosphère | 6 | 24 |
-| Boss | atlas 3 × 3 : neuf pièces articulables et transparentes | 6 | 54 |
-| Riva Spark | atlas 3 × 3 : neuf poses ou états lisibles | 1 | 9 |
-| VFX | atlas 4 × 4 : seize effets isolés | 1 | 16 |
-| **Total** |  | **14** | **103** |
+| Arènes de campagne | quatre couches de parallaxe | 6 | 24 |
+| Boss de campagne | neuf pièces articulables | 6 | 54 |
+| Boss Forge 07–30 | quatre planches 3 × 2, un sprite composite transparent par machine | 4 | 24 |
+| Riva Spark | atlas historique, corps cohérent v4 et bras-canon v4 | 3 | 11 |
+| VFX | seize effets isolés | 1 | 16 |
+| **Total** |  | **20** | **129** |
 
-Les masters sont des sources de découpe. Les exports restent indépendants, cadrés sans chevauchement parasite, sans texte, logo ni filigrane. Les pièces de boss, Riva et les VFX exigent une véritable transparence.
+Les exports sont cadrés, détourés et hachés par le pipeline reproductible. Le rig Riva de production compose uniquement le corps v4 et le bras-canon v4 ; son pivot de semelles correspond au plancher logique. Les machines Forge conservent un fallback procédural et ne sont pas présentées comme des rigs multipièces.
 
 ## Contrats de maîtrise
 
@@ -111,7 +121,7 @@ Les masters sont des sources de découpe. Les exports restent indépendants, cad
 | Foundry Titan | 66 s | Aucun dégât | Ne subir aucun impact direct de mine pendant la phase 3. |
 | Crown Engine Ω | 82 s | Aucun dégât | Porter le coup final au noyau pendant une surcharge. |
 
-Ces dix-huit contrats sont définis dans `story.js`. Leur présence dans le registre ne vaut pas acquisition : seul un résultat évalué et écrit dans `mastery` peut les marquer comme réussis. Pour Magnetron et Chrono Mantis, le runtime valide dès qu’un cycle complet de phase 3 est terminé sans l’impact interdit ; un cycle parfait déjà acquis n’est pas annulé par un cycle ultérieur. Le contrat de Foundry Titan mesure les impacts directs de mine, pas leur déclenchement automatique.
+`story.js` définit dix-huit contrats de campagne et `expansion-story.js` soixante-douze contrats Forge, soit quatre-vingt-dix objectifs déclarés. Le runtime mesure les dix-huit historiques et soixante-quatre métriques Forge. Les huit métriques qui demandent une sous-mécanique non encore représentée sont affichées « NON ÉVALUÉE » et ne peuvent jamais être accordées par défaut. Un contrat n’est acquis qu’après évaluation et écriture dans la sauvegarde locale. Les défis de Magnetron et Chrono Mantis exigent un cycle complet de phase 3 sans l’impact interdit ; celui de Foundry Titan interdit un impact direct de mine.
 
 ## Chargement runtime et PWA
 

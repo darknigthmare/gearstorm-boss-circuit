@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080b18" />
-  <meta name="description" content="GEARSTORM: Boss Circuit v2.5, une campagne boss rush 2D originale en six actes, avec histoire, Codex et contrats de maîtrise." />
+  <meta name="description" content="GEARSTORM: Boss Circuit v2.6, une campagne boss rush 2D originale en six actes et une Forge de 24 machines supplémentaires." />
   <meta name="application-name" content="GEARSTORM" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,15 +12,15 @@
   <meta name="apple-mobile-web-app-title" content="GEARSTORM" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_FR" />
-  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.5" />
+  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.6" />
   <meta property="og:description" content="Riva Spark remonte la ligne fantôme M-0 et libère les six districts du Circuit." />
   <meta property="og:image" content="assets/gearstorm-key-art.png" />
   <meta property="og:image:alt" content="Riva Spark face aux machines du Circuit Voltério" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.5" />
-  <meta name="twitter:description" content="Six actes. Dix-huit phases. Dix-huit contrats de maîtrise." />
+  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.6" />
+  <meta name="twitter:description" content="Trente machines jouables. Quatre-vingt-dix phases. Campagne narrative et Forge d’entraînement." />
   <meta name="twitter:image" content="assets/gearstorm-key-art.png" />
-  <title>GEARSTORM: Boss Circuit v2.5</title>
+  <title>GEARSTORM: Boss Circuit v2.6</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="assets/gearstorm-icon.svg" />
   <link rel="apple-touch-icon" href="assets/gearstorm-icon-192.png" />
@@ -53,15 +53,15 @@
         </figure>
         <div class="panel hero-panel">
           <div class="release-line">
-            <p class="eyebrow">ÉDITION NARRATIVE // V2.5</p>
+            <p class="eyebrow">ÉDITION FORGE // V2.6</p>
             <span class="release-status"><span aria-hidden="true"></span> Systèmes prêts</span>
           </div>
           <h1 id="game-title"><span>GEARSTORM</span><small>BOSS CIRCUIT</small></h1>
-          <p class="tagline">Riva Spark remonte six districts asservis, brise leurs machines-gardiennes et coupe l’émission de Cassian Voltério à sa source.</p>
+          <p class="tagline">Riva Spark libère les six districts du Circuit, puis éprouve vingt-quatre machines civiques réinventées dans la Forge.</p>
           <ul id="build-summary" class="build-summary" aria-label="Contenu de cette version">
-            <li><strong>6</strong><span>actes</span></li>
-            <li><strong>18</strong><span>phases</span></li>
-            <li><strong>18</strong><span>contrats</span></li>
+            <li><strong>30</strong><span>boss jouables</span></li>
+            <li><strong>90</strong><span>phases</span></li>
+            <li><strong>8</strong><span>familles Forge</span></li>
           </ul>
           <div id="campaign-recap" class="campaign-recap" aria-labelledby="campaign-recap-title">
             <span id="campaign-recap-title" class="recap-kicker">Opération en cours</span>
@@ -75,7 +75,8 @@
             </button>
             <button id="start-rush" class="primary launch-button" aria-controls="story-screen">Lancer un nouveau Circuit <span aria-hidden="true">→</span></button>
             <div class="menu-grid">
-              <button id="practice" aria-controls="boss-select-screen">Laboratoire des boss</button>
+              <button id="practice" aria-controls="boss-select-screen">Laboratoire campagne</button>
+              <button id="forge" data-gearstorm-mode="forge" aria-controls="boss-select-screen">Forge des 30 boss</button>
               <button id="codex" aria-controls="codex-screen">Codex du Circuit</button>
               <button id="how-to" aria-controls="how-screen">Commandes et règles</button>
               <button id="settings" aria-controls="settings-screen">Options et accessibilité</button>
@@ -149,13 +150,17 @@
       <div class="panel wide-panel">
         <div class="screen-heading">
           <div>
-            <p class="eyebrow">MODE ENTRAÎNEMENT</p>
-            <h2 id="boss-select-title">Laboratoire des boss</h2>
+            <p id="boss-select-eyebrow" class="eyebrow">MODE ENTRAÎNEMENT</p>
+            <h2 id="boss-select-title">Laboratoire &amp; Forge</h2>
           </div>
           <button class="back-button" data-back="title-screen">Retour</button>
         </div>
-        <p id="lab-progress" class="screen-progress" role="status" aria-live="polite">1 machine analysée sur 6 · Les dossiers se complètent dans le Codex.</p>
-        <div id="boss-grid" class="boss-grid" role="list" aria-label="Machines débloquées"></div>
+        <div class="boss-mode-tabs" role="group" aria-label="Catalogue de machines">
+          <button type="button" data-gearstorm-mode="practice">Campagne débloquée</button>
+          <button type="button" data-gearstorm-mode="forge">Forge complète · 30 boss</button>
+        </div>
+        <p id="lab-progress" class="screen-progress" role="status" aria-live="polite">1 machine analysée sur 6 · La Forge propose 24 simulations supplémentaires.</p>
+        <div id="boss-grid" class="boss-grid" role="group" aria-label="Machines débloquées"></div>
       </div>
     </section>
 
@@ -510,6 +515,8 @@
   </main>
 
   <script src="story.js"></script>
+  <script src="expansion-story.js"></script>
+  <script src="boss-roster.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

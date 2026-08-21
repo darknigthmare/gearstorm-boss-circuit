@@ -1,17 +1,35 @@
 import vm from 'node:vm';
 
-export const APP_RELEASE = '2.5.0';
+export const APP_RELEASE = '2.6.0';
 export const SAVE_SCHEMA_VERSION = 4;
 export const SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
 export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
 export const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
 export const STORY_SCHEMA_VERSION = 1;
 export const STORY_CONTENT_VERSION = '1.0.0';
-export const MASTERY_CONTRACT_COUNT = 18;
+export const EXPANSION_STORY_SCHEMA_VERSION = 1;
+export const EXPANSION_STORY_CONTENT_VERSION = '1.0.0';
+export const CAMPAIGN_BOSS_COUNT = 6;
+export const FORGE_BOSS_COUNT = 24;
+export const PLAYABLE_BOSS_COUNT = CAMPAIGN_BOSS_COUNT + FORGE_BOSS_COUNT;
+export const PHASE_COUNT = PLAYABLE_BOSS_COUNT * 3;
+export const STORY_MASTERY_CONTRACT_COUNT = 18;
+export const EXPANSION_MASTERY_CONTRACT_COUNT = 72;
+export const MASTERY_CONTRACT_COUNT = STORY_MASTERY_CONTRACT_COUNT + EXPANSION_MASTERY_CONTRACT_COUNT;
 export const DIST_BUDGET_BYTES = 24 * 1024 * 1024;
+
+export const CAMPAIGN_BOSS_IDS = Object.freeze(['rammer', 'kraken', 'drill', 'mantis', 'cyclotron', 'omega']);
+export const FORGE_BOSS_IDS = Object.freeze([
+  'bastion-ricochet', 'hydraulic-warden', 'hive-foreman', 'echo-fencer', 'breaker-array', 'vertical-verdict',
+  'rail-tyrant', 'triplex-hunter', 'ground-eater', 'floodline-leviathan', 'centrifuge-zero', 'tempest-regulator',
+  'ascension-frame', 'counterforge', 'carrier-cathedral', 'twin-governors', 'loadout-reactor', 'orbital-famine',
+  'logic-crucible', 'vector-vault', 'skyborne-battery', 'endurance-engine', 'adaptive-archivist', 'null-crown',
+]);
+export const PLAYABLE_BOSS_IDS = Object.freeze([...CAMPAIGN_BOSS_IDS, ...FORGE_BOSS_IDS]);
 
 export const REQUIRED_UI_IDS = Object.freeze([
   'continue-run',
+  'forge',
   'codex',
   'codex-screen',
   'codex-grid',
@@ -54,6 +72,9 @@ export const REQUIRED_GAME_SYSTEMS = Object.freeze([
   'MASTERY_CONTRACT_IDS',
   'HERO_RIG',
   'BOSS_RIGS',
+  'BOSS_REGISTRY',
+  'EXPANSION_STORY',
+  'launchForgeBoss',
   'drawRigPart',
   'getRigDiagnostics',
 ]);
@@ -75,7 +96,7 @@ function htmlIds(html) {
 export function validateStoryContract(storySource) {
   invariant(typeof storySource === 'string' && storySource.length > 1_000, 'Source narrative story.js absente ou incomplete.');
   invariant(!/^\s*(?:import|export)\s/m.test(storySource), 'story.js doit rester un script classique charge avant game.js.');
-  invariant(!/\b(?:document|window|localStorage)\b/.test(storySource), 'story.js doit rester declaratif et independant du DOM.');
+  invariant(!/(?:document|window|localStorage)\s*(?:\.|\[)/.test(storySource), 'story.js doit rester declaratif et independant du DOM.');
 
   const context = vm.createContext({});
   new vm.Script(storySource, { filename: 'story.js' }).runInContext(context, { timeout: 1_000 });
@@ -85,7 +106,7 @@ export function validateStoryContract(storySource) {
   invariant(story.contentVersion === STORY_CONTENT_VERSION, `Contenu narratif ${STORY_CONTENT_VERSION} attendu.`);
   invariant(Object.isFrozen(story), 'Le registre narratif public doit etre immuable.');
 
-  const expectedBosses = ['rammer', 'kraken', 'drill', 'mantis', 'cyclotron', 'omega'];
+  const expectedBosses = CAMPAIGN_BOSS_IDS;
   invariant(Array.isArray(story.bossOrder) && story.bossOrder.join(',') === expectedBosses.join(','), 'Ordre narratif des six boss invalide.');
   invariant(Array.isArray(story.acts) && story.acts.length === expectedBosses.length, 'Les six actes narratifs sont requis.');
   invariant(story.intro?.lines?.length >= 3 && story.prologue?.lines?.length >= 3 && story.epilogue?.lines?.length >= 3, 'Introduction, prologue et epilogue complets requis.');
@@ -94,32 +115,109 @@ export function validateStoryContract(storySource) {
   invariant(expectedBosses.every(bossId => Object.keys(story.combatLabels?.[bossId] || {}).length >= 3), 'Libelles de combat incomplets pour les six boss.');
 
   const contracts = expectedBosses.flatMap(bossId => story.masteryContracts?.[bossId] || []);
-  invariant(contracts.length === MASTERY_CONTRACT_COUNT, `${MASTERY_CONTRACT_COUNT} contrats de maitrise requis.`);
-  invariant(new Set(contracts.map(contract => contract.id)).size === MASTERY_CONTRACT_COUNT, 'Identifiants de contrats de maitrise dupliques.');
+  invariant(contracts.length === STORY_MASTERY_CONTRACT_COUNT, `${STORY_MASTERY_CONTRACT_COUNT} contrats de maitrise campagne requis.`);
+  invariant(new Set(contracts.map(contract => contract.id)).size === STORY_MASTERY_CONTRACT_COUNT, 'Identifiants de contrats de maitrise campagne dupliques.');
   invariant(contracts.every(contract => typeof contract.metric === 'string' && ['number', 'string'].includes(typeof contract.target)), 'Contrat de maitrise incomplet.');
 
   return {
     storySchemaVersion: story.schemaVersion,
     storyContentVersion: story.contentVersion,
-    acts: story.acts.length,
-    masteryContracts: contracts.length,
+    campaignBosses: story.acts.length,
+    storyMasteryContracts: contracts.length,
   };
 }
 
-export function validateApplicationContract({ game, story, html, manifest, packageJson }) {
+export function validateExpansionStoryContract(expansionStorySource) {
+  invariant(typeof expansionStorySource === 'string' && expansionStorySource.length > 5_000, 'Source narrative expansion-story.js absente ou incomplete.');
+  invariant(!/^\s*(?:import|export)\s/m.test(expansionStorySource), 'expansion-story.js doit rester un script classique charge avant game.js.');
+  invariant(!/(?:document|window|localStorage)\s*(?:\.|\[)/.test(expansionStorySource), 'expansion-story.js doit rester declaratif et independant du DOM.');
+
+  const context = vm.createContext({});
+  new vm.Script(expansionStorySource, { filename: 'expansion-story.js' }).runInContext(context, { timeout: 1_000 });
+  const expansion = context.GEARSTORM_EXPANSION_STORY;
+  invariant(expansion && typeof expansion === 'object', 'globalThis.GEARSTORM_EXPANSION_STORY absent.');
+  invariant(expansion.schemaVersion === EXPANSION_STORY_SCHEMA_VERSION, 'Schema narratif Forge ' + EXPANSION_STORY_SCHEMA_VERSION + ' attendu.');
+  invariant(expansion.contentVersion === EXPANSION_STORY_CONTENT_VERSION, 'Contenu narratif Forge ' + EXPANSION_STORY_CONTENT_VERSION + ' attendu.');
+  invariant(expansion.runtimeIntegrated === true, 'Le contenu Forge doit etre marque integre au runtime.');
+  invariant(Object.isFrozen(expansion), 'Le registre narratif Forge public doit etre immuable.');
+
+  const bosses = Array.from(expansion.bosses || []);
+  invariant(bosses.length === FORGE_BOSS_COUNT, FORGE_BOSS_COUNT + ' boss Forge narratifs requis.');
+  invariant(bosses.map(boss => boss.id).join(',') === FORGE_BOSS_IDS.join(','), 'Ordre narratif des 24 boss Forge invalide.');
+  invariant(bosses.every(boss => Array.isArray(boss.phaseTitles) && boss.phaseTitles.length === 3), 'Trois titres de phase sont requis pour chaque boss Forge.');
+
+  const contracts = bosses.flatMap(boss => Array.from(boss.masteryContracts || []));
+  invariant(contracts.length === EXPANSION_MASTERY_CONTRACT_COUNT, EXPANSION_MASTERY_CONTRACT_COUNT + ' contrats Forge requis.');
+  invariant(new Set(contracts.map(contract => contract.id)).size === EXPANSION_MASTERY_CONTRACT_COUNT, 'Identifiants de contrats Forge dupliques.');
+  invariant(typeof expansion.getBossById === 'function' && typeof expansion.getMasteryContracts === 'function', 'Helpers narratifs Forge absents.');
+
+  return {
+    expansionStorySchemaVersion: expansion.schemaVersion,
+    expansionStoryContentVersion: expansion.contentVersion,
+    forgeBosses: bosses.length,
+    expansionMasteryContracts: contracts.length,
+  };
+}
+
+export function validateBossRosterContract(bossRosterSource) {
+  invariant(typeof bossRosterSource === 'string' && bossRosterSource.length > 5_000, 'Source boss-roster.js absente ou incomplete.');
+  invariant(!/^\s*(?:import|export)\s/m.test(bossRosterSource), 'boss-roster.js doit rester un script classique charge avant game.js.');
+
+  const context = vm.createContext({});
+  new vm.Script(bossRosterSource, { filename: 'boss-roster.js' }).runInContext(context, { timeout: 1_000 });
+  const roster = context.GEARSTORM_BOSS_ROSTER;
+  invariant(roster && typeof roster === 'object', 'globalThis.GEARSTORM_BOSS_ROSTER absent.');
+  invariant(roster.schemaVersion === 1, 'Schema du roster boss 1 attendu.');
+  invariant(Object.isFrozen(roster), 'Le roster boss public doit etre immuable.');
+
+  const bosses = Array.from(roster.all || []);
+  invariant(bosses.length === PLAYABLE_BOSS_COUNT, PLAYABLE_BOSS_COUNT + ' boss jouables requis.');
+  invariant(bosses.map(boss => boss.id).join(',') === PLAYABLE_BOSS_IDS.join(','), 'Ordre des 30 boss jouables invalide.');
+  invariant(Array.from(roster.campaign?.() || []).length === CAMPAIGN_BOSS_COUNT, 'Six boss campagne requis.');
+  const expanded = Array.from(roster.expanded?.() || []);
+  invariant(expanded.length === FORGE_BOSS_COUNT, 'Vingt-quatre boss Forge requis.');
+  invariant(bosses.every(boss => Array.isArray(boss.phases) && boss.phases.length === 3), 'Trois phases jouables sont requises par boss.');
+  invariant(bosses.reduce((total, boss) => total + boss.phases.length, 0) === PHASE_COUNT, PHASE_COUNT + ' phases jouables requises.');
+  invariant(expanded.every(boss => boss.status === 'forge-playable' && boss.productionStatus !== 'planned'), 'Tous les boss Forge doivent etre en statut jouable.');
+  invariant(expanded.every(boss => boss.artPack?.status === 'generated' && boss.artPack.bundleId), 'Chaque boss Forge doit utiliser son sprite genere.');
+  invariant(expanded.every(boss => boss.codex?.releaseEligible === true), 'Chaque entree Codex Forge doit etre publiable.');
+  invariant(typeof roster.createRuntime === 'function' && expanded.every(boss => roster.createRuntime(boss.id)?.id === boss.id), 'Runtime partage Forge incomplet.');
+  invariant(roster.resolveLaunchMode?.('forge') === 'forge', 'Mode de lancement Forge absent.');
+  invariant(roster.validate?.().valid === true, 'Le roster boss refuse son propre contrat de validation.');
+
+  return {
+    playableBosses: bosses.length,
+    playablePhases: PHASE_COUNT,
+  };
+}
+
+export function validateApplicationContract({ game, story, expansionStory, bossRoster, html, manifest, packageJson }) {
   invariant(packageJson?.version === APP_RELEASE, `Version application ${APP_RELEASE} attendue.`);
   invariant(typeof game === 'string' && typeof story === 'string' && typeof html === 'string', 'Sources game.js, story.js et index.html requises.');
   const storyContract = validateStoryContract(story);
+  const hasForgeSources = typeof expansionStory === 'string' || typeof bossRoster === 'string';
+  invariant(!hasForgeSources || (typeof expansionStory === 'string' && typeof bossRoster === 'string'), 'expansion-story.js et boss-roster.js doivent etre valides ensemble.');
+  const expansionStoryContract = hasForgeSources ? validateExpansionStoryContract(expansionStory) : {};
+  const bossRosterContract = hasForgeSources ? validateBossRosterContract(bossRoster) : {};
 
   const ids = htmlIds(html);
-  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.5 : #${id} absent.`);
+  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.6 : #${id} absent.`);
   const domReferences = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   for (const id of domReferences) invariant(ids.has(id), `Contrat DOM : #${id} reference par game.js mais absent.`);
 
   const storyTag = html.search(/<script\s+src=["']story\.js["'][^>]*><\/script>/i);
+  const expansionStoryTag = html.search(/<script\s+src=["']expansion-story\.js["'][^>]*><\/script>/i);
+  const bossRosterTag = html.search(/<script\s+src=["']boss-roster\.js["'][^>]*><\/script>/i);
   const gameTag = html.search(/<script\s+src=["']game\.js["'][^>]*><\/script>/i);
   invariant(storyTag >= 0 && gameTag > storyTag, 'story.js doit etre charge avant game.js.');
+  if (hasForgeSources) {
+    invariant(expansionStoryTag > storyTag && bossRosterTag > expansionStoryTag && gameTag > bossRosterTag, 'Ordre shell requis : story, expansion-story, boss-roster, game.');
+  }
   invariant(/globalThis\.GEARSTORM_STORY/.test(game), 'Le moteur doit exiger le registre narratif global.');
+  if (hasForgeSources) {
+    invariant(/globalThis\.GEARSTORM_BOSS_ROSTER/.test(game), 'Le moteur doit charger le roster boss global.');
+    invariant(/globalThis\.GEARSTORM_EXPANSION_STORY/.test(game), 'Le moteur doit charger le registre narratif Forge global.');
+  }
 
   invariant(new RegExp(`const\\s+SAVE_KEY\\s*=\\s*["']${escapeRegExp(SAVE_KEY)}["']`).test(game), `Sauvegarde v${SAVE_SCHEMA_VERSION} absente.`);
   invariant(new RegExp(`const\\s+PREVIOUS_SAVE_KEY\\s*=\\s*["']${escapeRegExp(PREVIOUS_SAVE_KEY)}["']`).test(game), 'Cle de migration v3 absente.');
@@ -133,7 +231,7 @@ export function validateApplicationContract({ game, story, html, manifest, packa
   invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v4.');
 
   for (const marker of REQUIRED_GAME_SYSTEMS) {
-    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.5 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.6 absent : ${marker}.`);
   }
 
   invariant(/new URLSearchParams\(location\.search\)/.test(game), 'Le routeur de lancement doit lire la query string.');
@@ -142,10 +240,10 @@ export function validateApplicationContract({ game, story, html, manifest, packa
   const routeBlock = game.slice(game.indexOf('function routeLaunchMode'), game.indexOf('function applySettings'));
   invariant(!/startRun|startFight|unlockAudio/.test(routeBlock), 'Un raccourci PWA ne doit pas demarrer combat ou audio sans geste utilisateur.');
   const shortcuts = new Set((manifest?.shortcuts || []).map(shortcut => shortcut.url));
-  for (const url of ['./?mode=rush', './?mode=practice']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
+  for (const url of ['./?mode=rush', './?mode=practice', './?mode=forge']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
 
-  invariant(html.includes('GEARSTORM: Boss Circuit v2.5'), 'Metadonnees HTML v2.5 absentes.');
-  invariant(!/GEARSTORM: Boss Circuit v2\.[23]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
+  invariant(html.includes('GEARSTORM: Boss Circuit v2.6'), 'Metadonnees HTML v2.6 absentes.');
+  invariant(!/GEARSTORM: Boss Circuit v2\.[2-5]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
   invariant(/qaAllowed[\s\S]+__GEARSTORM_QA__/.test(game), 'Surface QA locale absente ou non protegee.');
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
   for (const field of ['phaseCounts', 'hitbox', 'weakPoint', 'feetLocalY', 'muzzle', 'transitionExplosionOnly']) {
@@ -153,7 +251,7 @@ export function validateApplicationContract({ game, story, html, manifest, packa
   }
   const qaBlock = game.slice(game.indexOf("Object.defineProperty(window, '__GEARSTORM_QA__'"));
   for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'setRigDebug', 'launchMode']) {
-    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.5 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.6 absent : ${marker}.`);
   }
 
   return {
@@ -162,5 +260,8 @@ export function validateApplicationContract({ game, story, html, manifest, packa
     uiIds: REQUIRED_UI_IDS.length,
     gameSystems: REQUIRED_GAME_SYSTEMS.length,
     ...storyContract,
+    ...expansionStoryContract,
+    ...bossRosterContract,
+    masteryContracts: STORY_MASTERY_CONTRACT_COUNT + (expansionStoryContract.expansionMasteryContracts || 0),
   };
 }

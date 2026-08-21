@@ -9,10 +9,11 @@
   const TAU = Math.PI * 2;
   const STORY = globalThis.GEARSTORM_STORY;
   if (!STORY || !Array.isArray(STORY.acts) || STORY.acts.length !== 6) throw new Error('Registre narratif GEARSTORM indisponible.');
+  const EXPANSION_STORY = globalThis.GEARSTORM_EXPANSION_STORY || null;
   const MASTERY_CONTRACT_IDS = new Set(Object.values(STORY.masteryContracts).flat().map(contract => contract.id));
   const STORY_SCENE_IDS = new Set([STORY.intro.id, STORY.prologue.id, ...STORY.acts.map(act => act.id), STORY.epilogue.id]);
 
-  const BOSSES = [
+  const LEGACY_BOSSES = [
     {
       id: 'rammer',
       name: 'RIVET REX',
@@ -86,13 +87,16 @@
       transmission: 'La Couronne est brisée. Le Circuit Voltério appartient de nouveau à ceux qui y vivent.'
     }
   ];
+  const BOSS_REGISTRY = globalThis.GEARSTORM_BOSS_ROSTER || null;
+  const BOSSES = BOSS_REGISTRY?.list?.() || LEGACY_BOSSES;
+  const CAMPAIGN_BOSSES = BOSS_REGISTRY?.campaign?.() || LEGACY_BOSSES;
+  const LEGACY_BOSS_IDS = new Set(BOSS_REGISTRY?.legacyIds || LEGACY_BOSSES.map(entry => entry.id));
 
   const DIFFICULTIES = {
     casual: { enemySpeed: 0.82, bossHealth: 0.86, playerHealth: 8, scoreMultiplier: 0.82, parMultiplier: 1.18, name: 'Pilote' },
     standard: { enemySpeed: 1, bossHealth: 1, playerHealth: 6, scoreMultiplier: 1, parMultiplier: 1, name: 'Ingénieur' },
     overdrive: { enemySpeed: 1.18, bossHealth: 1.18, playerHealth: 5, scoreMultiplier: 1.32, parMultiplier: 0.9, name: 'Overdrive' }
   };
-  const BOSS_PAR_TIMES = [44, 52, 58, 54, 66, 82];
   const RUSH_RETRY_PENALTY = 12;
   const RUSH_RETRY_SCORE_PENALTY = 750;
 
@@ -101,9 +105,9 @@
   const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
   const LEGACY_SAVE_KEY = 'geargrin_overdrive_save';
   const RANK_VALUES = Object.freeze({ C: 1, B: 2, A: 3, S: 4 });
-  const requestedLaunchMode = ['rush', 'practice'].includes(new URLSearchParams(location.search).get('mode'))
-    ? new URLSearchParams(location.search).get('mode')
-    : null;
+  const requestedModeValue = new URLSearchParams(location.search).get('mode');
+  const requestedLaunchMode = BOSS_REGISTRY?.resolveLaunchMode?.(requestedModeValue)
+    || (['rush', 'practice'].includes(requestedModeValue) ? requestedModeValue : null);
   const UPGRADES = [
     { id: 'rapid', maxStacks: 3, icon: 'electric-arcs', name: 'Cadence polarisée', description: 'Réduit de 22 % le délai entre deux tirs.', apply: build => { build.fireRate *= 0.78; } },
     { id: 'core', maxStacks: 2, icon: 'explosion-core', name: 'Noyau auxiliaire', description: 'Ajoute deux points de vie au prochain châssis.', apply: build => { build.maxHpBonus += 2; } },
@@ -167,6 +171,9 @@
   let save = loadSave();
   let state = 'menu';
   let runMode = 'rush';
+  let selectionMode = requestedLaunchMode === 'forge' ? 'forge' : 'practice';
+  let selectedPracticePhase = 1;
+  let selectedPracticeCheckpoint = 1;
   let currentBossIndex = 0;
   let currentBossStart = 0;
   let rushStart = 0;
@@ -208,6 +215,7 @@
   let currentBossHazardHits = Object.create(null);
   let currentBossPerfectCycles = Object.create(null);
   let currentBossCycleState = Object.create(null);
+  let currentForgeTelemetry = createForgeTelemetry();
 
   const keys = Object.create(null);
   const pressed = new Set();
@@ -256,7 +264,7 @@
   const storyArchiveProgress = document.querySelector('#story-archive-progress');
 
 
-  const ART_MANIFEST_URL = 'assets/generated/v2.5.0/asset-manifest.json';
+  const ART_MANIFEST_URL = 'assets/generated/v2.6.0/asset-manifest.json';
   const artLoader = document.querySelector('#art-loader');
   const artLoaderLabel = document.querySelector('#art-loader-label');
   const artLoaderProgress = document.querySelector('#art-loader-progress');
@@ -276,13 +284,11 @@
     initialPromise: null
   };
 
-  const RIVA_RENDER_SCALE = 1.18;
-  const RIVA_FOOT_OFFSET = 36 * (RIVA_RENDER_SCALE - 1);
+  const RIVA_RENDER_SCALE = 1;
+  const RIVA_FOOT_OFFSET = 0;
   const RIVA_MUZZLE = Object.freeze({ x: 45, y: -8 });
-  const RIVA_GENERATED_MUZZLE = Object.freeze({
-    x: RIVA_MUZZLE.x * RIVA_RENDER_SCALE,
-    y: RIVA_MUZZLE.y * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET
-  });
+  // Le bord droit alpha du firing-arm v4 donne le canon a x ~= 60.
+  const RIVA_GENERATED_MUZZLE = Object.freeze({ x: 60, y: -56 });
   const BOSS_WEAK_POINTS = Object.freeze({
     rammer: Object.freeze({ x: 20, y: -42, r: 30, part: 'core' }),
     kraken: Object.freeze({ x: 0, y: 5, r: 34, part: 'core' }),
@@ -308,14 +314,10 @@
   const HERO_RIG = Object.freeze({
     'dash-trail': rigPart('dash-trail', 1, [-46, 0], [209, 169], 0.27, [0, 51, 418, 287], 'trail'),
     'overload-halo': rigPart('overload-halo', 1, [0, -8], [182, 158], 0.3, [0, 6, 364, 309], 'halo'),
-    // Le torse porte deja le bras arriere. Cette piece OpenAI v3 est uniquement
-    // l'avant-bras de tir, ancre au coude et glisse sous le canon separe.
-    'arm-near': rigPart('arm-near', 1, [9, -7], [105, 203], 0.13, [79, 158, 339, 260], 'forearm'),
-    boots: rigPart('boots', 1, [0, 0], [183, 75], 0.126, [36, 66, 330, 361], 'feet'),
-    head: rigPart('head', 1, [0, -28], [280, 360], 0.15, [56, 70, 409, 418], 'head'),
-    legs: rigPart('legs', 1, [0, 0], [205, 45], 0.11, [53, 19, 348, 372], 'legs'),
-    'pulse-cannon': rigPart('pulse-cannon', 1, [8, -8], [80, 150], 0.11, [64, 55, 418, 237], 'weapon'),
-    torso: rigPart('torso', 1, [0, -28], [210, 100], 0.18, [57, 84, 339, 373], 'torso')
+    // Composite OpenAI v4 : un corps unique fixe les semelles au sol ; seul
+    // l'avant-bras/canon reste independant pour le recul au socket de tir.
+    'body-core': rigPart('body-core', 1, [0, 36], [209, 409], 0.3, [138, 9, 280, 409], 'body'),
+    'firing-arm': rigPart('firing-arm', 1, [16, -56], [70, 180], 0.135, [24, 119, 394, 298], 'weapon')
   });
 
   const BOSS_RIGS = Object.freeze({
@@ -608,15 +610,14 @@
 
   function heroArtReady() {
     const parts = artRuntime.manifest?.heroine?.parts;
-    const body = ['head', 'torso', 'legs', 'boots', 'arm-near', 'pulse-cannon'];
-    return !!parts && body.every(name => generatedImage(parts[name]));
+    return !!parts && ['body-core', 'firing-arm'].every(name => generatedImage(parts[name]));
   }
 
   function drawGeneratedPlayer() {
     const parts = artRuntime.manifest?.heroine?.parts;
     if (!heroArtReady()) return false;
     ctx.save();
-    // Agrandissement autour du point de contact au sol : la hitbox reste inchangée.
+    // Le pivot du body-core est sa semelle : local y=36 reste exactement au sol.
     ctx.translate(0, -RIVA_FOOT_OFFSET);
     ctx.scale(RIVA_RENDER_SCALE, RIVA_RENDER_SCALE);
     const gait = player.onGround ? Math.sin(player.anim) : 0;
@@ -640,22 +641,12 @@
       ? 'drop-shadow(0px 3px 2px rgba(0,0,0,1)) drop-shadow(0px 0px 4px rgba(255,255,255,0.9))'
       : 'drop-shadow(0px 3px 2px rgba(0,0,0,0.96)) drop-shadow(0px 0px 3px rgba(102,235,255,0.44))';
     ctx.rotate((player.dashTime > 0 ? -0.11 : 0) + airborne * 0.065);
-    drawRigPart(parts.legs, HERO_RIG.legs, {
-      rotation: gait * 0.025 * speedPose
+    drawRigPart(parts['body-core'], HERO_RIG['body-core'], {
+      rotation: gait * 0.008 * speedPose - airborne * 0.018
     });
-    drawRigPart(parts.boots, HERO_RIG.boots);
-    drawRigPart(parts.torso, HERO_RIG.torso, {
-      rotation: -gait * 0.012 * speedPose
-    });
-    drawRigPart(parts.head, HERO_RIG.head, {
-      rotation: -airborne * 0.035
-    });
-    drawRigPart(parts['arm-near'], HERO_RIG['arm-near'], {
-      rotation: gait * 0.025 * speedPose - firing * 0.018
-    });
-    drawRigPart(parts['pulse-cannon'], HERO_RIG['pulse-cannon'], {
-      x: firing ? -3 : 0,
-      rotation: firing ? -0.018 : 0
+    drawRigPart(parts['firing-arm'], HERO_RIG['firing-arm'], {
+      x: firing ? -2.5 : 0,
+      rotation: gait * 0.012 * speedPose - firing * 0.022
     });
     ctx.restore();
     ctx.restore();
@@ -694,9 +685,57 @@
   }
 
   function drawGeneratedBoss() {
-    const rig = BOSS_RIGS[boss?.data?.id];
     const parts = artRuntime.manifest?.bosses?.[boss?.data?.id]?.parts;
-    if (!rig || !parts) return false;
+    if (!parts) return false;
+    if (isExpandedBoss()) {
+      const sprite = generatedImage(parts.sprite);
+      if (!sprite) return false;
+      const size = clamp(Math.max(boss.w, boss.h) * 1.18, 220, 250);
+      const transitioning = boss.state === 'phaseTransition';
+      const duration = save.settings.reduceMotion ? 0.65 : 1.15;
+      const progress = transitioning ? clamp(boss.stateTime / duration, 0, 1) : 0;
+      const burst = transitioning ? Math.sin(progress * Math.PI) : 0;
+      ctx.save();
+      ctx.filter = boss.hitFlash > 0
+        ? 'brightness(2.2) saturate(0.3) drop-shadow(0px 5px 3px rgba(0,0,0,0.92))'
+        : 'drop-shadow(0px 6px 4px rgba(0,0,0,0.94)) drop-shadow(0px 0px 4px rgba(255,255,255,0.18))';
+      if (transitioning && !save.settings.reduceMotion) {
+        for (let index = 0; index < 4; index++) {
+          const angle = index / 4 * TAU + progress * 0.45;
+          ctx.save();
+          ctx.globalAlpha = 0.12 * burst;
+          ctx.translate(Math.cos(angle) * burst * 18, Math.sin(angle) * burst * 14);
+          ctx.rotate(Math.sin(angle) * burst * 0.035);
+          ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
+          ctx.restore();
+        }
+      }
+      ctx.globalAlpha = transitioning ? 0.84 + (1 - burst) * 0.16 : 1;
+      ctx.scale(1 + burst * 0.09, 1 + burst * 0.09);
+      ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
+      ctx.restore();
+
+      // Les marqueurs restent cales sur les vraies hitboxes, meme avec le sprite composite.
+      for (const part of boss.runtime?.parts || []) {
+        if (part.role === 'armor' || part.role === 'weak-point' || part.destroyed) continue;
+        const x = part.hitbox?.x ?? part.anchor?.x ?? 0;
+        const y = part.hitbox?.y ?? part.anchor?.y ?? 0;
+        const radius = part.hitbox?.r || 20;
+        ctx.save();
+        ctx.strokeStyle = part.state === 'damaged' ? '#ffd0d8' : boss.data.accent;
+        ctx.fillStyle = part.state === 'damaged' ? 'rgba(139,84,98,0.32)' : 'rgba(8,15,28,0.24)';
+        ctx.lineWidth = save.settings.highContrast ? 5 : 3;
+        ctx.beginPath();
+        ctx.rect(x - radius, y - radius, radius * 2, radius * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+      return true;
+    }
+
+    const rig = BOSS_RIGS[boss?.data?.id];
+    if (!rig) return false;
     const active = rig.parts.filter(spec => spec.phase <= boss.phase);
     if (!active.every(spec => generatedImage(parts[spec.name]))) return false;
     ctx.save();
@@ -712,10 +751,19 @@
   }
 
   function drawGeneratedBossPreview(data) {
-    const rig = BOSS_RIGS[data.id];
     const parts = artRuntime.manifest?.bosses?.[data.id]?.parts;
-    if (!rig || !parts) return false;
     void preloadGeneratedBossBundle(data.id);
+    if (data.engine === 'expanded') {
+      const sprite = generatedImage(parts?.sprite);
+      if (!sprite) return false;
+      ctx.save();
+      ctx.filter = 'drop-shadow(0px 6px 4px rgba(0,0,0,0.95))';
+      ctx.drawImage(sprite, -75, -75, 150, 150);
+      ctx.restore();
+      return true;
+    }
+    const rig = BOSS_RIGS[data.id];
+    if (!rig || !parts) return false;
     const active = rig.parts.filter(spec => spec.phase === 1);
     if (!active.every(spec => generatedImage(parts[spec.name]))) return false;
     ctx.save();
@@ -740,8 +788,8 @@
 
   function getRigDiagnostics() {
     const bodyParts = Object.values(HERO_RIG).filter(spec => !['trail', 'halo'].includes(spec.motion));
-    const boots = HERO_RIG.boots;
-    const feetLocalY = boots.joint[1] + (boots.bbox[3] - boots.pivot[1]) * boots.scale;
+    const bodyCore = HERO_RIG['body-core'];
+    const feetLocalY = bodyCore.joint[1] + (bodyCore.bbox[3] - bodyCore.pivot[1]) * bodyCore.scale;
     const bossHitboxes = {
       rammer: [190, 160], kraken: [190, 160], drill: [190, 160],
       mantis: [190, 160], cyclotron: [230, 160], omega: [190, 220]
@@ -762,6 +810,24 @@
         transitionExplosionOnly: true
       };
     }
+    for (const entry of BOSS_REGISTRY?.expanded?.() || []) {
+      const spriteEntry = artRuntime.manifest?.bosses?.[entry.id]?.parts?.sprite;
+      const weak = entry.weakPoint;
+      bosses[entry.id] = {
+        parts: entry.parts.length,
+        phaseCounts: [1, 2, 3].map(phase => entry.parts.filter(part => part.appearsInPhase <= phase).length),
+        phase1Bounds: null,
+        hitbox: { width: entry.hitbox.w, height: entry.hitbox.h },
+        corePart: weak.part,
+        coreVisualTarget: { x: weak.x, y: weak.y },
+        weakPoint: { x: weak.x, y: weak.y, radius: weak.r },
+        corePivotMeasured: null,
+        generatedSpriteManifest: Boolean(spriteEntry?.src),
+        generatedSpriteLoaded: Boolean(generatedImage(spriteEntry)),
+        proceduralFallback: true,
+        transitionExplosionOnly: true
+      };
+    }
     return {
       heroine: {
         parts: Object.keys(HERO_RIG).length,
@@ -772,7 +838,7 @@
         renderedFeetLocalY: Math.round((feetLocalY * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET) * 10) / 10,
         muzzle: { ...RIVA_MUZZLE },
         renderedMuzzle: { ...RIVA_GENERATED_MUZZLE },
-        visibleArmSources: Object.freeze({ rearArm: 'torso', firingForearm: 'arm-near:openai-v3', cannon: 'pulse-cannon', excluded: 'arm-far' }),
+        visibleArmSources: Object.freeze({ body: 'body-core:openai-v4', firingArm: 'firing-arm:openai-v4', excluded: 'head,torso,legs,boots,arm-near,pulse-cannon,arm-far' }),
         facingMirroredAtRoot: true
       },
       bosses
@@ -850,7 +916,7 @@
   function sanitizeRushSnapshot(value) {
     if (!value || typeof value !== 'object') return null;
     const bossIndex = Math.floor(Number(value.bossIndex));
-    if (!Number.isFinite(bossIndex) || bossIndex < 0 || bossIndex >= BOSSES.length) return null;
+    if (!Number.isFinite(bossIndex) || bossIndex < 0 || bossIndex >= CAMPAIGN_BOSSES.length) return null;
     const counts = new Map();
     const installed = [];
     for (const rawId of Array.isArray(value.installed) ? value.installed : []) {
@@ -867,7 +933,7 @@
       version: 2,
       bossIndex,
       checkpoint,
-      pendingUpgrade: checkpoint !== 'fight' && bossIndex < BOSSES.length - 1,
+      pendingUpgrade: checkpoint !== 'fight' && bossIndex < CAMPAIGN_BOSSES.length - 1,
       score: Math.max(0, Math.floor(Number(value.score) || 0)),
       rushElapsedBeforeBoss: Math.max(0, Number(value.rushElapsedBeforeBoss) || 0),
       rushRetryPenalty: Math.max(0, Number(value.rushRetryPenalty) || 0),
@@ -888,7 +954,7 @@
       if (!raw) return structuredClone(DEFAULT_SAVE);
       const parsed = JSON.parse(raw);
       const safe = structuredClone(DEFAULT_SAVE);
-      safe.unlocked = Math.floor(clamp(Number(parsed?.unlocked) || 1, 1, BOSSES.length));
+      safe.unlocked = Math.floor(clamp(Number(parsed?.unlocked) || 1, 1, CAMPAIGN_BOSSES.length));
       safe.bestRush = Number.isFinite(parsed?.bestRush) && parsed.bestRush > 0 ? parsed.bestRush : null;
       safe.completed = parsed?.completed === true;
       safe.bestTimes = {};
@@ -903,19 +969,19 @@
         ? parsed.codexUnlocked.filter(id => BOSSES.some(entry => entry.id === id))
         : [];
       const migratedCodex = parsed?.completed === true
-        ? BOSSES.map(entry => entry.id)
-        : BOSSES.slice(0, Math.max(0, safe.unlocked - 1)).map(entry => entry.id);
+        ? CAMPAIGN_BOSSES.map(entry => entry.id)
+        : CAMPAIGN_BOSSES.slice(0, Math.max(0, safe.unlocked - 1)).map(entry => entry.id);
       safe.codexUnlocked = [...new Set([...explicitCodex, ...migratedCodex])];
       safe.rushSnapshot = sanitizeRushSnapshot(parsed?.rushSnapshot);
       const explicitCampaign = Array.isArray(parsed?.campaignCleared)
-        ? parsed.campaignCleared.filter(id => BOSSES.some(entry => entry.id === id))
+        ? parsed.campaignCleared.filter(id => LEGACY_BOSS_IDS.has(id))
         : [];
       const inferredCampaignCount = safe.completed
-        ? BOSSES.length
+        ? CAMPAIGN_BOSSES.length
         : safe.rushSnapshot
-          ? Math.min(BOSSES.length, safe.rushSnapshot.bossIndex + (safe.rushSnapshot.checkpoint === 'fight' ? 0 : 1))
+          ? Math.min(CAMPAIGN_BOSSES.length, safe.rushSnapshot.bossIndex + (safe.rushSnapshot.checkpoint === 'fight' ? 0 : 1))
           : 0;
-      safe.campaignCleared = [...new Set([...explicitCampaign, ...BOSSES.slice(0, inferredCampaignCount).map(entry => entry.id)])];
+      safe.campaignCleared = [...new Set([...explicitCampaign, ...CAMPAIGN_BOSSES.slice(0, inferredCampaignCount).map(entry => entry.id)])];
       const explicitStory = Array.isArray(parsed?.storySeen) ? parsed.storySeen.filter(id => STORY_SCENE_IDS.has(id)) : [];
       const inferredStory = safe.campaignCleared.length
         ? [STORY.intro.id, STORY.prologue.id, ...safe.campaignCleared.map(id => STORY.getActByBossId(id)?.id).filter(Boolean)]
@@ -924,7 +990,10 @@
       safe.storySeen = [...new Set([...explicitStory, ...inferredStory])];
       safe.mastery = {};
       for (const entry of BOSSES) {
-        const allowed = new Set(STORY.getMasteryContracts(entry.id).map(contract => contract.id));
+        const contracts = LEGACY_BOSS_IDS.has(entry.id)
+          ? STORY.getMasteryContracts(entry.id)
+          : EXPANSION_STORY?.getMasteryContracts?.(entry.id) || entry.masteryContracts || [];
+        const allowed = new Set(contracts.map(contract => contract.id));
         const earned = Array.isArray(parsed?.mastery?.[entry.id]) ? parsed.mastery[entry.id] : [];
         safe.mastery[entry.id] = [...new Set(earned.filter(id => allowed.has(id)))];
       }
@@ -1002,7 +1071,7 @@
     const labels = {
       fight: ['Reprendre le Rush', 'Reprendre au début de MACHINE ' + machine],
       interlude: ['Continuer l’histoire', 'Lire la transmission après MACHINE ' + machine],
-      upgrade: ['Continuer le Circuit', 'Choisir le module avant MACHINE ' + String(Math.min(BOSSES.length, snapshot.bossIndex + 2)).padStart(2, '0')]
+      upgrade: ['Continuer le Circuit', 'Choisir le module avant MACHINE ' + String(Math.min(CAMPAIGN_BOSSES.length, snapshot.bossIndex + 2)).padStart(2, '0')]
     };
     const [heading, copy] = labels[snapshot.checkpoint] || labels.fight;
     if (title) title.textContent = heading;
@@ -1157,14 +1226,14 @@
       status: act.civicFunction,
       location: act.district,
       storyKey: act.id,
-      continueLabel: index === BOSSES.length - 1 ? 'Reprendre la Couronne →' : 'Accéder à l’atelier →',
+      continueLabel: index === CAMPAIGN_BOSSES.length - 1 ? 'Reprendre la Couronne →' : 'Accéder à l’atelier →',
       consequence: act.restoration,
-      tone: index === BOSSES.length - 1 ? 'resolution' : 'district',
+      tone: index === CAMPAIGN_BOSSES.length - 1 ? 'resolution' : 'district',
       allowBack: false,
       onContinue: () => {
         markStorySeen(act.id);
         pendingStoryAction = null;
-        if (index === BOSSES.length - 1) showEnding();
+        if (index === CAMPAIGN_BOSSES.length - 1) showEnding();
         else {
           saveRushSnapshot({ checkpoint: 'upgrade' });
           showUpgradeSelection();
@@ -1228,13 +1297,13 @@
   }
 
   function syncCampaignUi() {
-    const liberated = save.campaignCleared.length;
-    const next = BOSSES.find(entry => !save.campaignCleared.includes(entry.id));
+    const liberated = save.campaignCleared.filter(id => LEGACY_BOSS_IDS.has(id)).length;
+    const next = CAMPAIGN_BOSSES.find(entry => !save.campaignCleared.includes(entry.id));
     const campaignProgress = document.querySelector('#campaign-progress');
     const campaignNext = document.querySelector('#campaign-next');
     const labProgress = document.querySelector('#lab-progress');
     const startButton = document.querySelector('#start-rush');
-    if (campaignProgress) campaignProgress.textContent = liberated + ' / ' + BOSSES.length + ' districts libérés';
+    if (campaignProgress) campaignProgress.textContent = liberated + ' / ' + CAMPAIGN_BOSSES.length + ' districts libérés';
     if (campaignNext) {
       campaignNext.textContent = next
         ? 'Prochaine cible : ' + next.arena + ' · ' + next.name
@@ -1243,7 +1312,7 @@
     if (startButton) startButton.firstChild.textContent = save.completed ? 'Rejouer le Circuit complet ' : 'Lancer un nouveau Circuit ';
     if (labProgress) {
       const files = save.codexUnlocked.length;
-      labProgress.textContent = save.unlocked + ' machine' + (save.unlocked > 1 ? 's' : '') + ' analysée' + (save.unlocked > 1 ? 's' : '') + ' sur ' + BOSSES.length + ' · ' + files + ' dossier' + (files > 1 ? 's' : '') + ' Codex.';
+      labProgress.textContent = save.unlocked + ' machine' + (save.unlocked > 1 ? 's' : '') + ' analysée' + (save.unlocked > 1 ? 's' : '') + ' sur ' + CAMPAIGN_BOSSES.length + ' · ' + BOSSES.length + ' profils Forge · ' + files + ' dossier' + (files > 1 ? 's' : '') + ' Codex.';
     }
   }
 
@@ -1251,15 +1320,15 @@
     const grid = document.querySelector('#codex-grid');
     const progress = document.querySelector('#codex-progress');
     const meter = document.querySelector('#codex-progress-meter');
-    const unlockedCount = save.codexUnlocked.length;
-    if (progress) progress.textContent = unlockedCount + ' / ' + BOSSES.length + ' machines identifiées';
+    const unlockedCount = save.codexUnlocked.filter(id => LEGACY_BOSS_IDS.has(id)).length;
+    if (progress) progress.textContent = unlockedCount + ' / ' + CAMPAIGN_BOSSES.length + ' machines identifiées';
     if (meter) {
-      meter.max = BOSSES.length;
+      meter.max = CAMPAIGN_BOSSES.length;
       meter.value = unlockedCount;
-      meter.textContent = unlockedCount + ' sur ' + BOSSES.length;
+      meter.textContent = unlockedCount + ' sur ' + CAMPAIGN_BOSSES.length;
     }
     if (grid) {
-      BOSSES.forEach((entry, index) => {
+      CAMPAIGN_BOSSES.forEach((entry, index) => {
         const card = grid.querySelector('[data-boss-id="' + entry.id + '"]');
         if (!card) return;
         const act = STORY.getActByOrder(index + 1);
@@ -1302,8 +1371,9 @@
       showIntroStory();
       return 'story-screen';
     }
-    if (requestedLaunchMode === 'practice') {
-      buildBossGrid();
+    if (requestedLaunchMode === 'practice' || requestedLaunchMode === 'forge') {
+      selectionMode = requestedLaunchMode;
+      buildBossGrid(selectionMode);
       showScreen('boss-select-screen');
       return 'boss-select-screen';
     }
@@ -1370,9 +1440,14 @@
 
   function syncCombatGuidance() {
     if (!player || !boss || state !== 'fight') return;
-    let objective = 'Survis au cycle et attends l’ouverture du noyau.';
-    if (boss.state === 'intro') objective = 'Analyse la machine et prépare ton premier déplacement.';
-    else if (boss.state === 'phaseTransition') objective = 'Transformation en cours · les projectiles sont neutralisés.';
+    const expansionStory = EXPANSION_STORY?.getBossById?.(boss.data.id);
+    let objective = expansionStory?.objective || 'Survis au cycle et attends l’ouverture du noyau.';
+    if (boss.state === 'intro') objective = expansionStory
+      ? expansionStory.shortIntro + ' · OBJECTIF · ' + expansionStory.objective
+      : 'Analyse la machine et prépare ton premier déplacement.';
+    else if (boss.state === 'phaseTransition' || boss.state === 'phaseEnter') objective = 'Transformation en cours · les projectiles sont neutralisés.';
+    else if (boss.state === 'telegraph') objective = 'TÉLÉGRAPHE · lis la forme et gagne la zone sûre.';
+    else if (boss.state === 'active' && boss.runtime) objective = boss.attackLabel + ' · progression ' + boss.runtime.mechanicProgress + '/' + boss.runtime.mechanicTarget + '.';
     else if (boss.vulnerable) objective = 'NOYAU OUVERT · concentre tirs et ruée sur la cible lumineuse.';
     else if (['slamTelegraph', 'crashTelegraph', 'dashTelegraph'].includes(boss.state)) objective = 'DANGER IMMINENT · quitte la zone marquée.';
     else if (boss.hidden) objective = 'Machine enfouie · repère le cercle d’éruption.';
@@ -1385,7 +1460,8 @@
       cyclotron: 'Reste mobile : les mines ferment progressivement l’arène.',
       omega: 'Traite chaque grille comme un rythme : observe, puis traverse.'
     };
-    let hint = bossHints[boss.data.id];
+    const family = boss.runtime?.family;
+    let hint = bossHints[boss.data.id] || BOSS_REGISTRY?.families?.[family]?.loop || boss.data.fairnessRule;
     if (player.overload >= 100 && player.overloadTime <= 0) hint = 'SURCHARGE PRÊTE · L / X pour amplifier les dégâts et dissiper les menaces.';
     else if (player.barrier > 0) hint = 'Égide active : ' + player.barrier + ' impact' + (player.barrier > 1 ? 's' : '') + ' absorbé' + (player.barrier > 1 ? 's' : '') + '.';
 
@@ -1438,29 +1514,55 @@
   function readFightClock() {
     return fightClockAccumulated + (fightClockRunning ? Math.max(0, wallNow() - fightClockStartedAt) : 0);
   }
-  function buildBossGrid() {
+  function buildBossGrid(mode = selectionMode) {
     const grid = document.getElementById('boss-grid');
+    if (!grid) return;
+    selectionMode = mode === 'forge' ? 'forge' : 'practice';
+    const forge = selectionMode === 'forge';
     grid.textContent = '';
-    BOSSES.forEach((entry, index) => {
-      const unlocked = index < save.unlocked;
+    const gridBosses = forge ? BOSSES : CAMPAIGN_BOSSES;
+    gridBosses.forEach((entry, visibleIndex) => {
+      const index = BOSSES.findIndex(candidate => candidate.id === entry.id);
+      const campaignEntry = LEGACY_BOSS_IDS.has(entry.id);
+      const unlocked = forge || visibleIndex < save.unlocked;
+      const expansionStory = campaignEntry ? null : EXPANSION_STORY?.getBossById?.(entry.id);
+      const intro = expansionStory?.shortIntro || entry.description;
+      const objective = expansionStory?.objective || entry.description;
+      const cardCopy = intro + (objective && objective !== intro ? ' OBJECTIF · ' + objective : '');
       const button = document.createElement('button');
       button.className = 'boss-card';
+      button.dataset.bossId = entry.id;
+      button.dataset.bossEngine = entry.engine || (campaignEntry ? 'legacy' : 'expanded');
       button.style.setProperty('--boss-color', entry.color);
       button.disabled = !unlocked;
-      button.innerHTML = `
-        <span>
-          <span class="boss-number">${unlocked ? `MACHINE ${String(index + 1).padStart(2, '0')}` : 'VERROUILLÉE'}</span>
-          <strong>${unlocked ? entry.name : 'SIGNATURE INCONNUE'}</strong>
-          <em>${unlocked ? entry.arena : 'Termine la machine précédente'}</em>
-        </span>
-        <span>
-          <small>${unlocked ? entry.description : 'Données chiffrées par Voltério.'}</small>
-          <span class="best">${unlocked ? `Meilleur temps : ${formatTime(save.bestTimes[entry.id])} · Rang ${save.bestRanks[entry.id] || '—'}` : ''}</span>
-        </span>`;
-      if (unlocked) button.addEventListener('click', () => startRun('practice', index));
+      const number = (forge ? 'FORGE ' : 'MACHINE ') + String(visibleIndex + 1).padStart(2, '0');
+      const status = forge && !campaignEntry ? ' · SIMULATION ACTIVE' : '';
+      button.setAttribute('aria-label', unlocked
+        ? number + ' · ' + entry.name + ' · ' + objective
+        : 'Machine ' + String(visibleIndex + 1).padStart(2, '0') + ' verrouillée');
+      button.innerHTML = '<span><span class="boss-number">' + (unlocked ? number + status : 'VERROUILLÉE') + '</span>'
+        + '<strong>' + (unlocked ? entry.name : 'SIGNATURE INCONNUE') + '</strong>'
+        + '<em>' + (unlocked ? entry.arena : 'Termine la machine précédente') + '</em></span>'
+        + '<span><small>' + (unlocked ? cardCopy : 'Données chiffrées par Voltério.') + '</small>'
+        + '<span class="best">' + (unlocked ? 'Meilleur temps : ' + formatTime(save.bestTimes[entry.id]) + ' · Rang ' + (save.bestRanks[entry.id] || '—') : '') + '</span></span>';
+      if (unlocked) button.addEventListener('click', () => startRun(forge ? 'forge' : 'practice', index));
       grid.appendChild(button);
     });
     syncCampaignUi();
+
+    const eyebrow = document.querySelector('#boss-select-eyebrow');
+    const title = document.querySelector('#boss-select-title');
+    const progress = document.querySelector('#boss-select-progress, #lab-progress');
+    if (eyebrow) eyebrow.textContent = forge ? 'FORGE ÉTENDUE // 30 MACHINES' : 'MODE ENTRAÎNEMENT // CAMPAGNE';
+    if (title) title.textContent = forge ? 'Forge intégrale' : 'Laboratoire de campagne';
+    if (progress) progress.textContent = forge
+      ? BOSSES.length + ' profils jouables · 6 machines historiques + ' + (BOSSES.length - CAMPAIGN_BOSSES.length) + ' simulations Forge avec art OpenAI v2.6.'
+      : Math.min(save.unlocked, CAMPAIGN_BOSSES.length) + ' / ' + CAMPAIGN_BOSSES.length + ' machines de campagne accessibles en entraînement.';
+    grid.setAttribute('aria-label', forge ? 'Forge complète des 30 boss' : 'Machines de campagne débloquées');
+    document.querySelectorAll('#boss-select-screen [data-gearstorm-mode]').forEach(tab => {
+      const tabMode = BOSS_REGISTRY?.resolveLaunchMode?.(tab.dataset.gearstormMode || tab.dataset.bossMode);
+      tab.setAttribute('aria-pressed', String(tabMode === selectionMode));
+    });
   }
 
   function difficulty() {
@@ -1510,19 +1612,22 @@
     };
   }
 
-  function createBoss(index) {
+  function createBoss(index, initialPhase = 1, checkpoint = 1) {
     const data = BOSSES[index];
     const maxHp = Math.round(data.hp * difficulty().bossHealth);
+    const phase = clamp(Math.floor(Number(initialPhase) || 1), 1, 3);
+    const startingHp = phase === 1 ? maxHp : phase === 2 ? Math.ceil(maxHp * 2 / 3) : Math.ceil(maxHp / 3);
+    const expanded = data.engine === 'expanded';
     return {
       data,
       x: 960,
       y: 330,
       vx: 0,
       vy: 0,
-      w: data.id === 'cyclotron' ? 230 : 190,
-      h: data.id === 'omega' ? 220 : 160,
+      w: data.hitbox?.w || (data.id === 'cyclotron' ? 230 : 190),
+      h: data.hitbox?.h || (data.id === 'omega' ? 220 : 160),
       maxHp,
-      hp: maxHp,
+      hp: startingHp,
       state: 'intro',
       stateTime: 0,
       totalTime: 0,
@@ -1538,13 +1643,15 @@
       attackLabel: 'INITIALISATION',
       direction: -1,
       rotation: 0,
-      phase: 1,
+      phase,
       dashHitCooldown: 0,
+      collisionEnabled: true,
+      runtime: expanded && BOSS_REGISTRY ? BOSS_REGISTRY.createRuntime(data.id, { phase, checkpoint, attempt: currentBossRetries }) : null,
       defeated: false
     };
   }
 
-  function startRun(mode, index = 0) {
+  function startRun(mode, index = 0, options = {}) {
     if (mode === 'rush' && sanitizeRushSnapshot(save.rushSnapshot)
       && !confirm('Un Circuit est déjà en cours. Lancer une nouvelle campagne remplacera ce point de reprise. Continuer ?')) {
       showScreen('title-screen');
@@ -1552,7 +1659,10 @@
       return false;
     }
     unlockAudio();
-    runMode = mode;
+    runMode = mode === 'forge' ? 'forge' : mode;
+    selectionMode = runMode === 'forge' ? 'forge' : 'practice';
+    selectedPracticePhase = runMode === 'rush' ? 1 : clamp(Math.floor(Number(options.phase) || 1), 1, 3);
+    selectedPracticeCheckpoint = runMode === 'rush' ? 1 : Math.max(1, Math.floor(Number(options.checkpoint) || 1));
     if (mode === 'rush') save.rushSnapshot = null;
     currentBossIndex = index;
     score = 0;
@@ -1569,7 +1679,7 @@
     return true;
   }
 
-  function startFight(index, { retry = false } = {}) {
+  function startFight(index, { retry = false, phase = selectedPracticePhase, checkpoint = selectedPracticeCheckpoint } = {}) {
     currentBossIndex = index;
     if (retry) score = scoreAtBossStart;
     else {
@@ -1583,6 +1693,7 @@
     currentBossHazardHits = Object.create(null);
     currentBossPerfectCycles = Object.create(null);
     currentBossCycleState = Object.create(null);
+    currentForgeTelemetry = createForgeTelemetry();
     hideRadioExchange();
     combo = 0;
     comboTimer = 0;
@@ -1590,7 +1701,7 @@
     resetFightClock();
     resetWorld();
     player = createPlayer();
-    boss = createBoss(index);
+    boss = createBoss(index, runMode === 'rush' ? 1 : phase, checkpoint);
     void queueGeneratedArtForBoss(boss.data.id, true);
     currentBossStart = performance.now() / 1000;
     state = 'fight';
@@ -1604,8 +1715,8 @@
 
   function retryFight() {
     const penalized = runMode === 'rush';
+    currentBossRetries += 1;
     if (penalized) {
-      currentBossRetries += 1;
       runRetryCount += 1;
       rushRetryPenalty += RUSH_RETRY_PENALTY;
     }
@@ -1621,14 +1732,19 @@
   function configureIntro(retry = false) {
     const data = BOSSES[currentBossIndex];
     const act = runMode === 'rush' ? STORY.getActByOrder(currentBossIndex + 1) : null;
+    const expansionStory = data.engine === 'expanded' ? EXPANSION_STORY?.getBossById?.(data.id) : null;
+    const functionLabel = expansionStory?.civicFunction || act?.civicFunction || data.epithet || data.arena;
+    const briefing = expansionStory
+      ? expansionStory.shortIntro + ' · OBJECTIF — ' + expansionStory.objective
+      : act?.preFight?.map(line => line.speaker + ' — ' + line.text).join('  ·  ') || data.quote;
     document.getElementById('intro-index').textContent = data.arena + ' · MACHINE ' + String(currentBossIndex + 1).padStart(2, '0');
     document.getElementById('intro-name').textContent = data.name;
-    document.getElementById('intro-epithet').textContent = act?.civicFunction || data.epithet;
-    document.getElementById('intro-quote').textContent = act?.preFight?.map(line => line.speaker + ' — ' + line.text).join('  ·  ') || data.quote;
+    document.getElementById('intro-epithet').textContent = functionLabel;
+    document.getElementById('intro-quote').textContent = briefing;
     bossIntro.classList.add('visible');
     bossIntro.setAttribute('aria-hidden', 'false');
     introTimer = retry ? 1.25 : (matchMedia('(max-width: 820px)').matches ? 5.2 : 3.8);
-    announce(data.name + '. ' + (act?.civicFunction || data.epithet));
+    announce(data.name + '. ' + functionLabel);
   }
 
   function startMasteryCycle(kind) {
@@ -1778,6 +1894,469 @@
     sfx('overload');
   }
 
+  function createForgeTelemetry() {
+    return {
+      actions: new Set(),
+      actionSequence: [],
+      familyCompletions: Object.create(null),
+      perfectFamilyCycles: Object.create(null),
+      familyHits: Object.create(null),
+      partsDestroyed: new Set(),
+      uniquePartIds: new Set(),
+      destroyedByRole: Object.create(null),
+      firstWindowByRole: Object.create(null),
+      reflectionHits: 0,
+      reflectionStreak: 0,
+      maximumReflectionStreak: 0,
+      reflectionTargets: new Set(),
+      lurePresses: 0,
+      dashCounters: 0,
+      puzzlePerfectSequences: 0,
+      puzzleErrors: 0,
+      adaptations: new Set(),
+      laneHits: new Set(),
+      gravityQuadrants: new Set(),
+      openings: 0,
+      finalPhaseOpenings: 0,
+      minimumReservePercent: 100,
+      healsUsed: 0,
+      cycleStartDamage: 0,
+      cycleStartPuzzleErrors: 0,
+      lastMechanicFamily: null,
+      lastEnvironment: 'stable',
+      finish: null
+    };
+  }
+
+  function incrementForgeMetric(bucket, key, amount = 1) {
+    bucket[key] = (bucket[key] || 0) + amount;
+    return bucket[key];
+  }
+
+  function forgeTelemetrySnapshot() {
+    const telemetry = currentForgeTelemetry;
+    return {
+      actions: [...telemetry.actions],
+      familyCompletions: { ...telemetry.familyCompletions },
+      perfectFamilyCycles: { ...telemetry.perfectFamilyCycles },
+      familyHits: { ...telemetry.familyHits },
+      partsDestroyed: [...telemetry.partsDestroyed],
+      destroyedByRole: { ...telemetry.destroyedByRole },
+      reflectionHits: telemetry.reflectionHits,
+      maximumReflectionStreak: telemetry.maximumReflectionStreak,
+      reflectionTargets: [...telemetry.reflectionTargets],
+      lurePresses: telemetry.lurePresses,
+      dashCounters: telemetry.dashCounters,
+      puzzlePerfectSequences: telemetry.puzzlePerfectSequences,
+      puzzleErrors: telemetry.puzzleErrors,
+      adaptations: [...telemetry.adaptations],
+      laneHits: [...telemetry.laneHits],
+      gravityQuadrants: [...telemetry.gravityQuadrants],
+      openings: telemetry.openings,
+      finalPhaseOpenings: telemetry.finalPhaseOpenings,
+      minimumReservePercent: telemetry.minimumReservePercent,
+      healsUsed: telemetry.healsUsed,
+      finish: telemetry.finish ? { ...telemetry.finish } : null
+    };
+  }
+
+  const EXPANDED_ATTACKABLE_ROLES = new Set(['module', 'drone', 'anchor', 'coupling', 'section', 'valve', 'condensator', 'null-module']);
+
+  function isExpandedBoss(data = boss?.data) {
+    return data?.engine === 'expanded' && Boolean(BOSS_REGISTRY);
+  }
+
+  function expandedPhase() {
+    return isExpandedBoss() ? BOSS_REGISTRY.getPhase(boss.data.id, boss.phase) : null;
+  }
+
+  function expandedFamily() {
+    return boss?.runtime?.family || expandedPhase()?.family || boss?.data?.family || null;
+  }
+
+  function expandedRandom(min = 0, max = 1) {
+    const value = boss?.runtime?.rng ? boss.runtime.rng() : Math.random();
+    return min + (max - min) * value;
+  }
+
+  function noteExpandedInput(kind) {
+    if (!isExpandedBoss() || !boss.runtime?.inputTelemetry || !Object.hasOwn(boss.runtime.inputTelemetry, kind)) return;
+    boss.runtime.inputTelemetry[kind] += 1;
+    currentForgeTelemetry.actions.add(kind);
+    currentForgeTelemetry.actionSequence.push(kind);
+    if (currentForgeTelemetry.actionSequence.length > 3) currentForgeTelemetry.actionSequence.shift();
+  }
+
+  function applyExpandedArenaForces(dt) {
+    if (!isExpandedBoss() || !boss.runtime || !player) return;
+    const environment = boss.runtime.environment;
+    if (environment === 'wind-left') player.vx -= 430 * dt;
+    else if (environment === 'wind-right') player.vx += 430 * dt;
+    else if (environment === 'gravity-left') player.vx -= 620 * dt;
+    else if (environment === 'gravity-right') player.vx += 620 * dt;
+    else if (environment === 'fluid-high') {
+      player.vx *= Math.pow(0.36, dt);
+      player.vy -= 310 * dt;
+    }
+    if (boss.data.id === 'orbital-famine' && boss.state === 'active') {
+      boss.runtime.resource = Math.max(0, boss.runtime.resource - dt * (8 + boss.phase * 2));
+      currentForgeTelemetry.minimumReservePercent = Math.min(currentForgeTelemetry.minimumReservePercent, boss.runtime.resource);
+      if (boss.runtime.resource <= 0 && !boss.runtime.resourceEmpty) {
+        boss.runtime.resourceEmpty = true;
+        hurtPlayer(1, player.x < W / 2 ? 1 : -1, 'energyDrain');
+        boss.runtime.resource = 38;
+      }
+    }
+  }
+
+  function resetExpandedParts() {
+    if (!boss?.runtime?.parts) return;
+    for (const part of boss.runtime.parts) {
+      part.hp = part.maxHp;
+      part.state = 'intact';
+      part.destroyed = false;
+    }
+  }
+
+  function configureExpandedPhase() {
+    if (!isExpandedBoss()) return;
+    const previousSeed = boss.runtime?.seed || BOSS_REGISTRY.seedFor(boss.data.id, currentBossRetries);
+    const checkpoint = boss.runtime?.round || selectedPracticeCheckpoint;
+    boss.runtime = BOSS_REGISTRY.createRuntime(boss.data.id, { phase: boss.phase, checkpoint, seed: previousSeed + boss.phase * 7919 });
+    boss.x = 930;
+    boss.y = expandedFamily() === 'vertical-lane' ? 315 : 390;
+    boss.vx = 0;
+    boss.vy = 0;
+    boss.hidden = false;
+    boss.collisionEnabled = true;
+    boss.attackLabel = 'PHASE ' + boss.phase + ' · CALIBRAGE FORGE';
+  }
+
+  function prepareExpandedTelegraph() {
+    const runtime = boss.runtime;
+    const phase = expandedPhase();
+    if (!runtime || !phase) return;
+    runtime.family = phase.family;
+    runtime.selectedPattern = phase.patterns[boss.cycle % phase.patterns.length];
+    runtime.mechanicComplete = false;
+    runtime.mechanicProgress = 0;
+    currentForgeTelemetry.cycleStartDamage = damageTaken;
+    currentForgeTelemetry.cycleStartPuzzleErrors = currentForgeTelemetry.puzzleErrors;
+    runtime.mechanicTarget = phase.mechanicTarget || 1;
+    runtime.attemptResolved = false;
+    runtime.environment = 'stable';
+    const family = runtime.family;
+    if (family === 'lure') {
+      runtime.lureTargetX = clamp(player.x, 72, W - 72);
+      runtime.lureDirection = Math.sign(runtime.lureTargetX - boss.x) || -1;
+    } else if (family === 'modules') {
+      const attackable = runtime.parts.filter(part => EXPANDED_ATTACKABLE_ROLES.has(part.role));
+      if (attackable.every(part => part.destroyed)) resetExpandedParts();
+      runtime.mechanicTarget = Math.max(1, attackable.filter(part => !part.destroyed).length);
+    } else if (family === 'mimic') {
+      runtime.adaptation = Object.entries(runtime.inputTelemetry).sort((a, b) => b[1] - a[1])[0]?.[0] || 'shot';
+      runtime.inputTelemetry = { shot: 0, jump: 0, dash: 0 };
+    } else if (family === 'vertical-lane') {
+      runtime.safeLane = Math.floor(expandedRandom(0, 3));
+      runtime.dangerLanes = [0, 1, 2].filter(lane => lane !== runtime.safeLane);
+    } else if (family === 'gravity-weather') {
+      const arenaType = boss.data.arenaController?.type;
+      if (arenaType === 'fluid') runtime.environment = boss.phase >= 2 ? 'fluid-high' : 'fluid-low';
+      else if (arenaType === 'gravity') runtime.environment = boss.cycle % 2 ? 'gravity-left' : 'gravity-right';
+      else if (arenaType === 'energy') runtime.environment = 'energy-drain';
+      else runtime.environment = ['wind-left', 'conductive-rain', 'heat'][boss.cycle % 3];
+    } else if (family === 'posture-duo') {
+      const pilotScale = save.settings.difficulty === 'casual' ? 0.66 : 1;
+      runtime.posture = Math.max(1, Math.ceil(runtime.mechanicTarget * pilotScale));
+      runtime.mechanicTarget = runtime.posture;
+    } else if (family === 'puzzle-endgame') {
+      const count = Math.min(5, Math.max(3, runtime.mechanicTarget));
+      runtime.puzzleSequence = Array.from({ length: count }, (_, index) => index);
+      for (let index = count - 1; index > 0; index--) {
+        const swap = Math.floor(expandedRandom(0, index + 1));
+        [runtime.puzzleSequence[index], runtime.puzzleSequence[swap]] = [runtime.puzzleSequence[swap], runtime.puzzleSequence[index]];
+      }
+      runtime.puzzleIndex = 0;
+      runtime.puzzleNodes = Array.from({ length: count }, (_, index) => ({
+        id: index,
+        x: 180 + index * (900 / Math.max(1, count - 1)),
+        y: GROUND - 118 - (index % 2) * 92,
+        r: 27,
+        active: false
+      }));
+    }
+    boss.attackLabel = 'PHASE ' + boss.phase + ' · ' + (BOSS_REGISTRY.families[family]?.label || runtime.selectedPattern);
+    sfx('warning');
+  }
+
+  function spawnReflectableCharge(index = 0) {
+    const phase = expandedPhase();
+    const speed = 205 + boss.phase * 28;
+    const angle = Math.atan2(player.y - boss.y, player.x - boss.x) + (index - 1) * 0.08;
+    enemyShots.push({
+      type: 'reflectOrb', shape: index % 3, x: boss.x, y: boss.y,
+      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 17,
+      age: 0, life: 6, damage: 1, friendly: false, reflected: false,
+      pattern: phase?.patterns?.[0] || 'reflect'
+    });
+  }
+
+  function startExpandedActive() {
+    const runtime = boss.runtime;
+    const family = expandedFamily();
+    if (!runtime) return;
+    boss.attackLabel = 'PHASE ' + boss.phase + ' · ' + runtime.selectedPattern.toUpperCase().replaceAll('-', ' ');
+    if (family === 'reflect') {
+      spawnReflectableCharge(0);
+    } else if (family === 'modules') {
+      spawnFan(boss.x, boss.y + 18, 3 + boss.phase, 190 + boss.phase * 15, 2.2, 3.9, 'orb');
+    } else if (family === 'mimic') {
+      showToast('RÉPONSE MIMÉTIQUE · ' + runtime.adaptation.toUpperCase());
+    } else if (family === 'vertical-lane') {
+      for (const lane of runtime.dangerLanes) spawnBeamV(213 + lane * 427, 0.18, 0.7);
+    } else if (family === 'gravity-weather') {
+      showToast('ENVIRONNEMENT · ' + runtime.environment.toUpperCase().replaceAll('-', ' '));
+      if (runtime.environment === 'conductive-rain') spawnBeamV(clamp(player.x, 120, 1160), 0.35, 0.5);
+      if (runtime.environment === 'heat') spawnBeamH(GROUND - 42, 0.42, 0.52);
+    } else if (family === 'puzzle-endgame') {
+      spawnFan(boss.x, boss.y, 3 + boss.phase, 175, 2.35, 3.85, 'orb');
+    }
+  }
+
+  function completeExpandedMechanic(message = 'OUVERTURE VALIDÉE') {
+    if (!boss?.runtime || boss.runtime.mechanicComplete) return;
+    boss.runtime.mechanicComplete = true;
+    boss.runtime.mechanicProgress = Math.max(boss.runtime.mechanicProgress, boss.runtime.mechanicTarget);
+    const family = expandedFamily();
+    incrementForgeMetric(currentForgeTelemetry.familyCompletions, family);
+    if (damageTaken === currentForgeTelemetry.cycleStartDamage) {
+      incrementForgeMetric(currentForgeTelemetry.perfectFamilyCycles, family);
+      if (boss.phase === 3) incrementForgeMetric(currentForgeTelemetry.perfectFamilyCycles, 'phase3');
+    }
+    if (family === 'puzzle-endgame' && currentForgeTelemetry.puzzleErrors === currentForgeTelemetry.cycleStartPuzzleErrors) {
+      currentForgeTelemetry.puzzlePerfectSequences += 1;
+    }
+    if (family === 'mimic' && boss.runtime.adaptation) currentForgeTelemetry.adaptations.add(boss.runtime.adaptation);
+    currentForgeTelemetry.lastMechanicFamily = family;
+    currentForgeTelemetry.lastEnvironment = boss.runtime.environment;
+    score += Math.round((boss.data.scoreRules?.mechanicBonus || 400) * difficulty().scoreMultiplier);
+    addFloatingText(boss.x, boss.y - 110, message, boss.data.accent);
+    sfx('heavyHit');
+  }
+
+  function enterExpandedVulnerability() {
+    if (!boss || boss.state === 'vulnerable') return;
+    boss.runtime.environment = 'stable';
+    currentForgeTelemetry.openings += 1;
+    if (boss.phase === 3) currentForgeTelemetry.finalPhaseOpenings += 1;
+    setBossState('vulnerable');
+    boss.vulnerable = true;
+    boss.attackLabel = 'PHASE ' + boss.phase + ' · NOYAU FORGE OUVERT';
+    showToast(boss.data.name + ' · NOYAU OUVERT');
+  }
+
+  function updateExpandedFamilyActive(dt) {
+    const runtime = boss.runtime;
+    const phase = expandedPhase();
+    const family = expandedFamily();
+    if (!runtime || !phase) return;
+    if (family === 'reflect') {
+      const count = Math.min(5, 1 + boss.phase);
+      for (let index = 1; index < count; index++) bossEvent('reflect-' + index, index * 0.58, () => spawnReflectableCharge(index));
+      boss.y = 340 + Math.sin(boss.totalTime * 2.2) * 48;
+    } else if (family === 'lure') {
+      boss.x += runtime.lureDirection * (540 + boss.phase * 70) * dt * difficulty().enemySpeed;
+      boss.y = 485;
+      if (!runtime.attemptResolved && (boss.x < 135 || boss.x > W - 135 || boss.stateTime > phase.activeSeconds * 0.78)) {
+        runtime.attemptResolved = true;
+        const pressHit = runtime.lureTargetX < 165 || runtime.lureTargetX > W - 165;
+        boss.x = clamp(boss.x, 105, W - 105);
+        spawnShockwaves(boss.x, 2);
+        shake(11);
+        if (pressHit) {
+          currentForgeTelemetry.lurePresses += 1;
+          completeExpandedMechanic('PRESSE AMORCÉE');
+        }
+      }
+    } else if (family === 'modules') {
+      boss.x = 910 + Math.sin(boss.totalTime * 1.4) * 125;
+      boss.y = 370 + Math.cos(boss.totalTime * 1.8) * 36;
+      bossEvent('module-volley', 1.05, () => spawnFan(boss.x, boss.y, 4 + boss.phase, 210, 2.25, 3.9, 'orb'));
+      const attackable = runtime.parts.filter(part => EXPANDED_ATTACKABLE_ROLES.has(part.role));
+      if (attackable.length && attackable.every(part => part.destroyed)) completeExpandedMechanic('RÉSEAU DÉMONTÉ');
+    } else if (family === 'mimic') {
+      if (runtime.adaptation === 'shot') bossEvent('mimic-shot', 0.25, () => spawnFan(boss.x, boss.y, 5 + boss.phase, 245, 2.15, 3.95, 'orb'));
+      else if (runtime.adaptation === 'jump') bossEvent('mimic-jump', 0.25, () => spawnBeamH(GROUND - 98, 0.38, 0.55));
+      else bossEvent('mimic-dash', 0.25, () => { spawnBeamV(clamp(player.x - 150, 100, 1180), 0.38, 0.52); spawnBeamV(clamp(player.x + 150, 100, 1180), 0.38, 0.52); });
+      if (boss.stateTime >= phase.activeSeconds * 0.82) completeExpandedMechanic('RÉPONSE SURVÉCUE');
+    } else if (family === 'vertical-lane') {
+      boss.x = 940 + Math.sin(boss.totalTime * 1.6) * 95;
+      boss.y = 300 + Math.sin(boss.totalTime * 2.1) * 150;
+      if (boss.phase >= 2) bossEvent('lane-cross', 1.15, () => spawnBeamH(GROUND - 150, 0.42, 0.5));
+      if (boss.stateTime >= phase.activeSeconds * 0.82) completeExpandedMechanic('AXE SÛR FRANCHI');
+    } else if (family === 'gravity-weather') {
+      boss.x = 930 + Math.sin(boss.totalTime * 1.25) * 135;
+      boss.y = 315 + Math.cos(boss.totalTime * 1.75) * 70;
+      if (boss.phase >= 2) bossEvent('environment-orb', 0.95, () => spawnFan(boss.x, boss.y, 4, 195, 2.25, 3.85, 'orb'));
+      if (boss.stateTime >= phase.activeSeconds * 0.84) completeExpandedMechanic('SYSTÈME STABILISÉ');
+    } else if (family === 'posture-duo') {
+      boss.x = lerp(boss.x, clamp(player.x + (boss.direction * 104), 170, 1110), 1 - Math.pow(0.012, dt));
+      boss.y = 500;
+      if (boss.stateTime > 0.8) bossEvent('duo-counter', 0.82, () => spawnFan(boss.x, boss.y, 4, 205, 2.2, 3.9, 'blade'));
+      if (runtime.posture <= 0) completeExpandedMechanic('POSTURE ROMPUE');
+    } else if (family === 'puzzle-endgame') {
+      boss.x = 925 + Math.sin(boss.totalTime * 1.2) * 120;
+      boss.y = 330 + Math.cos(boss.totalTime * 1.7) * 55;
+      if (boss.phase >= 2) bossEvent('puzzle-pressure', 1.1, () => spawnMine(clamp(player.x + expandedRandom(-130, 130), 70, 1210), GROUND - 18));
+      if (runtime.puzzleIndex >= runtime.puzzleSequence.length) completeExpandedMechanic('SÉQUENCE RÉSOLUE');
+    }
+  }
+
+  function updateExpandedBoss(dt) {
+    const phase = expandedPhase();
+    if (!phase || !boss.runtime) return;
+    if (boss.state === 'phaseEnter') {
+      bossEvent('phase-config', 0, configureExpandedPhase);
+      boss.vulnerable = false;
+      boss.attackLabel = 'PHASE ' + boss.phase + ' · SYNCHRONISATION';
+      if (boss.stateTime > (save.settings.reduceMotion ? 0.42 : 0.72)) setBossState('neutral');
+    } else if (boss.state === 'neutral') {
+      boss.vulnerable = false;
+      boss.x = lerp(boss.x, 930, 1 - Math.pow(0.01, dt));
+      boss.y = lerp(boss.y, 380, 1 - Math.pow(0.01, dt));
+      boss.attackLabel = 'PHASE ' + boss.phase + ' · POSITIONNEMENT';
+      if (boss.stateTime > 0.55) {
+        prepareExpandedTelegraph();
+        setBossState('telegraph');
+      }
+    } else if (boss.state === 'telegraph') {
+      boss.vulnerable = false;
+      boss.attackLabel = 'PHASE ' + boss.phase + ' · TÉLÉGRAPHE ' + boss.runtime.selectedPattern.toUpperCase().replaceAll('-', ' ');
+      if (boss.stateTime >= phase.telegraphSeconds * (save.settings.difficulty === 'casual' ? 1.25 : 1)) {
+        setBossState('active');
+        startExpandedActive();
+      }
+    } else if (boss.state === 'active') {
+      boss.vulnerable = false;
+      updateExpandedFamilyActive(dt);
+      if (boss.runtime.mechanicComplete) enterExpandedVulnerability();
+      else if (boss.stateTime >= phase.activeSeconds) setBossState('recovery');
+    } else if (boss.state === 'recovery') {
+      boss.vulnerable = false;
+      boss.runtime.environment = 'stable';
+      boss.attackLabel = 'PHASE ' + boss.phase + ' · RÉCUPÉRATION';
+      if (boss.stateTime >= phase.recoverySeconds) {
+        if (boss.runtime.mechanicComplete) enterExpandedVulnerability();
+        else { boss.cycle += 1; setBossState('neutral'); }
+      }
+    } else if (boss.state === 'vulnerable') {
+      boss.vulnerable = true;
+      boss.x = lerp(boss.x, 920, 1 - Math.pow(0.004, dt));
+      boss.y = lerp(boss.y, 430, 1 - Math.pow(0.004, dt));
+      boss.attackLabel = 'PHASE ' + boss.phase + ' · NOYAU FORGE OUVERT';
+      if (boss.stateTime >= phase.vulnerabilitySeconds) {
+        boss.cycle += 1;
+        boss.runtime.mechanicComplete = false;
+        boss.runtime.mechanicProgress = 0;
+        boss.runtime.environment = 'stable';
+        if (expandedFamily() === 'modules') resetExpandedParts();
+        setBossState('neutral');
+      }
+    }
+  }
+
+  function tryExpandedDashCounter() {
+    if (!isExpandedBoss() || expandedFamily() !== 'posture-duo' || !['telegraph', 'active'].includes(boss.state)) return false;
+    const runtime = boss.runtime;
+    runtime.posture = Math.max(0, runtime.posture - 1);
+    currentForgeTelemetry.dashCounters += 1;
+    runtime.mechanicProgress = runtime.mechanicTarget - runtime.posture;
+    addFloatingText(boss.x, boss.y - 92, 'RUPTURE ' + runtime.mechanicProgress + '/' + runtime.mechanicTarget, boss.data.accent);
+    spawnBurst(boss.x, boss.y, boss.data.accent, 16, 270);
+    if (runtime.posture <= 0) {
+      completeExpandedMechanic('POSTURE ROMPUE');
+      enterExpandedVulnerability();
+    }
+    return true;
+  }
+
+  function expandedPartWorldHitbox(part) {
+    const hitbox = part.hitbox || { x: part.anchor?.x || 0, y: part.anchor?.y || 0, r: 20 };
+    return { x: boss.x + hitbox.x, y: boss.y + hitbox.y, r: hitbox.r || 20 };
+  }
+
+  function hitExpandedPart(part, amount) {
+    if (!part || part.destroyed || !Number.isFinite(part.hp)) return false;
+    part.hp = Math.max(0, part.hp - Math.max(1, amount));
+    part.state = part.hp <= 0 ? 'destroyed' : part.hp <= part.maxHp * 0.5 ? 'damaged' : 'intact';
+    part.destroyed = part.hp <= 0;
+    const hitbox = expandedPartWorldHitbox(part);
+    spawnBurst(hitbox.x, hitbox.y, part.destroyed ? boss.data.accent : '#dce5f6', part.destroyed ? 16 : 6, part.destroyed ? 260 : 120);
+    addFloatingText(hitbox.x, hitbox.y - 20, part.destroyed ? 'PIÈCE DÉTRUITE' : 'MODULE', boss.data.accent);
+    if (part.destroyed) {
+      boss.runtime.mechanicProgress += 1;
+      currentForgeTelemetry.partsDestroyed.add(boss.phase + ':' + part.id);
+      currentForgeTelemetry.uniquePartIds.add(part.id);
+      incrementForgeMetric(currentForgeTelemetry.destroyedByRole, part.role);
+      if (boss.cycle === 0) incrementForgeMetric(currentForgeTelemetry.firstWindowByRole, part.role);
+      if (part.role === 'condensator') {
+        boss.runtime.resource = Math.min(100, boss.runtime.resource + 38);
+        boss.runtime.resourceEmpty = false;
+      }
+      if (expandedFamily() === 'modules') {
+        const remaining = boss.runtime.parts.filter(candidate => EXPANDED_ATTACKABLE_ROLES.has(candidate.role) && !candidate.destroyed);
+        boss.runtime.mechanicTarget = Math.max(boss.runtime.mechanicProgress, boss.runtime.mechanicProgress + remaining.length);
+        if (!remaining.length) completeExpandedMechanic('RÉSEAU DÉMONTÉ');
+      }
+    }
+    return true;
+  }
+
+  function resolveExpandedPlayerShot(shot) {
+    if (!isExpandedBoss() || !boss.runtime || boss.defeated) return false;
+    for (const projectile of enemyShots) {
+      if (projectile.type !== 'reflectOrb' || projectile.friendly) continue;
+      if (!circleHit(shot.x, shot.y, shot.r, projectile.x, projectile.y, projectile.r + 5)) continue;
+      const angle = Math.atan2(boss.weakY - projectile.y, boss.weakX - projectile.x);
+      const speed = 660 + boss.phase * 45;
+      projectile.vx = Math.cos(angle) * speed;
+      projectile.vy = Math.sin(angle) * speed;
+      projectile.friendly = true;
+      projectile.reflected = true;
+      projectile.damage = 0;
+      projectile.life = Math.max(projectile.life, 2.2);
+      spawnBurst(projectile.x, projectile.y, boss.data.accent, 10, 210);
+      sfx('deflect');
+      return true;
+    }
+    if (expandedFamily() === 'puzzle-endgame' && ['telegraph', 'active'].includes(boss.state)) {
+      for (const node of boss.runtime.puzzleNodes) {
+        if (node.active || !circleHit(shot.x, shot.y, shot.r, node.x, node.y, node.r)) continue;
+        const expected = boss.runtime.puzzleSequence[boss.runtime.puzzleIndex];
+        if (node.id === expected) {
+          node.active = true;
+          boss.runtime.puzzleIndex += 1;
+          boss.runtime.mechanicProgress = boss.runtime.puzzleIndex;
+          boss.runtime.mechanicTarget = boss.runtime.puzzleSequence.length;
+          addFloatingText(node.x, node.y - 32, 'FORME ' + boss.runtime.puzzleIndex, boss.data.accent);
+          if (boss.runtime.puzzleIndex >= boss.runtime.puzzleSequence.length) completeExpandedMechanic('SÉQUENCE RÉSOLUE');
+        } else {
+          currentForgeTelemetry.puzzleErrors += 1;
+          addFloatingText(node.x, node.y - 32, 'ORDRE INCHANGÉ', '#f5d59f');
+        }
+        return true;
+      }
+    }
+    if (!['intro', 'phaseEnter', 'phaseTransition', 'defeat'].includes(boss.state)) {
+      for (const part of boss.runtime.parts) {
+        if (!EXPANDED_ATTACKABLE_ROLES.has(part.role) || part.destroyed) continue;
+        const hitbox = expandedPartWorldHitbox(part);
+        if (circleHit(shot.x, shot.y, shot.r, hitbox.x, hitbox.y, hitbox.r)) return hitExpandedPart(part, shot.damage || runBuild.shotDamage);
+      }
+    }
+    return false;
+  }
+
   function updatePlayer(dt) {
     const moveLeft = inputDown('ArrowLeft', 'KeyA', 'KeyQ') || touchDown('left') || controller.left;
     const moveRight = inputDown('ArrowRight', 'KeyD') || touchDown('right') || controller.right;
@@ -1806,6 +2385,7 @@
     }
 
     if (jumpPress && player.jumpsLeft > 0) {
+      noteExpandedInput('jump');
       player.vy = -runBuild.jumpPower;
       player.jumpsLeft -= 1;
       player.onGround = false;
@@ -1814,6 +2394,7 @@
     }
 
     if (dashPress && player.dashCooldown <= 0) {
+      noteExpandedInput('dash');
       player.dashTime = 0.19;
       player.dashCooldown = runBuild.dashCooldown;
       player.invuln = Math.max(player.invuln, 0.24);
@@ -1831,6 +2412,7 @@
     }
 
     if (attackHeld && player.shotCooldown <= 0) {
+      noteExpandedInput('shot');
       player.shotCooldown = runBuild.fireRate;
       const spread = runBuild.multishot === 1 ? [0] : [-0.11, 0, 0.11];
       const muzzle = playerMuzzlePosition();
@@ -1862,6 +2444,7 @@
       particles.push({ x: player.x - player.facing * 24, y: player.y + rand(-20, 20), vx: -player.facing * rand(120, 280), vy: rand(-50, 50), life: 0.28, max: 0.28, size: rand(3, 8), color: '#77efff' });
     }
 
+    applyExpandedArenaForces(dt);
     player.x += player.vx * dt;
     player.y += player.vy * dt;
     player.x = clamp(player.x, 28, W - 28);
@@ -1889,7 +2472,12 @@
     }
 
     if (boss && !boss.hidden && !boss.defeated && overlapsPlayerBoss()) {
-      if (player.dashTime > 0 && boss.vulnerable && player.dashHitLock <= 0 && boss.dashHitCooldown <= 0) {
+      if (player.dashTime > 0 && player.dashHitLock <= 0 && boss.dashHitCooldown <= 0 && tryExpandedDashCounter()) {
+        player.dashHitLock = 0.5;
+        boss.dashHitCooldown = 0.5;
+        player.vx = -player.facing * 520;
+        player.vy = -320;
+      } else if (player.dashTime > 0 && boss.vulnerable && player.dashHitLock <= 0 && boss.dashHitCooldown <= 0) {
         damageBoss(runBuild.dashDamage, 'dash');
         player.dashHitLock = 0.5;
         boss.dashHitCooldown = 0.5;
@@ -1911,6 +2499,10 @@
       if (shot.trail >= 0.025) {
         shot.trail = 0;
         particles.push({ x: shot.x, y: shot.y, vx: -shot.vx * 0.05 + rand(-30,30), vy: rand(-25,25), life: 0.22, max: 0.22, size: rand(2,5), color: '#8defff' });
+      }
+      if (resolveExpandedPlayerShot(shot)) {
+        playerShots.splice(i, 1);
+        continue;
       }
       if (boss && !boss.hidden && !boss.defeated && circleHit(shot.x, shot.y, shot.r, boss.weakX, boss.weakY, boss.weakR)) {
         if (boss.vulnerable) {
@@ -1961,6 +2553,7 @@
     if (player && runBuild.phaseRepair > 0 && player.hp < player.maxHp) {
       const repaired = Math.min(runBuild.phaseRepair, player.maxHp - player.hp);
       player.hp += repaired;
+      if (isExpandedBoss()) currentForgeTelemetry.healsUsed += repaired;
       spawnGeneratedVfx('scrap-glow', player.x, player.y, { size: 92, duration: 0.55, growth: 0.45 });
       addFloatingText(player.x, player.y - 54, '+' + repaired + ' NOYAU', '#8dffb2');
       announce('Auto-réparation : ' + repaired + ' noyau restauré.');
@@ -2018,6 +2611,7 @@
       case 'mantis': updateMantis(dt); break;
       case 'cyclotron': updateCyclotron(dt); break;
       case 'omega': updateOmega(dt); break;
+      default: updateExpandedBoss(dt); break;
     }
     updateWeakPoint();
   }
@@ -2030,7 +2624,7 @@
       mantis: 'dashTelegraph',
       cyclotron: 'roll',
       omega: 'arsenal'
-    }[boss.data.id];
+    }[boss.data.id] || (isExpandedBoss() ? 'phaseEnter' : 'neutral');
   }
 
   function updateRammer(dt) {
@@ -2315,7 +2909,7 @@
   }
 
   function updateWeakPoint() {
-    const weak = BOSS_WEAK_POINTS[boss.data.id];
+    const weak = BOSS_WEAK_POINTS[boss.data.id] || boss.data.weakPoint || { x: 0, y: -8, r: 32 };
     boss.weakX = boss.x + weak.x;
     boss.weakY = boss.y + weak.y;
     boss.weakR = weak.r;
@@ -2330,6 +2924,13 @@
     boss.hp = Math.max(floor, boss.hp - requested);
     const actualDamage = previousHp - boss.hp;
     if (actualDamage <= 0) return 0;
+    if (isExpandedBoss() && player) {
+      if (expandedFamily() === 'vertical-lane') currentForgeTelemetry.laneHits.add(Math.min(2, Math.floor(player.x / (W / 3))));
+      if (expandedFamily() === 'gravity-weather') {
+        const quadrant = (player.x < W / 2 ? 'left' : 'right') + (player.y < GROUND - 120 ? '-high' : '-low');
+        currentForgeTelemetry.gravityQuadrants.add(quadrant);
+      }
+    }
     combo = comboTimer > 0 ? combo + 1 : 1;
     comboTimer = runBuild.comboWindow;
     maxCombo = Math.max(maxCombo, combo);
@@ -2355,10 +2956,26 @@
 
   function defeatBoss() {
     pauseFightClock();
+    if (isExpandedBoss()) {
+      currentForgeTelemetry.finish = {
+        bossId: boss.data.id,
+        source: currentBossFinishSource,
+        family: expandedFamily(),
+        afterMechanic: boss.runtime?.mechanicComplete === true,
+        lastMechanicFamily: currentForgeTelemetry.lastMechanicFamily,
+        environment: currentForgeTelemetry.lastEnvironment,
+        resource: boss.runtime?.resource ?? 0,
+        variedActions: new Set(currentForgeTelemetry.actionSequence).size,
+        preservedSections: boss.runtime?.parts?.filter(part => part.role === 'section' && !part.destroyed).length || 0
+      };
+    }
     boss.defeated = true;
     boss.vulnerable = false;
     boss.attackLabel = 'DÉSINTÉGRATION';
-    unlockCodexEntry(boss.data.id);
+    boss.collisionEnabled = false;
+    if (boss.runtime) boss.runtime.environment = 'stable';
+    if (isExpandedBoss()) { boss.state = 'defeat'; boss.hidden = true; }
+    if (runMode !== 'forge') unlockCodexEntry(boss.data.id);
     enemyShots = [];
     playerShots = [];
     transitionTimer = 2.45;
@@ -2381,6 +2998,7 @@
 
   function hurtPlayer(amount, direction = -1, source = 'unknown') {
     if (!player || player.invuln > 0 || state !== 'fight') return;
+    if (isExpandedBoss()) incrementForgeMetric(currentForgeTelemetry.familyHits, expandedFamily());
     const phaseKey = source + ':phase' + (boss?.phase || 1);
     currentBossHazardHits[phaseKey] = (currentBossHazardHits[phaseKey] || 0) + 1;
     noteMasteryCycleHit(source);
@@ -2428,7 +3046,21 @@
       s.age += dt;
       s.life -= dt;
 
-      if (s.type === 'orb') {
+      if (s.type === 'reflectOrb') {
+        s.x += s.vx * dt * speedFactor;
+        s.y += s.vy * dt * speedFactor;
+        if (s.friendly && boss && !boss.defeated && circleHit(s.x, s.y, s.r, boss.weakX, boss.weakY, boss.weakR + 24)) {
+          boss.runtime.mechanicProgress += 1;
+          currentForgeTelemetry.reflectionHits += 1;
+          currentForgeTelemetry.reflectionStreak += 1;
+          currentForgeTelemetry.maximumReflectionStreak = Math.max(currentForgeTelemetry.maximumReflectionStreak, currentForgeTelemetry.reflectionStreak);
+          currentForgeTelemetry.reflectionTargets.add(boss.phase + ':' + (s.shape || 0));
+          spawnBurst(s.x, s.y, boss.data.accent, 18, 320);
+          addFloatingText(s.x, s.y - 24, 'RENVOI ' + boss.runtime.mechanicProgress + '/' + boss.runtime.mechanicTarget, boss.data.accent);
+          s.life = 0;
+          if (boss.runtime.mechanicProgress >= boss.runtime.mechanicTarget) completeExpandedMechanic('RELAIS SURCHARGÉS');
+        }
+      } else if (s.type === 'orb') {
         s.x += s.vx * dt * speedFactor;
         s.y += s.vy * dt * speedFactor;
       } else if (s.type === 'rocket') {
@@ -2488,11 +3120,15 @@
       }
 
       if (s.damage > 0 && shotHitsPlayer(s)) {
+        if (s.type === 'reflectOrb' && !s.friendly) currentForgeTelemetry.reflectionStreak = 0;
         hurtPlayer(s.damage, player.x < (s.x || W / 2) ? -1 : 1, s.type);
         if (!['beamV', 'beamH'].includes(s.type)) s.life = 0;
       }
 
-      if (s.life <= 0 || s.x < -220 || s.x > W + 220 || s.y > H + 180) enemyShots.splice(i, 1);
+      if (s.life <= 0 || s.x < -220 || s.x > W + 220 || s.y > H + 180) {
+        if (s.type === 'reflectOrb' && !s.friendly) currentForgeTelemetry.reflectionStreak = 0;
+        enemyShots.splice(i, 1);
+      }
     }
   }
 
@@ -2508,7 +3144,7 @@
       const active = s.age >= s.telegraph && s.age <= s.telegraph + s.active;
       return active && Math.abs(py - s.y) < s.width / 2 + player.h * 0.3;
     }
-    if (s.type === 'warningCircle') return false;
+    if (s.friendly || s.type === 'warningCircle') return false;
     if (s.type === 'shock') {
       return Math.abs(px - s.x) < 25 + player.w / 2 && Math.abs((py + player.h / 2) - GROUND) < 48;
     }
@@ -2557,7 +3193,7 @@
       const rankedBossTime = lastBossTime + lastBossRetryPenalty;
       save.bestTimes[boss.data.id] = Math.min(save.bestTimes[boss.data.id] ?? Infinity, rankedBossTime);
       if (runMode === 'rush') {
-        save.unlocked = Math.max(save.unlocked, Math.min(BOSSES.length, currentBossIndex + 2));
+        save.unlocked = Math.max(save.unlocked, Math.min(CAMPAIGN_BOSSES.length, currentBossIndex + 2));
         if (!save.campaignCleared.includes(boss.data.id)) save.campaignCleared.push(boss.data.id);
       }
       persistSave();
@@ -2566,14 +3202,107 @@
     }
   }
 
+  const FORGE_MAXIMUM_METRICS = new Set([
+    'damageTaken', 'finalOpeningsUsed', 'coreOpeningsUsed', 'mimicCounterHits',
+    'laneCollisions', 'collapsingSectionHits', 'pressureHits', 'adaptedCounterHits',
+    'adaptiveCounterHits', 'sectionRetries', 'checkpointRetries', 'healsUsed'
+  ]);
+
+  function evaluateForgeMetric(metric, target, rankedTime) {
+    const telemetry = currentForgeTelemetry;
+    const finish = telemetry.finish || {};
+    const familyHits = telemetry.familyHits;
+    const counts = {
+      damageTaken,
+      timeSeconds: rankedTime,
+      mechanicCycles: Object.values(telemetry.familyCompletions).reduce((sum, value) => sum + value, 0),
+      relaysDisabledByReflection: telemetry.reflectionHits,
+      distinctRamsPressed: telemetry.lurePresses,
+      perfectFinalCycle: telemetry.perfectFamilyCycles.phase3 || 0,
+      correctPriorityTargets: telemetry.uniquePartIds.size,
+      finalOpeningsUsed: telemetry.finalPhaseOpenings,
+      actionDiversity: telemetry.actions.size,
+      mimicCounterHits: familyHits.mimic || 0,
+      cleanModuleShutdowns: telemetry.destroyedByRole.module || 0,
+      coreOpeningsUsed: telemetry.finalPhaseOpenings,
+      weightsReturned: telemetry.familyCompletions['vertical-lane'] || 0,
+      couplersDestroyed: telemetry.destroyedByRole.coupling || 0,
+      laneCollisions: familyHits['vertical-lane'] || 0,
+      distinctLaneHits: telemetry.laneHits.size,
+      perfectPermutationCycle: telemetry.perfectFamilyCycles['vertical-lane'] || 0,
+      selfDestroyedSupports: telemetry.lurePresses,
+      collapsingSectionHits: familyHits.lure || 0,
+      valvesClosedInCycle: telemetry.destroyedByRole.valve || 0,
+      pressureHits: boss?.data?.id === 'floodline-leviathan' ? familyHits['gravity-weather'] || 0 : 0,
+      distinctGravityQuadrants: telemetry.gravityQuadrants.size,
+      firstWindowModules: telemetry.firstWindowByRole.module || 0,
+      anchorsFirstWindow: telemetry.firstWindowByRole.anchor || 0,
+      perfectCounters: telemetry.dashCounters,
+      civilSectionsPreserved: finish.preservedSections || 0,
+      sectionRetries: currentBossRetries,
+      adaptationsExploited: telemetry.adaptations.size,
+      adaptedCounterHits: familyHits.mimic || 0,
+      condensatorsCollected: telemetry.destroyedByRole.condensator || 0,
+      minimumReservePercent: telemetry.minimumReservePercent,
+      perfectSequences: telemetry.puzzlePerfectSequences,
+      maximumBounceChain: telemetry.maximumReflectionStreak,
+      distinctBatteriesHit: telemetry.reflectionTargets.size,
+      checkpointRetries: currentBossRetries,
+      healsUsed: telemetry.healsUsed,
+      distinctAdaptationsExpired: telemetry.adaptations.size,
+      adaptiveCounterHits: familyHits.mimic || 0,
+      distinctRelaysReflected: telemetry.reflectionTargets.size,
+      uniqueModulesDisabled: telemetry.destroyedByRole['null-module'] || 0
+    };
+
+    if (Object.hasOwn(counts, metric)) {
+      const value = counts[metric];
+      const maximum = FORGE_MAXIMUM_METRICS.has(metric) || metric === 'timeSeconds';
+      const achieved = metric === 'timeSeconds'
+        ? save.settings.difficulty !== 'casual' && value <= target
+        : metric === 'minimumReservePercent'
+          ? value >= target
+          : maximum ? value <= target : value >= target;
+      return { supported: true, value, achieved };
+    }
+
+    const finishChecks = {
+      dashFinish: finish.source === 'dash',
+      reflectedFinish: finish.bossId === 'bastion-ricochet' && finish.lastMechanicFamily === 'reflect',
+      discFinish: finish.bossId === 'echo-fencer' && finish.lastMechanicFamily === 'mimic',
+      summitFinish: finish.bossId === 'vertical-verdict' && finish.lastMechanicFamily === 'vertical-lane',
+      turbineStopFinish: finish.bossId === 'floodline-leviathan' && String(finish.environment).startsWith('fluid'),
+      axisLockFinish: finish.bossId === 'centrifuge-zero' && String(finish.environment).startsWith('gravity'),
+      heatDissipationFinish: finish.bossId === 'tempest-regulator' && finish.environment === 'heat',
+      postureBreakFinish: finish.bossId === 'counterforge' && finish.lastMechanicFamily === 'posture-duo',
+      interruptedTransferFinish: finish.bossId === 'twin-governors' && finish.lastMechanicFamily === 'posture-duo',
+      openConfigurationFinish: finish.bossId === 'loadout-reactor' && finish.lastMechanicFamily === 'mimic',
+      fullReserveFinish: finish.bossId === 'orbital-famine' && finish.resource >= 99,
+      previewedVectorFinish: finish.bossId === 'vector-vault' && finish.lastMechanicFamily === 'reflect',
+      chargedReturnFinish: finish.bossId === 'skyborne-battery' && finish.lastMechanicFamily === 'reflect',
+      variedSequenceFinish: finish.bossId === 'adaptive-archivist' && finish.variedActions >= 3,
+      nullBreakFinish: finish.bossId === 'null-crown' && finish.lastMechanicFamily === 'posture-duo'
+    };
+    if (Object.hasOwn(finishChecks, metric)) return { supported: true, value: finishChecks[metric] ? 1 : 0, achieved: finishChecks[metric] === true };
+    return { supported: false, value: null, achieved: false };
+  }
+
   function evaluateMasteryContracts(rankedTime) {
-    const act = STORY.getActByOrder(currentBossIndex + 1);
-    if (!act) return [];
-    const bossId = act.bossId;
+    const act = runMode === 'rush' ? STORY.getActByOrder(currentBossIndex + 1) : null;
+    const bossId = BOSSES[currentBossIndex].id;
+    const expansionAct = BOSSES[currentBossIndex].engine === 'expanded' ? EXPANSION_STORY?.getBossById?.(bossId) : null;
+    const contracts = act?.masteryContracts || expansionAct?.masteryContracts || BOSSES[currentBossIndex].masteryContracts || [];
     const previous = new Set(save.mastery[bossId] || []);
-    const results = act.masteryContracts.map(contract => {
+    const results = contracts.map(contract => {
+      let supported = true;
       let achieved = false;
-      if (contract.metric === 'timeSeconds') achieved = save.settings.difficulty !== 'casual' && rankedTime <= contract.target;
+      let value = null;
+      if (expansionAct) {
+        const evaluation = evaluateForgeMetric(contract.metric, contract.target, rankedTime);
+        supported = evaluation.supported;
+        achieved = evaluation.achieved;
+        value = evaluation.value;
+      } else if (contract.metric === 'timeSeconds') achieved = save.settings.difficulty !== 'casual' && rankedTime <= contract.target;
       else if (contract.metric === 'damageTaken') achieved = damageTaken <= contract.target;
       else if (contract.metric === 'dashFinish') achieved = currentBossFinishSource === 'dash';
       else if (contract.metric === 'overloadDuringOpening') achieved = currentBossOverloadOpening;
@@ -2581,9 +3310,10 @@
       else if (contract.metric === 'perfectDashCycle') achieved = (currentBossPerfectCycles.dash || 0) >= contract.target;
       else if (contract.metric === 'minesTriggered') achieved = (currentBossHazardHits['mine:phase3'] || 0) <= contract.target;
       else if (contract.metric === 'overloadFinish') achieved = currentBossOverloadFinish;
-      const earnedNow = achieved && !previous.has(contract.id);
-      if (achieved) previous.add(contract.id);
-      return { ...contract, achieved, earnedNow };
+      else supported = false;
+      const earnedNow = supported && achieved && !previous.has(contract.id);
+      if (supported && achieved) previous.add(contract.id);
+      return { ...contract, supported, achieved: supported && achieved, earnedNow, value };
     });
     const before = (save.mastery[bossId] || []).length;
     save.mastery[bossId] = [...previous];
@@ -2603,8 +3333,11 @@
       card.className = 'mastery-contract';
       const unlocked = contract.achieved || (save.mastery[BOSSES[currentBossIndex].id] || []).includes(contract.id);
       card.dataset.earned = String(unlocked);
+      card.dataset.supported = String(contract.supported !== false);
       const status = document.createElement('span');
-      status.textContent = contract.earnedNow ? 'NOUVEAU · +500' : unlocked ? 'ARCHIVÉ' : 'À REFAIRE';
+      status.textContent = contract.supported === false
+        ? 'NON ÉVALUÉE · TÉLÉMÉTRIE ABSENTE'
+        : contract.earnedNow ? 'NOUVEAU · +500' : unlocked ? 'ARCHIVÉ' : 'À REFAIRE';
       const title = document.createElement('strong');
       title.textContent = contract.title;
       const objective = document.createElement('small');
@@ -2615,7 +3348,7 @@
   }
 
   function calculateRank(time, hits, retries) {
-    const par = BOSS_PAR_TIMES[currentBossIndex] * difficulty().parMultiplier;
+    const par = (BOSSES[currentBossIndex].parTime || 60) * difficulty().parMultiplier;
     const performanceRatio = time / par;
     const rating = 108 - performanceRatio * 48 - hits * 9 - retries * 17 + (difficulty().scoreMultiplier - 1) * 12;
     if (rating >= 76 && hits === 0 && retries === 0) return 'S';
@@ -2639,27 +3372,30 @@
     hideRadioExchange();
     state = 'result';
     touchControls.classList.remove('in-game');
-    const finalBoss = currentBossIndex === BOSSES.length - 1;
+    const finalBoss = currentBossIndex === CAMPAIGN_BOSSES.length - 1;
     const rushComplete = runMode === 'rush' && finalBoss;
     const rankedTime = lastBossTime + lastBossRetryPenalty;
     const medal = calculateRank(rankedTime, damageTaken, currentBossRetries);
-    const practiceResult = runMode === 'practice';
+    const practiceResult = runMode !== 'rush';
     const act = practiceResult ? null : STORY.getActByOrder(currentBossIndex + 1);
+    const expansionStory = boss.data.engine === 'expanded' ? EXPANSION_STORY?.getBossById?.(boss.data.id) : null;
     recordBestRank(BOSSES[currentBossIndex].id, medal);
     const masteryResults = evaluateMasteryContracts(rankedTime);
     document.getElementById('result-eyebrow').textContent = practiceResult ? 'SIMULATION TERMINÉE' : rushComplete ? 'COURONNE NEUTRALISÉE' : 'MACHINE NEUTRALISÉE';
     document.getElementById('result-title').textContent = rushComplete ? 'Crown Engine Ω est tombé' : BOSSES[currentBossIndex].name;
-    document.getElementById('result-summary').textContent = practiceResult
-      ? 'Données de combat archivées. La progression de campagne reste inchangée.'
-      : act?.districtConsequence || BOSSES[currentBossIndex].transmission;
+    document.getElementById('result-summary').textContent = expansionStory?.restoration
+      || (practiceResult
+        ? 'Données de combat archivées. La progression de campagne reste inchangée.'
+        : act?.districtConsequence || BOSSES[currentBossIndex].transmission);
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = true;
     const resultBuild = document.querySelector('#result-build');
     if (resultBuild) resultBuild.textContent = describeBuild();
-    if (resultLoreLabel) resultLoreLabel.textContent = practiceResult ? 'Rapport du Laboratoire' : 'Journal de Riva';
-    if (resultLore) resultLore.textContent = practiceResult
-      ? 'Profil mécanique : ' + BOSSES[currentBossIndex].description
-      : act?.rivaJournal || BOSSES[currentBossIndex].transmission;
+    if (resultLoreLabel) resultLoreLabel.textContent = expansionStory ? 'Journal de Riva · Forge' : practiceResult ? 'Rapport du Laboratoire' : 'Journal de Riva';
+    if (resultLore) resultLore.textContent = expansionStory?.journal
+      || (practiceResult
+        ? 'Profil mécanique : ' + BOSSES[currentBossIndex].description
+        : act?.rivaJournal || BOSSES[currentBossIndex].transmission);
     renderMasteryResults(masteryResults);
 
     if (runMode === 'rush') {
@@ -2676,7 +3412,7 @@
     announce(boss.data.name + ' neutralisé. Rang ' + medal + '. Temps ' + formatTime(rankedTime) + '.');
 
     const continueButton = document.getElementById('continue-button');
-    continueButton.textContent = runMode === 'practice' ? 'Retour au Laboratoire' : 'Lire la transmission';
+    continueButton.textContent = runMode !== 'rush' ? 'Retour au Laboratoire' : 'Lire la transmission';
     continueButton.hidden = false;
     showScreen('result-screen');
   }
@@ -2690,7 +3426,7 @@
       state = 'menu';
       player = null;
       boss = null;
-      buildBossGrid();
+      buildBossGrid(runMode === 'forge' ? 'forge' : 'practice');
       showScreen('boss-select-screen');
     }
   }
@@ -2721,13 +3457,13 @@
     if (summary) summary.textContent = 'Build actuel : ' + describeBuild() + '. Choisis un module pour la prochaine machine.';
     const upgradeProgress = document.querySelector('#upgrade-progress');
     const upgradeBuild = document.querySelector('#upgrade-build');
-    if (upgradeProgress) upgradeProgress.textContent = 'Prochaine étape : ' + BOSSES[Math.min(currentBossIndex + 1, BOSSES.length - 1)].arena;
+    if (upgradeProgress) upgradeProgress.textContent = 'Prochaine étape : ' + CAMPAIGN_BOSSES[Math.min(currentBossIndex + 1, CAMPAIGN_BOSSES.length - 1)].arena;
     if (upgradeBuild) upgradeBuild.textContent = 'Build actuel : ' + describeBuild();
     for (const upgrade of choices) {
       const button = document.createElement('button');
       button.className = 'upgrade-card';
       const stacks = runBuild.installed.filter(id => id === upgrade.id).length;
-      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.5.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
+      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.6.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
       button.addEventListener('click', () => installUpgrade(upgrade));
       grid.appendChild(button);
     }
@@ -2787,7 +3523,8 @@
   function openLaboratory() {
     hideToast();
     state = 'menu';
-    buildBossGrid();
+    selectionMode = 'practice';
+    buildBossGrid('practice');
     showScreen('boss-select-screen');
   }
 
@@ -3047,13 +3784,10 @@
     const airborneHeight = Math.max(0, GROUND - (player.y + player.h / 2));
     const shadowScale = clamp(1 - airborneHeight / 420, 0.48, 1);
     ctx.save();
-    ctx.fillStyle = save.settings.highContrast ? 'rgba(0,0,0,0.88)' : 'rgba(3,8,18,0.62)';
-    ctx.strokeStyle = save.settings.highContrast ? 'rgba(122,241,255,0.75)' : 'rgba(111,231,255,0.28)';
-    ctx.lineWidth = 2;
+    ctx.fillStyle = save.settings.highContrast ? 'rgba(0,0,0,0.94)' : 'rgba(0,0,0,0.68)';
     ctx.beginPath();
-    ctx.ellipse(player.x, GROUND + 2, 34 * shadowScale, 8 * shadowScale, 0, 0, TAU);
+    ctx.ellipse(player.x, GROUND + 1, 18 * shadowScale, 3 * shadowScale, 0, 0, TAU);
     ctx.fill();
-    ctx.stroke();
     ctx.restore();
     const blink = player.invuln > 0 && Math.floor(player.invuln * 16) % 2 === 0;
     if (blink) return;
@@ -3139,6 +3873,7 @@
         case 'mantis': drawMantis(); break;
         case 'cyclotron': drawCyclotron(); break;
         case 'omega': drawOmega(); break;
+        default: drawExpandedBoss(); break;
       }
     }
     if (!generatedBoss && boss.phase >= 2) {
@@ -3165,8 +3900,107 @@
     drawWeakPointFeedback();
   }
 
+  function drawExpandedBoss() {
+    const runtime = boss.runtime;
+    const family = expandedFamily();
+    const t = save.settings.reduceMotion ? 0 : boss.totalTime;
+    ctx.save();
+    ctx.rotate(Math.sin(t * 1.4) * 0.035);
+    ctx.fillStyle = '#1c2535';
+    ctx.strokeStyle = boss.data.color;
+    ctx.lineWidth = save.settings.highContrast ? 7 : 5;
+    ctx.beginPath();
+    const sides = family === 'puzzle-endgame' ? 8 : family === 'modules' ? 6 : 5;
+    for (let index = 0; index < sides; index++) {
+      const angle = -Math.PI / 2 + index / sides * TAU;
+      const radius = 76 + (index % 2) * 13;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = hexToRgba(boss.data.color, 0.32);
+    ctx.fillRect(-88, 38, 176, 28);
+    for (const part of runtime?.parts || []) {
+      if (part.role === 'armor' || part.role === 'weak-point' || part.destroyed) continue;
+      const x = part.hitbox?.x || part.anchor?.x || 0;
+      const y = part.hitbox?.y || part.anchor?.y || 0;
+      const radius = part.hitbox?.r || 20;
+      ctx.fillStyle = part.state === 'damaged' ? '#8b5462' : '#303d55';
+      ctx.strokeStyle = part.state === 'damaged' ? '#ffd0d8' : boss.data.accent;
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.rect(x - radius, y - radius, radius * 2, radius * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 11px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(part.id).split('-').at(-1), x, y + 4);
+    }
+    if (family === 'posture-duo') {
+      for (const side of [-1, 1]) {
+        ctx.fillStyle = side < 0 ? boss.data.color : boss.data.accent;
+        ctx.beginPath(); ctx.arc(side * 116, -18 + Math.sin(t * 2 + side) * 16, 28, 0, TAU); ctx.fill();
+      }
+    }
+    drawMachineCore(boss.data.weakPoint?.x || 0, boss.data.weakPoint?.y || -8, boss.data.weakPoint?.r || 32, boss.data.accent, boss.vulnerable);
+    ctx.fillStyle = boss.data.accent;
+    ctx.font = '950 13px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(boss.data.order).padStart(2, '0'), 0, 7);
+    ctx.restore();
+  }
+
+  function drawExpandedArenaWarnings() {
+    const runtime = boss.runtime;
+    if (!runtime || !['telegraph', 'active'].includes(boss.state)) return;
+    const family = expandedFamily();
+    const pulse = save.settings.reduceMotion ? 0.7 : 0.55 + Math.sin(boss.totalTime * 8) * 0.15;
+    ctx.save();
+    ctx.lineWidth = save.settings.highContrast ? 7 : 5;
+    ctx.strokeStyle = hexToRgba(boss.data.accent, 0.82);
+    ctx.fillStyle = hexToRgba(boss.data.color, 0.13 + pulse * 0.08);
+    ctx.setLineDash(boss.state === 'telegraph' ? [16, 12] : []);
+    if (family === 'reflect') {
+      ctx.beginPath(); ctx.moveTo(boss.x, boss.y); ctx.lineTo(player.x, player.y); ctx.stroke();
+      ctx.fillRect(player.x - 34, player.y - 34, 68, 68);
+    } else if (family === 'lure') {
+      ctx.fillRect(0, 160, 165, GROUND - 160);
+      ctx.fillRect(W - 165, 160, 165, GROUND - 160);
+      ctx.strokeRect(runtime.lureTargetX - 58, 110, 116, GROUND - 110);
+    } else if (family === 'vertical-lane') {
+      for (let lane = 0; lane < 3; lane++) {
+        const x = lane * (W / 3);
+        ctx.fillStyle = lane === runtime.safeLane ? 'rgba(120,255,190,0.12)' : hexToRgba(boss.data.color, 0.2);
+        ctx.fillRect(x, 52, W / 3, GROUND - 52);
+        ctx.strokeRect(x + 6, 58, W / 3 - 12, GROUND - 64);
+      }
+    } else if (family === 'posture-duo') {
+      ctx.beginPath(); ctx.arc(boss.x, boss.y, 118 + pulse * 14, 0, TAU); ctx.stroke();
+    } else if (family === 'puzzle-endgame') {
+      for (const node of runtime.puzzleNodes) {
+        ctx.fillStyle = node.active ? 'rgba(140,255,190,0.4)' : 'rgba(12,18,38,0.85)';
+        ctx.beginPath();
+        if (node.id % 3 === 0) ctx.rect(node.x - node.r, node.y - node.r, node.r * 2, node.r * 2);
+        else if (node.id % 3 === 1) ctx.arc(node.x, node.y, node.r, 0, TAU);
+        else { ctx.moveTo(node.x, node.y - node.r); ctx.lineTo(node.x + node.r, node.y + node.r); ctx.lineTo(node.x - node.r, node.y + node.r); ctx.closePath(); }
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.font = '900 16px system-ui'; ctx.textAlign = 'center'; ctx.fillText(String(node.id + 1), node.x, node.y + 6);
+      }
+    } else if (family === 'gravity-weather') {
+      const direction = runtime.environment.endsWith('left') ? -1 : runtime.environment.endsWith('right') ? 1 : 0;
+      if (direction) {
+        for (let y = 180; y < GROUND; y += 90) { ctx.beginPath(); ctx.moveTo(W / 2, y); ctx.lineTo(W / 2 + direction * 180, y); ctx.stroke(); }
+      }
+    }
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#fff';
+    ctx.font = '950 16px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(BOSS_REGISTRY.families[family]?.label || runtime.selectedPattern, W / 2, 205);
+    ctx.restore();
+  }
+
   function drawWeakPointFeedback() {
-    if (!boss || boss.defeated || boss.hidden || ['intro', 'phaseTransition'].includes(boss.state)) return;
+    if (!boss || boss.defeated || boss.hidden || ['intro', 'phaseEnter', 'phaseTransition', 'defeat'].includes(boss.state)) return;
     const time = save.settings.reduceMotion ? 0 : performance.now() / 1000;
     const pulse = save.settings.reduceMotion ? 0 : Math.sin(time * 7);
     const radius = boss.weakR + (boss.vulnerable ? 12 + pulse * 3 : 8);
@@ -3358,7 +4192,23 @@
   function drawEnemyShots() {
     for (const s of enemyShots) {
       ctx.save();
-      if (s.type === 'orb') {
+      if (s.type === 'reflectOrb') {
+        ctx.translate(s.x, s.y);
+        ctx.rotate(Math.atan2(s.vy, s.vx));
+        ctx.fillStyle = s.friendly ? '#fff39a' : boss?.data?.color || '#ffb24c';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        const sides = 3 + (s.shape || 0);
+        for (let index = 0; index < sides; index++) {
+          const angle = index / sides * TAU;
+          const x = Math.cos(angle) * s.r;
+          const y = Math.sin(angle) * s.r;
+          if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.fillRect(-3, -s.r - 13, 6, 10);
+      } else if (s.type === 'orb') {
         ctx.shadowColor = '#78eaff'; ctx.shadowBlur = 14;
         ctx.fillStyle = '#88f4ff'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,TAU); ctx.fill();
         ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(s.x-3,s.y-3,s.r*0.35,0,TAU); ctx.fill();
@@ -3417,6 +4267,7 @@
 
   function drawArenaWarnings() {
     if (!boss) return;
+    if (isExpandedBoss()) drawExpandedArenaWarnings();
     const pulse = save.settings.reduceMotion ? 0.5 : 0.5 + Math.sin(performance.now() / 85) * 0.18;
     if (boss.state === 'slamTelegraph' || boss.state === 'crashTelegraph') {
       const duration = boss.state === 'slamTelegraph' ? 0.85 : 0.82;
@@ -3560,6 +4411,7 @@
   function shake(amount){screenShake=Math.max(screenShake,amount);}
 
   function overlapsPlayerBoss(){
+    if (!boss?.collisionEnabled) return false;
     const bx=boss.x-boss.w/2,by=boss.y-boss.h/2;
     const px=player.x-player.w/2,py=player.y-player.h/2;
     return px<bx+boss.w&&px+player.w>bx&&py<by+boss.h&&py+player.h>by;
@@ -3670,7 +4522,7 @@
   document.getElementById('prologue-start')?.addEventListener('click',()=>{markStorySeen(STORY.prologue.id);startRun('rush',0);});
   storyContinue?.addEventListener('click',()=>{const action=pendingStoryAction; if(action) action();});
   storyBack?.addEventListener('click',()=>{pendingStoryAction=null;currentStoryKey=null;showScreen('title-screen');});
-  document.getElementById('practice').addEventListener('click',()=>{buildBossGrid();showScreen('boss-select-screen');});
+  document.getElementById('practice').addEventListener('click',()=>{selectionMode='practice';buildBossGrid('practice');showScreen('boss-select-screen');});
   document.querySelector('#continue-run')?.addEventListener('click', resumeRushSnapshot);
   document.querySelector('#codex')?.addEventListener('click',()=>{buildCodex();showScreen('codex-screen');});
   document.getElementById('how-to').addEventListener('click',()=>showScreen('how-screen'));
@@ -3707,10 +4559,33 @@
     const settings={...save.settings};save=structuredClone(DEFAULT_SAVE);save.settings=settings;persistSave();applySettings();buildBossGrid();buildCodex();syncContinueRun();showToast('Progression réinitialisée');
   });
 
+  BOSS_REGISTRY?.installDomHooks?.({
+    root: document,
+    onMode: mode => {
+      if (!['practice', 'forge'].includes(mode)) return;
+      selectionMode = mode;
+      buildBossGrid(mode);
+      showScreen('boss-select-screen');
+    },
+    onSelect: (entry, options) => {
+      const index = BOSSES.findIndex(candidate => candidate.id === entry.id);
+      if (index >= 0) startRun(entry.engine === 'expanded' ? 'forge' : selectionMode, index, options);
+    }
+  });
+
+  function launchForgeBoss(id, options = {}) {
+    const index = BOSSES.findIndex(entry => entry.id === id);
+    if (index < 0) return false;
+    return startRun(LEGACY_BOSS_IDS.has(id) && options.mode === 'practice' ? 'practice' : 'forge', index, options);
+  }
+
   const qaAllowed = new URLSearchParams(location.search).get('qa') === '1' && ['127.0.0.1', 'localhost'].includes(location.hostname);
   if (qaAllowed) Object.defineProperty(window, '__GEARSTORM_QA__', {
     value: Object.freeze({
-      getState: () => ({ state, runMode, launchMode: requestedLaunchMode, bossIndex: currentBossIndex, boss: boss?.data.name ?? null, bossState: boss?.state ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, barrier: player?.barrier ?? null, installed: [...runBuild.installed], rushSnapshot: sanitizeRushSnapshot(save.rushSnapshot), activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
+      getState: () => ({ state, runMode, launchMode: requestedLaunchMode, bossIndex: currentBossIndex, bossId: boss?.data.id ?? null, boss: boss?.data.name ?? null, bossState: boss?.state ?? null, bossFamily: boss?.runtime?.family ?? null, mechanicProgress: boss?.runtime?.mechanicProgress ?? null, mechanicTarget: boss?.runtime?.mechanicTarget ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, barrier: player?.barrier ?? null, installed: [...runBuild.installed], rushSnapshot: sanitizeRushSnapshot(save.rushSnapshot), activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
+      getBossRoster: () => BOSSES.map(entry => ({ id: entry.id, name: entry.name, engine: entry.engine, family: entry.family, wave: entry.wave })),
+      getForgeTelemetry: () => forgeTelemetrySnapshot(),
+      launchBoss: (id, options = {}) => launchForgeBoss(id, options),
       get art() { return getGeneratedArtState(); },
       get ready() { return artRuntime.ready; },
       get loaded() { return [...artRuntime.images.keys()]; },

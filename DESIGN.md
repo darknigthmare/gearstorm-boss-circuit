@@ -23,6 +23,12 @@ Le Professeur Cassian Voltério a transformé six infrastructures du Circuit en 
 
 Chaque boss franchit trois seuils de points de vie. Les phases augmentent la densité, modifient les timings et ajoutent des modules visuels ainsi que de nouvelles contre-attaques.
 
+## Forge des trente machines
+
+Après l’épilogue ou depuis le titre, la Forge expose les six machines historiques et vingt-quatre profils supplémentaires. Ce mode ne modifie ni `campaignCleared`, ni les six relais, ni l’ordre narratif de la campagne. Chaque extension possède trois phases et utilise une des huit familles partagées : renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo ou séquence finale.
+
+Le registre `boss-roster.js` contient les hitboxes, points faibles, valeurs, familles et télégraphes. `expansion-story.js` fournit objectifs, journaux et restaurations civiles symboliques. Les résultats Forge enregistrent temps, rang et maîtrise compatible, puis reviennent à la sélection.
+
 ## Progression
 
 Onze modules couvrent la cadence, le noyau, la ruée, le tir multiple, les dégâts, la surcharge, le bouclier, la mobilité, la précision, le combo et l’auto-réparation de phase. Ils ne persistent que pendant le Circuit en cours ; leurs limites de cumul propres empêchent de dépasser le niveau prévu. Les boss débloqués, meilleurs temps et meilleurs rangs sont sauvegardés sur l’appareil. Le Laboratoire permet de rejouer chaque machine vaincue sans faire avancer les six relais de campagne.
@@ -31,28 +37,11 @@ Onze modules couvrent la cadence, le noyau, la ruée, le tir multiple, les dég�
 
 Les dangers utilisent des télégraphes avant collision. Le mode mouvement réduit diminue les particules et transitions ; le contraste renforcé épaissit les repères. Le jeu accepte clavier AZERTY/QWERTY, souris, manette et tactile. L’indicateur de chargement artistique reste compact, annoncé par les technologies d’assistance et neutralise ses animations quand le mouvement réduit est demandé.
 
-## Direction artistique v2.2
+## Direction artistique v2.6
 
-La direction privilégie des silhouettes mécaniques immédiatement reconnaissables, une matière industrielle peinte et des accents lumineux propres à chaque district. La lisibilité de l’action prime sur le détail décoratif.
+La direction privilégie une silhouette lisible, une matière industrielle peinte et des accents lumineux propres à chaque machine. Les vingt sources OpenAI retenues produisent 129 WebP : 24 couches de décor, 54 pièces pour les six boss de campagne, 24 sprites Forge, 11 pièces de Riva et 16 VFX.
 
-### Décomposition des 14 masters
-
-- Six atlases de décor 2 × 2 produisent chacun quatre couches : fond lointain opaque, plan médian, premier plan et atmosphère superposable. Total : 24 couches de parallaxe.
-- Six atlases de boss 3 × 3 produisent chacun neuf pièces articulables sur fond réellement transparent. Total : 54 pièces.
-- Un atlas Riva Spark 3 × 3 fournit neuf poses ou états cohérents à la même échelle.
-- Un atlas VFX 4 × 4 fournit seize effets isolés, sans texte et sans décor résiduel.
-
-Le total de production est de 14 masters OpenAI Image Generation intégré pour 103 assets indépendants. Les images sont originales, propres à GEARSTORM, sans logo, filigrane, texte incorporé ni reprise d’une franchise tierce.
-
-### Règles d’intégration
-
-- Les couches d’arène doivent conserver des zones de jeu lisibles et ne jamais masquer un télégraphe.
-- Les pivots des neuf pièces de chaque boss doivent permettre l’animation sans saut de silhouette.
-- Riva conserve proportions, palette et orientation entre ses neuf cellules.
-- Les VFX doivent être isolables sans bord de cellule visible.
-- Le key art et le titre sont prioritaires ; les assets de rencontre sont chargés à la demande.
-- Le cache PWA peut conserver les ressources validées, tandis que le rendu procédural Canvas assure le fallback en cas d’échec.
-- La progression de chargement peut être signalée au titre ou au prologue, sans bloquer l’accès aux commandes et avec respect du contraste élevé et du mouvement réduit.
+Riva utilise un corps v4 cohérent et un seul bras-canon indépendant. Le pivot de semelle tombe sur le plancher logique ; l’ombre n’est plus une plate-forme lumineuse. Les boss Forge possèdent chacun un sprite transparent, mais leurs arènes et animations secondaires restent procédurales. Le moteur conserve ses fallbacks si une ressource ne charge pas.
 
 ## Progression narrative v2.4
 
@@ -93,7 +82,7 @@ Les objectifs et conseils sont séparés : désactiver `#hints-toggle` masque `#
 
 ## Contrats de maîtrise
 
-`story.js` définit trois contrats par machine, soit dix-huit objectifs : temps de référence en difficulté Ingénieur ou Overdrive, combat sans dégâts et défi propre au pattern ou au coup final. Leur définition narrative et leurs identifiants sont stables ; un contrat n’est considéré acquis que lorsque le runtime enregistre sa condition dans la sauvegarde locale. Les défis de Magnetron et Chrono Mantis exigent un cycle complet de phase 3 sans l’impact interdit ; celui de Foundry Titan interdit un impact direct de mine, pas son déclenchement automatique.
+`story.js` définit dix-huit contrats de campagne et `expansion-story.js` soixante-douze contrats Forge, soit quatre-vingt-dix objectifs déclarés. Le runtime mesure les dix-huit historiques et soixante-quatre métriques Forge. Les huit métriques qui demandent une sous-mécanique non encore représentée sont affichées « NON ÉVALUÉE » et ne peuvent jamais être accordées par défaut. Un contrat n’est acquis qu’après évaluation et écriture dans la sauvegarde locale. Les défis de Magnetron et Chrono Mantis exigent un cycle complet de phase 3 sans l’impact interdit ; celui de Foundry Titan interdit un impact direct de mine.
 
 ## Fin
 

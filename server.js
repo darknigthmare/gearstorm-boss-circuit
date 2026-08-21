@@ -3,11 +3,13 @@ const { readFile, realpath, stat } = require('node:fs/promises');
 const { extname, resolve, sep } = require('node:path');
 
 const PROJECT_ROOT = resolve(__dirname);
-const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.5.0/';
+const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.6.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
   'styles.css',
   'story.js',
+  'expansion-story.js',
+  'boss-roster.js',
   'game.js',
   'manifest.webmanifest',
   'sw.js',
@@ -24,6 +26,8 @@ const REVALIDATE_FILES = new Set([
   'index.html',
   'styles.css',
   'story.js',
+  'expansion-story.js',
+  'boss-roster.js',
   'game.js',
   'manifest.webmanifest',
   'sw.js',
@@ -67,7 +71,9 @@ function sendText(request, response, statusCode, message, extraHeaders = {}) {
 function isPublicAsset(relative) {
   if (PUBLIC_SHELL_ASSETS.has(relative)) return true;
   if (relative === GENERATED_RUNTIME_PREFIX + 'asset-manifest.json') return true;
-  return /^assets\/generated\/v2\.5\.0\/(?:arenas|bosses|heroine|vfx)\/[a-z0-9-]+(?:\/[a-z0-9-]+)?\.webp$/.test(relative);
+  if (!relative.startsWith(GENERATED_RUNTIME_PREFIX)) return false;
+  const runtimePath = relative.slice(GENERATED_RUNTIME_PREFIX.length);
+  return /^(?:arenas|bosses|heroine|vfx)\/[a-z0-9-]+(?:\/[a-z0-9-]+)?\.webp$/.test(runtimePath);
 }
 
 function resolvePublicFile(rootDir, requestUrl, host) {

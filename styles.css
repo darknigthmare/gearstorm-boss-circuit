@@ -449,19 +449,42 @@ h3 { margin: 0 0 0.45rem; color: #eefaff; }
 
 .boss-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.boss-mode-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: -0.55rem 0 0.9rem;
+}
+
+.boss-mode-tabs button {
+  width: auto;
+  min-height: 40px;
+  flex: 1 1 220px;
+  padding: 0.62rem 0.9rem;
+  border-color: rgba(126, 233, 255, 0.24);
+  background: rgba(8, 14, 31, 0.82);
+  font-size: 0.78rem;
+}
+
+.boss-mode-tabs button[aria-pressed="true"] {
+  border-color: rgba(255, 178, 76, 0.7);
+  background: rgba(255, 178, 76, 0.13);
+  color: #fff2cf;
 }
 
 .boss-card {
   position: relative;
-  min-height: 205px;
+  min-height: 178px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: space-between;
   overflow: hidden;
-  padding: 1.1rem;
+  padding: 0.95rem;
   text-align: left;
 }
 
@@ -480,8 +503,8 @@ h3 { margin: 0 0 0.45rem; color: #eefaff; }
 .boss-number { color: var(--boss-color, var(--cyan)); font-weight: 950; letter-spacing: 0.12em; }
 .boss-card strong { display: block; margin-top: 0.55rem; font-size: 1.15rem; }
 .boss-card em { display: block; margin-top: 0.3rem; color: var(--muted); font-size: 0.85rem; font-style: normal; }
-.boss-card small { color: #a7b2cd; line-height: 1.4; }
-.boss-card .best { margin-top: 0.65rem; color: #ffe39a; font-weight: 800; }
+.boss-card small { display: block; color: #a7b2cd; line-height: 1.4; }
+.boss-card .best { display: block; margin-top: 0.65rem; color: #ffe39a; font-weight: 800; }
 
 .manual-grid {
   display: grid;

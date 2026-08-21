@@ -1,5 +1,15 @@
 # Historique des versions
 
+## 2.6.0 — Les trente machines
+
+- Ajout d’une Forge séparée de la campagne : trente boss sélectionnables, quatre-vingt-dix phases et huit familles mécaniques pilotées par données.
+- Intégration des profils 07–30 avec télégraphes, points faibles, valeurs propres, résultats, journal de Riva et progression de maîtrise sans modifier les six relais narratifs.
+- Quatre planches OpenAI originales couvrent les 24 nouvelles silhouettes ; le manifeste immuable v2.6 publie 129 WebP et conserve un fallback procédural.
+- Remplacement du rig composite de Riva par un corps OpenAI v4 cohérent et un bras-canon unique ; semelles alignées sur le sol logique et ombre de contact resserrée.
+- Ajout des registres `boss-roster.js` et `expansion-story.js`, de la route `?mode=forge`, de la sélection 30 boss et des contrats de release correspondants.
+- Nettoyage déterministe des fragments alpha entre cellules sans repeindre les sources générées.
+- Chaîne PWA, serveur, cache Vercel, CI et build alignés sur la v2.6.
+
 ## 2.5.0 — Forge des machines
 
 - Remplacement du membre avant de Riva par un avant-bras OpenAI dédié, sans épaule ni bras complet dupliqué ; le torse fournit le bras arrière et le canon reste le membre de tir.

@@ -1,16 +1,18 @@
 # GEARSTORM — Contrat d’expansion des boss
 
-Statut du document : spécification de production
+Statut du document : implémentation Forge v2.6 et feuille de raffinement
 
-Portée : 30 boss originaux, dont 6 déjà présents dans le jeu et 24 planifiés
+Portée : 30 boss originaux jouables, dont 6 en campagne et 24 dans la Forge
 
-Référence technique actuelle : GEARSTORM v2.5, manifeste d’assets générés v2.5.0
+Référence technique actuelle : GEARSTORM v2.6, manifeste d’assets générés v2.6.0
 
 ## 1. Objet et limites
 
 Ce document transforme l’étude des grandes mécaniques de boss de la série Sonic en une feuille de route originale pour GEARSTORM. Il décrit des verbes de jeu, des structures d’arène et des méthodes de production. Il n’autorise ni la copie d’une apparence, ni la reprise d’un nom, d’une silhouette, d’un personnage, d’un décor ou d’un asset Sega.
 
-Les vingt-quatre boss des vagues 1 à 4 sont des concepts de production. Ils ne sont pas implémentés, jouables ou illustrés au moment de la rédaction. Leur nom, leur place narrative et leur équilibrage restent soumis à validation avant développement.
+La v2.6 intègre les vingt-quatre boss des vagues 1 à 4 dans une Forge séparée de la campagne. Les trente machines sont sélectionnables et combattables, possèdent trois phases, des télégraphes, des valeurs propres, un objectif et une fiche narrative. Les 24 profils Forge partagent huit familles de mécaniques pilotées par données ; leurs arènes et animations secondaires utilisent le rendu procédural, tandis qu’un sprite OpenAI transparent propre à chaque boss est chargé à la demande.
+
+Ce statut « jouable » ne signifie pas que les vingt-quatre extensions disposent déjà chacune d’une IA entièrement sur mesure, d’un rig multipièces ou d’un décor en quatre couches. Les tableaux ci-dessous restent aussi la feuille de raffinement pour transformer progressivement les familles partagées en rencontres encore plus spécifiques. La campagne, ses six relais et l’épilogue restent volontairement limités aux six boss historiques.
 
 La mention IP-safe désigne ici un ensemble de garde-fous internes. Elle ne remplace pas une validation juridique lorsqu’une diffusion commerciale l’exige.
 
@@ -70,8 +72,8 @@ Cette méthode permet de couvrir une grande variété historique de combats sans
 
 | Statut | Signification |
 |---|---|
-| Présent | Le boss existe dans la version actuelle du jeu. Ce statut ne signifie pas qu’il ne reste aucun travail d’art, de rig ou d’équilibrage. |
-| Planifié | Le concept est décrit dans ce document, sans promesse d’implémentation déjà réalisée. |
+| Campagne | Boss canonique de la campagne, avec progression, district et rig historique. |
+| Forge jouable | Boss sélectionnable dans la Forge, doté de trois phases, d’un sprite original et d’une famille mécanique partagée. |
 | Bloqué | Une dépendance moteur, artistique, narrative ou d’accessibilité empêche sa production. |
 | Candidat release | Code, assets, narration, tests et audit visuel sont terminés pour la rencontre. |
 
@@ -96,12 +98,12 @@ Objectif : ajouter six boucles très différentes en restant compatible avec le 
 
 | No | Nom de travail | Statut | Arène proposée | Boucle principale | Phases et règle d’équité |
 |---:|---|---|---|---|---|
-| 07 | BASTION RICOCHET | Planifié | Galerie des Parafoudres | Renvoyer des charges balistiques vers trois relais de bouclier | P1 : un angle ; P2 : ricochets ; P3 : relais mobiles. Chaque projectile renvoyable porte une forme et un son uniques. |
-| 08 | HYDRAULIC WARDEN | Planifié | Chambre des Mors | Leurrer ses béliers dans les presses latérales | Les presses ne s’activent jamais sans zone de refuge visible ; la dernière phase accélère le cycle mais n’en réduit pas le télégraphe. |
-| 09 | HIVE FOREMAN | Planifié | Dépôt des Micro-Forges | Choisir entre drones de protection, réparation et munition | Trois familles de drones, une seule vague active à la fois ; détruire le bon drone expose le contremaître. |
-| 10 | ECHO FENCER | Planifié | Salle de Répétition | Duel mimétique qui répond à l’action la plus répétée de Riva | La copie est annoncée avant usage ; aucune capacité de la joueuse n’est désactivée et le boss ne possède pas sa silhouette. |
-| 11 | BREAKER ARRAY | Planifié | Station de Délestage | Détruire quatre modules dans l’ordre choisi pour ouvrir le noyau | L’ordre modifie la phase suivante sans créer de choix perdant ; chaque module a sa hitbox et son état endommagé. |
-| 12 | VERTICAL VERDICT | Planifié | Puits des Contrepoids | Monter avec un ascenseur tout en retournant les contrepoids | Le bas de l’écran n’est létal qu’après double avertissement ; une plateforme sûre existe à chaque cycle. |
+| 07 | BASTION RICOCHET | Forge jouable | Galerie des Parafoudres | Renvoyer des charges balistiques vers trois relais de bouclier | P1 : un angle ; P2 : ricochets ; P3 : relais mobiles. Chaque projectile renvoyable porte une forme et un son uniques. |
+| 08 | HYDRAULIC WARDEN | Forge jouable | Chambre des Mors | Leurrer ses béliers dans les presses latérales | Les presses ne s’activent jamais sans zone de refuge visible ; la dernière phase accélère le cycle mais n’en réduit pas le télégraphe. |
+| 09 | HIVE FOREMAN | Forge jouable | Dépôt des Micro-Forges | Choisir entre drones de protection, réparation et munition | Trois familles de drones, une seule vague active à la fois ; détruire le bon drone expose le contremaître. |
+| 10 | ECHO FENCER | Forge jouable | Salle de Répétition | Duel mimétique qui répond à l’action la plus répétée de Riva | La copie est annoncée avant usage ; aucune capacité de la joueuse n’est désactivée et le boss ne possède pas sa silhouette. |
+| 11 | BREAKER ARRAY | Forge jouable | Station de Délestage | Détruire quatre modules dans l’ordre choisi pour ouvrir le noyau | L’ordre modifie la phase suivante sans créer de choix perdant ; chaque module a sa hitbox et son état endommagé. |
+| 12 | VERTICAL VERDICT | Forge jouable | Puits des Contrepoids | Monter avec un ascenseur tout en retournant les contrepoids | Le bas de l’écran n’est létal qu’après double avertissement ; une plateforme sûre existe à chaque cycle. |
 
 Critère de sortie de vague : les six boss doivent fonctionner au clavier, au tactile et à la manette, disposer de leur pack d’assets complet, de tests déterministes et d’un audit visuel desktop/mobile.
 
@@ -111,12 +113,12 @@ Objectif : étendre le contrôleur d’arène avec défilement, voies, destructi
 
 | No | Nom de travail | Statut | Arène proposée | Boucle principale | Phases et règle d’équité |
 |---:|---|---|---|---|---|
-| 13 | RAIL TYRANT | Planifié | Rocade Cargo 7 | Rattraper une locomotive blindée, détruire ses attaches puis son moteur | Défilement continu ; les obstacles impossibles ne peuvent jamais partager la même voie. |
-| 14 | TRIPLEX HUNTER | Planifié | Couloir Triplex | Changer de voie pour armer un tir de flanc | Trois voies, attaque frontale puis croisée ; toute permutation est annoncée avant verrouillage. |
-| 15 | GROUND EATER | Planifié | Chantier de Démolition | Forcer la machine à détruire ses propres appuis | Les zones détruites sont reconstruites par roulement ; au moins 35 % du sol reste praticable. |
-| 16 | FLOODLINE LEVIATHAN | Planifié | Réservoir des Écluses | Fermer des vannes pendant que l’eau modifie sa hauteur et les trajectoires | La pression remplace toute notion d’oxygène si le lore de Riva ne valide pas la plongée ; aucune mort instantanée hors chute clairement signalée. |
-| 17 | CENTRIFUGE ZERO | Planifié | Anneau Centrifuge | Exploiter les quarts de tour de gravité pour atteindre le rotor | Rotation par pas de 90 degrés ; option réduction des mouvements avec transition fondue et caméra stable. |
-| 18 | TEMPEST REGULATOR | Planifié | Observatoire Météore | Neutraliser successivement vent, pluie conductrice et chaleur | Un seul état météorologique dangereux à la fois ; pictogrammes et sons accompagnent toujours la couleur. |
+| 13 | RAIL TYRANT | Forge jouable | Rocade Cargo 7 | Rattraper une locomotive blindée, détruire ses attaches puis son moteur | Défilement continu ; les obstacles impossibles ne peuvent jamais partager la même voie. |
+| 14 | TRIPLEX HUNTER | Forge jouable | Couloir Triplex | Changer de voie pour armer un tir de flanc | Trois voies, attaque frontale puis croisée ; toute permutation est annoncée avant verrouillage. |
+| 15 | GROUND EATER | Forge jouable | Chantier de Démolition | Forcer la machine à détruire ses propres appuis | Les zones détruites sont reconstruites par roulement ; au moins 35 % du sol reste praticable. |
+| 16 | FLOODLINE LEVIATHAN | Forge jouable | Réservoir des Écluses | Fermer des vannes pendant que l’eau modifie sa hauteur et les trajectoires | La pression remplace toute notion d’oxygène si le lore de Riva ne valide pas la plongée ; aucune mort instantanée hors chute clairement signalée. |
+| 17 | CENTRIFUGE ZERO | Forge jouable | Anneau Centrifuge | Exploiter les quarts de tour de gravité pour atteindre le rotor | Rotation par pas de 90 degrés ; option réduction des mouvements avec transition fondue et caméra stable. |
+| 18 | TEMPEST REGULATOR | Forge jouable | Observatoire Météore | Neutraliser successivement vent, pluie conductrice et chaleur | Un seul état météorologique dangereux à la fois ; pictogrammes et sons accompagnent toujours la couleur. |
 
 Critère de sortie de vague : le contrôleur d’arène doit être générique, testé séparément et réutilisable. Aucun de ces boss ne doit coder son défilement ou sa gravité directement dans sa logique d’attaque.
 
@@ -126,12 +128,12 @@ Objectif : ajouter rupture, ascension, alternance de cibles, réaction au build 
 
 | No | Nom de travail | Statut | Arène proposée | Boucle principale | Phases et règle d’équité |
 |---:|---|---|---|---|---|
-| 19 | ASCENSION FRAME | Planifié | Pilier des Ascensions | Courir sur les bras abaissés du colosse pour détruire ses ancrages | Trois routes courtes, jamais une longue séquence sans reprise ; chute non létale vers une plateforme de récupération. |
-| 20 | COUNTERFORGE | Planifié | Cour du Contrecoup | Briser sa posture par ruée ou contre au moment précis | La fenêtre de contre utilise un signal visuel, sonore et haptique ; mode Pilote élargit la fenêtre. |
-| 21 | CARRIER CATHEDRAL | Planifié | Cathédrale Mobile | Traverser plusieurs sections de la forteresse avant le cœur | Le boss devient l’arène ; chaque section constitue un checkpoint interne en entraînement. |
-| 22 | TWIN GOVERNORS | Planifié | Chambre des Deux Régulateurs | Deux machines se passent bouclier et alimentation | Une seule cible principale vulnérable ; leurs collisions mutuelles peuvent être provoquées mais jamais requises sans indice. |
-| 23 | LOADOUT REACTOR | Planifié | Atelier des Modules | Réagit aux modules installés par Riva et expose un contre différent | Adaptation plafonnée à une mécanique ; aucun hard counter ne neutralise le build choisi. |
-| 24 | ORBITAL FAMINE | Planifié | Orbital Terminus | Combat aérien où une réserve d’énergie décroît et se recharge par actions risquées | Des condensateurs apparaissent selon une cadence garantie ; la réserve ne masque jamais la barre de vie. |
+| 19 | ASCENSION FRAME | Forge jouable | Pilier des Ascensions | Courir sur les bras abaissés du colosse pour détruire ses ancrages | Trois routes courtes, jamais une longue séquence sans reprise ; chute non létale vers une plateforme de récupération. |
+| 20 | COUNTERFORGE | Forge jouable | Cour du Contrecoup | Briser sa posture par ruée ou contre au moment précis | La fenêtre de contre utilise un signal visuel, sonore et haptique ; mode Pilote élargit la fenêtre. |
+| 21 | CARRIER CATHEDRAL | Forge jouable | Cathédrale Mobile | Traverser plusieurs sections de la forteresse avant le cœur | Le boss devient l’arène ; chaque section constitue un checkpoint interne en entraînement. |
+| 22 | TWIN GOVERNORS | Forge jouable | Chambre des Deux Régulateurs | Deux machines se passent bouclier et alimentation | Une seule cible principale vulnérable ; leurs collisions mutuelles peuvent être provoquées mais jamais requises sans indice. |
+| 23 | LOADOUT REACTOR | Forge jouable | Atelier des Modules | Réagit aux modules installés par Riva et expose un contre différent | Adaptation plafonnée à une mécanique ; aucun hard counter ne neutralise le build choisi. |
+| 24 | ORBITAL FAMINE | Forge jouable | Orbital Terminus | Combat aérien où une réserve d’énergie décroît et se recharge par actions risquées | Des condensateurs apparaissent selon une cadence garantie ; la réserve ne masque jamais la barre de vie. |
 
 Critère de sortie de vague : les pièces destructibles, points d’ancrage, jauges de rupture et ressources temporaires doivent être exposés par des composants moteur communs.
 
@@ -141,12 +143,12 @@ Objectif : introduire des changements de genre courts, un gauntlet, une adaptati
 
 | No | Nom de travail | Statut | Arène proposée | Boucle principale | Phases et règle d’équité |
 |---:|---|---|---|---|---|
-| 25 | LOGIC CRUCIBLE | Planifié | Chambre Booléenne | Activer des relais selon une séquence de formes pour ouvrir le noyau | Puzzle de moins de 45 secondes par cycle ; solution lisible sans couleur et jamais réinitialisée par un dégât. |
-| 26 | VECTOR VAULT | Planifié | Chambre des Vecteurs | Orienter des déflecteurs pour faire ricocher les tirs de Riva | Prévisualisation de trajectoire en mode Pilote ; le boss reste actif pendant la résolution. |
-| 27 | SKYBORNE BATTERY | Planifié | Batterie Aérostatique | Séquence de tir mobile, esquive et renvoi de torpilles | Changement de genre limité à une rencontre ; visée assistée au tactile et à la manette. |
-| 28 | ENDURANCE ENGINE | Planifié | Circuit d’Endurance | Machine qui convoque des fragments mécaniques en gauntlet sans soin complet | Six manches courtes et télégraphiées ; reprise au début de la manche en Laboratoire. |
-| 29 | ADAPTIVE ARCHIVIST | Planifié | Archives Réactives | Observe la fréquence de tir, saut et ruée puis change une seule réponse | L’adaptation est locale au combat, visible dans l’interface et remise à zéro à chaque tentative. |
-| 30 | NULL CROWN | Planifié | Trône Zéro | Boss secret composite débloqué par la maîtrise, combinant renvoi, modules et rupture | Trois phases avec checkpoint d’entraînement ; aucune phase ne copie l’apparence ou l’ordre d’un final de franchise existant. |
+| 25 | LOGIC CRUCIBLE | Forge jouable | Chambre Booléenne | Activer des relais selon une séquence de formes pour ouvrir le noyau | Puzzle de moins de 45 secondes par cycle ; solution lisible sans couleur et jamais réinitialisée par un dégât. |
+| 26 | VECTOR VAULT | Forge jouable | Chambre des Vecteurs | Orienter des déflecteurs pour faire ricocher les tirs de Riva | Prévisualisation de trajectoire en mode Pilote ; le boss reste actif pendant la résolution. |
+| 27 | SKYBORNE BATTERY | Forge jouable | Batterie Aérostatique | Séquence de tir mobile, esquive et renvoi de torpilles | Changement de genre limité à une rencontre ; visée assistée au tactile et à la manette. |
+| 28 | ENDURANCE ENGINE | Forge jouable | Circuit d’Endurance | Machine qui convoque des fragments mécaniques en gauntlet sans soin complet | Six manches courtes et télégraphiées ; reprise au début de la manche en Laboratoire. |
+| 29 | ADAPTIVE ARCHIVIST | Forge jouable | Archives Réactives | Observe la fréquence de tir, saut et ruée puis change une seule réponse | L’adaptation est locale au combat, visible dans l’interface et remise à zéro à chaque tentative. |
+| 30 | NULL CROWN | Forge jouable | Trône Zéro | Boss secret composite débloqué par la maîtrise, combinant renvoi, modules et rupture | Trois phases avec checkpoint d’entraînement ; aucune phase ne copie l’apparence ou l’ordre d’un final de franchise existant. |
 
 Critère de sortie de vague : le boss secret ne peut être annoncé comme disponible avant que sa condition de déblocage, sa sauvegarde, son Codex, ses récompenses et son épilogue optionnel soient réellement implémentés.
 
@@ -281,13 +283,13 @@ L’ajout des vagues demandera une migration de sauvegarde, sans écraser la ver
 - version de données du registre ;
 - valeur par défaut sûre pour tout contenu absent d’une ancienne sauvegarde.
 
-La version exacte du nouveau format sera décidée lors de l’implémentation. Ce document ne prétend pas qu’une migration existe déjà.
+La sauvegarde v4 conserve déjà des maps dynamiques de temps, rangs et maîtrise ; aucun nouveau schéma n’est nécessaire pour les identifiants Forge. Les résultats Forge restent séparés de `campaignCleared` et des checkpoints du Rush.
 
 ## 6. Architecture des packs d’assets
 
 ### 6.1 Compatibilité avec le manifeste actuel
 
-Le manifeste v2.5.0 utilise déjà :
+Le manifeste v2.6.0 utilise :
 
 - quatre couches d’arène de 768 × 512 pixels ;
 - des pièces de boss de 418 × 418 pixels avec alpha ;
@@ -295,7 +297,7 @@ Le manifeste v2.5.0 utilise déjà :
 - largeur, hauteur, poids, transparence et SHA-256 ;
 - chargement par bundle de boss.
 
-L’expansion doit conserver cette compatibilité avant toute évolution de schéma.
+Les 24 sprites Forge composites respectent ce contrat. L’arborescence multipièces ci-dessous demeure la cible de raffinement, pas une affirmation sur les fichiers déjà publiés.
 
 ### 6.2 Arborescence cible par boss
 
@@ -576,19 +578,18 @@ Un concept trop proche est rejeté puis reconstruit depuis sa fonction industrie
 - libération des bitmaps d’un boss quitté, sauf bundle explicitement conservé ;
 - possibilité de réduire particules et secousses sans modifier la difficulté.
 
-## 11. Ordre d’exécution recommandé
+## 11. Backlog de raffinement après v2.6
 
-1. Corriger définitivement le rig de Riva, notamment les avant-bras, pivots et ordre de dessin.
-2. Stabiliser les six boss actuels et leur contrat de données.
-3. Extraire la machine à états et les patterns communs.
-4. Étendre le manifeste avec pivots, rôles et provenance.
-5. Produire entièrement un seul vertical slice de la vague 1 : code, art, lore, tests et QA.
-6. Valider le coût réel du vertical slice avant de générer les cinq autres packs.
-7. Livrer une vague à la fois.
-8. Ne démarrer les colosses et changements de genre qu’après validation du contrôleur d’arène.
-9. Produire NULL CROWN en dernier, lorsque toutes ses mécaniques sources sont stables.
+La base jouable est livrée ; les étapes suivantes améliorent la singularité sans bloquer l’accès aux trente combats :
 
-Une vague n’est pas terminée parce que ses images existent. Elle est terminée lorsque ses six combats sont jouables, équilibrés, intégrés à la progression, documentés et vérifiés.
+1. convertir les sprites composites Forge en rigs multipièces lorsque leur animation propre le justifie ;
+2. produire des décors parallaxe dédiés aux quatre vagues ;
+3. spécialiser progressivement les variantes d’arène au-delà des huit familles partagées ;
+4. mesurer et automatiser les contrats de maîtrise qui exigent une télémétrie encore absente ;
+5. équilibrer temps de référence, dégâts et densité sur appareil mobile réel ;
+6. conserver les identifiants, la séparation campagne/Forge et la sauvegarde v4 pendant ces raffinements.
+
+Une image seule ne vaut pas un combat. Dans la v2.6, chaque profil possède bien une boucle jouable ; les améliorations listées ici concernent sa profondeur, son animation et sa validation matérielle.
 
 ## 12. Sources officielles consultées
 
@@ -613,16 +614,16 @@ Les sources servent à inventorier les jeux et à comprendre des familles géné
 - SEGA, Sonic Rumble — manches, survie et compétition multijoueur : https://sonic.sega.jp/SonicChannel/gametitle/SonicRamble.html
 - SEGA, Sonic Racing: CrossWorlds — variation de parcours et compétition : https://sonic.sega.jp/SonicRacingCrossWorlds/
 
-## 13. Définition de terminé pour les 30 boss
+## 13. État livré des 30 boss
 
-Le contrat de trente boss sera réellement accompli uniquement lorsque :
+Le contrat de base est atteint dans la v2.6 :
 
-- les six boss actuels auront passé la nouvelle validation de rig et de gameplay ;
-- les vingt-quatre boss planifiés seront effectivement implémentés ;
-- trente packs d’assets originaux et traçables seront intégrés ;
-- les trente rencontres disposeront de narration, Codex, progression et maîtrise ;
-- les migrations de sauvegarde seront testées ;
-- toutes les vagues auront passé build, tests, audit visuel, accessibilité et performance ;
-- la version publiée aura été vérifiée dans le navigateur et sur ses contrôles réels.
+- six boss de campagne et vingt-quatre boss Forge sont présents dans le registre ;
+- les trente rencontres ont trois phases et sont lançables depuis l’interface ou la surface QA locale ;
+- chaque extension utilise une des huit familles mécaniques déterministes ;
+- les 24 silhouettes Forge et les 6 rigs historiques sont présents dans le manifeste v2.6 ;
+- expansion-story.js fournit quatre vagues, journaux, objectifs, Codex et 72 contrats déclarés ;
+- les résultats Forge n’avancent jamais les six relais de campagne ;
+- build, tests de contrats, serveur, PWA et release valident ce registre.
 
-Jusque-là, ce document reste un contrat d’expansion, pas une déclaration de contenu livré.
+Limites assumées : les arènes Forge restent procédurales, les 24 nouvelles machines utilisent un sprite composite au lieu de pièces indépendantes, plusieurs contrats très spécifiques sont affichés « NON ÉVALUÉE » tant que leur télémétrie exacte n’existe pas, et la validation tactile/manette physique reste une QA matérielle séparée.

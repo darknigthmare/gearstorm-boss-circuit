@@ -2,19 +2,19 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 
-export const ASSET_RELEASE = '2.5.0';
+export const ASSET_RELEASE = '2.6.0';
 export const ASSET_DIRECTORY = `v${ASSET_RELEASE}`;
-export const ASSET_MANIFEST_PATH = 'assets/generated/v2.5.0/asset-manifest.json';
+export const ASSET_MANIFEST_PATH = 'assets/generated/v2.6.0/asset-manifest.json';
 export const ASSET_BUDGET_BYTES = 20 * 1024 * 1024;
 export const EXPECTED_COUNTS = Object.freeze({
-  runtimeFiles: 103,
+  runtimeFiles: 129,
   arenaLayers: 24,
-  bossParts: 54,
-  heroineParts: 9,
+  bossParts: 78,
+  heroineParts: 11,
   vfx: 16,
-  alpha: 97,
+  alpha: 123,
   opaque: 6,
-  masters: 17,
+  masters: 20,
 });
 export const CATEGORY_BUDGETS = Object.freeze({
   arena: 512 * 1024,
@@ -22,7 +22,14 @@ export const CATEGORY_BUDGETS = Object.freeze({
   heroine: 256 * 1024,
   vfx: 128 * 1024,
 });
-export const BOSS_IDS = Object.freeze(['rammer', 'kraken', 'drill', 'mantis', 'cyclotron', 'omega']);
+export const CORE_BOSS_IDS = Object.freeze(['rammer', 'kraken', 'drill', 'mantis', 'cyclotron', 'omega']);
+export const EXPANSION_BOSS_IDS = Object.freeze([
+  'bastion-ricochet', 'hydraulic-warden', 'hive-foreman', 'echo-fencer', 'breaker-array', 'vertical-verdict',
+  'rail-tyrant', 'triplex-hunter', 'ground-eater', 'floodline-leviathan', 'centrifuge-zero', 'tempest-regulator',
+  'ascension-frame', 'counterforge', 'carrier-cathedral', 'twin-governors', 'loadout-reactor', 'orbital-famine',
+  'logic-crucible', 'vector-vault', 'skyborne-battery', 'endurance-engine', 'adaptive-archivist', 'null-crown',
+]);
+export const BOSS_IDS = Object.freeze([...CORE_BOSS_IDS, ...EXPANSION_BOSS_IDS]);
 const ARENA_LAYERS = Object.freeze(['far', 'mid', 'ground', 'foreground']);
 const WEBP_HEADER = Buffer.from('WEBP');
 const RIFF_HEADER = Buffer.from('RIFF');
@@ -132,10 +139,10 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd()) {
   invariant(manifest.release === ASSET_RELEASE, `asset-manifest: release ${ASSET_RELEASE} attendue`);
   invariant(typeof manifest.generator === 'string' && manifest.generator.length > 0, 'asset-manifest: générateur absent');
   invariant(typeof manifest.license === 'string' && manifest.license.length > 0, 'asset-manifest: licence absente');
-  keysMatch(manifest.arenas, BOSS_IDS, 'Arènes');
+  keysMatch(manifest.arenas, CORE_BOSS_IDS, 'Arènes');
   keysMatch(manifest.bosses, BOSS_IDS, 'Boss');
 
-  for (const bossId of BOSS_IDS) {
+  for (const bossId of CORE_BOSS_IDS) {
     keysMatch(manifest.arenas[bossId].layers, ARENA_LAYERS, `Couches d’arène ${bossId}`);
     invariant(Object.keys(manifest.bosses[bossId].parts || {}).length === 9, `Boss ${bossId}: 9 pièces attendues`);
     for (const [layer, asset] of Object.entries(manifest.arenas[bossId].layers)) {
@@ -143,14 +150,17 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd()) {
       invariant(asset.alpha === (layer !== 'far'), `arena:${bossId}:${layer}: contrat alpha invalide`);
     }
   }
+  for (const bossId of EXPANSION_BOSS_IDS) {
+    keysMatch(manifest.bosses[bossId].parts, ['sprite'], `Sprite boss d'extension ${bossId}`);
+  }
   invariant(manifest.heroine?.id === 'riva-spark', 'Héroïne riva-spark attendue');
-  invariant(Object.keys(manifest.heroine.parts || {}).length === EXPECTED_COUNTS.heroineParts, '9 pièces héroïne attendues');
+  invariant(Object.keys(manifest.heroine.parts || {}).length === EXPECTED_COUNTS.heroineParts, '11 pièces héroïne attendues');
   invariant(Object.keys(manifest.vfx || {}).length === EXPECTED_COUNTS.vfx, '16 VFX attendus');
 
   const entries = flattenAssetManifest(manifest);
   invariant(entries.length === EXPECTED_COUNTS.runtimeFiles, `${EXPECTED_COUNTS.runtimeFiles} assets runtime attendus, reçu ${entries.length}`);
   invariant(entries.filter(entry => entry.kind === 'arena').length === EXPECTED_COUNTS.arenaLayers, '24 couches d’arène attendues');
-  invariant(entries.filter(entry => entry.kind === 'boss').length === EXPECTED_COUNTS.bossParts, '54 pièces boss attendues');
+  invariant(entries.filter(entry => entry.kind === 'boss').length === EXPECTED_COUNTS.bossParts, '78 pièces boss attendues');
 
   const ids = new Set();
   const sources = new Set();
@@ -162,7 +172,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd()) {
   for (const entry of entries) {
     invariant(!ids.has(entry.id), `Identifiant dupliqué: ${entry.id}`);
     ids.add(entry.id);
-    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.5\.0\/.+\.webp$/.test(entry.src), `${entry.id}: chemin runtime invalide`);
+    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.6\.0\/.+\.webp$/.test(entry.src), `${entry.id}: chemin runtime invalide`);
     invariant(!entry.src.includes('..') && !entry.src.includes('\\'), `${entry.id}: chemin non sécurisé`);
     invariant(!sources.has(entry.src), `Source dupliquée: ${entry.src}`);
     sources.add(entry.src);

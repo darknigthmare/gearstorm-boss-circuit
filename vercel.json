@@ -104,6 +104,24 @@
       ]
     },
     {
+      "source": "/boss-roster.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/expansion-story.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/game.js",
       "headers": [
         {
@@ -131,7 +149,7 @@
       ]
     },
     {
-      "source": "/assets/generated/v2.5.0/(.*)",
+      "source": "/assets/generated/v2.6.0/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

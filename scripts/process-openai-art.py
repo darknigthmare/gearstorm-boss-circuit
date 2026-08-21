@@ -1,4 +1,4 @@
-"""Build independent runtime art from the 14 OpenAI master sheets.
+"""Build independent runtime art from the OpenAI master sheets.
 
 The image generator currently bakes its transparency preview into RGB pixels.
 This deterministic post-process crops every requested cell, removes only the
@@ -18,10 +18,18 @@ from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "assets" / "generated"
-OUTPUT_ROOT = SOURCE_ROOT / "v2.5.0"
+ASSET_RELEASE = "v2.6.0"
+OUTPUT_ROOT = SOURCE_ROOT / ASSET_RELEASE
 MANIFEST_PATH = OUTPUT_ROOT / "asset-manifest.json"
 
-BOSSES = ("rammer", "kraken", "drill", "mantis", "cyclotron", "omega")
+CORE_BOSSES = ("rammer", "kraken", "drill", "mantis", "cyclotron", "omega")
+EXPANSION_BOSSES = (
+    "bastion-ricochet", "hydraulic-warden", "hive-foreman", "echo-fencer", "breaker-array", "vertical-verdict",
+    "rail-tyrant", "triplex-hunter", "ground-eater", "floodline-leviathan", "centrifuge-zero", "tempest-regulator",
+    "ascension-frame", "counterforge", "carrier-cathedral", "twin-governors", "loadout-reactor", "orbital-famine",
+    "logic-crucible", "vector-vault", "skyborne-battery", "endurance-engine", "adaptive-archivist", "null-crown",
+)
+BOSSES = CORE_BOSSES + EXPANSION_BOSSES
 ARENA_LAYERS = ("far", "mid", "ground", "foreground")
 BOSS_PARTS = {
     "rammer": ("wheel", "chassis", "ram", "hammer-left", "hammer-right", "rivet-pod", "mine-seismic", "core", "overdrive"),
@@ -113,7 +121,7 @@ def save_runtime(image: Image.Image, relative_path: str, alpha: bool) -> dict:
         width, height = check.size
         has_alpha = "A" in check.getbands()
     return {
-        "src": f"assets/generated/v2.5.0/{relative_path}",
+        "src": f"assets/generated/{ASSET_RELEASE}/{relative_path}",
         "width": width,
         "height": height,
         "alpha": has_alpha,
@@ -136,6 +144,44 @@ def normalize_sprite(image: Image.Image, max_extent: int) -> Image.Image:
     return canvas
 
 
+def remove_alpha_islands(image: Image.Image, minimum_pixels: int) -> Image.Image:
+    """Remove tiny disconnected crop spill without redrawing generated pixels."""
+    rgba = image.convert("RGBA")
+    width, height = rgba.size
+    alpha = rgba.getchannel("A")
+    alpha_pixels = alpha.load()
+    visited = bytearray(width * height)
+    discard: list[tuple[int, int]] = []
+
+    for start_y in range(height):
+        for start_x in range(width):
+            start = start_y * width + start_x
+            if visited[start] or alpha_pixels[start_x, start_y] <= 8:
+                continue
+            queue = deque([(start_x, start_y)])
+            visited[start] = 1
+            component: list[tuple[int, int]] = []
+            while queue:
+                x, y = queue.popleft()
+                component.append((x, y))
+                for neighbour_x, neighbour_y in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+                    if not (0 <= neighbour_x < width and 0 <= neighbour_y < height):
+                        continue
+                    neighbour = neighbour_y * width + neighbour_x
+                    if visited[neighbour] or alpha_pixels[neighbour_x, neighbour_y] <= 8:
+                        continue
+                    visited[neighbour] = 1
+                    queue.append((neighbour_x, neighbour_y))
+            if len(component) < minimum_pixels:
+                discard.extend(component)
+
+    if discard:
+        for x, y in discard:
+            alpha_pixels[x, y] = 0
+        rgba.putalpha(alpha)
+    return rgba
+
+
 def source(path: Path) -> Image.Image:
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -145,7 +191,7 @@ def source(path: Path) -> Image.Image:
 def main() -> None:
     manifest: dict = {
         "schemaVersion": 1,
-        "release": "2.5.0",
+        "release": "2.6.0",
         "generator": "OpenAI ImageGen built-in",
         "license": "Original project artwork",
         "arenas": {},
@@ -154,7 +200,7 @@ def main() -> None:
         "vfx": {},
     }
 
-    for boss in BOSSES:
+    for boss in CORE_BOSSES:
         master = source(SOURCE_ROOT / "arenas" / f"{boss}-parallax-openai-v1.png")
         layers = {}
         for index, layer in enumerate(ARENA_LAYERS):
@@ -168,7 +214,7 @@ def main() -> None:
         layers["foreground"]["speed"] = 0.19
         manifest["arenas"][boss] = {"layers": layers}
 
-    for boss in BOSSES:
+    for boss in CORE_BOSSES:
         master = source(SOURCE_ROOT / "bosses" / f"{boss}-parts-openai-v1.png")
         parts = {}
         for index, part in enumerate(BOSS_PARTS[boss]):
@@ -181,15 +227,41 @@ def main() -> None:
         crop = extract_alpha(hero.crop(cell_box(hero.size, 3, 3, index)))
         manifest["heroine"]["parts"][part] = save_runtime(crop, f"heroine/riva-spark/{part}.webp", True)
 
-    # The v1 sheet contains two complete arms while the torso already carries
-    # the rear sleeve. A dedicated OpenAI forearm avoids triple-arm overlap.
-    corrected_forearm = source(SOURCE_ROOT / "riva" / "riva-forearm-near-openai-v3.png")
-    manifest["heroine"]["parts"]["arm-near"] = save_runtime(
-        normalize_sprite(corrected_forearm, 260),
-        "heroine/riva-spark/arm-near.webp",
+    # v4 replaces stacked anatomical fragments with a coherent body core and
+    # one independent firing assembly. Legacy pieces remain as safe fallback.
+    body_core = source(SOURCE_ROOT / "riva" / "riva-body-core-openai-v4.png")
+    firing_arm = source(SOURCE_ROOT / "riva" / "riva-firing-arm-openai-v4.png")
+    manifest["heroine"]["parts"]["body-core"] = save_runtime(
+        normalize_sprite(body_core, 400),
+        "heroine/riva-spark/body-core.webp",
+        True,
+    )
+    manifest["heroine"]["parts"]["firing-arm"] = save_runtime(
+        normalize_sprite(firing_arm, 370),
+        "heroine/riva-spark/firing-arm.webp",
         True,
     )
 
+    expansion_root = SOURCE_ROOT / "expansion-sources"
+    for start in range(0, len(EXPANSION_BOSSES), 6):
+        first = 7 + start
+        last = first + 5
+        master = source(expansion_root / f"bosses-{first:02d}-{last:02d}-source.png")
+        for cell_index, boss_id in enumerate(EXPANSION_BOSSES[start:start + 6]):
+            crop = master.crop(cell_box(master.size, 3, 2, cell_index))
+            sprite = normalize_sprite(crop, 394)
+            island_threshold = {
+                "counterforge": 3_000,
+                "loadout-reactor": 1_000,
+                "hive-foreman": 200,
+                "tempest-regulator": 35,
+            }.get(boss_id, 250)
+            sprite = remove_alpha_islands(sprite, island_threshold)
+            manifest["bosses"][boss_id] = {
+                "parts": {
+                    "sprite": save_runtime(sprite, f"bosses/{boss_id}/sprite.webp", True)
+                }
+            }
     vfx = source(SOURCE_ROOT / "vfx" / "circuit-vfx-openai-v1.png")
     for index, effect in enumerate(VFX):
         crop = extract_alpha(vfx.crop(cell_box(vfx.size, 4, 4, index)))
@@ -203,11 +275,11 @@ def main() -> None:
     entries.extend(manifest["heroine"]["parts"].values())
     entries.extend(manifest["vfx"].values())
     manifest["summary"] = {
-        "masters": 17,
+        "masters": 20,
         "runtimeFiles": len(entries),
         "arenaLayers": 24,
-        "bossParts": 54,
-        "heroineParts": 9,
+        "bossParts": 54 + len(EXPANSION_BOSSES),
+        "heroineParts": len(manifest["heroine"]["parts"]),
         "vfx": 16,
         "totalBytes": sum(entry["bytes"] for entry in entries),
     }

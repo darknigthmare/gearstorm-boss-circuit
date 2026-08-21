@@ -10,27 +10,24 @@ GEARSTORM: Boss Circuit est un jeu original créé pour ce projet.
 - Audio : synthèse Web Audio, sans fichier musical tiers.
 - Bibliothèques et assets tiers au runtime : aucun déclaré.
 
-## Production visuelle v2.2
+## Production visuelle v2.6
 
-La provenance déclarée du lot illustré est OpenAI Image Generation intégré. Les 14 masters ont été conçus pour GEARSTORM, sans reprise d’un asset existant, d’un personnage sous licence ou d’un key art tiers.
+La provenance déclarée du lot illustré est OpenAI Image Generation intégré. Les vingt sources retenues ont été conçues pour GEARSTORM, sans reprise d’un asset existant, d’un personnage sous licence ou d’un key art tiers.
 
-| Production | Masters | Sorties indépendantes |
+| Production | Sources | Sorties runtime |
 | --- | ---: | ---: |
-| Six atlases de décors, quatre couches de parallaxe chacun | 6 | 24 |
-| Six atlases de boss, neuf pièces transparentes chacun | 6 | 54 |
-| Un atlas Riva Spark, neuf poses / états | 1 | 9 |
-| Un atlas VFX 4 × 4 | 1 | 16 |
-| **Total** | **14** | **103** |
+| Six décors de campagne, quatre couches chacun | 6 | 24 |
+| Six boss de campagne, neuf pièces chacun | 6 | 54 |
+| Quatre planches Forge couvrant les boss 07–30 | 4 | 24 sprites |
+| Riva Spark : atlas historique + corps v4 + bras-canon v4 | 3 | 11 pièces |
+| VFX 4 × 4 | 1 | 16 |
+| **Total** | **20** | **129 WebP** |
 
-Le key art et l’icône d’application sont également des créations originales générées avec OpenAI Image Generation pour ce projet.
+Le key art et les icônes d’application sont également des créations originales produites pour ce projet. Les contraintes interdisent texte intégré, logo, filigrane et imitation d’une franchise. Le pipeline retire déterministement le damier RGB aplati, nettoie uniquement les îlots alpha parasites, normalise les sorties et enregistre taille et SHA-256 dans le manifeste v2.6.
 
-Les contraintes de production interdisent texte intégré, logo, filigrane et imitation d’une franchise. Les exports de boss, Riva et VFX doivent conserver une véritable transparence alpha. Les 14 masters servent de sources ; les 103 assets indépendants sont découpés, nommés et chargés comme des ressources autonomes.
+Riva utilise désormais un corps complet cohérent, avec buste, taille, bassin, jambes et bottes dans la même pièce. Son pivot de semelle est aligné sur le sol logique du pont. Une unique pièce bras-canon indépendante se raccorde au socket d’épaule ; les anciens fragments ne sont plus composés dans le rig de production.
 
-Au runtime, le lazy loading privilégie le titre puis la rencontre courante. Les ressources valides peuvent rejoindre le cache PWA ; le fallback procédural reste disponible si leur chargement ou leur décodage échoue.
-
-## Correction du rig de Riva v2.5
-
-Trois sources OpenAI supplémentaires documentent la recherche de pose des bras. Les deux études v2 restent des références de production non publiées au runtime. Seul `riva-forearm-near-openai-v3.png`, conçu comme un avant-bras et une main sans épaule ni biceps, remplace la pièce avant de Riva dans le catalogue v2.5. Le détourage, le cadrage et l’encodage WebP sont déterministes ; aucun asset tiers n’est incorporé.
+Les 24 machines Forge disposent chacune d’un sprite transparent propre. Elles ne sont pas créditées comme rigs multipièces : leurs animations secondaires et leurs arènes sont actuellement procédurales, avec fallback Canvas en cas d’échec de chargement.
 
 ## Écriture et expérience v2.4
 
@@ -41,6 +38,12 @@ Riva Spark est la technicienne qui a conçu la ligne de maintenance manuelle M-0
 Les six districts — Rocade des Rivets, Couloir des Hautes-Tensions, Fosse Ferromagnétique, Horloge de la Faille, Fournaise des Pistons et Citadelle Voltério — suivent les six machines déjà établies. L’épilogue rend les commandes aux équipes locales, place Cassian en détention et confirme le refus de Riva de devenir une nouvelle autorité centrale.
 
 La conception UX v2.4 couvre l’ouverture narrative, les interludes de district, le briefing de combat, le Codex, les archives M-0, la reprise de progression, les récapitulatifs de build, l’aide en pause et les états accessibles/mobile. Les hooks DOM sont documentés séparément du code de gameplay afin de préserver leur stabilité.
+
+## Forge jouable 07–30
+
+`expansion-story.js` contient le registre narratif original des vingt-quatre boss Forge : quatre vagues, fonctions civiques, objectifs, trois phases, journaux, Codex, restaurations et soixante-douze contrats de maîtrise. `boss-roster.js` les relie au moteur via huit familles de patterns partagées. Le statut runtime est intégré ; une victoire Forge archive sa performance sans avancer les six relais de campagne.
+
+Quatre planches 3 × 2 générées avec OpenAI ImageGen couvrent les boss 07–12, 13–18, 19–24 et 25–30. Le générateur ayant aplati l’aperçu de transparence en RGB, le damier neutre est retiré par `extract_alpha()` sans peinture ni invention de pixels. Les sources, prompts disponibles, hachages, dérivés et limites sont consignés dans `assets/generated/expansion-sources/PROVENANCE.md`.
 
 ## Fallback procédural
 

@@ -3,10 +3,16 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   APP_RELEASE,
+  CAMPAIGN_BOSS_COUNT,
   DIST_BUDGET_BYTES,
+  EXPANSION_MASTERY_CONTRACT_COUNT,
+  FORGE_BOSS_COUNT,
   MASTERY_CONTRACT_COUNT,
+  PHASE_COUNT,
+  PLAYABLE_BOSS_COUNT,
   SAVE_SCHEMA_VERSION,
   STORY_CONTENT_VERSION,
+  STORY_MASTERY_CONTRACT_COUNT,
   STORY_SCHEMA_VERSION,
 } from '../scripts/app-contract.mjs';
 import {
@@ -26,10 +32,10 @@ const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScri
   readFile('scripts/check-release.mjs', 'utf8'),
 ]);
 
-test('les versions application et assets 2.5 restent declarees separement', () => {
+test('les versions application et assets 2.6 restent declarees separement', () => {
   assert.equal(packageJson.version, APP_RELEASE);
-  assert.equal(APP_RELEASE, '2.5.0');
-  assert.equal(ASSET_RELEASE, '2.5.0');
+  assert.equal(APP_RELEASE, '2.6.0');
+  assert.equal(ASSET_RELEASE, '2.6.0');
   assert.notEqual(APP_RELEASE, STORY_CONTENT_VERSION);
   assert.match(buildScript, /packageJson\.version !== APP_RELEASE/);
   assert.match(buildScript, /release: ASSET_RELEASE/);
@@ -37,15 +43,21 @@ test('les versions application et assets 2.5 restent declarees separement', () =
   assert.equal(SAVE_SCHEMA_VERSION, 4);
   assert.equal(STORY_SCHEMA_VERSION, 1);
   assert.equal(STORY_CONTENT_VERSION, '1.0.0');
-  assert.equal(MASTERY_CONTRACT_COUNT, 18);
+  assert.equal(CAMPAIGN_BOSS_COUNT, 6);
+  assert.equal(FORGE_BOSS_COUNT, 24);
+  assert.equal(PLAYABLE_BOSS_COUNT, 30);
+  assert.equal(PHASE_COUNT, 90);
+  assert.equal(STORY_MASTERY_CONTRACT_COUNT, 18);
+  assert.equal(EXPANSION_MASTERY_CONTRACT_COUNT, 72);
+  assert.equal(MASTERY_CONTRACT_COUNT, 90);
 });
 
 test('le build reste une liste blanche reproductible et minimale', () => {
-  assert.match(buildScript, /const publicFiles = \['index\.html', 'styles\.css', 'story\.js', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
+  assert.match(buildScript, /const publicFiles = \['index\.html', 'styles\.css', 'story\.js', 'expansion-story\.js', 'boss-roster\.js', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
   assert.match(buildScript, /const shellAssets = \['gearstorm-icon\.svg', 'gearstorm-icon-192\.png', 'gearstorm-icon-512\.png', 'gearstorm-key-art\.png'\]/);
   assert.match(buildScript, /\.\.\.runtimeAssets\.files/);
   assert.match(buildScript, /validateApplicationContract/);
-  assert.match(buildScript, /schemaVersion: 3/);
+  assert.match(buildScript, /schemaVersion: 4/);
   assert.doesNotMatch(buildScript, /LANCER_LE_JEU|QA_REPORT|README\.md/);
   assert.doesNotMatch(buildScript, /cp\(resolve\(root, 'assets'/);
   assert.ok(DIST_BUDGET_BYTES > ASSET_BUDGET_BYTES);
@@ -53,16 +65,19 @@ test('le build reste une liste blanche reproductible et minimale', () => {
   assert.match(releaseScript, /SHA-256 incoherent/);
 });
 
-test('la PWA est installable, versionnee et ne precache pas les 103 WebP', () => {
+test('la PWA est installable, versionnee et ne precache pas les 129 WebP', () => {
   assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
   assert.equal(manifest.launch_handler?.client_mode, 'navigate-existing');
   assert.ok(manifest.icons.some(icon => icon.purpose.includes('maskable')));
   assert.ok(manifest.shortcuts.every(shortcut => shortcut.icons?.some(icon => icon.sizes === '192x192')));
   const keyArt = manifest.screenshots.find(screenshot => screenshot.src.includes('gearstorm-key-art.png'));
   assert.equal(keyArt?.sizes, '1672x941');
-  assert.match(serviceWorker, /const APP_VERSION = '2\.5\.0'/);
+  assert.ok(manifest.shortcuts.some(shortcut => shortcut.url === './?mode=forge'));
+  assert.match(serviceWorker, /const APP_VERSION = '2\.6\.0'/);
   assert.match(serviceWorker, /'\.\/story\.js'/);
-  assert.match(serviceWorker, /const ASSET_VERSION = '2\.5\.0'/);
+  assert.match(serviceWorker, /'\.\/expansion-story\.js'/);
+  assert.match(serviceWorker, /'\.\/boss-roster\.js'/);
+  assert.match(serviceWorker, /const ASSET_VERSION = '2\.6\.0'/);
   assert.match(serviceWorker, /cacheFirstRuntime/);
   assert.match(serviceWorker, /staleWhileRevalidateShell/);
   assert.match(serviceWorker, /networkFirstNavigation/);
@@ -73,15 +88,18 @@ test('la PWA est installable, versionnee et ne precache pas les 103 WebP', () =>
 test('Vercel, la CI Linux et les exclusions satisfont le contrat infrastructure', () => {
   assert.doesNotThrow(() => validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore }));
   assert.match(ci, /concurrency:[\s\S]+cancel-in-progress: true/);
-  assert.match(ci, /name: gearstorm-web-v2\.5\.0/);
+  assert.match(ci, /name: gearstorm-web-v2\.6\.0/);
   assert.match(vercelIgnore, /^\.env\*$/m);
-  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.5\.0\/$/m);
+  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.6\.0\/$/m);
 });
 
 test('les scripts npm couvrent syntaxe, tests, build et verification release', () => {
+  assert.match(packageJson.scripts.check, /node --check expansion-story\.js/);
+  assert.match(packageJson.scripts.check, /node --check boss-roster\.js/);
   assert.match(packageJson.scripts.check, /node --check sw\.js/);
   assert.match(packageJson.scripts.check, /scripts\/app-contract\.mjs/);
   assert.match(packageJson.scripts.check, /scripts\/infrastructure-contract\.mjs/);
+  assert.match(packageJson.scripts.test, /tests\/expansion-story\.test\.mjs/);
   assert.match(packageJson.scripts.test, /tests\/release\.test\.mjs/);
   assert.match(packageJson.scripts.test, /tests\/sw\.test\.mjs/);
   assert.equal(packageJson.scripts.qa, 'npm run check && npm test && npm run build && npm run check:release');
