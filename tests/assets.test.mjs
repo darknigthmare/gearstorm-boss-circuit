@@ -89,7 +89,8 @@ test('les 26 masters OpenAI sont traces mais jamais publies', async () => {
 
 test('le build copie le catalogue et les assets declares sans copie recursive des masters', async () => {
   const build = await readFile('scripts/build.mjs', 'utf8');
-  assert.match(build, /validateRuntimeAssets\(root\)/);
+  assert.match(build, /process\.env\.VERCEL !== '1'/);
+  assert.match(build, /validateRuntimeAssets\(root, \{ validateMasters: validateSourceMasters \}\)/);
   assert.match(build, /\.\.\.runtimeAssets\.files/);
   assert.doesNotMatch(build, /cp\(resolve\(root, 'assets'/);
   assert.doesNotMatch(build, /assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources)/);

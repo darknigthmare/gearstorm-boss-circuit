@@ -27,6 +27,7 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
 if (dirname(dist) !== root) throw new Error('Répertoire de build non sécurisé.');
+const validateSourceMasters = process.env.VERCEL !== '1';
 
 const publicFiles = ['index.html', 'styles.css', 'story.js', 'expansion-story.js', 'boss-roster.js', 'game.js', 'manifest.webmanifest', 'sw.js'];
 const shellAssets = ['gearstorm-icon.svg', 'gearstorm-icon-192.png', 'gearstorm-icon-512.png', 'gearstorm-key-art.png'];
@@ -38,7 +39,7 @@ const [html, story, expansionStory, bossRoster, game, manifest, packageJson, run
   readFile(resolve(root, 'game.js'), 'utf8'),
   readFile(resolve(root, 'manifest.webmanifest'), 'utf8').then(JSON.parse),
   readFile(resolve(root, 'package.json'), 'utf8').then(JSON.parse),
-  validateRuntimeAssets(root),
+  validateRuntimeAssets(root, { validateMasters: validateSourceMasters }),
 ]);
 
 if (packageJson.version !== APP_RELEASE) {

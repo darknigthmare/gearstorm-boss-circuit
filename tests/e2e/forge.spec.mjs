@@ -41,17 +41,18 @@ test('les 24 boss Forge ont un système propre et démarrent dans leurs trois ph
   expect(coverage.supported).toBe(72);
   expect(coverage.unsupported).toEqual([]);
 
-  for (const entry of forge) {
-    for (const phase of [1, 2, 3]) {
-      expect(await page.evaluate(({ id, phase }) => window.__GEARSTORM_QA__.launchBoss(id, { phase }), { id: entry.id, phase })).toBe(true);
-      await page.waitForFunction(({ id, phase }) => {
-        const state = window.__GEARSTORM_QA__.getState();
-        return state.bossId === id && state.phase === phase;
-      }, { id: entry.id, phase });
-      const state = await page.evaluate(() => window.__GEARSTORM_QA__.getState());
-      expect(state.bossId).toBe(entry.id);
-      expect(state.mechanicId).toBe(entry.mechanicId);
-    }
+  const launches = await page.evaluate(entries => entries.flatMap(entry => [1, 2, 3].map(phase => {
+    const launched = window.__GEARSTORM_QA__.launchBoss(entry.id, { phase });
+    const state = window.__GEARSTORM_QA__.getState();
+    return { id: entry.id, mechanicId: entry.mechanicId, phase, launched, state };
+  })), forge.map(({ id, mechanicId }) => ({ id, mechanicId })));
+
+  expect(launches).toHaveLength(72);
+  for (const launch of launches) {
+    expect(launch.launched, launch.id + ' phase ' + launch.phase).toBe(true);
+    expect(launch.state.bossId).toBe(launch.id);
+    expect(launch.state.phase).toBe(launch.phase);
+    expect(launch.state.mechanicId).toBe(launch.mechanicId);
   }
 });
 
