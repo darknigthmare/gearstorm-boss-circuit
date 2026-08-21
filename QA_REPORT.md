@@ -31,7 +31,7 @@ Parcours contrôlés :
 
 ## Audit visuel
 
-Neuf captures locales ont été générées sous `audit-visual-v27/`. Aucun visuel de référence externe pixel-perfect n’existait ; la comparaison a donc porté sur le système visuel du jeu, les ancres logiques 1280 × 720 et les contrats de rig.
+Dix captures ont été générées, dont une de la production publique sous `audit-visual-v27/`. Aucun visuel de référence externe pixel-perfect n’existait ; la comparaison a donc porté sur le système visuel du jeu, les ancres logiques 1280 × 720 et les contrats de rig.
 
 Constats validés :
 
@@ -60,6 +60,16 @@ Constats validés :
 - Les 24 backdrops sont des tableaux monocouche : ils sont uniques et cohérents, mais moins profonds que les six arènes historiques à quatre plans parallaxes.
 - Les signatures propres aux 24 boss reposent volontairement sur huit familles de simulation communes ; elles ne constituent pas 24 moteurs physiques indépendants.
 
-## Verdict local
+## Vérification de production
 
-Candidat v2.7.0 prêt à publier. Les contrats, la release, la sécurité, la campagne, le Circuit Forge, les assets et les parcours navigateur contrôlés sont verts. La vérification de production doit encore confirmer le déploiement READY, HTTP 200, les en-têtes immuables v2.7 et l’absence d’erreur console sur l’URL publique.
+Le commit c063fa7 a passé le gate GitHub Actions Node 22/Linux puis a été promu sur Vercel. Le déploiement est READY sur https://gearstorm-boss-circuit.vercel.app.
+
+- page publique : HTTP 200 avec CSP, HSTS, COOP et politique de permissions ;
+- build-manifest.json : application 2.7.0, sauvegarde v5, 30 boss, 90 phases, 90 contrats et 225 assets ;
+- asset Forge : HTTP 200, image/webp, cache public 1 an immutable ;
+- service worker : HTTP 200, portée racine et revalidation immédiate ;
+- parcours Chrome public : titre chargé, Forge ouverte, 30 cartes présentes, aucune erreur console.
+
+## Verdict final
+
+GEARSTORM 2.7.0 est publié et vérifié. La release, la sécurité, la CI Linux, les 30 boss, les 90 phases, les 90 contrats et les parcours navigateur contrôlés sont verts, dans les limites matérielles et multi-navigateurs listées ci-dessus.
