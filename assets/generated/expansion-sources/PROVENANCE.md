@@ -1,6 +1,6 @@
 # Provenance — sources d’expansion des boss 07–30
 
-Statut : **sources OpenAI intégrées au runtime v2.6**. Les quatre planches alimentent vingt-quatre sprites WebP transparents publiés sous `assets/generated/v2.6.0/bosses/`.
+Statut : **sources OpenAI intégrées au runtime v2.7**. Les quatre planches alimentent vingt-quatre rigs de quatre pièces, soit quatre-vingt-seize WebP transparents publiés sous `assets/generated/v2.7.0/bosses/`.
 
 ## Chaîne de production
 
@@ -10,7 +10,7 @@ Statut : **sources OpenAI intégrées au runtime v2.6**. Les quatre planches ali
 - Contrôle IP : aucun asset, logo, personnage ou modèle officiel fourni ; exclusions explicites contre les silhouettes et codes visuels reconnaissables d’une franchise existante
 - Sortie du générateur : PNG RGB avec aperçu de transparence damier aplati
 - Correction technique : `extract_alpha()`, normalisation 418 × 418 et suppression des petits îlots alpha déconnectés, sans peinture ni invention de pixels
-- État runtime : intégré au manifeste immuable v2.6 ; un sprite composite par boss, avec fallback procédural
+- État runtime : intégré au manifeste immuable v2.7 ; quatre pièces alignées par boss, avec pivots, joints, z-order, noyau faible et fallback procédural
 
 ## Sources réellement consommées
 
@@ -21,7 +21,7 @@ Statut : **sources OpenAI intégrées au runtime v2.6**. Les quatre planches ali
 | 19–24 | `bosses-19-24-source.png` | 1536 × 1024 | `aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60` |
 | 25–30 | `bosses-25-30-source.png` | 1536 × 1024 | `0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae` |
 
-Les variantes RGBA 07–12 et 13–18 ainsi que les tentatives intermédiaires sont conservées comme preuves de production. Le build public n’embarque ni ces PNG, ni les prompts, ni les masters : il copie seulement les 129 WebP déclarés et le catalogue.
+Les variantes RGBA 07–12 et 13–18 ainsi que les tentatives intermédiaires sont conservées comme preuves de production. Le build public n’embarque ni ces PNG, ni les prompts, ni les masters : il copie seulement les 225 WebP v2.7 déclarés et le catalogue.
 
 ## Prompt final — boss 07–12
 
@@ -70,4 +70,4 @@ Les deux dernières générations ont conservé le même contrat 3 × 2, le mêm
 
 ## Limites de réutilisation
 
-Les planches alimentent les sprites composites Forge. Elles ne constituent pas des rigs multipièces : pivots avancés, états de dégâts, animations internes et décors parallaxe dédiés restent des raffinements de production documentés dans `BOSS_EXPANSION.md`.
+Les planches alimentent des rigs runtime en quatre couches segmentées : châssis, noyau faible et deux appendices. Pivots, joints, ordre de dessin et états de phase sont déclarés ; les pièces ne sont toutefois pas quatre générations natives séparées. Les backdrops dédiés sont documentés dans `../forge-arena-sources/PROVENANCE.md`.

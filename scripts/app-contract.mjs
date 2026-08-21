@@ -1,10 +1,11 @@
 import vm from 'node:vm';
 
-export const APP_RELEASE = '2.6.0';
-export const SAVE_SCHEMA_VERSION = 4;
-export const SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
-export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
-export const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
+export const APP_RELEASE = '2.7.0';
+export const SAVE_SCHEMA_VERSION = 5;
+export const SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
+export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
+export const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
+export const V2_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
 export const STORY_SCHEMA_VERSION = 1;
 export const STORY_CONTENT_VERSION = '1.0.0';
 export const EXPANSION_STORY_SCHEMA_VERSION = 1;
@@ -29,6 +30,16 @@ export const PLAYABLE_BOSS_IDS = Object.freeze([...CAMPAIGN_BOSS_IDS, ...FORGE_B
 
 export const REQUIRED_UI_IDS = Object.freeze([
   'continue-run',
+  'continue-forge',
+  'forge-circuit-card',
+  'forge-run-summary',
+  'forge-wave-progress',
+  'forge-rush-start',
+  'forge-ending-screen',
+  'forge-ending-summary',
+  'forge-ending-stats',
+  'forge-ending-restart',
+  'forge-ending-menu',
   'forge',
   'codex',
   'codex-screen',
@@ -54,6 +65,13 @@ export const REQUIRED_UI_IDS = Object.freeze([
 
 export const REQUIRED_GAME_SYSTEMS = Object.freeze([
   'sanitizeRushSnapshot',
+  'sanitizeForgeRushSnapshot',
+  'saveForgeRushSnapshot',
+  'clearForgeRushSnapshot',
+  'resumeForgeRushSnapshot',
+  'syncContinueForge',
+  'getForgeRunState',
+  'showForgeEnding',
   'saveRushSnapshot',
   'clearRushSnapshot',
   'resumeRushSnapshot',
@@ -181,6 +199,18 @@ export function validateBossRosterContract(bossRosterSource) {
   invariant(expanded.every(boss => boss.status === 'forge-playable' && boss.productionStatus !== 'planned'), 'Tous les boss Forge doivent etre en statut jouable.');
   invariant(expanded.every(boss => boss.artPack?.status === 'generated' && boss.artPack.bundleId), 'Chaque boss Forge doit utiliser son sprite genere.');
   invariant(expanded.every(boss => boss.codex?.releaseEligible === true), 'Chaque entree Codex Forge doit etre publiable.');
+
+  const mechanicIds = expanded.map(boss => boss.signature?.mechanicId);
+  invariant(mechanicIds.every(mechanicId => typeof mechanicId === 'string' && mechanicId.length > 0), 'Chaque boss Forge doit declarer un mechanicId.');
+  invariant(new Set(mechanicIds).size === FORGE_BOSS_COUNT, 'Les 24 mechanicId Forge doivent etre uniques.');
+
+  const phaseStateGroups = expanded.map(boss => boss.signature?.phaseStates);
+  invariant(phaseStateGroups.every(states => Array.isArray(states) && states.length === 3), 'Chaque signature Forge doit declarer exactement 3 phaseStates.');
+  const phaseStates = phaseStateGroups.flat();
+  invariant(phaseStates.every(state => typeof state === 'string' && state.length > 0), 'Chaque phaseState Forge doit etre une chaine non vide.');
+  invariant(phaseStates.length === FORGE_BOSS_COUNT * 3, '72 phaseStates Forge requis.');
+  invariant(new Set(phaseStates).size === FORGE_BOSS_COUNT * 3, 'Les 72 phaseStates Forge doivent etre globalement uniques.');
+
   invariant(typeof roster.createRuntime === 'function' && expanded.every(boss => roster.createRuntime(boss.id)?.id === boss.id), 'Runtime partage Forge incomplet.');
   invariant(roster.resolveLaunchMode?.('forge') === 'forge', 'Mode de lancement Forge absent.');
   invariant(roster.validate?.().valid === true, 'Le roster boss refuse son propre contrat de validation.');
@@ -188,6 +218,9 @@ export function validateBossRosterContract(bossRosterSource) {
   return {
     playableBosses: bosses.length,
     playablePhases: PHASE_COUNT,
+    forgeSignatures: expanded.length,
+    forgeMechanicIds: mechanicIds.length,
+    forgePhaseStates: phaseStates.length,
   };
 }
 
@@ -201,7 +234,7 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const bossRosterContract = hasForgeSources ? validateBossRosterContract(bossRoster) : {};
 
   const ids = htmlIds(html);
-  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.6 : #${id} absent.`);
+  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.7 : #${id} absent.`);
   const domReferences = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   for (const id of domReferences) invariant(ids.has(id), `Contrat DOM : #${id} reference par game.js mais absent.`);
 
@@ -222,16 +255,17 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   invariant(new RegExp(`const\\s+SAVE_KEY\\s*=\\s*["']${escapeRegExp(SAVE_KEY)}["']`).test(game), `Sauvegarde v${SAVE_SCHEMA_VERSION} absente.`);
   invariant(new RegExp(`const\\s+PREVIOUS_SAVE_KEY\\s*=\\s*["']${escapeRegExp(PREVIOUS_SAVE_KEY)}["']`).test(game), 'Cle de migration v3 absente.');
   invariant(new RegExp(`const\\s+OLDER_SAVE_KEY\\s*=\\s*["']${escapeRegExp(OLDER_SAVE_KEY)}["']`).test(game), 'Cle de migration v2 absente.');
-  invariant(/version\s*:\s*4\b/.test(game), 'Schema de sauvegarde version 4 absent.');
-  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'campaignCleared', 'storySeen', 'mastery']) {
-    invariant(new RegExp(`\\b${field}\\b`).test(game), `Champ de sauvegarde v4 absent : ${field}.`);
+  invariant(/version\s*:\s*5\b/.test(game), 'Schema de sauvegarde version 5 absent.');
+  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'campaignCleared', 'storySeen', 'mastery', 'bestForgeRush', 'forgeCompleted', 'forgeCleared', 'forgeRushSnapshot']) {
+    invariant(new RegExp(`\\b${field}\\b`).test(game), `Champ de sauvegarde v5 absent : ${field}.`);
   }
   invariant(/localStorage\.getItem\(PREVIOUS_SAVE_KEY\)/.test(game), 'La migration doit lire la sauvegarde v3.');
-  invariant(/localStorage\.getItem\(OLDER_SAVE_KEY\)/.test(game), 'La migration doit conserver la lecture de la sauvegarde v2.');
-  invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v4.');
+  invariant(/localStorage\.getItem\(OLDER_SAVE_KEY\)/.test(game), 'La migration doit conserver la lecture de la sauvegarde v3.');
+  invariant(/localStorage\.getItem\(V2_SAVE_KEY\)/.test(game), 'La migration doit conserver la lecture de la sauvegarde v2.');
+  invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v5.');
 
   for (const marker of REQUIRED_GAME_SYSTEMS) {
-    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.6 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.7 absent : ${marker}.`);
   }
 
   invariant(/new URLSearchParams\(location\.search\)/.test(game), 'Le routeur de lancement doit lire la query string.');
@@ -240,18 +274,18 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const routeBlock = game.slice(game.indexOf('function routeLaunchMode'), game.indexOf('function applySettings'));
   invariant(!/startRun|startFight|unlockAudio/.test(routeBlock), 'Un raccourci PWA ne doit pas demarrer combat ou audio sans geste utilisateur.');
   const shortcuts = new Set((manifest?.shortcuts || []).map(shortcut => shortcut.url));
-  for (const url of ['./?mode=rush', './?mode=practice', './?mode=forge']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
+  for (const url of ['./?mode=rush', './?mode=practice', './?mode=forge', './?mode=forgeRush']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
 
-  invariant(html.includes('GEARSTORM: Boss Circuit v2.6'), 'Metadonnees HTML v2.6 absentes.');
-  invariant(!/GEARSTORM: Boss Circuit v2\.[2-5]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
+  invariant(html.includes('GEARSTORM: Boss Circuit v2.7'), 'Metadonnees HTML v2.7 absentes.');
+  invariant(!/GEARSTORM: Boss Circuit v2\.[2-6]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
   invariant(/qaAllowed[\s\S]+__GEARSTORM_QA__/.test(game), 'Surface QA locale absente ou non protegee.');
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
   for (const field of ['phaseCounts', 'hitbox', 'weakPoint', 'feetLocalY', 'muzzle', 'transitionExplosionOnly']) {
     invariant(new RegExp(`\\b${field}\\b`).test(rigDiagnosticsBlock), `Diagnostic de rig incomplet : ${field}.`);
   }
   const qaBlock = game.slice(game.indexOf("Object.defineProperty(window, '__GEARSTORM_QA__'"));
-  for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'setRigDebug', 'launchMode']) {
-    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.6 absent : ${marker}.`);
+  for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'getForgeRunState', 'getForgeContractCoverage', 'startForgeRush', 'resumeForgeRush', 'setRigDebug', 'launchMode']) {
+    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.7 absent : ${marker}.`);
   }
 
   return {

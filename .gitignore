@@ -10,6 +10,8 @@ release/
 .qa-*
 *.zip
 coverage/
+test-results/
+playwright-report/
 Thumbs.db
 .DS_Store
 audit-visual-v*/

@@ -1,5 +1,16 @@
 # Historique des versions
 
+## 2.7.0 — Les quatre anneaux
+
+- Ajout du Circuit Forge séquentiel des machines 07 à 30 : quatre vagues de six combats, choix de module entre les boss et écran de restauration final.
+- Migration vers la sauvegarde locale v5 avec reprise séparée aux checkpoints `fight`, `upgrade` et `ending`, build, score, temps, pénalités et meilleur temps Forge conservés.
+- Attribution de vingt-quatre `mechanicId` et de soixante-douze signatures d’état uniques aux boss Forge. Elles spécialisent huit familles socles enrichies et ne sont pas présentées comme vingt-quatre moteurs sans logique partagée.
+- Instrumentation des 72/72 contrats de maîtrise Forge : les compteurs proviennent de la télémétrie de combat et aucune métrique inconnue ne réussit par défaut.
+- Nouveau manifeste artistique 2.7.0 : 26 masters OpenAI de provenance vers 225 WebP runtime, dont 24 backdrops Forge et 96 pièces Forge.
+- Correction du rig de Riva : corps unique sans torse doublé, semelles alignées sur le sol logique, bras-canon raccordé au socket et ombre de contact resserrée.
+- Conservation du fallback Canvas, du chargement à la demande et de la séparation stricte entre le Circuit Forge et les six relais de campagne.
+- Cette entrée décrit le contenu livré ; elle ne certifie ni QA matérielle, ni commit, ni push, ni déploiement public.
+
 ## 2.6.0 — Les trente machines
 
 - Ajout d’une Forge séparée de la campagne : trente boss sélectionnables, quatre-vingt-dix phases et huit familles mécaniques pilotées par données.

@@ -90,6 +90,8 @@ test('expansion-story.js est autonome, immuable et intégré au runtime', () => 
   assert.ok(Object.isFrozen(story.bosses[0].codex));
   assert.ok(Object.isFrozen(story.bosses[0].interlude));
   assert.ok(Object.isFrozen(story.masteryContracts));
+  assert.ok(Object.isFrozen(story.forgeCircuit));
+  assert.ok(Object.isFrozen(story.forgeCircuit.epilogue));
 });
 
 test('les entrees 07 a 30 suivent exactement le contrat BOSS_EXPANSION', () => {
@@ -233,6 +235,25 @@ test('la continuite maintient Cassian detenu et fait de NULL CROWN un prototype 
   assert.match(nullCrown, /prototype/);
   assert.match(nullCrown, /(?:pas|ni) son retour/);
   assert.doesNotMatch(nullCrown, /cassian ressuscit/);
+});
+
+test('le Circuit Forge ordonne les 24 boss et ses quatre checkpoints de vague', () => {
+  const story = loadExpansionStory();
+  const circuit = story.forgeCircuit;
+  assert.equal(circuit.id, 'forge-circuit-07-30');
+  assert.equal(circuit.mode, 'forgeRush');
+  assert.equal(circuit.upgradesBetweenBosses, true);
+  assert.deepEqual(Array.from(circuit.bossOrder), Array.from(story.bosses, boss => boss.id));
+  assert.deepEqual(Array.from(circuit.resumeCheckpoints), ['fight', 'upgrade', 'ending']);
+  assert.equal(circuit.waveCheckpoints.length, 4);
+  for (const checkpoint of circuit.waveCheckpoints) {
+    const waveBosses = story.getBossesByWave(checkpoint.wave);
+    assert.equal(checkpoint.firstBossId, waveBosses[0].id);
+    assert.equal(checkpoint.finalBossId, waveBosses.at(-1).id);
+    assert.ok(checkpoint.title.length > 8);
+  }
+  assert.match(circuit.epilogue.summary, /vingt-quatre services/i);
+  assert.match(circuit.epilogue.outcome, /Cassian reste détenu/);
 });
 
 test('les helpers sont deterministes et ne renvoient aucun conteneur mutable', () => {

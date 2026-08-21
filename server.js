@@ -3,7 +3,7 @@ const { readFile, realpath, stat } = require('node:fs/promises');
 const { extname, resolve, sep } = require('node:path');
 
 const PROJECT_ROOT = resolve(__dirname);
-const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.6.0/';
+const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.7.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
   'styles.css',

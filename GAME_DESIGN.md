@@ -1,6 +1,6 @@
-# GEARSTORM: Boss Circuit — conception 2.6
+# GEARSTORM: Boss Circuit — conception 2.7
 
-`DESIGN.md` reste la source de vérité des règles et `story.js` celle des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise. `expansion-story.js` et `boss-roster.js` étendent ce contrat à la Forge. Ce document fixe leur intégration de production, de narration interactive et d’UX pour la version 2.6.
+`DESIGN.md` reste la source de vérité des règles et `story.js` celle des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise. `expansion-story.js` et `boss-roster.js` étendent ce contrat à la Forge. Ce document fixe leur intégration de production, de narration interactive et d’UX pour la version 2.7.
 
 ## Invariants de jeu
 
@@ -13,14 +13,15 @@
 - L’objectif critique demeure visible même lorsque les conseils contextuels sont désactivés.
 - Une victoire de Laboratoire peut enrichir le Codex, mais ne libère jamais un relais de campagne.
 
-## Extension Forge v2.6
+## Extension Forge v2.7
 
 - Le roster total contient exactement trente identifiants stables et quatre-vingt-dix phases.
-- Les vingt-quatre extensions sont jouables uniquement dans la Forge ; elles ne libèrent aucun district.
-- Huit familles mécaniques mutualisent le moteur sans prétendre fournir vingt-quatre IA entièrement sur mesure.
-- Chaque profil charge son sprite v2.6 à la demande et conserve un fallback procédural.
-- Toute maîtrise non mesurable est signalée « NON ÉVALUÉE », jamais réussie implicitement.
-- Le corps de Riva touche le plancher logique par son pivot de semelles ; l’ombre sert uniquement de contact.
+- Les vingt-quatre extensions sont jouables en sélection libre et dans le Circuit Forge 07–30 ; elles ne libèrent aucun district de campagne.
+- Le Circuit Forge comporte quatre vagues de six, des améliorations entre les boss, une reprise v5 et une fin dédiée.
+- Vingt-quatre `mechanicId` et soixante-douze signatures d’état uniques spécialisent huit familles mécaniques communes ; cette mutualisation reste explicite.
+- Chaque profil charge quatre pièces et un backdrop v2.7 à la demande, avec fallback procédural.
+- Les 72/72 contrats de maîtrise Forge sont instrumentés ; une mesure inconnue ne vaut jamais réussite.
+- Le corps de Riva touche le plancher logique par son pivot de semelles, son torse n’est rendu qu’une fois et l’ombre sert uniquement de contact.
 
 ## Progression narrative des six districts
 
@@ -51,9 +52,11 @@ Riva Spark reste la technicienne de maintenance qui a conçu la ligne manuelle M
 10. Après Crown Engine Ω, l’interlude final mène à l’épilogue : Cassian est détenu et les six commandes sont distribuées aux équipes civiles.
 11. Le Codex et les archives M-0 conservent les informations réellement découvertes.
 
+Le Circuit Forge constitue un second parcours complet : sélection de FORGE 07, six combats par vague, choix de module entre les boss, sauvegarde après chaque victoire, reprise au combat ou à l’Atelier, puis écran final après FORGE 30. La Forge libre demeure une surface d’entraînement indépendante.
+
 ## Contrat des hooks UX
 
-Tous les IDs historiques sont conservés. Les hooks v2.6 complètent les écrans sans modifier leur sémantique par CSS.
+Tous les IDs historiques sont conservés. Les hooks v2.7 complètent les écrans sans modifier leur sémantique par CSS.
 
 | Hook | État initial | Comportement requis |
 | --- | --- | --- |
@@ -73,16 +76,25 @@ Tous les IDs historiques sont conservés. Les hooks v2.6 complètent les écrans
 | `#pause-objective`, `#pause-build` | Valeurs de repli | Reprendre le contexte du combat et `describeBuild()`. |
 | `#result-lore`, `#result-build` | Valeurs de repli | Afficher le journal de Riva, la restauration du district et le build après victoire. |
 | `#result-mastery` | Conteneur vide | N’afficher comme acquis que les contrats dont la condition a été évaluée et sauvegardée par le runtime. |
+| `#forge-rush-start`, `#continue-forge` | Nouvelle tentative / reprise masquée | Lancer FORGE 07 ou restaurer le checkpoint v5 sans toucher à la reprise de campagne. |
+| `#forge-run-summary`, `#forge-wave-progress` | 24 machines, vague 1 | Exposer la vague, le nombre de victoires, le build et la prochaine étape avec un état textuel. |
+| `#forge-ending-screen` | Écran fermé | Résumer la restauration des quatre anneaux, le temps total et le build après FORGE 30. |
 
 Les hooks complémentaires `#continue-run-detail`, `#lab-progress`, `#upgrade-progress`, `#upgrade-build`, `#story-archive-progress` et `#gameover-hint` complètent le texte visible mais ne remplacent aucun état moteur.
 
 ## Contrat de sauvegarde narrative
 
-- `campaignCleared` contient uniquement les machines neutralisées dans un Circuit de campagne.
-- `storySeen` mémorise l’intro, le prologue, les interludes et l’épilogue effectivement traversés.
-- `codexUnlocked` reste indépendant : le Laboratoire peut documenter une machine sans libérer son relais.
-- `mastery` associe à chaque machine uniquement les identifiants de contrats validés.
-- `rushSnapshot.checkpoint` distingue `fight`, `interlude` et `upgrade` afin qu’une reprise ne saute ni une scène ni un choix de module.
+La sauvegarde locale v5 migre les données v4 sans effacer la campagne. Elle sépare explicitement les deux Circuits :
+
+- `campaignCleared` contient uniquement les machines neutralisées dans un Circuit de campagne ;
+- `storySeen` mémorise l’intro, le prologue, les interludes et l’épilogue effectivement traversés ;
+- `codexUnlocked` reste indépendant : le Laboratoire peut documenter une machine sans libérer son relais ;
+- `mastery` associe à chaque machine uniquement les identifiants de contrats réellement validés ;
+- `rushSnapshot.checkpoint` distingue `fight`, `interlude` et `upgrade` pour la campagne ;
+- `forgeCleared`, `forgeCompleted` et `bestForgeRush` portent l’historique Forge sans avancer les six relais ;
+- `forgeRushSnapshot` conserve le boss 07–30 courant, `fight`, `upgrade` ou `ending`, le temps, les pénalités, le score, les tentatives, la difficulté et les modules installés.
+
+La sauvegarde reste locale au navigateur : aucune synchronisation cloud ou interappareil n’est revendiquée.
 
 ## Onboarding et accessibilité
 
@@ -95,20 +107,21 @@ Les hooks complémentaires `#continue-run-detail`, `#lab-progress`, `#upgrade-pr
 - Le contraste renforcé et `prefers-contrast` durcissent les bordures et les fonds ; le mouvement réduit neutralise les animations non essentielles.
 - Les petits écrans réorganisent le Codex, les récapitulatifs et les commandes en une colonne sans réduire les cibles sous 44 × 44 CSS px.
 
-## Contrat artistique v2.6
+## Contrat artistique v2.7
 
-Vingt sources originales produites avec OpenAI Image Generation intégré alimentent 129 assets indépendants.
+Vingt-six masters originaux produits avec OpenAI Image Generation intégré alimentent 225 assets runtime indépendants dans le manifeste 2.7.0.
 
-| Famille | Contrat de production | Sources | Assets runtime |
+| Famille | Contrat de production | Masters | Assets runtime |
 | --- | --- | ---: | ---: |
 | Arènes de campagne | quatre couches de parallaxe | 6 | 24 |
 | Boss de campagne | neuf pièces articulables | 6 | 54 |
-| Boss Forge 07–30 | quatre planches 3 × 2, un sprite composite transparent par machine | 4 | 24 |
+| Boss Forge 07–30 | quatre planches 3 × 2 segmentées en quatre pièces par machine | 4 | 96 |
+| Arènes Forge 07–30 | six planches, un backdrop par machine | 6 | 24 |
 | Riva Spark | atlas historique, corps cohérent v4 et bras-canon v4 | 3 | 11 |
 | VFX | seize effets isolés | 1 | 16 |
-| **Total** |  | **20** | **129** |
+| **Total** |  | **26** | **225** |
 
-Les exports sont cadrés, détourés et hachés par le pipeline reproductible. Le rig Riva de production compose uniquement le corps v4 et le bras-canon v4 ; son pivot de semelles correspond au plancher logique. Les machines Forge conservent un fallback procédural et ne sont pas présentées comme des rigs multipièces.
+Les exports sont cadrés, détourés et hachés par le pipeline reproductible. Le rig Riva de production compose une seule fois le corps v4, pose ses semelles sur le plancher logique et raccorde uniquement le bras-canon v4 au socket d’épaule. Chaque machine Forge dispose de quatre pièces et d’un backdrop, mais conserve une animation secondaire pilotée par famille et un fallback procédural ; le backdrop n’est pas un décor parallaxe à quatre couches.
 
 ## Contrats de maîtrise
 
@@ -121,7 +134,7 @@ Les exports sont cadrés, détourés et hachés par le pipeline reproductible. L
 | Foundry Titan | 66 s | Aucun dégât | Ne subir aucun impact direct de mine pendant la phase 3. |
 | Crown Engine Ω | 82 s | Aucun dégât | Porter le coup final au noyau pendant une surcharge. |
 
-`story.js` définit dix-huit contrats de campagne et `expansion-story.js` soixante-douze contrats Forge, soit quatre-vingt-dix objectifs déclarés. Le runtime mesure les dix-huit historiques et soixante-quatre métriques Forge. Les huit métriques qui demandent une sous-mécanique non encore représentée sont affichées « NON ÉVALUÉE » et ne peuvent jamais être accordées par défaut. Un contrat n’est acquis qu’après évaluation et écriture dans la sauvegarde locale. Les défis de Magnetron et Chrono Mantis exigent un cycle complet de phase 3 sans l’impact interdit ; celui de Foundry Titan interdit un impact direct de mine.
+`story.js` définit dix-huit contrats de campagne et `expansion-story.js` soixante-douze contrats Forge, soit quatre-vingt-dix objectifs. Les 72/72 contrats Forge possèdent une métrique instrumentée : les compteurs de temps, dégâts, ouvertures, finish, erreurs et interactions de famille proviennent de la télémétrie de la tentative. Les signatures restent construites sur huit familles socles enrichies ; l’instrumentation complète ne signifie donc pas soixante-douze sous-systèmes physiques indépendants. Une valeur inconnue échoue fermement et n’est jamais convertie en réussite. Les défis de Magnetron, Chrono Mantis et Foundry Titan conservent leurs conditions historiques précises.
 
 ## Chargement runtime et PWA
 

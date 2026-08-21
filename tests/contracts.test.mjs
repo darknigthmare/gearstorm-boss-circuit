@@ -10,6 +10,7 @@ import {
   SAVE_KEY,
   SAVE_SCHEMA_VERSION,
   validateApplicationContract,
+  validateBossRosterContract,
 } from '../scripts/app-contract.mjs';
 
 const [html, css, story, expansionStorySource, game, bossRosterSource, readme, design, packageJson, manifest, artManifest] = await Promise.all([
@@ -23,7 +24,7 @@ const [html, css, story, expansionStorySource, game, bossRosterSource, readme, d
   readFile('DESIGN.md', 'utf8'),
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
-  readFile('assets/generated/v2.6.0/asset-manifest.json', 'utf8').then(JSON.parse),
+  readFile('assets/generated/v2.7.0/asset-manifest.json', 'utf8').then(JSON.parse),
 ]);
 
 const rosterContext = {};
@@ -62,9 +63,32 @@ test('les libelles de contenu restent alignes aux mecaniques jouables', () => {
   assert.match(game, /STORY\.getCombatLabel/);
 });
 
-test('le contrat applicatif v2.6 complet est respecte', () => {
+test('le contrat applicatif complet est respecte', () => {
   assert.doesNotThrow(() => validateApplicationContract({ game, story, expansionStory: expansionStorySource, bossRoster: bossRosterSource, html, manifest, packageJson }));
   assert.equal(packageJson.version, APP_RELEASE);
+});
+
+test('le contrat release refuse les signatures Forge dupliquees ou incompletes', () => {
+  const summary = validateBossRosterContract(bossRosterSource);
+  assert.equal(summary.forgeSignatures, 24);
+  assert.equal(summary.forgeMechanicIds, 24);
+  assert.equal(summary.forgePhaseStates, 72);
+
+  const internalGate = "  if (!validation.valid) throw new Error('Registre GEARSTORM invalide : ' + validation.errors.join(' | '));";
+  const contractOnlySource = bossRosterSource.replace(internalGate, '  if (!validation.valid) void validation;');
+  assert.notEqual(contractOnlySource, bossRosterSource);
+
+  const duplicateMechanicId = contractOnlySource.replace("mechanicId: 'pressure-refuge'", "mechanicId: 'relay-bank'");
+  assert.throws(() => validateBossRosterContract(duplicateMechanicId), /24 mechanicId Forge doivent etre uniques/);
+
+  const incompletePhaseStates = contractOnlySource.replace(
+    "phaseStates: ['angle-lock', 'cross-bank', 'relay-drift']",
+    "phaseStates: ['angle-lock', 'cross-bank']"
+  );
+  assert.throws(() => validateBossRosterContract(incompletePhaseStates), /exactement 3 phaseStates/);
+
+  const duplicatePhaseState = contractOnlySource.replace("'ram-prime'", "'angle-lock'");
+  assert.throws(() => validateBossRosterContract(duplicatePhaseState), /72 phaseStates Forge doivent etre globalement uniques/);
 });
 
 test('tous les identifiants DOM utilises par le moteur existent et sont uniques', () => {
@@ -74,18 +98,20 @@ test('tous les identifiants DOM utilises par le moteur existent et sont uniques'
   const references = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   assert.ok(references.length > 30);
   for (const id of references) assert.ok(ids.has(id), `id manquant: ${id}`);
-  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.6 manquante: ${id}`);
+  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.7 manquante: ${id}`);
 });
 
-test('la sauvegarde v4 migre les v3 et v2 et porte la reprise narrative', () => {
-  assert.match(game, new RegExp(SAVE_KEY));
-  assert.match(game, new RegExp(PREVIOUS_SAVE_KEY));
-  assert.match(game, new RegExp(`version\\s*:\\s*${SAVE_SCHEMA_VERSION}\\b`));
-  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'campaignCleared', 'storySeen', 'mastery']) assert.match(game, new RegExp(`\\b${field}\\b`));
+test('la sauvegarde v5 migre v4 a v2 et porte les deux reprises', () => {
+  assert.match(game, /gearstorm_boss_circuit_save_v5/);
+  assert.match(game, /gearstorm_boss_circuit_save_v4/);
+  assert.match(game, /gearstorm_boss_circuit_save_v3/);
+  assert.match(game, /gearstorm_boss_circuit_save_v2/);
+  assert.match(game, /version\s*:\s*5\b/);
+  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'forgeRushSnapshot', 'forgeCleared', 'forgeCompleted', 'campaignCleared', 'storySeen', 'mastery']) assert.match(game, new RegExp('\\b' + field + '\\b'));
   assert.match(game, /localStorage\.getItem\(PREVIOUS_SAVE_KEY\)/);
   assert.match(game, /localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/);
-  for (const marker of ['sanitizeRushSnapshot', 'saveRushSnapshot', 'clearRushSnapshot', 'resumeRushSnapshot', 'syncContinueRun']) {
-    assert.match(game, new RegExp(`\\b${marker}\\b`));
+  for (const marker of ['sanitizeRushSnapshot', 'saveRushSnapshot', 'clearRushSnapshot', 'resumeRushSnapshot', 'syncContinueRun', 'sanitizeForgeRushSnapshot', 'saveForgeRushSnapshot', 'clearForgeRushSnapshot', 'resumeForgeRushSnapshot', 'syncContinueForge']) {
+    assert.match(game, new RegExp('\\b' + marker + '\\b'));
   }
 });
 
@@ -114,7 +140,7 @@ test('les rigs generes et leur diagnostic QA sont explicites', () => {
   assert.match(game, /qaAllowed[\s\S]+127\.0\.0\.1[\s\S]+localhost/);
 });
 
-test('le rig composite OpenAI v4 de Riva garde les semelles et l avant-bras coherents', () => {
+test('le rig composite OpenAI v2.7 de Riva garde les semelles et l avant-bras coherents', () => {
   const playerRenderer = game.slice(game.indexOf('function drawGeneratedPlayer'), game.indexOf('function bossRigPose'));
   assert.match(playerRenderer, /drawRigPart\(parts\['body-core'\]/);
   assert.match(playerRenderer, /drawRigPart\(parts\['firing-arm'\]/);
@@ -123,7 +149,7 @@ test('le rig composite OpenAI v4 de Riva garde les semelles et l avant-bras cohe
   }
   assert.match(game, /'body-core': rigPart\('body-core', 1, \[0, 36\], \[209, 409\], 0\.3, \[138, 9, 280, 409\], 'body'\)/);
   assert.match(game, /'firing-arm': rigPart\('firing-arm', 1, \[16, -56\], \[70, 180\], 0\.135, \[24, 119, 394, 298\], 'weapon'\)/);
-  assert.match(game, /assets\/generated\/v2\.6\.0\/asset-manifest\.json/);
+  assert.match(game, /assets\/generated\/v2\.7\.0\/asset-manifest\.json/);
   assert.match(game, /visibleArmSources:[\s\S]+body-core:openai-v4[\s\S]+firing-arm:openai-v4/);
   const shadow = game.slice(game.indexOf('function drawPlayer()'), game.indexOf('const blink', game.indexOf('function drawPlayer()')));
   assert.match(shadow, /ellipse\(player\.x, GROUND \+ 1, 18 \* shadowScale, 3 \* shadowScale/);
@@ -139,6 +165,13 @@ test('le registre data-driven livre les 30 boss et les 24 contrats Forge', () =>
   assert.equal(bossRoster.campaign().length, 6);
   assert.equal(bossRoster.expanded().length, 24);
   assert.equal(bossRoster.resolveLaunchMode('expanded'), 'forge');
+  assert.equal(bossRoster.resolveLaunchMode('forge-rush'), 'forgeRush');
+  assert.equal(bossRoster.apiVersion, '1.0.0');
+  assert.equal(bossRoster.schemaVersion, 1);
+  assert.equal(bossRoster.validate().stats.signatures, 24);
+  assert.equal(bossRoster.validate().stats.signatureStates, 72);
+  const mechanicIds = new Set();
+  const signatureStates = new Set();
 
   for (const [id, name] of EXPANSION_BOSS_CONTRACT) {
     const entry = bossRoster.get(id);
@@ -148,17 +181,30 @@ test('le registre data-driven livre les 30 boss et les 24 contrats Forge', () =>
     assert.notEqual(entry.productionStatus, 'planned', id);
     assert.equal(entry.phases.length, 3, id);
     assert.equal(entry.masteryContracts.length, 3, id);
+    assert.ok(entry.signature?.mechanicId, id);
+    assert.equal(entry.signature.phaseStates.length, 3, id);
+    mechanicIds.add(entry.signature.mechanicId);
+    entry.signature.phaseStates.forEach(state => signatureStates.add(state));
+    entry.phases.forEach((phase, index) => {
+      assert.equal(phase.mechanicId, entry.signature.mechanicId, id);
+      assert.equal(phase.signatureState, entry.signature.phaseStates[index], id);
+    });
     assert.deepEqual([...entry.masteryContracts].map(contract => contract.id), [...rosterContext.GEARSTORM_EXPANSION_STORY.getMasteryContracts(id)].map(contract => contract.id), id);
     assert.ok(entry.parts.some(part => part.role === 'weak-point' && part.hitbox), id);
     assert.equal(entry.artPack.status, 'generated', id);
     assert.equal(entry.artPack.bundleId, id, id);
     assert.equal(entry.artPack.proceduralFallback, true, id);
-    assert.equal(entry.arenaPack.status, 'missing', id);
+    assert.equal(entry.arenaPack.status, 'generated', id);
+    assert.equal(entry.arenaPack.layout, 'backdrop', id);
     assert.equal(entry.arenaPack.proceduralFallback, true, id);
     assert.equal(entry.codex.releaseEligible, true, id);
-    assert.match(artManifest.bosses[id].parts.sprite.src, new RegExp('/bosses/' + id + '/sprite\\.webp$'));
+    assert.deepEqual(Object.keys(artManifest.bosses[id].parts).sort(), ['appendage-left', 'appendage-right', 'chassis', 'core']);
+    assert.equal(artManifest.bosses[id].parts.core.weakCore, true, id);
+    assert.match(artManifest.arenas[id].backdrop.src, new RegExp('/arenas/' + id + '/backdrop\\.webp$'));
   }
-  assert.equal(artManifest.release, '2.6.0');
+  assert.equal(mechanicIds.size, 24);
+  assert.equal(signatureStates.size, 72);
+  assert.equal(artManifest.release, '2.7.0');
 });
 
 test('les huit familles ont des boucles, telegraphes et handlers distincts', () => {
@@ -189,8 +235,9 @@ test('la Forge expose selection, lore, chrono, rang, practice et secours procedu
   for (const marker of ['installDomHooks', 'launchForgeBoss', 'getBossRoster', 'launchBoss', 'selectedPracticePhase', 'selectedPracticeCheckpoint']) {
     assert.match(game + bossRosterSource, new RegExp('\\b' + marker + '\\b'));
   }
-  assert.match(game, /generatedImage\(parts\.sprite\)/);
-  assert.match(game, /drawImage\(sprite, -size \/ 2, -size \/ 2, size, size\)/);
+  assert.match(game, /entries\.length < 4/);
+  assert.match(game, /generatedMultipartManifest/);
+  assert.match(game, /generatedImage\(arena\.backdrop\)/);
   assert.match(game, /default: drawExpandedBoss\(\)/);
   assert.match(game, /const par = \(BOSSES\[currentBossIndex\]\.parTime \|\| 60\)/);
   assert.match(game, /EXPANSION_STORY[\s\S]+shortIntro[\s\S]+objective[\s\S]+restoration[\s\S]+journal/);
@@ -204,6 +251,39 @@ test('la Forge expose selection, lore, chrono, rang, practice et secours procedu
   for (const id of ['rammer', 'kraken', 'drill', 'mantis', 'cyclotron', 'omega']) {
     assert.match(game, new RegExp("case '" + id + "':"));
   }
+});
+
+test('les 24 signatures runtime et les 72 contrats Forge sont couverts', () => {
+  const expanded = [...bossRoster.expanded()];
+  const signatureBlock = game.slice(game.indexOf('function updateExpandedSignature'), game.indexOf('function updateExpandedFamilyActive'));
+  for (const entry of expanded) assert.match(signatureBlock, new RegExp("case '" + entry.id + "'"), entry.id);
+  const metricBlock = game.slice(game.indexOf('function evaluateForgeMetric'), game.indexOf('function evaluateMasteryContracts'));
+  const contracts = expanded.flatMap(entry => [...entry.masteryContracts]);
+  assert.equal(contracts.length, 72);
+  for (const contract of contracts) assert.match(metricBlock, new RegExp('\\b' + contract.metric + '\\b'), contract.metric);
+  for (const metric of ['repairsCompleted', 'fallDamageTaken', 'recoveryFalls', 'openDoorCoreFinish', 'mutualCollisions', 'manualSequenceResets', 'selfRicochetHits']) {
+    assert.match(metricBlock, new RegExp('\\b' + metric + '\\b'));
+  }
+  assert.match(game, /function forgeContractCoverage/);
+  assert.match(game, /getForgeContractCoverage/);
+});
+
+test('le Circuit Forge enchaine 07 a 30 avec vagues, modules, reprise et epilogue', () => {
+  for (const marker of ['forgeRush', 'FORGE_START_INDEX', 'FORGE_FINAL_INDEX', 'saveForgeRushSnapshot', 'resumeForgeRushSnapshot', 'showForgeEnding', 'getForgeRunState']) {
+    assert.match(game, new RegExp('\\b' + marker + '\\b'));
+  }
+  assert.match(game, /runMode === 'forgeRush'[\s\S]+showUpgradeSelection/);
+  assert.match(game, /startFight\(currentBossIndex \+ 1\)/);
+  assert.equal(rosterContext.GEARSTORM_EXPANSION_STORY.forgeCircuit.bossOrder.length, 24);
+  assert.deepEqual([...rosterContext.GEARSTORM_EXPANSION_STORY.forgeCircuit.bossOrder], EXPANSION_BOSS_CONTRACT.map(([id]) => id));
+  assert.equal(rosterContext.GEARSTORM_EXPANSION_STORY.forgeCircuit.waveCheckpoints.length, 4);
+  assert.deepEqual([...rosterContext.GEARSTORM_EXPANSION_STORY.forgeCircuit.resumeCheckpoints], ['fight', 'upgrade', 'ending']);
+  const runStateBlock = game.slice(game.indexOf('function getForgeRunState'), game.indexOf('function unlockCodexEntry'));
+  for (const field of ['mode', 'index', 'bossIndex', 'wave', 'completed', 'finished', 'snapshot']) {
+    assert.match(runStateBlock, new RegExp('\\b' + field + '\\b'), field);
+  }
+  assert.match(game, /runtime\.signatureCycle \+= 1/);
+  assert.match(game, /enduranceRounds\.add\(6\)/);
 });
 
 test('le combat ne demarre jamais sous la plaque d introduction', () => {
@@ -236,7 +316,11 @@ test('les chronos, retry et sauvegardes suivent les garde-fous', () => {
   assert.match(game, /if \(boss\.defeated\) return/);
   assert.match(game, /Number\.isFinite\(parsed\?\.bestRush\)/);
   assert.match(game, /Object\.hasOwn\(DIFFICULTIES/);
-  assert.match(game, /sanitizeRushSnapshot\(save\.rushSnapshot\)[\s\S]+confirm\('Un Circuit est déjà en cours/);
+  const startRunStart = game.indexOf('function startRun');
+  const startRunBlock = game.slice(startRunStart, game.indexOf('function startFight(', startRunStart));
+  assert.match(startRunBlock, /sanitizeRushSnapshot\(save\.rushSnapshot\)/);
+  assert.match(startRunBlock, /sanitizeForgeRushSnapshot\(save\.forgeRushSnapshot\)/);
+  assert.match(startRunBlock, /confirm\('Un ' \+ label/);
   assert.match(game, /const elapsed=currentBossElapsed/);
   assert.doesNotMatch(game, /const elapsed=performance\.now/);
 });
@@ -254,7 +338,7 @@ test('les raccourcis PWA sont routes sans demarrer un combat implicitement', () 
   assert.doesNotMatch(routeBlock, /startRun|startFight|unlockAudio/);
 });
 
-test('la liste des systemes v2.6 reste centralisee', () => {
+test('la liste des systemes reste centralisee', () => {
   for (const marker of REQUIRED_GAME_SYSTEMS) assert.match(game, new RegExp(`\\b${marker}\\b`));
 });
 

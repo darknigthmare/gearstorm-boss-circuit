@@ -1,18 +1,18 @@
 # GEARSTORM — Contrat d’expansion des boss
 
-Statut du document : implémentation Forge v2.6 et feuille de raffinement
+Statut du document : implémentation Forge v2.7 livrée et feuille de raffinement
 
-Portée : 30 boss originaux jouables, dont 6 en campagne et 24 dans la Forge
+Portée : 30 boss originaux jouables, dont 6 en campagne et 24 dans la Forge libre ou le Circuit Forge
 
-Référence technique actuelle : GEARSTORM v2.6, manifeste d’assets générés v2.6.0
+Référence technique actuelle : GEARSTORM v2.7, sauvegarde v5, manifeste d’assets générés 2.7.0
 
 ## 1. Objet et limites
 
 Ce document transforme l’étude des grandes mécaniques de boss de la série Sonic en une feuille de route originale pour GEARSTORM. Il décrit des verbes de jeu, des structures d’arène et des méthodes de production. Il n’autorise ni la copie d’une apparence, ni la reprise d’un nom, d’une silhouette, d’un personnage, d’un décor ou d’un asset Sega.
 
-La v2.6 intègre les vingt-quatre boss des vagues 1 à 4 dans une Forge séparée de la campagne. Les trente machines sont sélectionnables et combattables, possèdent trois phases, des télégraphes, des valeurs propres, un objectif et une fiche narrative. Les 24 profils Forge partagent huit familles de mécaniques pilotées par données ; leurs arènes et animations secondaires utilisent le rendu procédural, tandis qu’un sprite OpenAI transparent propre à chaque boss est chargé à la demande.
+La v2.7 intègre les vingt-quatre boss des vagues 1 à 4 dans une Forge séparée de la campagne. Les trente machines sont sélectionnables et combattables, possèdent trois phases, des télégraphes, des valeurs propres, un objectif et une fiche narrative. Le Circuit Forge enchaîne 07 à 30 en quatre vagues, propose des améliorations entre les boss, sauvegarde sa reprise en v5 et se conclut par une restauration dédiée.
 
-Ce statut « jouable » ne signifie pas que les vingt-quatre extensions disposent déjà chacune d’une IA entièrement sur mesure, d’un rig multipièces ou d’un décor en quatre couches. Les tableaux ci-dessous restent aussi la feuille de raffinement pour transformer progressivement les familles partagées en rencontres encore plus spécifiques. La campagne, ses six relais et l’épilogue restent volontairement limités aux six boss historiques.
+Les 24 profils Forge possèdent 24 `mechanicId` et 72 signatures d’état uniques. Ces signatures enrichissent huit familles de mécaniques communes : elles ne constituent pas vingt-quatre IA entièrement indépendantes. Chaque machine charge quatre pièces OpenAI et un backdrop propre ; les animations secondaires, hazards et transitions restent composés par le moteur partagé, et les backdrops Forge ne sont pas des décors parallaxe à quatre couches. La campagne, ses six relais et son épilogue restent volontairement séparés.
 
 La mention IP-safe désigne ici un ensemble de garde-fous internes. Elle ne remplace pas une validation juridique lorsqu’une diffusion commerciale l’exige.
 
@@ -73,7 +73,7 @@ Cette méthode permet de couvrir une grande variété historique de combats sans
 | Statut | Signification |
 |---|---|
 | Campagne | Boss canonique de la campagne, avec progression, district et rig historique. |
-| Forge jouable | Boss sélectionnable dans la Forge, doté de trois phases, d’un sprite original et d’une famille mécanique partagée. |
+| Forge jouable | Boss sélectionnable ou intégré au Circuit Forge, doté de trois phases, d’un `mechanicId`, de quatre pièces originales, d’un backdrop et d’une famille mécanique enrichie. |
 | Bloqué | Une dépendance moteur, artistique, narrative ou d’accessibilité empêche sa production. |
 | Candidat release | Code, assets, narration, tests et audit visuel sont terminés pour la rencontre. |
 
@@ -139,7 +139,7 @@ Critère de sortie de vague : les pièces destructibles, points d’ancrage, jau
 
 ### 4.5 Vague 4 — Expérimental et endgame
 
-Objectif : introduire des changements de genre courts, un gauntlet, une adaptation contrôlée et un vrai secret final.
+Objectif : introduire des changements de genre courts, un gauntlet, une adaptation contrôlée et un prototype final secret dans le lore.
 
 | No | Nom de travail | Statut | Arène proposée | Boucle principale | Phases et règle d’équité |
 |---:|---|---|---|---|---|
@@ -148,15 +148,15 @@ Objectif : introduire des changements de genre courts, un gauntlet, une adaptati
 | 27 | SKYBORNE BATTERY | Forge jouable | Batterie Aérostatique | Séquence de tir mobile, esquive et renvoi de torpilles | Changement de genre limité à une rencontre ; visée assistée au tactile et à la manette. |
 | 28 | ENDURANCE ENGINE | Forge jouable | Circuit d’Endurance | Machine qui convoque des fragments mécaniques en gauntlet sans soin complet | Six manches courtes et télégraphiées ; reprise au début de la manche en Laboratoire. |
 | 29 | ADAPTIVE ARCHIVIST | Forge jouable | Archives Réactives | Observe la fréquence de tir, saut et ruée puis change une seule réponse | L’adaptation est locale au combat, visible dans l’interface et remise à zéro à chaque tentative. |
-| 30 | NULL CROWN | Forge jouable | Trône Zéro | Boss secret composite débloqué par la maîtrise, combinant renvoi, modules et rupture | Trois phases avec checkpoint d’entraînement ; aucune phase ne copie l’apparence ou l’ordre d’un final de franchise existant. |
+| 30 | NULL CROWN | Forge jouable | Trône Zéro | Prototype secret composite clôturant le Circuit Forge, combinant renvoi, modules et rupture | Trois phases avec checkpoint d’entraînement ; aucune phase ne copie l’apparence ou l’ordre d’un final de franchise existant. |
 
-Critère de sortie de vague : le boss secret ne peut être annoncé comme disponible avant que sa condition de déblocage, sa sauvegarde, son Codex, ses récompenses et son épilogue optionnel soient réellement implémentés.
+Dans la v2.7, le statut secret de NULL CROWN est narratif : FORGE 30 reste accessible dans la sélection libre et conclut le Circuit Forge avec sauvegarde, Codex et épilogue dédiés. Toute future condition de déblocage devra être migrée et documentée avant activation.
 
-## 5. Architecture moteur requise
+## 5. Architecture moteur livrée et cible
 
 ### 5.1 Registre de boss piloté par les données
 
-Le tableau BOSSES actuel peut rester la source de compatibilité pendant la migration, mais la cible est un registre déclaratif. Une entrée doit au minimum décrire :
+`boss-roster.js` est le registre déclaratif courant ; le tableau historique des six boss ne subsiste que comme repli de compatibilité. Une entrée décrit au minimum :
 
 - identifiant stable ;
 - nom affiché et nom de travail ;
@@ -167,6 +167,7 @@ Le tableau BOSSES actuel peut rester la source de compatibilité pendant la migr
 - pack d’art et pack d’arène ;
 - pièces, points faibles et hitboxes ;
 - liste ordonnée des phases ;
+- `mechanicId`, signature d’état et hazard propres à chaque phase ;
 - patterns disponibles par phase ;
 - règles de transition ;
 - contrôleur d’arène ;
@@ -272,34 +273,32 @@ Le directeur choisit les patterns autorisés selon la phase et applique des règ
 
 ### 5.7 Progression et sauvegarde
 
-L’ajout des vagues demandera une migration de sauvegarde, sans écraser la version actuelle. Prévoir :
+La sauvegarde locale v5 migre la v4 et normalise toute donnée absente. Elle conserve :
 
-- déblocage par vague et par boss ;
-- meilleurs temps et rangs ;
-- contrats de maîtrise ;
-- dossiers Codex ;
-- checkpoints de Rush ;
-- statut du boss secret ;
-- version de données du registre ;
-- valeur par défaut sûre pour tout contenu absent d’une ancienne sauvegarde.
+- meilleurs temps, rangs, Codex et contrats de maîtrise par identifiant stable ;
+- `forgeCleared`, `forgeCompleted` et `bestForgeRush`, séparés de `campaignCleared` ;
+- `forgeRushSnapshot` avec boss courant, nombre de victoires, checkpoint `fight`, `upgrade` ou `ending`, score, temps, pénalités, tentatives, difficulté et build ;
+- reprise au début du combat, au choix de module ou à la fin, sans sauter une décision ;
+- valeurs par défaut sûres lors de la migration depuis une sauvegarde antérieure.
 
-La sauvegarde v4 conserve déjà des maps dynamiques de temps, rangs et maîtrise ; aucun nouveau schéma n’est nécessaire pour les identifiants Forge. Les résultats Forge restent séparés de `campaignCleared` et des checkpoints du Rush.
+La Forge libre et le Laboratoire peuvent enrichir temps, rangs, maîtrise ou Codex sans avancer le Circuit Forge. La sauvegarde v5 reste locale au navigateur et ne fournit ni compte ni synchronisation interappareil.
 
 ## 6. Architecture des packs d’assets
 
-### 6.1 Compatibilité avec le manifeste actuel
+### 6.1 Manifeste actuel
 
-Le manifeste v2.6.0 utilise :
+Le manifeste 2.7.0, de schéma 2, référence vingt-six masters de provenance et 225 WebP runtime :
 
-- quatre couches d’arène de 768 × 512 pixels ;
-- des pièces de boss de 418 × 418 pixels avec alpha ;
-- des VFX proches de 314 × 314 pixels avec alpha ;
-- largeur, hauteur, poids, transparence et SHA-256 ;
-- chargement par bundle de boss.
+- 24 couches de parallaxe pour les six arènes de campagne ;
+- 54 pièces pour les six boss de campagne ;
+- 96 pièces Forge, soit châssis, noyau et deux appendices pour chacun des boss 07–30 ;
+- 24 backdrops Forge dédiés ;
+- 11 pièces de Riva et 16 VFX ;
+- largeur, hauteur, poids, transparence et SHA-256 pour chaque sortie.
 
-Les 24 sprites Forge composites respectent ce contrat. L’arborescence multipièces ci-dessous demeure la cible de raffinement, pas une affirmation sur les fichiers déjà publiés.
+Les masters ne sont jamais des fichiers runtime. Les bundles sont chargés à la demande et gardent un fallback Canvas en cas d’absence ou d’échec de décodage.
 
-### 6.2 Arborescence cible par boss
+### 6.2 Arborescence cible enrichie par boss
 
     assets/generated/<release>/
       bosses/<boss-id>/
@@ -578,18 +577,19 @@ Un concept trop proche est rejeté puis reconstruit depuis sa fonction industrie
 - libération des bitmaps d’un boss quitté, sauf bundle explicitement conservé ;
 - possibilité de réduire particules et secousses sans modifier la difficulté.
 
-## 11. Backlog de raffinement après v2.6
+## 11. Limites et backlog après v2.7
 
-La base jouable est livrée ; les étapes suivantes améliorent la singularité sans bloquer l’accès aux trente combats :
+La base jouable, narrative, artistique et télémétrique est livrée ; les limites restantes sont explicites :
 
-1. convertir les sprites composites Forge en rigs multipièces lorsque leur animation propre le justifie ;
-2. produire des décors parallaxe dédiés aux quatre vagues ;
-3. spécialiser progressivement les variantes d’arène au-delà des huit familles partagées ;
-4. mesurer et automatiser les contrats de maîtrise qui exigent une télémétrie encore absente ;
-5. équilibrer temps de référence, dégâts et densité sur appareil mobile réel ;
-6. conserver les identifiants, la séparation campagne/Forge et la sauvegarde v4 pendant ces raffinements.
+1. les 24 `mechanicId` et 72 états uniques reposent sur huit familles socles enrichies, pas sur vingt-quatre moteurs d’IA isolés ;
+2. chaque boss Forge possède quatre pièces, mais pas encore un rig exhaustif avec overlays de dégâts, débris et VFX entièrement propres ;
+3. chaque arène Forge possède un backdrop unique, pas quatre couches de parallaxe indépendantes ;
+4. les 72/72 contrats sont instrumentés, mais plusieurs signatures s’appuient sur des événements sémantiques communs aux familles ;
+5. l’équilibrage fin des temps de référence, dégâts et densité demande encore des sessions sur téléphones et manettes physiques variés ;
+6. la sauvegarde v5 est locale : synchronisation cloud, compte joueur et reprise interappareil restent hors périmètre ;
+7. les identifiants, la séparation campagne/Forge et les migrations v5 doivent rester stables pendant tout raffinement.
 
-Une image seule ne vaut pas un combat. Dans la v2.6, chaque profil possède bien une boucle jouable ; les améliorations listées ici concernent sa profondeur, son animation et sa validation matérielle.
+Une image seule ne vaut pas un combat. Chaque profil possède une boucle jouable et trois états propres ; le backlog vise désormais davantage d’animation, de parallaxe, de singularité et de validation matérielle.
 
 ## 12. Sources officielles consultées
 
@@ -616,14 +616,14 @@ Les sources servent à inventorier les jeux et à comprendre des familles géné
 
 ## 13. État livré des 30 boss
 
-Le contrat de base est atteint dans la v2.6 :
+Le contrat de base est atteint dans la v2.7 :
 
 - six boss de campagne et vingt-quatre boss Forge sont présents dans le registre ;
-- les trente rencontres ont trois phases et sont lançables depuis l’interface ou la surface QA locale ;
-- chaque extension utilise une des huit familles mécaniques déterministes ;
-- les 24 silhouettes Forge et les 6 rigs historiques sont présents dans le manifeste v2.6 ;
-- expansion-story.js fournit quatre vagues, journaux, objectifs, Codex et 72 contrats déclarés ;
-- les résultats Forge n’avancent jamais les six relais de campagne ;
-- build, tests de contrats, serveur, PWA et release valident ce registre.
+- les trente rencontres totalisent quatre-vingt-dix phases et sont lançables depuis l’interface ;
+- le Circuit Forge parcourt 07–30 en quatre vagues, avec améliorations, sauvegarde v5, reprise et fin dédiée ;
+- les extensions exposent 24 `mechanicId` et 72 signatures d’état uniques au-dessus de huit familles déterministes ;
+- le manifeste 2.7.0 publie 24 backdrops et 96 pièces Forge dans un total de 225 WebP issus de 26 masters ;
+- `expansion-story.js` fournit quatre vagues, journaux, objectifs, Codex, restaurations et 72/72 contrats instrumentés ;
+- les résultats et checkpoints Forge n’avancent jamais les six relais de campagne.
 
-Limites assumées : les arènes Forge restent procédurales, les 24 nouvelles machines utilisent un sprite composite au lieu de pièces indépendantes, plusieurs contrats très spécifiques sont affichés « NON ÉVALUÉE » tant que leur télémétrie exacte n’existe pas, et la validation tactile/manette physique reste une QA matérielle séparée.
+Ce document ne certifie pas à lui seul la QA, la publication ou le comportement sur matériel physique. Les limites de mutualisation moteur, de profondeur des rigs, de parallaxe, de sauvegarde locale et de validation matérielle sont consignées en section 11.

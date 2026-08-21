@@ -20,7 +20,7 @@ jobs:
   qa:
     name: Node 22 / Linux release gate
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     defaults:
       run:
         shell: bash
@@ -39,12 +39,26 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Run the complete release gate
         run: npm run qa
+      - name: Install the pinned Chromium runtime
+        run: npx playwright install --with-deps chromium
+      - name: Run real browser journeys
+        run: npm run test:e2e
       - name: Audit production and development dependencies
         run: npm audit --audit-level=high
       - name: Upload the verified static artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gearstorm-web-v2.6.0
+          name: gearstorm-web-v2.7.0
           path: dist/
           if-no-files-found: error
           retention-days: 14
+      - name: Upload browser traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gearstorm-playwright-v2.7.0
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -111,7 +111,7 @@ const [distHtml, distStory, distExpansionStory, distBossRoster, distGame, distMa
   readFile('dist/boss-roster.js', 'utf8'),
   readFile('dist/game.js', 'utf8'),
   readFile('dist/manifest.webmanifest', 'utf8').then(JSON.parse),
-  validateRuntimeAssets('dist'),
+  validateRuntimeAssets('dist', { validateMasters: false }),
 ]);
 validateApplicationContract({ game: distGame, story: distStory, expansionStory: distExpansionStory, bossRoster: distBossRoster, html: distHtml, manifest: distManifest, packageJson });
 assert.equal(distRuntime.entries.length, EXPECTED_COUNTS.runtimeFiles);

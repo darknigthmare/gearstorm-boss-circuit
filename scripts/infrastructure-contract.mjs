@@ -58,7 +58,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(coreBlock.includes("'./expansion-story.js'"), 'Le registre narratif Forge doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./boss-roster.js'"), 'Le roster des 30 boss doit faire partie du shell PWA.');
   invariant(coreBlock.includes(`assets/generated/v\${ASSET_VERSION}/asset-manifest.json`), 'Catalogue assets absent du shell PWA.');
-  invariant(!/\.webp[\x60'"]/.test(coreBlock), 'Les 129 WebP ne doivent pas etre precaches.');
+  invariant(!/\.webp[\x60'"]/.test(coreBlock), 'Les 225 WebP ne doivent pas etre precaches.');
 
   const ignored = new Set(vercelIgnore.split(/\r?\n/).map(line => line.trim()).filter(Boolean));
   for (const pattern of [
@@ -87,6 +87,8 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     'node-version: 22',
     'npm ci --ignore-scripts',
     'npm run qa',
+    'npx playwright install --with-deps chromium',
+    'npm run test:e2e',
     'npm audit --audit-level=high',
     'actions/upload-artifact@v4',
     'persist-credentials: false',

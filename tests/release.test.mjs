@@ -32,15 +32,15 @@ const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScri
   readFile('scripts/check-release.mjs', 'utf8'),
 ]);
 
-test('les versions application et assets 2.6 restent declarees separement', () => {
+test('les versions application et assets 2.7 restent declarees separement', () => {
   assert.equal(packageJson.version, APP_RELEASE);
-  assert.equal(APP_RELEASE, '2.6.0');
-  assert.equal(ASSET_RELEASE, '2.6.0');
+  assert.equal(APP_RELEASE, '2.7.0');
+  assert.equal(ASSET_RELEASE, '2.7.0');
   assert.notEqual(APP_RELEASE, STORY_CONTENT_VERSION);
   assert.match(buildScript, /packageJson\.version !== APP_RELEASE/);
   assert.match(buildScript, /release: ASSET_RELEASE/);
   assert.match(buildScript, new RegExp(`saveSchemaVersion:\\s*SAVE_SCHEMA_VERSION`));
-  assert.equal(SAVE_SCHEMA_VERSION, 4);
+  assert.equal(SAVE_SCHEMA_VERSION, 5);
   assert.equal(STORY_SCHEMA_VERSION, 1);
   assert.equal(STORY_CONTENT_VERSION, '1.0.0');
   assert.equal(CAMPAIGN_BOSS_COUNT, 6);
@@ -65,7 +65,7 @@ test('le build reste une liste blanche reproductible et minimale', () => {
   assert.match(releaseScript, /SHA-256 incoherent/);
 });
 
-test('la PWA est installable, versionnee et ne precache pas les 129 WebP', () => {
+test('la PWA est installable, versionnee et ne precache pas les 225 WebP', () => {
   assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
   assert.equal(manifest.launch_handler?.client_mode, 'navigate-existing');
   assert.ok(manifest.icons.some(icon => icon.purpose.includes('maskable')));
@@ -73,11 +73,12 @@ test('la PWA est installable, versionnee et ne precache pas les 129 WebP', () =>
   const keyArt = manifest.screenshots.find(screenshot => screenshot.src.includes('gearstorm-key-art.png'));
   assert.equal(keyArt?.sizes, '1672x941');
   assert.ok(manifest.shortcuts.some(shortcut => shortcut.url === './?mode=forge'));
-  assert.match(serviceWorker, /const APP_VERSION = '2\.6\.0'/);
+  assert.ok(manifest.shortcuts.some(shortcut => shortcut.url === './?mode=forgeRush'));
+  assert.match(serviceWorker, /const APP_VERSION = '2\.7\.0'/);
   assert.match(serviceWorker, /'\.\/story\.js'/);
   assert.match(serviceWorker, /'\.\/expansion-story\.js'/);
   assert.match(serviceWorker, /'\.\/boss-roster\.js'/);
-  assert.match(serviceWorker, /const ASSET_VERSION = '2\.6\.0'/);
+  assert.match(serviceWorker, /const ASSET_VERSION = '2\.7\.0'/);
   assert.match(serviceWorker, /cacheFirstRuntime/);
   assert.match(serviceWorker, /staleWhileRevalidateShell/);
   assert.match(serviceWorker, /networkFirstNavigation/);
@@ -88,9 +89,9 @@ test('la PWA est installable, versionnee et ne precache pas les 129 WebP', () =>
 test('Vercel, la CI Linux et les exclusions satisfont le contrat infrastructure', () => {
   assert.doesNotThrow(() => validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore }));
   assert.match(ci, /concurrency:[\s\S]+cancel-in-progress: true/);
-  assert.match(ci, /name: gearstorm-web-v2\.6\.0/);
+  assert.match(ci, /name: gearstorm-web-v2\.7\.0/);
   assert.match(vercelIgnore, /^\.env\*$/m);
-  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.6\.0\/$/m);
+  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.7\.0\/$/m);
 });
 
 test('les scripts npm couvrent syntaxe, tests, build et verification release', () => {
@@ -103,4 +104,8 @@ test('les scripts npm couvrent syntaxe, tests, build et verification release', (
   assert.match(packageJson.scripts.test, /tests\/release\.test\.mjs/);
   assert.match(packageJson.scripts.test, /tests\/sw\.test\.mjs/);
   assert.equal(packageJson.scripts.qa, 'npm run check && npm test && npm run build && npm run check:release');
+  assert.equal(packageJson.scripts['test:e2e'], 'playwright test');
+  assert.equal(packageJson.scripts['qa:ci'], 'npm run qa && npm run test:e2e');
+  assert.match(ci, /playwright install --with-deps chromium/);
+  assert.match(ci, /npm run test:e2e/);
 });

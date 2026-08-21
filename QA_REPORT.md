@@ -1,58 +1,65 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.6.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.7.0
 
-Validation locale effectuée le 21 août 2026 sur le candidat v2.6.0.
+Validation locale effectuée le 21 août 2026 sur le candidat v2.7.0.
 
-## Automatisation
+## Gates de release
 
-- `npm run qa` : succès intégral, 55/55 tests réussis.
-- Build v2.6.0 et `check-release` : réussis.
-- `dist/` : 20 364 880 octets.
-- Registre : 30 boss jouables, 90 phases et 90 contrats de maîtrise déclarés.
-- Bibliothèque runtime : 129 WebP v2.6.0, 17 088 342 octets, dérivés de 20 sources OpenAI documentées.
+- `npm run qa` : réussi.
+- Syntaxe Node : réussie sur le moteur, les registres, le serveur, le service worker et les scripts de release.
+- Tests automatisés : 61/61 réussis.
+- Build et `check-release` : réussis.
+- Bundle public : 21 697 935 octets.
+- Catalogue graphique : 225 WebP v2.7.0, 18 248 604 octets, dérivés de 26 masters OpenAI documentés ; les masters sont exclus de `dist/`.
+- Contenu livré : 30 boss, 90 phases et 90 contrats de maîtrise.
 - `npm audit --audit-level=high` : 0 vulnérabilité.
 
-## Parcours navigateur v2.6 — ordinateur
+## QA navigateur
 
-Chrome local via `agent-browser 0.34.0`, viewport 1440 × 900 :
+La QA a utilisé Google Chrome local via Playwright, le navigateur intégré étant indisponible dans cette session à cause de l’ACL Windows. Les tests sont reproductibles avec `npm run test:e2e`.
 
-- titre v2.6 et Forge intégrale chargés sans erreur console ;
-- manifeste v2.6.0 prêt, 129/129 assets chargés et aucune ressource en échec ;
-- 30 cartes Forge exactes et 24/24 boss étendus lancés en mode `fight`, avec leur ID, leur phase 1 et leur sprite OpenAI ;
-- un représentant de chacune des huit familles a franchi la transition phase 1 → phase 2 ;
-- Bastion Ricochet a confirmé la transition 150 → 100 PV ;
-- Riva v4 a été inspectée en combat : silhouette complète, taille/buste/pelvis séparés, deux jambes lisibles et semelles alignées sur le plan du pont ;
-- les statistiques de carte sont désormais séparées du descriptif, sans collision de texte.
+Résultat E2E : 5 tests réussis, 1 test volontairement ignoré. La matrice lourde de 72 lancements (24 boss Forge × 3 phases) tourne une fois sur Chromium desktop ; les parcours menu, Forge, rig de Riva et reprise du Circuit tournent aussi en émulation tactile mobile.
 
-Captures courantes :
+Parcours contrôlés :
 
-- `qa-gearstorm-v26-browser/01-title-desktop.png` ;
-- `qa-gearstorm-v26-browser/02-forge-grid-desktop.png` ;
-- `qa-gearstorm-v26-browser/03-bastion-phase1-desktop.png` ;
-- `qa-gearstorm-v26-browser/06-riva-ground-contact-desktop.png`.
+- titre, navigation, Laboratoire, Forge intégrale et absence de débordement horizontal ;
+- 30 cartes de boss et 24 signatures `mechanicId` distinctes ;
+- lancement des 24 boss Forge dans chacune de leurs trois phases ;
+- démarrage et checkpoint reprenable du Circuit Forge ;
+- traversée accélérée des 24 victoires, choix d’améliorations et véritable écran de fin ;
+- rendu représentatif des quatre vagues : Bastion Ricochet, Floodline Leviathan, Carrier Cathedral et Null Crown ;
+- viewport desktop 1440 × 900, portrait tactile 390 × 844 et HUD tactile.
 
-## Mobile et accessibilité
+## Audit visuel
 
-- titre et Forge vérifiés à 390 × 844, sans débordement horizontal ;
-- navigation, boutons et cartes restent entièrement accessibles par défilement ;
-- audit axe de la Forge mobile : 0 violation confirmée ;
-- 21 contrôles de contraste restent indéterminés automatiquement à cause des gradients et pseudo-éléments et ont donc été relus visuellement ;
-- captures : `04-title-mobile-390x844.png` et `05-forge-mobile-390x844.png`.
+Neuf captures locales ont été générées sous `audit-visual-v27/`. Aucun visuel de référence externe pixel-perfect n’existait ; la comparaison a donc porté sur le système visuel du jeu, les ancres logiques 1280 × 720 et les contrats de rig.
 
-## Gameplay, contenu et progression
+Constats validés :
 
-- la campagne conserve ses six relais et reste distincte de la Forge ;
-- le Laboratoire n’affiche que les six machines de campagne, tandis que la Forge expose les 30 profils ;
-- les 24 boss étendus utilisent huit familles de contrôleurs data-driven, chacune avec télégraphes, boucle et trois phases ;
-- histoire, objectifs, journaux et résultats Forge proviennent du registre narratif intégré ;
-- 64/72 métriques de maîtrise Forge sont mesurées ; les huit mécaniques non instrumentées restent explicitement « NON ÉVALUÉE » et ne peuvent pas être acquises par défaut.
+- les semelles de Riva et son ombre touchent le plancher logique ;
+- le corps composite sépare lisiblement tête, buste, taille et jambes ; aucun troisième bras ni avant-bras flottant n’est visible ;
+- le bras-canon rejoint le socket d’épaule sans doublonner le torse ;
+- les boss Forge assemblent quatre pièces manifestées, gardent leur noyau sur la hitbox et projettent désormais une ombre au sol lorsqu’ils sont en hauteur ;
+- les backdrops Forge respectent le plancher à `GROUND = 620`, le HUD conserve son contraste et les télégraphes restent visibles ;
+- le menu, la grille Forge, le combat mobile et l’épilogue ne débordent pas ;
+- le bilan Forge affiche cinq statistiques équilibrées sans détruire la structure DOM accessible.
 
-## Publication
+## Contenu et progression
 
-Ce rapport couvre le candidat local. Les preuves GitHub, CI et Vercel publiques sont collectées après le commit et le déploiement.
+- La campagne historique reste distincte du Laboratoire.
+- Le Circuit Forge enchaîne les machines 07 à 30 en quatre vagues, conserve le build, sauvegarde entre les victoires et se termine sur l’épilogue « Protocole sans couronne ».
+- La sauvegarde v5 migre les schémas v4, v3 et v2.
+- Les 24 boss ont 24 signatures et 72 états de phase uniques, bâtis sur huit familles moteur éprouvées.
+- Les 72 contrats Forge sont instrumentés ; avec les 18 contrats de campagne, le jeu en expose 90.
+- Les assets disposent d’un fallback procédural et le cache PWA ne précache pas les 225 WebP d’un seul bloc.
 
-## Limites du passage
+## Limites de validation
 
-- Les 24 boss Forge partagent huit familles de comportement et une arène procédurale ; ils ne possèdent pas encore chacun une IA, une arène et un rig multipartite uniques.
-- Les 24 combats ont été lancés et leurs transitions de famille validées, mais leurs 72 phases n’ont pas toutes été terminées manuellement de bout en bout.
-- Aucune manette physique, aucun appareil tactile physique et aucun lecteur d’écran réel n’ont été testés.
-- Le navigateur intégré était bloqué par le helper ACL Windows ; le fallback autorisé a utilisé Chrome local avec `agent-browser`.
+- Aucun test matériel n’a été effectué avec une manette physique, un écran tactile réel ou un lecteur d’écran.
+- L’émulation mobile Chromium ne remplace pas les performances d’un appareil bas de gamme.
+- Firefox, Safari/WebKit et le comportement de quota PWA extrême ne sont pas couverts par ce passage.
+- Les 24 backdrops sont des tableaux monocouche : ils sont uniques et cohérents, mais moins profonds que les six arènes historiques à quatre plans parallaxes.
+- Les signatures propres aux 24 boss reposent volontairement sur huit familles de simulation communes ; elles ne constituent pas 24 moteurs physiques indépendants.
+
+## Verdict local
+
+Candidat v2.7.0 prêt à publier. Les contrats, la release, la sécurité, la campagne, le Circuit Forge, les assets et les parcours navigateur contrôlés sont verts. La vérification de production doit encore confirmer le déploiement READY, HTTP 200, les en-têtes immuables v2.7 et l’absence d’erreur console sur l’URL publique.

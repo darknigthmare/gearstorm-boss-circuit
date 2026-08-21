@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit — conception
+# GEARSTORM: Boss Circuit — conception v2.7
 
 ## Pitch
 
@@ -25,25 +25,27 @@ Chaque boss franchit trois seuils de points de vie. Les phases augmentent la den
 
 ## Forge des trente machines
 
-Après l’épilogue ou depuis le titre, la Forge expose les six machines historiques et vingt-quatre profils supplémentaires. Ce mode ne modifie ni `campaignCleared`, ni les six relais, ni l’ordre narratif de la campagne. Chaque extension possède trois phases et utilise une des huit familles partagées : renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo ou séquence finale.
+Depuis le titre, la Forge propose deux parcours distincts. La Forge libre expose les trente machines pour des tentatives indépendantes ; le Circuit Forge enchaîne uniquement les boss 07 à 30 en quatre vagues de six. Aucun de ces parcours ne modifie `campaignCleared`, les six relais ou l’ordre narratif de la campagne.
 
-Le registre `boss-roster.js` contient les hitboxes, points faibles, valeurs, familles et télégraphes. `expansion-story.js` fournit objectifs, journaux et restaurations civiles symboliques. Les résultats Forge enregistrent temps, rang et maîtrise compatible, puis reviennent à la sélection.
+Chaque extension possède trois phases. Le registre attribue vingt-quatre `mechanicId` et soixante-douze signatures d’état uniques, mais les rencontres reposent volontairement sur huit familles socles enrichies : renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et puzzle/endgame. La singularité vient des objectifs, paramètres, hazards, télégraphes et états propres, pas d’une duplication de vingt-quatre moteurs.
+
+Le Circuit Forge sauvegarde en v5 le combat, le choix de module ou la fin à reprendre. Un module est proposé entre les boss ; la dernière victoire ouvre la restauration des quatre anneaux et enregistre le meilleur temps. `boss-roster.js` porte les règles de combat et `expansion-story.js` les objectifs, journaux, restaurations et 72 contrats instrumentés.
 
 ## Progression
 
-Onze modules couvrent la cadence, le noyau, la ruée, le tir multiple, les dégâts, la surcharge, le bouclier, la mobilité, la précision, le combo et l’auto-réparation de phase. Ils ne persistent que pendant le Circuit en cours ; leurs limites de cumul propres empêchent de dépasser le niveau prévu. Les boss débloqués, meilleurs temps et meilleurs rangs sont sauvegardés sur l’appareil. Le Laboratoire permet de rejouer chaque machine vaincue sans faire avancer les six relais de campagne.
+Onze modules couvrent la cadence, le noyau, la ruée, le tir multiple, les dégâts, la surcharge, le bouclier, la mobilité, la précision, le combo et l’auto-réparation de phase. Ils ne persistent que pendant le Circuit en cours ; leurs limites de cumul propres empêchent de dépasser le niveau prévu. La sauvegarde locale v5 conserve déblocages, meilleurs temps, rangs, maîtrise et reprises séparées de campagne et de Forge. Le Laboratoire et la Forge libre permettent de rejouer sans faire avancer les six relais ni le Circuit Forge.
 
 ## Accessibilité et lisibilité
 
 Les dangers utilisent des télégraphes avant collision. Le mode mouvement réduit diminue les particules et transitions ; le contraste renforcé épaissit les repères. Le jeu accepte clavier AZERTY/QWERTY, souris, manette et tactile. L’indicateur de chargement artistique reste compact, annoncé par les technologies d’assistance et neutralise ses animations quand le mouvement réduit est demandé.
 
-## Direction artistique v2.6
+## Direction artistique v2.7
 
-La direction privilégie une silhouette lisible, une matière industrielle peinte et des accents lumineux propres à chaque machine. Les vingt sources OpenAI retenues produisent 129 WebP : 24 couches de décor, 54 pièces pour les six boss de campagne, 24 sprites Forge, 11 pièces de Riva et 16 VFX.
+La direction privilégie une silhouette lisible, une matière industrielle peinte et des accents lumineux propres à chaque machine. Les vingt-six masters OpenAI retenus produisent 225 WebP runtime : 24 couches de décor de campagne, 54 pièces pour les six boss de campagne, 24 backdrops Forge, 96 pièces Forge, 11 pièces de Riva et 16 VFX. Le manifeste 2.7.0 conserve dimensions, alpha, poids et SHA-256 ; les masters servent uniquement à la provenance.
 
-Riva utilise un corps v4 cohérent et un seul bras-canon indépendant. Le pivot de semelle tombe sur le plancher logique ; l’ombre n’est plus une plate-forme lumineuse. Les boss Forge possèdent chacun un sprite transparent, mais leurs arènes et animations secondaires restent procédurales. Le moteur conserve ses fallbacks si une ressource ne charge pas.
+Riva utilise un corps v4 cohérent et un seul bras-canon indépendant. Le pivot de semelles tombe exactement sur le plancher logique, le torse n’est composé qu’une fois et l’ombre est une petite ellipse de contact. Chaque boss Forge possède un backdrop et quatre pièces transparentes ; leurs animations secondaires restent pilotées par les huit familles moteur. Le moteur conserve ses fallbacks si une ressource ne charge pas.
 
-## Progression narrative v2.4
+## Progression narrative
 
 ### Riva contre le système de Voltério
 
@@ -64,7 +66,7 @@ Cassian Voltério traite d’abord Riva comme une candidate imprévue, puis tran
 
 Le registre Codex décrit pour chaque machine son origine civile, son détournement, la lecture mécanique du combat et l’impact de sa neutralisation. Les entrées se débloquent séparément de l’avancement des relais : une analyse de Laboratoire peut enrichir le Codex sans libérer artificiellement un district de campagne.
 
-## Parcours UX v2.4
+## Parcours UX
 
 - **Titre** : état du Circuit, prochain relais, reprise conditionnelle et accès direct au Codex.
 - **Intro** : prise de contrôle de la Couronne et interruption des six services civils.
@@ -82,8 +84,8 @@ Les objectifs et conseils sont séparés : désactiver `#hints-toggle` masque `#
 
 ## Contrats de maîtrise
 
-`story.js` définit dix-huit contrats de campagne et `expansion-story.js` soixante-douze contrats Forge, soit quatre-vingt-dix objectifs déclarés. Le runtime mesure les dix-huit historiques et soixante-quatre métriques Forge. Les huit métriques qui demandent une sous-mécanique non encore représentée sont affichées « NON ÉVALUÉE » et ne peuvent jamais être accordées par défaut. Un contrat n’est acquis qu’après évaluation et écriture dans la sauvegarde locale. Les défis de Magnetron et Chrono Mantis exigent un cycle complet de phase 3 sans l’impact interdit ; celui de Foundry Titan interdit un impact direct de mine.
+`story.js` définit dix-huit contrats de campagne et `expansion-story.js` soixante-douze contrats Forge, soit quatre-vingt-dix objectifs. Les 72/72 contrats Forge sont instrumentés : temps, dégâts, ouvertures, réponses de famille et événements propres au boss alimentent leurs métriques. Cette couverture réutilise les huit familles socles enrichies ; elle ne prétend pas que chaque compteur provient d’un sous-système entièrement indépendant. Une métrique absente reste non acquise et aucun contrat n’est sauvegardé sans évaluation réelle. Les défis historiques de Magnetron, Chrono Mantis et Foundry Titan conservent leurs interdictions précises de phase 3.
 
 ## Fin
 
-Après Crown Engine Ω, l’interlude de la Citadelle confirme la détention de Cassian, puis l’épilogue rend les six commandes locales aux équipes civiles. Riva refuse la Couronne au profit de six interrupteurs, six équipes et d’une ligne M-0 indépendante. L’écran final peut résumer le temps, le score, les tentatives et les modules installés avant le Laboratoire ou le menu principal.
+Après Crown Engine Ω, l’interlude de la Citadelle confirme la détention de Cassian, puis l’épilogue rend les six commandes locales aux équipes civiles. Riva refuse la Couronne au profit de six interrupteurs, six équipes et d’une ligne M-0 indépendante. Le Circuit Forge possède sa propre fin : après NULL CROWN, les vingt-quatre services des quatre anneaux rendent leurs clés aux districts, sans ressusciter Cassian ni réécrire la campagne. Chaque écran final résume le temps et le build du parcours correspondant.

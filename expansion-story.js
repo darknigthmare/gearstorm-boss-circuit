@@ -818,6 +818,28 @@
     playerPromise: "Chaque victoire de Forge restaure symboliquement une fonction civique dans le journal de Riva, sans modifier les six relais de la campagne."
   };
 
+  const forgeCircuit = {
+    id: 'forge-circuit-07-30',
+    mode: 'forgeRush',
+    title: 'Circuit Forge · Les quatre anneaux',
+    bossOrder: bosses.map((boss) => boss.id),
+    waveCheckpoints: waves.map((wave) => ({
+      wave: wave.number,
+      id: wave.id,
+      title: wave.title,
+      firstBossId: bosses.find((boss) => boss.wave === wave.number)?.id,
+      finalBossId: [...bosses].reverse().find((boss) => boss.wave === wave.number)?.id
+    })),
+    upgradesBetweenBosses: true,
+    resumeCheckpoints: ['fight', 'upgrade', 'ending'],
+    epilogue: {
+      title: 'Aucune couronne',
+      summary: "Les vingt-quatre services répondent de nouveau aux districts. Le Trône Zéro conserve un arrêt d'urgence, mais ses clés sont distribuées, auditées et révocables.",
+      riva: "Une ville n'est pas une machine à commander. C'est un système que chacun doit pouvoir comprendre, réparer et arrêter.",
+      outcome: 'Cassian reste détenu ; NULL CROWN est neutralisée sans devenir une nouvelle autorité centrale.'
+    }
+  };
+
   function deepFreeze(value) {
     if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
     for (const child of Object.values(value)) deepFreeze(child);
@@ -883,6 +905,7 @@
     runtimeIntegrated: true,
     bossRange: Object.freeze(['07', '30']),
     expansionPremise,
+    forgeCircuit,
     waves,
     bosses,
     bossesByWave,

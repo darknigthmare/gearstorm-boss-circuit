@@ -170,6 +170,35 @@
     { order: 30, id: 'null-crown', name: 'NULL CROWN', wave: 4, family: 'puzzle-endgame', phaseFamilies: ['reflect', 'modules', 'posture-duo'], arena: 'Trône Zéro', hp: 300, parTime: 105, color: '#7656c9', accent: '#fff0a8', partCount: 4, partRole: 'null-module', patterns: ['null-reflection', 'null-modules', 'null-rupture'], rule: 'Secret réservé à la Forge tant que déblocage, Codex, récompense et épilogue ne sont pas livrés.', secret: true, checkpoints: ['phase-1', 'phase-2', 'phase-3'] }
   ];
 
+  // Une signature par machine : les familles restent un vocabulaire commun,
+  // mais chaque profil possède son propre automate secondaire et ses propres états.
+  const SIGNATURE_PROFILES = deepFreeze({
+    'bastion-ricochet': { mechanicId: 'relay-bank', phaseStates: ['angle-lock', 'cross-bank', 'relay-drift'], hazard: 'reflect-split', cadence: 0.58, intensity: 2 },
+    'hydraulic-warden': { mechanicId: 'pressure-refuge', phaseStates: ['ram-prime', 'alternating-press', 'total-lock'], hazard: 'wall-press', cadence: 0.72, intensity: 2 },
+    'hive-foreman': { mechanicId: 'drone-priority', phaseStates: ['guard-shift', 'repair-shift', 'ammo-shift'], hazard: 'repair-cycle', cadence: 0.84, intensity: 3 },
+    'echo-fencer': { mechanicId: 'action-echo', phaseStates: ['sample-step', 'delayed-copy', 'saturated-copy'], hazard: 'input-copy', cadence: 0.66, intensity: 2 },
+    'breaker-array': { mechanicId: 'breaker-order', phaseStates: ['free-order', 'order-remix', 'mobile-order'], hazard: 'module-grid', cadence: 0.76, intensity: 4 },
+    'vertical-verdict': { mechanicId: 'counterweight-climb', phaseStates: ['weight-rise', 'double-warning', 'summit-shift'], hazard: 'fall-line', cadence: 0.82, intensity: 2 },
+    'rail-tyrant': { mechanicId: 'cargo-pursuit', phaseStates: ['convoy-lock', 'coupling-break', 'engine-pass'], hazard: 'rail-pass', cadence: 0.70, intensity: 4 },
+    'triplex-hunter': { mechanicId: 'lane-permutation', phaseStates: ['front-lock', 'cross-permutation', 'triple-flank'], hazard: 'lane-cross', cadence: 0.64, intensity: 3 },
+    'ground-eater': { mechanicId: 'rotating-rebuild', phaseStates: ['support-mark', 'rolling-collapse', 'support-feint'], hazard: 'floor-collapse', cadence: 0.80, intensity: 3 },
+    'floodline-leviathan': { mechanicId: 'pressure-valves', phaseStates: ['low-water', 'conductive-current', 'turbine-flood'], hazard: 'pressure-surge', cadence: 0.86, intensity: 3 },
+    'centrifuge-zero': { mechanicId: 'quarter-gravity', phaseStates: ['quarter-turn', 'offset-mass', 'axis-zero'], hazard: 'gravity-fall', cadence: 0.74, intensity: 4 },
+    'tempest-regulator': { mechanicId: 'weather-triad', phaseStates: ['wind-shear', 'charged-rain', 'heat-dome'], hazard: 'weather-cycle', cadence: 0.78, intensity: 3 },
+    'ascension-frame': { mechanicId: 'recovery-climb', phaseStates: ['left-route', 'right-route', 'central-anchor'], hazard: 'recovery-fall', cadence: 0.82, intensity: 3 },
+    counterforge: { mechanicId: 'counter-posture', phaseStates: ['dash-counter', 'delayed-counter', 'posture-burst'], hazard: 'counter-ring', cadence: 0.62, intensity: 3 },
+    'carrier-cathedral': { mechanicId: 'section-traverse', phaseStates: ['outer-deck', 'engine-nave', 'heart-vault'], hazard: 'door-traverse', cadence: 0.88, intensity: 3 },
+    'twin-governors': { mechanicId: 'governor-transfer', phaseStates: ['shield-transfer', 'power-transfer', 'mutual-impact'], hazard: 'dual-crossfire', cadence: 0.68, intensity: 2 },
+    'loadout-reactor': { mechanicId: 'build-response', phaseStates: ['loadout-read', 'single-adaptation', 'counter-window'], hazard: 'build-counter', cadence: 0.76, intensity: 2 },
+    'orbital-famine': { mechanicId: 'reserve-economy', phaseStates: ['reserve-drain', 'risky-recharge', 'solar-window'], hazard: 'energy-tax', cadence: 0.84, intensity: 3 },
+    'logic-crucible': { mechanicId: 'boolean-sequence', phaseStates: ['entry-clause', 'logic-pair', 'moving-proof'], hazard: 'sequence-reset', cadence: 0.72, intensity: 4 },
+    'vector-vault': { mechanicId: 'vector-preview', phaseStates: ['incident-vector', 'compound-deflection', 'inverse-path'], hazard: 'wall-ricochet', cadence: 0.60, intensity: 3 },
+    'skyborne-battery': { mechanicId: 'torpedo-return', phaseStates: ['mobile-fire', 'captive-torpedo', 'assisted-volley'], hazard: 'aerial-lock', cadence: 0.64, intensity: 3 },
+    'endurance-engine': { mechanicId: 'six-round-gauntlet', phaseStates: ['rounds-one-two', 'rounds-three-four', 'rounds-five-six'], hazard: 'round-combination', cadence: 0.70, intensity: 6 },
+    'adaptive-archivist': { mechanicId: 'expiring-adaptation', phaseStates: ['observe-page', 'adaptive-margin', 'contested-archive'], hazard: 'adaptive-response', cadence: 0.74, intensity: 3 },
+    'null-crown': { mechanicId: 'distributed-authority', phaseStates: ['reflected-authority', 'ownerless-modules', 'zero-throne-break'], hazard: 'crown-synthesis', cadence: 0.58, intensity: 4 }
+  });
+
   function makeParts(source) {
     const weak = source.weakPoint || { x: 0, y: -8, r: 32, part: 'core' };
     const parts = [
@@ -204,6 +233,7 @@
         : ['reflect', 'posture-duo'].includes(family)
           ? 1 + number
           : 1;
+    const signature = SIGNATURE_PROFILES[source.id];
     return {
       id: source.id + '-phase-' + number,
       number,
@@ -214,7 +244,12 @@
       activeSeconds: 2.1 + index * 0.28,
       recoverySeconds: Math.max(0.52, 0.72 - index * 0.08),
       vulnerabilitySeconds: Math.max(1.9, 2.65 - index * 0.25),
-      mechanicTarget: baseTarget
+      mechanicTarget: baseTarget,
+      mechanicId: signature?.mechanicId || null,
+      signatureState: signature?.phaseStates?.[index] || null,
+      signatureHazard: signature?.hazard || null,
+      signatureCadence: signature ? Math.max(0.42, signature.cadence - index * 0.04) : null,
+      signatureIntensity: signature ? signature.intensity + index : null
     };
   }
 
@@ -245,6 +280,7 @@
       order: source.order || LEGACY_IDS.indexOf(source.id) + 1,
       family,
       phaseFamilies: source.phaseFamilies || [family, family, family],
+      signature: engine === 'expanded' ? SIGNATURE_PROFILES[source.id] : null,
       color: source.color,
       accent: source.accent,
       hp: source.hp,
@@ -268,10 +304,18 @@
       parts: makeParts(source),
       phases,
       transitionRules: { healthFractions: [2 / 3, 1 / 3], clearProjectiles: true, lockAttacks: true },
-      artPack: { status: 'generated', bundleId: source.id, proceduralFallback: true },
-      arenaPack: engine === 'legacy'
-        ? { status: 'generated', bundleId: source.id, proceduralFallback: true }
-        : { status: 'missing', bundleId: null, proceduralFallback: true },
+      artPack: {
+        status: 'generated',
+        bundleId: source.id,
+        layout: engine === 'legacy' ? 'multipart-9' : 'multipart-4',
+        proceduralFallback: true
+      },
+      arenaPack: {
+        status: 'generated',
+        bundleId: source.id,
+        layout: engine === 'legacy' ? 'parallax-4' : 'backdrop',
+        proceduralFallback: true
+      },
       telegraphs: {
         visual: mechanics?.telegraph || 'Télégraphe historique propre à la machine.',
         audio: true,
@@ -374,6 +418,13 @@
       mechanicTarget: getPhase(entry.id, phase).mechanicTarget || 1,
       mechanicComplete: false,
       selectedPattern: getPhase(entry.id, phase).patterns[0],
+      mechanicId: getPhase(entry.id, phase).mechanicId || null,
+      signatureState: getPhase(entry.id, phase).signatureState || null,
+      signatureHazard: getPhase(entry.id, phase).signatureHazard || null,
+      signatureCadence: getPhase(entry.id, phase).signatureCadence || 0.8,
+      signatureIntensity: getPhase(entry.id, phase).signatureIntensity || 1,
+      signatureCycle: 0,
+      signatureCounters: Object.create(null),
       inputTelemetry: { shot: 0, jump: 0, dash: 0 },
       adaptation: null,
       safeLane: 1,
@@ -401,6 +452,8 @@
   function validate(entries = ROSTER) {
     const errors = [];
     const ids = new Set();
+    const mechanicIds = new Set();
+    const signatureStates = new Set();
     entries.forEach((entry, index) => {
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entry.id)) errors.push('id invalide: ' + entry.id);
       if (ids.has(entry.id)) errors.push('id dupliqué: ' + entry.id);
@@ -411,10 +464,20 @@
       if (!Array.isArray(entry.parts) || !entry.parts.some(part => part.role === 'weak-point' && part.hitbox)) errors.push('weak-point manquant: ' + entry.id);
       if (!Array.isArray(entry.phases) || entry.phases.length !== 3) errors.push('trois phases requises: ' + entry.id);
       if (entry.engine === 'expanded' && !entry.phaseFamilies.every(family => PATTERN_FAMILIES[family])) errors.push('famille inconnue: ' + entry.id);
-      if (entry.engine === 'expanded' && (!entry.artPack.proceduralFallback || entry.artPack.status !== 'generated' || entry.artPack.bundleId !== entry.id)) errors.push('pack visuel expansion invalide: ' + entry.id);
+      if (entry.engine === 'expanded' && (!entry.artPack.proceduralFallback || entry.artPack.status !== 'generated' || entry.artPack.bundleId !== entry.id || entry.artPack.layout !== 'multipart-4')) errors.push('pack visuel expansion invalide: ' + entry.id);
+      if (entry.engine === 'expanded' && (!entry.arenaPack.proceduralFallback || entry.arenaPack.status !== 'generated' || entry.arenaPack.bundleId !== entry.id || entry.arenaPack.layout !== 'backdrop')) errors.push('pack arene expansion invalide: ' + entry.id);
       if (entry.engine === 'expanded' && entry.productionStatus === 'planned') errors.push('boss expansion encore planifie: ' + entry.id);
       if (entry.engine === 'expanded' && entry.codex.releaseEligible !== true) errors.push('codex expansion non publiable: ' + entry.id);
       if (entry.engine === 'expanded' && entry.masteryContracts.length !== 3) errors.push('trois contrats Forge requis: ' + entry.id);
+      if (entry.engine === 'expanded') {
+        if (!entry.signature?.mechanicId || entry.signature.phaseStates?.length !== 3) errors.push('signature gameplay incomplète: ' + entry.id);
+        if (mechanicIds.has(entry.signature?.mechanicId)) errors.push('signature gameplay dupliquée: ' + entry.signature?.mechanicId);
+        mechanicIds.add(entry.signature?.mechanicId);
+        for (const state of entry.signature?.phaseStates || []) {
+          if (signatureStates.has(state)) errors.push('état signature dupliqué: ' + state);
+          signatureStates.add(state);
+        }
+      }
     });
     LEGACY_IDS.forEach((id, index) => {
       if (entries[index]?.id !== id) errors.push('compatibilité historique rompue: ' + id);
@@ -429,7 +492,9 @@
         total: entries.length,
         legacy: entries.filter(entry => entry.engine === 'legacy').length,
         expanded: entries.filter(entry => entry.engine === 'expanded').length,
-        families: expandedFamilies.size
+        families: expandedFamilies.size,
+        signatures: mechanicIds.size,
+        signatureStates: signatureStates.size
       }
     });
   }
@@ -437,6 +502,7 @@
   function resolveLaunchMode(value) {
     const mode = String(value || '').toLowerCase();
     if (mode === 'expanded') return 'forge';
+    if (['forgerush', 'forge-rush', 'circuit-forge'].includes(mode)) return 'forgeRush';
     return ['rush', 'practice', 'forge'].includes(mode) ? mode : null;
   }
 
@@ -474,6 +540,7 @@
     schemaVersion: SCHEMA_VERSION,
     stateSequence: COMMON_STATE_SEQUENCE,
     families: PATTERN_FAMILIES,
+    signatures: SIGNATURE_PROFILES,
     legacyIds: LEGACY_IDS,
     plannedIds: Object.freeze(EXPANSION_SOURCE.map(entry => entry.id)),
     all: ROSTER,
