@@ -1,5 +1,60 @@
 # Historique des versions
 
+## 2.8.0 — Circuit fiable
+
+- ENDURANCE ENGINE déroule désormais ses six manches : les seuils de phase exigent les manches 2, 4 puis 6, ce qui empêche un haut DPS de court-circuiter son épreuve.
+- Les checkpoints de campagne et du Circuit Forge conservent le nombre de nouvelles tentatives du boss courant ; un checkpoint Atelier conserve aussi exactement l’offre de modules affichée afin qu’une reprise ne la relance pas.
+- Ajout de contrôles d’export JSON v5 normalisé et d’import limité à 1 Mio. L’import passe par la migration/normalisation existante avant persistance et resynchronisation ; le runtime reste tolérant si ces hooks DOM ne sont pas rendus.
+- Une sauvegarde réellement neuve initialise mouvement réduit et contraste renforcé depuis les préférences du système ; une sauvegarde existante ou migrée garde toujours les choix de la joueuse.
+- Les cartes déverrouillées de la Forge peuvent afficher une miniature décorative issue des pièces WebP réelles, sans remplacer leur nom ni leur libellé accessible.
+- Le runtime PWA détecte un service worker en attente et ne lui demande `SKIP_WAITING` qu’après une action explicite sur le hook de mise à jour ; la première installation reste silencieuse et un seul rechargement suit le changement de contrôleur.
+- Le pack artistique reste le manifeste immuable 2.7.0 : 26 masters de provenance et 225 WebP runtime. La sauvegarde reste en schéma v5 ; le contenu reste fixé à 30 boss, 90 phases et 90 contrats de maîtrise.
+- Les parcours Playwright Chromium couvrent aussi le focus clavier, les cibles de 44 CSS px, l’export JSON, l’import normalisé, les préférences système au premier lancement, une Gamepad API simulée et le rechargement hors ligne. Le consentement d’un worker réellement `waiting` reste couvert par contrats Node ; Firefox et WebKit sont configurés en opt-in mais aucune exécution n’est revendiquée ici. Cette entrée ne certifie ni QA finale, ni test matériel, ni commit, ni push, ni déploiement public.
+
+## 2.7.0 — Les quatre anneaux
+
+- Ajout du Circuit Forge séquentiel des machines 07 à 30 : quatre vagues de six combats, choix de module entre les boss et écran de restauration final.
+- Migration vers la sauvegarde locale v5 avec reprise séparée aux checkpoints `fight`, `upgrade` et `ending`, build, score, temps, pénalités et meilleur temps Forge conservés.
+- Attribution de vingt-quatre `mechanicId` et de soixante-douze signatures d’état uniques aux boss Forge. Elles spécialisent huit familles socles enrichies et ne sont pas présentées comme vingt-quatre moteurs sans logique partagée.
+- Instrumentation des 72/72 contrats de maîtrise Forge : les compteurs proviennent de la télémétrie de combat et aucune métrique inconnue ne réussit par défaut.
+- Nouveau manifeste artistique 2.7.0 : 26 masters OpenAI de provenance vers 225 WebP runtime, dont 24 backdrops Forge et 96 pièces Forge.
+- Correction du rig de Riva : corps unique sans torse doublé, semelles alignées sur le sol logique, bras-canon raccordé au socket et ombre de contact resserrée.
+- Conservation du fallback Canvas, du chargement à la demande et de la séparation stricte entre le Circuit Forge et les six relais de campagne.
+- Cette entrée décrit le contenu livré ; elle ne certifie ni QA matérielle, ni commit, ni push, ni déploiement public.
+
+## 2.6.0 — Les trente machines
+
+- Ajout d’une Forge séparée de la campagne : trente boss sélectionnables, quatre-vingt-dix phases et huit familles mécaniques pilotées par données.
+- Intégration des profils 07–30 avec télégraphes, points faibles, valeurs propres, résultats, journal de Riva et progression de maîtrise sans modifier les six relais narratifs.
+- Quatre planches OpenAI originales couvrent les 24 nouvelles silhouettes ; le manifeste immuable v2.6 publie 129 WebP et conserve un fallback procédural.
+- Remplacement du rig composite de Riva par un corps OpenAI v4 cohérent et un bras-canon unique ; semelles alignées sur le sol logique et ombre de contact resserrée.
+- Ajout des registres `boss-roster.js` et `expansion-story.js`, de la route `?mode=forge`, de la sélection 30 boss et des contrats de release correspondants.
+- Nettoyage déterministe des fragments alpha entre cellules sans repeindre les sources générées.
+- Chaîne PWA, serveur, cache Vercel, CI et build alignés sur la v2.6.
+
+## 2.5.0 — Forge des machines
+
+- Remplacement du membre avant de Riva par un avant-bras OpenAI dédié, sans épaule ni bras complet dupliqué ; le torse fournit le bras arrière et le canon reste le membre de tir.
+- Nouveau runtime artistique immuable `assets/generated/v2.5.0/`, dérivé de 17 sources OpenAI et limité aux 103 WebP réellement consommés par le jeu.
+- Synchronisation de l’introduction de combat : l’IA, les projectiles et le chronomètre restent arrêtés tant que la plaque d’introduction est visible.
+- Ajout d’un contrat de forge pour étendre le Circuit à 30 machines originales, fondé sur des verbes de gameplay et sans reprendre noms, silhouettes ou assets d’une franchise tierce.
+- Renforcement des contrats de non-régression pour le rig de Riva, l’introduction et la chaîne PWA v2.5.
+
+
+## 2.4.0 — La dernière émission
+
+- Ajout de `story.js`, registre narratif immuable pour l’intro, le prologue, six actes, six interludes, l’épilogue, les dossiers Codex et les contrats de maîtrise.
+- Nouvelle ouverture : Cassian Voltério centralise les services civils des six districts dans la Couronne ; Riva Spark réactive la ligne manuelle M-0.
+- Campagne structurée selon **Intro → Prologue → Boss → Résultat → Interlude → Atelier**, avec résolution finale après Crown Engine Ω.
+- Chaque machine reçoit trois titres de phase, deux échanges de transformation, un journal de Riva, une conséquence de district et une restauration civile.
+- Arc de campagne complété : Cassian entraîne sa Couronne sur les solutions de Riva ; Riva injecte une contre-phase M-0 avant la Citadelle.
+- Épilogue clarifié : les six relais et leurs commandes locales sont restaurés, Cassian est détenu et Riva refuse une nouvelle centralisation.
+- Vocabulaire corrigé pour distinguer les six relais de sécurité, les six infrastructures civiles et les onze modules d’amélioration disponibles.
+- Sauvegarde v4 préparée pour séparer les victoires de campagne, les scènes découvertes, le Codex et les contrats de maîtrise des sessions d’entraînement.
+- Le registre définit dix-huit contrats de maîtrise, trois par machine ; cette entrée ne certifie pas leur validation en navigateur.
+- Ajout des surfaces narratives, des archives M-0 et des communications de phase dans l’interface responsive.
+- Aucun statut de QA, commit, push ou déploiement n’est affirmé par cette entrée.
+
 ## 2.3.0 — Liberation Protocol
 
 - Progression narrative structurée autour de Riva Spark, Cassian Voltério et des six districts reliés aux machines.

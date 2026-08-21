@@ -1,98 +1,197 @@
-# GEARSTORM: Boss Circuit — conception 2.3
+# GEARSTORM: Boss Circuit — conception de production 2.8.0
 
-`DESIGN.md` reste la source de vérité du lore, de la boucle de combat, des six machines, des améliorations, de la surcharge et de l’épilogue. Ce document fixe la couche de production, de narration interactive et d’intégration UX de la version 2.3.
+`DESIGN.md` reste la source de vérité des règles et `story.js` celle des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise. `expansion-story.js` et `boss-roster.js` étendent ce contrat à la Forge. Ce document fixe leur intégration de production, de narration interactive et d’UX pour la version applicative 2.8.0.
 
 ## Invariants de jeu
 
-- La campagne conserve six boss, trois phases par boss et le choix d’un module après chaque victoire.
+- Le roster contient exactement 30 identifiants stables et 90 phases : six boss de campagne et 24 boss Forge, trois phases chacun.
+- Les contrats totalisent exactement 90 objectifs : 18 en campagne et 72 dans la Forge.
+- La campagne choisit un module après chacune des cinq premières victoires.
+- Le Circuit Forge comporte quatre vagues de six boss, des améliorations entre les rencontres, une reprise v5 et une fin dédiée.
 - Les télégraphes restent lisibles avant toute collision dangereuse.
-- Une illustration ou un texte d’aide ne modifie jamais les hitboxes, les timings, les seuils de phase ou la logique de sauvegarde.
-- Chaque silhouette reste identifiable en mouvement, en contraste standard comme renforcé.
+- Une illustration ou un texte d’aide ne modifie jamais les hitboxes, timings, seuils de phase ou données de sauvegarde.
 - Clavier, souris, tactile et manette conservent la même priorité fonctionnelle.
-- Le rendu procédural reste une voie valide et jouable, pas un écran d’erreur.
+- Le fallback procédural reste une voie jouable, pas un écran d’erreur.
 - L’objectif critique demeure visible même lorsque les conseils contextuels sont désactivés.
+- Une victoire de Laboratoire peut enrichir le Codex, mais ne libère jamais un relais de campagne.
+- La Forge libre n’avance ni la campagne ni le Circuit Forge.
+
+## Extension Forge
+
+Les 24 extensions sont jouables en sélection libre et dans le Circuit Forge 07–30. Vingt-quatre `mechanicId` et 72 signatures d’état uniques spécialisent huit familles mécaniques communes : renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et puzzle/endgame. Cette mutualisation est un invariant explicite ; le jeu ne revendique pas 24 moteurs physiques sans code partagé.
+
+Chaque profil charge quatre pièces et un backdrop depuis le pack artistique v2.7.0, avec fallback procédural. Les 72 contrats Forge utilisent la télémétrie de la tentative et échouent si leur mesure est inconnue.
+
+### Règle spéciale d’ENDURANCE ENGINE
+
+ENDURANCE ENGINE déroule six manches internes. La jauge de vie ne peut franchir la limite de la phase 1 qu’après la manche 2, celle de la phase 2 qu’après la manche 4, et les derniers points de vie ne peuvent être retirés qu’après la manche 6. Le verrou est vérifié au moment des dégâts : une forte puissance offensive n’autorise pas un saut de cycle.
 
 ## Progression narrative des six districts
 
-Voltério a relié les infrastructures du Circuit en chaîne : chaque machine contrôle un district et alimente le verrou suivant. Les victoires de Riva sont donc à la fois mécaniques et civiles.
+Voltério a relié six infrastructures civiles à autant de relais de sécurité, puis centralisé leurs commandes dans la Couronne. Chaque machine verrouille un district et l’accès physique au suivant.
 
-| Étape | District | Machine | Enjeu | Conséquence de la victoire |
+| Étape | District | Machine | Enjeu | Conséquence |
 | ---: | --- | --- | --- | --- |
-| 01 | Rocade des Rivets | Rivet Rex | Axes de transport sous couvre-feu | Le premier verrou cède et Voltério identifie Riva comme une menace. |
-| 02 | Couloir des Hautes-Tensions | Sky Slicer | Brouillage aérien et isolement du nord | Les transmissions civiles reviennent vers les districts du nord. |
-| 03 | Fosse Ferromagnétique | Magnetron | Rails d’évacuation immobilisés | Les habitants peuvent quitter les gradins forcés. |
-| 04 | Horloge de la Faille | Chrono Mantis | Horloges et archives temporelles manipulées | Le Circuit enregistre de nouveau les secondes que Voltério voulait effacer. |
-| 05 | Fournaise des Pistons | Foundry Titan | Production énergétique du spectacle coercitif | La fonderie refroidit et la Couronne perd sa dernière alimentation externe. |
-| 06 | Citadelle Voltério | Crown Engine Ω | Nœud de commandement composite | La Couronne tombe et le Circuit revient à ceux qui y vivent. |
+| 01 | Rocade des Rivets | Rivet Rex | Transport, signalisation et convois | La Rocade redevient publique ; Cassian identifie Riva et M-0. |
+| 02 | Couloir des Hautes-Tensions | Sky Slicer | Énergie et communications | Le courant et les canaux civils reviennent ; l’apprentissage adaptatif apparaît. |
+| 03 | Fosse Ferromagnétique | Magnetron | Fret, rails et évacuations | Les trains repartent ; Riva découvre son dossier d’entraînement. |
+| 04 | Horloge de la Faille | Chrono Mantis | Horodatages et archives | Les archives prouvent le verrouillage planifié et révèlent l’inversion M-0. |
+| 05 | Fournaise des Pistons | Foundry Titan | Production et alimentation industrielle | Riva injecte la contre-phase qui remonte vers la Citadelle. |
+| 06 | Citadelle Voltério | Crown Engine Ω | Coordination et sécurité | La Couronne perd son exclusivité ; chaque district récupère ses commandes. |
 
-Riva Spark reste une technicienne de maintenance devenue pilote par nécessité. Elle gagne grâce à sa connaissance du réseau, sa lecture des cycles et l’adaptation de son équipement. Cassian Voltério demeure un ingénieur-showman : il transforme chaque échec en nouvelle mise en scène jusqu’à ce que son système ne puisse plus masquer la libération des districts.
+Riva gagne grâce à sa connaissance du réseau, sa lecture des cycles et l’adaptation de son équipement. Cassian transforme ses échecs en données pour une Couronne adaptative ; Riva lui fournit volontairement une fausse solution, la contre-phase M-0, qui neutralise son commandement sans arrêter les services.
 
-## Parcours d’un jeu complet
+## Parcours complets
 
-1. Le titre expose l’état de campagne, la prochaine cible et les entrées Rush, reprise, Laboratoire, Codex, manuel et options.
-2. Le prologue donne l’objectif global et montre la route des six districts sans imposer de tutoriel.
-3. L’intro de machine présente le district, la silhouette et la voix de Voltério dans une plaque contrastée sous le HUD.
-4. Le combat maintient un objectif bref et ajoute, si autorisé, un conseil contextuel lors d’une mécanique nouvelle.
-5. La pause rappelle objectif, build et commandes sans faire perdre le contexte.
-6. Le résultat relie performance, build et conséquence narrative avant la décision suivante.
-7. L’atelier rend visible la progression vers le district suivant et l’effet du build.
-8. Le Codex conserve les informations débloquées et permet de relire Riva, Voltério, machines et districts.
-9. L’épilogue confirme la libération des six secteurs et donne accès au Laboratoire.
+1. Le titre expose l’état de campagne, la prochaine cible et les entrées Circuit, reprise, Laboratoire, Forge, Codex, manuel et options.
+2. L’intro montre la prise de contrôle de la Couronne et l’interruption des six services civils.
+3. Le prologue active la ligne M-0, fixe l’objectif des six relais et présente l’itinéraire.
+4. L’intro de machine présente fonction civile, district, silhouette et voix.
+5. Le combat maintient un objectif bref, nomme chaque phase et peut ajouter un conseil contextuel.
+6. La pause rappelle objectif, build et commandes.
+7. Le résultat relie performance, build, journal de Riva et conséquence locale.
+8. L’interlude confirme la restauration et ouvre l’étape suivante.
+9. Après les cinq premiers boss, l’Atelier propose un module parmi onze.
+10. Après Crown Engine Ω, l’épilogue place Cassian en détention et distribue les commandes.
+11. Le Codex et les archives M-0 conservent les informations réellement découvertes.
+
+Le Circuit Forge constitue un second parcours complet : FORGE 07, six combats par vague, choix de module entre les boss, checkpoint après chaque étape, puis restauration finale après FORGE 30.
 
 ## Contrat des hooks UX
 
-Tous les IDs v2.2 sont conservés. Les hooks v2.3 sont ajoutés sans modifier leur sémantique par CSS.
+Tous les IDs historiques restent stables. Les hooks v2.8 ne changent pas la logique du jeu par CSS.
 
 | Hook | État initial | Comportement requis |
 | --- | --- | --- |
-| `#continue-run` | `hidden` | N’apparaître qu’avec une reprise valide, préciser sa destination et restaurer la campagne normalisée. |
-| `#campaign-progress`, `#campaign-next` | Texte de nouveau jeu | Refléter les districts libérés, la prochaine cible et la complétion. |
-| `#codex`, `#codex-screen` | Écran fermé | Ouvrir/fermer via le gestionnaire d’écrans et restituer le focus. |
-| `#codex-grid`, `#codex-progress` | Aucun dossier de victoire | Synchroniser attribut `data-state`, libellé d’état, détails cachés et progression sauvegardée. |
-| `#combat-objective` | Briefing masqué hors combat | Décrire l’action nécessaire pour le boss ou la phase en cours. |
-| `#combat-hint` | Conseil générique | Présenter une seule instruction courte lors d’une nouvelle mécanique, jamais à chaque frame. |
-| `#hints-toggle` | Activé | Persister le choix et masquer uniquement les conseils, pas l’objectif. |
-| `#pause-objective`, `#pause-build` | Valeurs de repli | Reprendre le contexte du combat et `describeBuild()`. |
-| `#result-lore`, `#result-build` | Valeurs de repli | Afficher la transmission du district et le build après victoire. |
+| `#story-screen`, `#story-dialogue` | Écran fermé | Présenter intro ou interlude depuis `story.js`. |
+| `#story-continue`, `#story-back` | Actions visibles | Avancer ou revenir au menu par une action explicite. |
+| `#continue-run` | `hidden` | N’apparaître qu’avec une reprise campagne valide et restaurer son checkpoint. |
+| `#continue-forge` | `hidden` | N’apparaître qu’avec une reprise Forge valide et restaurer son checkpoint. |
+| `#campaign-progress`, `#campaign-next` | Nouveau jeu | Refléter districts libérés, prochaine cible et complétion. |
+| `#codex`, `#codex-screen` | Écran fermé | Ouvrir/fermer le Codex et restituer le focus. |
+| `#codex-grid`, `#codex-progress` | Aucun dossier de victoire | Synchroniser état, origine civile, détournement, lecture et impact. |
+| `#combat-objective` | Masqué hors combat | Décrire l’action nécessaire pour le boss ou la phase. |
+| `#radio-comms`, `#radio-speaker`, `#radio-line` | Masqués | Exposer une communication temporaire sans recouvrir le HUD. |
+| `#combat-hint`, `#hints-toggle` | Conseil activé | Masquer seulement les conseils, jamais l’objectif. |
+| `#pause-objective`, `#pause-build` | Replis textuels | Reprendre objectif et build réels. |
+| `#result-lore`, `#result-build`, `#result-mastery` | Replis/containeur vide | Afficher conséquence, build et contrats réellement évalués. |
+| `#forge-rush-start`, `#forge-run-summary`, `#forge-wave-progress` | Nouveau Circuit | Lancer FORGE 07 et exposer vague, progression, build et prochaine étape. |
+| `#forge-ending-screen` | Écran fermé | Résumer les quatre anneaux, le temps et le build après FORGE 30. |
+| `#export-save` | Action visible | Télécharger une copie JSON v5 normalisée de la sauvegarde. |
+| `#import-save` | Action visible | Ouvrir explicitement le sélecteur de fichier. |
+| `#import-save-file` | Input fichier masqué | Accepter le JSON et transmettre le fichier au pipeline d’import validé avec un libellé accessible. |
+| `#update-app` | Masqué | Se révéler uniquement pour une mise à jour en attente d’une application déjà contrôlée. |
 
-Les hooks complémentaires `#continue-run-detail`, `#lab-progress`, `#upgrade-progress`, `#upgrade-build` et `#gameover-hint` complètent le texte visible mais ne remplacent aucun état moteur.
+Ces quatre hooks sont rendus dans `index.html` et requis par le contrat applicatif v2.8. Les écouteurs runtime restent néanmoins tolérants à leur absence afin de ne pas bloquer un repli partiel de l’interface.
+
+## Contrat des cartes de boss
+
+Chaque carte conserve son texte et son `aria-label`. Une carte déverrouillée peut ajouter `img.boss-card-art` avec `alt=""` et `aria-hidden="true"` ; une carte verrouillée n’insère aucune miniature.
+
+- Boss Forge : `assets/generated/v2.7.0/bosses/{id}/chassis.webp`.
+- Rivet Rex : `rammer/chassis.webp`.
+- Sky Slicer : `kraken/fuselage.webp`.
+- Magnetron : `drill/carapace.webp`.
+- Chrono Mantis : `mantis/torso.webp`.
+- Foundry Titan : `cyclotron/furnace-torso.webp`.
+- Crown Engine Ω : `omega/crown-hull.webp`.
+
+L’échec de chargement d’une miniature ne bloque ni la sélection ni la lecture du nom.
+
+## Contrat de sauvegarde v5
+
+La sauvegarde locale v5 migre les données anciennes sans effacer la campagne et sépare explicitement les deux Circuits :
+
+- `campaignCleared` contient uniquement les machines neutralisées en campagne ;
+- `storySeen` mémorise les scènes effectivement traversées ;
+- `codexUnlocked` reste indépendant de la libération des relais ;
+- `mastery` associe uniquement les contrats réellement validés ;
+- `rushSnapshot.checkpoint` distingue `fight`, `interlude` et `upgrade` ;
+- `forgeCleared`, `forgeCompleted` et `bestForgeRush` portent l’historique Forge ;
+- `forgeRushSnapshot` distingue `fight`, `upgrade` et `ending`.
+
+Les snapshots de campagne et de Forge conservent `currentBossRetries`. Un snapshot `upgrade` conserve aussi `upgradeOffer`, normalisée contre les modules connus et leurs limites. La reprise restaure les tentatives avant de recalculer la pénalité et réutilise l’offre sauvegardée au lieu d’en tirer une nouvelle.
+
+L’export sérialise `normalizeSaveData(save)` en JSON v5. L’import :
+
+1. refuse l’absence de fichier et les fichiers supérieurs à 1 Mio ;
+2. parse le JSON sans l’injecter dans le DOM ;
+3. appelle `normalizeSaveData`, qui porte aussi la migration ;
+4. persiste le résultat normalisé ;
+5. réapplique les réglages et resynchronise grille, Codex, archives et reprises ;
+6. annonce le succès ou refuse le fichier sans exposer son contenu brut.
+
+La sauvegarde reste locale au navigateur : aucune synchronisation cloud ou interappareil n’est revendiquée.
 
 ## Onboarding et accessibilité
 
-- Le prologue explique le but du Circuit ; il ne bloque pas le contrôle du joueur par une séquence obligatoire.
-- Les conseils apparaissent à des moments significatifs, restent courts et peuvent être désactivés.
-- L’objectif actif, les changements de phase et les résultats utilisent des annonces polies et atomiques ; les valeurs animées image par image ne sont pas annoncées.
-- Le Codex conserve une hiérarchie de titres et des états textuels « accessible » ou « chiffrée », sans dépendre de la couleur seule.
-- La pause est un dialogue modal et restitue un chemin clair vers reprise, nouvelle tentative ou menu.
-- Les plaques de briefing restent sous le HUD, évitent les commandes tactiles et utilisent un fond suffisamment opaque sur fumée ou orange lumineux.
-- Le contraste renforcé et `prefers-contrast` durcissent les bordures et les fonds ; le mouvement réduit neutralise les animations non essentielles.
-- Les petits écrans réorganisent le Codex, les récapitulatifs et les commandes en une colonne sans réduire les cibles sous 44 × 44 CSS px.
+- L’intro et le prologue expliquent l’objectif avant le premier combat.
+- Les conseils restent courts, facultatifs et séparés de l’objectif critique.
+- Les changements importants utilisent des annonces polies et atomiques ; les valeurs par frame ne sont pas annoncées.
+- Le Codex conserve une hiérarchie de titres et des états textuels, sans dépendre de la couleur seule.
+- La pause est un dialogue modal.
+- Le contraste renforcé et `prefers-contrast` durcissent bordures et fonds ; le mouvement réduit neutralise les animations non essentielles.
+- Une sauvegarde neuve initialise ces deux préférences depuis `matchMedia`. Les sauvegardes existantes et migrées préservent leurs réglages manuels.
+- Les cibles tactiles visent au moins 44 × 44 CSS px.
+- En portrait étroit, un conseil recommande le paysage ; le portrait reste un mode contraint et non la présentation tactique de référence.
 
-## Contrat artistique v2.2
+## Contrat artistique v2.7.0
 
-Quatorze masters originaux, produits avec OpenAI Image Generation intégré, alimentent 103 assets indépendants.
+Les 26 masters originaux produits avec OpenAI Image Generation alimentent 225 assets runtime indépendants dans le manifeste 2.7.0.
 
-| Famille | Contrat du master | Nombre de masters | Assets runtime |
+| Famille | Contrat | Masters | Assets runtime |
 | --- | --- | ---: | ---: |
-| Arènes | atlas 2 × 2 : fond lointain, plan médian, premier plan, atmosphère | 6 | 24 |
-| Boss | atlas 3 × 3 : neuf pièces articulables et transparentes | 6 | 54 |
-| Riva Spark | atlas 3 × 3 : neuf poses ou états lisibles | 1 | 9 |
-| VFX | atlas 4 × 4 : seize effets isolés | 1 | 16 |
-| **Total** |  | **14** | **103** |
+| Arènes de campagne | Quatre couches de parallaxe | 6 | 24 |
+| Boss de campagne | Neuf pièces articulables | 6 | 54 |
+| Boss Forge 07–30 | Quatre pièces par machine | 4 planches | 96 |
+| Arènes Forge 07–30 | Un backdrop par machine | 6 planches | 24 |
+| Riva Spark | Atlas historique, corps v4 et bras-canon v4 | 3 | 11 |
+| VFX | Seize effets isolés | 1 | 16 |
+| **Total** |  | **26** | **225** |
 
-Les masters sont des sources de découpe. Les exports restent indépendants, cadrés sans chevauchement parasite, sans texte, logo ni filigrane. Les pièces de boss, Riva et les VFX exigent une véritable transparence.
+Le rig Riva compose une seule fois le corps v4, pose ses semelles sur le plancher logique et raccorde uniquement le bras-canon v4 au socket d’épaule. Les backdrops Forge restent des couches uniques ; ils ne sont pas documentés comme des décors parallaxe complets.
+
+## Contrats de maîtrise
+
+| Machine | Temps Ingénieur ou Overdrive | Intégrité | Défi propre |
+| --- | ---: | --- | --- |
+| Rivet Rex | 44 s | Aucun dégât | Coup final avec la ruée dans le noyau ouvert. |
+| Sky Slicer | 52 s | Aucun dégât | Activer la Surcharge pendant une ouverture du condensateur. |
+| Magnetron | 58 s | Aucun dégât | Terminer un cycle complet de phase 3 sans subir éruption, débris ni onde. |
+| Chrono Mantis | 54 s | Aucun dégât | Terminer un cycle complet de phase 3 sans être touchée par une ruée. |
+| Foundry Titan | 66 s | Aucun dégât | Ne subir aucun impact direct de mine pendant la phase 3. |
+| Crown Engine Ω | 82 s | Aucun dégât | Porter le coup final au noyau pendant une Surcharge. |
+
+Les 72 contrats Forge possèdent une métrique instrumentée. Les signatures restent construites sur huit familles communes ; l’instrumentation complète ne signifie pas 72 sous-systèmes physiques indépendants. Une valeur inconnue échoue fermement.
 
 ## Chargement runtime et PWA
 
-1. Le key art, l’icône et l’interface de titre ont la priorité.
-2. Les couches d’arène, les pièces du boss courant, les poses utiles de Riva et les VFX requis sont demandés progressivement.
+1. Key art, icône et titre ont la priorité.
+2. Couches d’arène, pièces du boss courant, poses de Riva et VFX sont chargés progressivement.
 3. `#art-loader`, `#art-loader-label` et `#art-loader-progress` exposent un retour accessible optionnel.
-4. Une ressource validée peut entrer dans le cache PWA quand le jeu est servi en HTTP ou HTTPS.
-5. En cas d’absence, délai, erreur réseau ou échec de décodage, le moteur bascule vers le rendu procédural.
-6. Le chargement visuel ne bloque ni une commande de menu, ni une sauvegarde, ni un objectif critique.
+4. Une ressource validée peut entrer dans le cache PWA sous HTTP ou HTTPS.
+5. En cas d’échec, le moteur bascule vers le rendu procédural.
+6. Le chargement visuel ne bloque ni menu, ni sauvegarde, ni objectif critique.
+
+Le runtime PWA traite `waiting` et `updatefound`. Il ne demande `SKIP_WAITING` qu’après activation du hook `#update-app`, puis protège `controllerchange` contre plusieurs rechargements. Le premier install reste silencieux.
+
+## Surface de vérification présente
+
+Le dépôt contient :
+
+- des tests Node pour assets, contrats, histoires, release, serveur et service worker ;
+- une configuration Playwright par défaut pour Chromium desktop et mobile tactile ;
+- des projets Firefox desktop et WebKit desktop opt-in via `npm run test:e2e:cross-browser` ;
+- un parcours E2E vérifiant menu, Forge, grille de 30 boss, débordement horizontal et diagnostics du rig de Riva ;
+- une matrice E2E qui démarre les 24 boss Forge dans leurs trois phases ;
+- un parcours E2E qui démarre le Circuit Forge et lit son premier checkpoint ;
+- un parcours E2E Chromium qui vérifie focus clavier, cibles de 44 CSS px, téléchargement JSON v5, import normalisé, préférences système first-run, Gamepad API simulée et rechargement hors ligne ;
+- un workflow GitHub Actions Node 22.x qui prévoit QA, Chromium, E2E et audit de dépendances.
+
+Ces fichiers sont une surface de vérification, pas une preuve de QA finale. Les E2E ne parcourent pas encore les six manches complètes d’ENDURANCE ENGINE, une campagne complète, une vraie manette, un lecteur d’écran ou un appareil mobile physique. Le cycle d’un worker réellement `waiting` jusqu’au consentement reste couvert par les contrats Node et non par Playwright. Firefox et WebKit sont configurés mais aucune exécution n’est revendiquée dans cette revue.
 
 ## Distribution et preuve
 
 La cible reste une PWA à cache versionné, servie par HTTP ou HTTPS. Le lazy loading réduit le coût initial ; le fallback procédural maintient la jouabilité indépendamment du cache.
 
-Ce document spécifie le comportement attendu. Il ne certifie ni QA ni déploiement. `QA_REPORT.md` ne doit être modifié qu’après collecte de preuves pour les tests moteur, navigateur, responsive, accessibilité, PWA et publication.
+Ce document spécifie le comportement attendu et l’état statique observé. Il ne certifie ni QA finale, ni commit, ni push, ni déploiement. `QA_REPORT.md` reste réservé aux preuves réellement collectées.

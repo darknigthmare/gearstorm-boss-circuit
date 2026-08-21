@@ -3,16 +3,21 @@ const { readFile, realpath, stat } = require('node:fs/promises');
 const { extname, resolve, sep } = require('node:path');
 
 const PROJECT_ROOT = resolve(__dirname);
-const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.2.0/';
+const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.7.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
+  'pwa-update-v2.8.0.js',
   'styles.css',
+  'story.js',
+  'expansion-story.js',
+  'boss-roster.js',
   'game.js',
   'manifest.webmanifest',
   'sw.js',
   'favicon.ico',
   'robots.txt',
 ]);
+const VERSIONED_SHELL_FILES = new Set(['pwa-update-v2.8.0.js']);
 const PUBLIC_SHELL_ASSETS = new Set([
   'assets/gearstorm-icon.svg',
   'assets/gearstorm-icon-192.png',
@@ -22,6 +27,9 @@ const PUBLIC_SHELL_ASSETS = new Set([
 const REVALIDATE_FILES = new Set([
   'index.html',
   'styles.css',
+  'story.js',
+  'expansion-story.js',
+  'boss-roster.js',
   'game.js',
   'manifest.webmanifest',
   'sw.js',
@@ -65,7 +73,9 @@ function sendText(request, response, statusCode, message, extraHeaders = {}) {
 function isPublicAsset(relative) {
   if (PUBLIC_SHELL_ASSETS.has(relative)) return true;
   if (relative === GENERATED_RUNTIME_PREFIX + 'asset-manifest.json') return true;
-  return /^assets\/generated\/v2\.2\.0\/(?:arenas|bosses|heroine|vfx)\/[a-z0-9-]+(?:\/[a-z0-9-]+)?\.webp$/.test(relative);
+  if (!relative.startsWith(GENERATED_RUNTIME_PREFIX)) return false;
+  const runtimePath = relative.slice(GENERATED_RUNTIME_PREFIX.length);
+  return /^(?:arenas|bosses|heroine|vfx)\/[a-z0-9-]+(?:\/[a-z0-9-]+)?\.webp$/.test(runtimePath);
 }
 
 function resolvePublicFile(rootDir, requestUrl, host) {
@@ -116,9 +126,10 @@ function createGameServer(options = {}) {
       }
       const body = request.method === 'HEAD' ? null : await readFile(canonicalCandidate);
       const versionedRuntime = resolved.relative.startsWith(GENERATED_RUNTIME_PREFIX);
+      const versionedShell = VERSIONED_SHELL_FILES.has(resolved.relative);
       const cacheControl = REVALIDATE_FILES.has(resolved.relative)
         ? 'public, max-age=0, must-revalidate'
-        : versionedRuntime
+        : versionedRuntime || versionedShell
           ? 'public, max-age=31536000, immutable'
           : 'public, max-age=3600, stale-while-revalidate=86400';
 

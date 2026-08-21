@@ -1,7 +1,7 @@
 {
   "name": "GEARSTORM: Boss Circuit",
   "short_name": "GEARSTORM",
-  "description": "Un boss rush 2D original en six machines transformables.",
+  "description": "Une campagne boss rush 2D originale en six actes et une Forge de 24 machines : 30 boss jouables, 90 phases, histoire, Codex et 90 contrats de maîtrise.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
@@ -69,6 +69,30 @@
       "name": "Ouvrir le Laboratoire",
       "short_name": "Labo",
       "url": "./?mode=practice",
+      "icons": [
+        {
+          "src": "assets/gearstorm-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Ouvrir la Forge",
+      "short_name": "Forge",
+      "url": "./?mode=forge",
+      "icons": [
+        {
+          "src": "assets/gearstorm-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Continuer le Circuit Forge",
+      "short_name": "Circuit Forge",
+      "url": "./?mode=forgeRush",
       "icons": [
         {
           "src": "assets/gearstorm-icon-192.png",

@@ -2,7 +2,10 @@
 .github/
 tests/
 coverage/
+test-results/
+playwright-report/
 node_modules/
+dist/
 release/
 *.zip
 .tmp*
@@ -22,8 +25,14 @@ assets/generated/bosses/
 assets/generated/riva/
 assets/generated/vfx/
 assets/generated/PROVENANCE.md
+assets/generated/expansion-sources/
+assets/generated/forge-arena-sources/
+assets/generated/v2.5.0/
+assets/generated/v2.6.0/
 .env*
 qa-*.png
 scripts/*.py
 assets/generated/**/*.png
 assets/generated/**/*.psd
+audit-visual-v*/
+.audit-visual-v*/

@@ -4,8 +4,19 @@ import { access, readFile, readdir, stat } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 import {
   APP_RELEASE,
+  CAMPAIGN_BOSS_COUNT,
   DIST_BUDGET_BYTES,
+  EXPANSION_MASTERY_CONTRACT_COUNT,
+  EXPANSION_STORY_CONTENT_VERSION,
+  EXPANSION_STORY_SCHEMA_VERSION,
+  FORGE_BOSS_COUNT,
+  MASTERY_CONTRACT_COUNT,
+  PHASE_COUNT,
+  PLAYABLE_BOSS_COUNT,
   SAVE_SCHEMA_VERSION,
+  STORY_CONTENT_VERSION,
+  STORY_MASTERY_CONTRACT_COUNT,
+  STORY_SCHEMA_VERSION,
   validateApplicationContract,
 } from './app-contract.mjs';
 import {
@@ -32,6 +43,9 @@ const [
   packageJson,
   packageLock,
   html,
+  story,
+  expansionStory,
+  bossRoster,
   game,
   manifest,
   serviceWorker,
@@ -43,6 +57,9 @@ const [
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('package-lock.json', 'utf8').then(JSON.parse),
   readFile('index.html', 'utf8'),
+  readFile('story.js', 'utf8'),
+  readFile('expansion-story.js', 'utf8'),
+  readFile('boss-roster.js', 'utf8'),
   readFile('game.js', 'utf8'),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
   readFile('sw.js', 'utf8'),
@@ -56,7 +73,7 @@ assert.equal(packageJson.version, APP_RELEASE);
 assert.equal(packageLock.version, APP_RELEASE);
 assert.equal(packageLock.packages?.['']?.version, APP_RELEASE);
 assert.equal(packageLock.lockfileVersion, 3);
-validateApplicationContract({ game, html, manifest, packageJson });
+validateApplicationContract({ game, story, expansionStory, bossRoster, html, manifest, packageJson });
 validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore });
 
 assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
@@ -72,7 +89,11 @@ assert.equal(keyArtScreenshot?.sizes, '1672x941');
 
 const shellFiles = [
   'dist/index.html',
+  'dist/pwa-update-v2.8.0.js',
   'dist/styles.css',
+  'dist/story.js',
+  'dist/expansion-story.js',
+  'dist/boss-roster.js',
   'dist/game.js',
   'dist/manifest.webmanifest',
   'dist/sw.js',
@@ -84,13 +105,21 @@ const shellFiles = [
 ];
 for (const file of shellFiles) await access(file);
 
-const [distHtml, distGame, distManifest, distRuntime] = await Promise.all([
+const [distHtml, distPwaBootstrap, distStory, distExpansionStory, distBossRoster, distGame, distManifest, distRuntime] = await Promise.all([
   readFile('dist/index.html', 'utf8'),
+  readFile('dist/pwa-update-v2.8.0.js', 'utf8'),
+  readFile('dist/story.js', 'utf8'),
+  readFile('dist/expansion-story.js', 'utf8'),
+  readFile('dist/boss-roster.js', 'utf8'),
   readFile('dist/game.js', 'utf8'),
   readFile('dist/manifest.webmanifest', 'utf8').then(JSON.parse),
-  validateRuntimeAssets('dist'),
+  validateRuntimeAssets('dist', { validateMasters: false }),
 ]);
-validateApplicationContract({ game: distGame, html: distHtml, manifest: distManifest, packageJson });
+validateApplicationContract({ game: distGame, story: distStory, expansionStory: distExpansionStory, bossRoster: distBossRoster, html: distHtml, manifest: distManifest, packageJson });
+assert.match(distPwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_8__/);
+assert.match(distPwaBootstrap, /registration\.waiting/);
+assert.match(distPwaBootstrap, /SKIP_WAITING/);
+assert.match(distPwaBootstrap, /controllerchange/);
 assert.equal(distRuntime.entries.length, EXPECTED_COUNTS.runtimeFiles);
 assert.equal(distRuntime.totalBytes, sourceRuntime.totalBytes);
 assert.ok(distRuntime.totalBytes <= ASSET_BUDGET_BYTES);
@@ -105,10 +134,14 @@ assert.deepEqual((await readdir('dist/assets')).sort(), [
 assert.deepEqual((await readdir('dist/assets/generated')).sort(), [ASSET_DIRECTORY]);
 assert.deepEqual((await readdir('dist')).sort(), [
   'assets',
+  'boss-roster.js',
   'build-manifest.json',
+  'expansion-story.js',
   'game.js',
   'index.html',
   'manifest.webmanifest',
+  'pwa-update-v2.8.0.js',
+  'story.js',
   'styles.css',
   'sw.js',
 ]);
@@ -129,11 +162,22 @@ for (const [file, expectedSize] of [['dist/assets/gearstorm-icon-192.png', 192],
 }
 
 const buildManifest = JSON.parse(await readFile('dist/build-manifest.json', 'utf8'));
-assert.equal(buildManifest.schemaVersion, 2);
+assert.equal(buildManifest.schemaVersion, 4);
 assert.equal(buildManifest.version, APP_RELEASE);
 assert.deepEqual(buildManifest.application, {
   release: APP_RELEASE,
   saveSchemaVersion: SAVE_SCHEMA_VERSION,
+  storySchemaVersion: STORY_SCHEMA_VERSION,
+  storyContentVersion: STORY_CONTENT_VERSION,
+  expansionStorySchemaVersion: EXPANSION_STORY_SCHEMA_VERSION,
+  expansionStoryContentVersion: EXPANSION_STORY_CONTENT_VERSION,
+  campaignBosses: CAMPAIGN_BOSS_COUNT,
+  forgeBosses: FORGE_BOSS_COUNT,
+  playableBosses: PLAYABLE_BOSS_COUNT,
+  phases: PHASE_COUNT,
+  storyMasteryContracts: STORY_MASTERY_CONTRACT_COUNT,
+  expansionMasteryContracts: EXPANSION_MASTERY_CONTRACT_COUNT,
+  masteryContracts: MASTERY_CONTRACT_COUNT,
 });
 assert.deepEqual(buildManifest.runtimeAssets, {
   release: ASSET_RELEASE,
@@ -149,7 +193,7 @@ const actualFiles = (await listFiles('dist'))
   .sort();
 const declaredFiles = Object.keys(buildManifest.files).sort();
 assert.deepEqual(actualFiles, [...declaredFiles, 'build-manifest.json'].sort(), 'dist et build-manifest divergent.');
-assert.equal(declaredFiles.length, 5 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
+assert.equal(declaredFiles.length, 9 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
 
 let distBytes = 0;
 for (const path of actualFiles) {
@@ -168,4 +212,4 @@ for (const path of actualFiles) {
 }
 assert.ok(distBytes <= DIST_BUDGET_BYTES, `Budget dist depasse : ${distBytes} / ${DIST_BUDGET_BYTES}`);
 
-console.log(`Release web ${APP_RELEASE} verifiee : assets v${ASSET_RELEASE}, ${sourceRuntime.entries.length} WebP, ${distBytes} octets publies, PWA/CI/securite conformes.`);
+console.log(`Release web ${APP_RELEASE} verifiee : ${PLAYABLE_BOSS_COUNT} boss / ${PHASE_COUNT} phases, assets v${ASSET_RELEASE}, ${sourceRuntime.entries.length} WebP, ${MASTERY_CONTRACT_COUNT} contrats, ${distBytes} octets publies, PWA/CI/securite conformes.`);

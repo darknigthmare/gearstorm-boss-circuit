@@ -1,11 +1,15 @@
-const APP_VERSION = '2.3.0';
-const ASSET_VERSION = '2.2.0';
+const APP_VERSION = '2.8.0';
+const ASSET_VERSION = '2.7.0';
 const SHELL_CACHE = `gearstorm-shell-v${APP_VERSION}`;
-const RUNTIME_CACHE = `gearstorm-runtime-v${APP_VERSION}`;
+const RUNTIME_CACHE = `gearstorm-runtime-v${ASSET_VERSION}`;
 const GENERATED_RUNTIME_PREFIX = new URL(`./assets/generated/v${ASSET_VERSION}/`, self.registration.scope).pathname;
 const CORE_ASSETS = [
   './index.html',
+  './pwa-update-v2.8.0.js',
   './styles.css',
+  './story.js',
+  './expansion-story.js',
+  './boss-roster.js',
   './game.js',
   './manifest.webmanifest',
   './assets/gearstorm-icon.svg',
@@ -17,7 +21,7 @@ const CORE_ASSETS = [
 const CORE_PATHS = new Set(CORE_ASSETS.map(asset => new URL(asset, self.registration.scope).pathname));
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(CORE_ASSETS)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(CORE_ASSETS)));
 });
 
 self.addEventListener('activate', event => {

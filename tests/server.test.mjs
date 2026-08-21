@@ -40,7 +40,7 @@ test('le serveur livre le jeu avec la politique de securite complete', async () 
 
 test('les fichiers shell non versions sont toujours revalides', async () => {
   await withServer(async origin => {
-    for (const path of ['/game.js?release=2.3.0', '/styles.css', '/manifest.webmanifest']) {
+    for (const path of ['/story.js?release=2.8.0', '/expansion-story.js?release=2.8.0', '/boss-roster.js?release=2.8.0', '/game.js?release=2.8.0', '/styles.css', '/manifest.webmanifest']) {
       const response = await fetch(origin + path, { method: 'HEAD' });
       assert.equal(response.status, 200, path);
       assert.equal(response.headers.get('cache-control'), 'public, max-age=0, must-revalidate', path);
@@ -50,6 +50,18 @@ test('les fichiers shell non versions sont toujours revalides', async () => {
     assert.equal(worker.status, 200);
     assert.equal(worker.headers.get('service-worker-allowed'), '/');
     assert.equal(worker.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
+  });
+});
+
+test('le bootstrap PWA versionne est public et immutable', async () => {
+  await withServer(async origin => {
+    const expectedSize = (await stat('pwa-update-v2.8.0.js')).size;
+    const response = await fetch(origin + '/pwa-update-v2.8.0.js', { method: 'HEAD' });
+    assert.equal(response.status, 200);
+    assert.equal(Number(response.headers.get('content-length')), expectedSize);
+    assert.match(response.headers.get('content-type'), /text\/javascript/);
+    assert.equal(response.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+    assert.equal(await response.text(), '');
   });
 });
 
@@ -64,9 +76,9 @@ test('HEAD retourne les metadonnees exactes sans corps', async () => {
   });
 });
 
-test('les assets runtime v2.2 restent publics, types et immuables sous app v2.3', async () => {
+test('les 225 assets runtime v2.7 restent publics, types et immuables sous app v2.8', async () => {
   await withServer(async origin => {
-    const assetPath = '/assets/generated/v2.2.0/arenas/rammer/far.webp';
+    const assetPath = '/assets/generated/v2.7.0/arenas/rammer/far.webp';
     const expectedSize = (await stat('.' + assetPath)).size;
     const response = await fetch(origin + assetPath, { method: 'HEAD' });
     assert.equal(response.status, 200);
@@ -74,11 +86,11 @@ test('les assets runtime v2.2 restent publics, types et immuables sous app v2.3'
     assert.equal(Number(response.headers.get('content-length')), expectedSize);
     assert.equal(response.headers.get('cache-control'), 'public, max-age=31536000, immutable');
 
-    const catalog = await fetch(origin + '/assets/generated/v2.2.0/asset-manifest.json');
+    const catalog = await fetch(origin + '/assets/generated/v2.7.0/asset-manifest.json');
     assert.equal(catalog.status, 200);
     assert.match(catalog.headers.get('content-type'), /application\/json/);
     assert.equal(catalog.headers.get('cache-control'), 'public, max-age=31536000, immutable');
-    assert.equal((await catalog.json()).summary.runtimeFiles, 103);
+    assert.equal((await catalog.json()).summary.runtimeFiles, 225);
   });
 });
 
@@ -89,7 +101,9 @@ test('404, fichiers prives, masters, traversal et URL mal formee ne fuient rien'
       '/package.json',
       '/.env',
       '/assets/generated/arenas/rammer-parallax-openai-v1.png',
-      '/assets/generated/v2.2.0/arenas/rammer/far.webp/extra',
+      '/assets/generated/expansion-sources/bosses-07-12-source.png',
+      '/assets/generated/v2.5.0/arenas/rammer/far.webp',
+      '/assets/generated/v2.7.0/arenas/rammer/far.webp/extra',
       '/..%2Fpackage.json',
       '/%252e%252e%252fpackage.json',
       '/assets%5Cgearstorm-icon.svg',
