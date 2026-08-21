@@ -72,6 +72,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     '.github/',
     'tests/',
     'node_modules/',
+    'dist/',
     '.env*',
     'qa-*.png',
     'server.js',

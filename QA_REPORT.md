@@ -1,6 +1,6 @@
 # Rapport QA — GEARSTORM: Boss Circuit 2.8.0
 
-Validation locale effectuée le 21 août 2026 sur le candidat v2.8.0. Ce rapport consigne uniquement les preuves observées localement ; le déploiement de production reste en attente.
+Validation locale et production effectuée le 21 août 2026 sur GEARSTORM v2.8.0. Ce rapport distingue les gates locales, la CI distante et les vérifications réellement observées sur l’URL publique.
 
 ## Environnement vérifié
 
@@ -100,12 +100,20 @@ Le pack artistique reste celui du manifeste immuable v2.7.0 : 225 WebP runtime p
 
 ## Vérification de production
 
-**Statut : en attente.**
+**Statut : READY.**
 
-Aucun commit distant, workflow GitHub Actions, déploiement Vercel, statut `READY` ou réponse HTTP publique v2.8.0 n’est certifié par ce rapport local. La publication ne devra être déclarée terminée qu’après commit, push, gate distant, déploiement prêt et vérification HTTP de l’URL publique.
+- Commit applicatif vérifié : `de887c9` sur `codex/release-v2.4`.
+- Pull request : GitHub #1 vers `main`.
+- GitHub Actions : run `32492902447`, gate Node 22 / Linux réussi en 2 min 21 s, y compris parcours Chromium réels et artefact statique.
+- Déploiement Vercel : `dpl_ABfTiQjbt8UTq4jniH8KLFFL9VjC`, état `READY`, cible production.
+- URL canonique : `https://gearstorm-boss-circuit.vercel.app`.
+- Le HTML public annonce bien v2.8 et la Forge rend 30 cartes avec 30 miniatures sans image cassée.
+- Le manifeste public répond 200 et déclare application 2.8.0, sauvegarde v5, 30 boss, 90 phases, 90 contrats, assets 2.7.0, 225 WebP et 18 248 604 octets graphiques.
+- Le bootstrap `pwa-update-v2.8.0.js` répond 200 avec cache immutable ; `sw.js` répond 200 avec `must-revalidate` et scope `/` ; un WebP NULL CROWN répond 200 en `image/webp` immutable.
+- Le contrôle navigateur Chrome de production n’a remonté aucune erreur console ou page ; les ressources inspectées ont répondu 200.
 
 ## Verdict local
 
-Le candidat local GEARSTORM 2.8.0 satisfait les gates automatisées observées : 69/69 tests Node, 13 E2E Chromium réussis avec 1 test volontairement ignoré, 7/7 Firefox, 6/7 WebKit avec 1 limite runner documentée, parcours accéléré des 24 boss jusqu’à la fin, build de 21 708 298 octets et audit npm sans vulnérabilité.
+GEARSTORM 2.8.0 satisfait les gates automatisées observées : 69/69 tests Node, 13 E2E Chromium réussis avec 1 test volontairement ignoré, 7/7 Firefox, 6/7 WebKit avec 1 limite runner documentée, parcours accéléré des 24 boss jusqu’à la fin, build de 21 708 298 octets et audit npm sans vulnérabilité.
 
-Cette conclusion vaut pour l’environnement local et les limites ci-dessus. Le déploiement de production reste en attente.
+La CI distante est verte et la production Vercel est `READY`, servie en HTTP 200 avec les marqueurs v2.8 attendus. Les limites matérielles et portrait détaillées ci-dessus restent les seules réserves de validation.

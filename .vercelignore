@@ -5,6 +5,7 @@ coverage/
 test-results/
 playwright-report/
 node_modules/
+dist/
 release/
 *.zip
 .tmp*
