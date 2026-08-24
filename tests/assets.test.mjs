@@ -10,12 +10,17 @@ import {
   EXPANSION_BOSS_IDS,
   EXPANSION_PART_NAMES,
   EXPECTED_COUNTS,
+  NARRATIVE_NAMES,
+  RIVA_ANATOMY_PART_NAMES,
+  RIVA_EFFECT_PART_NAMES,
+  RIVA_PART_NAMES,
+  RIVA_RENDER_ORDER,
   validateRuntimeAssets,
 } from '../scripts/asset-contract.mjs';
 
 const runtimePromise = validateRuntimeAssets();
 
-test('le catalogue v2.7 contient exactement les 225 assets attendus', async () => {
+test('le catalogue v2.9 contient exactement les 233 assets attendus', async () => {
   const runtime = await runtimePromise;
   assert.equal(runtime.manifest.release, ASSET_RELEASE);
   assert.equal(runtime.entries.length, EXPECTED_COUNTS.runtimeFiles);
@@ -24,20 +29,25 @@ test('le catalogue v2.7 contient exactement les 225 assets attendus', async () =
   assert.equal(runtime.entries.filter(entry => entry.kind === 'boss').length, EXPECTED_COUNTS.bossParts);
   assert.equal(runtime.entries.filter(entry => entry.kind === 'heroine').length, EXPECTED_COUNTS.heroineParts);
   assert.equal(runtime.entries.filter(entry => entry.kind === 'vfx').length, EXPECTED_COUNTS.vfx);
+  assert.equal(runtime.entries.filter(entry => entry.kind === 'narrative').length, EXPECTED_COUNTS.narrative);
   assert.deepEqual(Object.keys(runtime.manifest.arenas), [...BOSS_IDS]);
   assert.deepEqual(Object.keys(runtime.manifest.bosses), [...BOSS_IDS]);
-  for (const bossId of CORE_BOSS_IDS) assert.equal(runtime.manifest.arenas[bossId].kind, 'parallax');
+  for (const bossId of CORE_BOSS_IDS) {
+    assert.equal(runtime.manifest.arenas[bossId].kind, 'parallax');
+    assert.equal(runtime.manifest.arenas[bossId].visualOffsetY, 80);
+  }
   for (const bossId of EXPANSION_BOSS_IDS) {
     assert.equal(runtime.manifest.arenas[bossId].kind, 'backdrop');
     assert.deepEqual(Object.keys(runtime.manifest.bosses[bossId].parts), [...EXPANSION_PART_NAMES]);
   }
-  assert.ok(runtime.manifest.heroine.parts['body-core']);
-  assert.ok(runtime.manifest.heroine.parts['firing-arm']);
+  assert.deepEqual(Object.keys(runtime.manifest.heroine.parts), [...RIVA_PART_NAMES]);
+  assert.deepEqual(runtime.manifest.heroine.rig.parts.map(part => part.name), [...RIVA_RENDER_ORDER]);
+  assert.deepEqual(Object.keys(runtime.manifest.narrative), [...NARRATIVE_NAMES]);
 });
 
 test('dimensions, alpha, signatures, tailles et SHA-256 sont verifies', async () => {
   const runtime = await runtimePromise;
-  assert.equal(runtime.totalBytes, 18_248_604);
+  assert.equal(runtime.totalBytes, runtime.manifest.summary.totalBytes);
   assert.ok(runtime.totalBytes <= ASSET_BUDGET_BYTES);
   assert.equal(runtime.alphaCount, EXPECTED_COUNTS.alpha);
   assert.equal(runtime.opaqueCount, EXPECTED_COUNTS.opaque);
@@ -49,7 +59,7 @@ test('dimensions, alpha, signatures, tailles et SHA-256 sont verifies', async ()
 test('les 24 arenes Forge sont uniques, opaques, 16:9 et calees sur le sol logique', async () => {
   const runtime = await runtimePromise;
   const backdrops = EXPANSION_BOSS_IDS.map(id => runtime.manifest.arenas[id]);
-  assert.ok(backdrops.every(arena => arena.groundY === 620 && arena.telegraphSafe === true));
+  assert.ok(backdrops.every(arena => arena.groundY === 620 && arena.visualOffsetY === 28 && arena.telegraphSafe === true));
   assert.ok(backdrops.every(arena => arena.backdrop.width === 768 && arena.backdrop.height === 432 && arena.backdrop.alpha === false));
   assert.equal(new Set(backdrops.map(arena => arena.backdrop.sha256)).size, EXPECTED_COUNTS.arenaBackdrops);
   assert.equal(new Set(backdrops.map(arena => arena.backdrop.src)).size, EXPECTED_COUNTS.arenaBackdrops);
@@ -74,16 +84,65 @@ test('les 24 boss Forge exposent des rigs multipartites complets', async () => {
   }
 });
 
-test('les 26 masters OpenAI sont traces mais jamais publies', async () => {
+test('Riva utilise 13 masters anatomiques natifs sans doublon anatomique', async () => {
+  const runtime = await runtimePromise;
+  const heroine = runtime.manifest.heroine;
+  assert.deepEqual(Object.keys(heroine.parts), [...RIVA_PART_NAMES]);
+  assert.deepEqual(heroine.rig.canvas, { width: 418, height: 418 });
+  assert.equal(heroine.rig.coordinateSpace, 'player-local-pixels');
+  assert.equal(heroine.rig.feetLocalY, 36);
+  assert.deepEqual(heroine.rig.ground, { physicalY: 620, localY: 36 });
+  assert.deepEqual(heroine.rig.muzzle, [60, -44]);
+  assert.ok(heroine.rig.rootOffsetY < 0);
+  const measuredFeet = Math.max(...heroine.rig.parts
+    .filter(part => RIVA_ANATOMY_PART_NAMES.includes(part.name))
+    .map(part => part.joint[1] + (part.bbox[1] + part.bbox[3] - part.pivot[1]) * part.scale));
+  assert.ok(Math.abs(measuredFeet - 36) <= 0.05);
+  assert.deepEqual(heroine.rig.parts.map(part => part.name), [...RIVA_RENDER_ORDER]);
+  assert.ok(heroine.rig.parts.every((part, index, parts) => index === 0 || part.z > parts[index - 1].z));
+  assert.ok(heroine.rig.parts.every(part => part.joint.length === 2 && part.pivot.length === 2 && part.bbox.length === 4));
+  assert.ok(heroine.rig.parts.every(part => part.bbox[2] > 0 && part.bbox[3] > 0 && part.coveragePixels >= 64));
+
+  const anatomy = RIVA_ANATOMY_PART_NAMES.map(name => heroine.parts[name]);
+  assert.ok(anatomy.every(part => part.role === 'anatomy' && part.nativePart === true));
+  assert.ok(anatomy.every(part => part.alpha && part.width === 418 && part.height === 418));
+  assert.equal(new Set(anatomy.map(part => part.source.masterFile)).size, RIVA_ANATOMY_PART_NAMES.length);
+  for (const name of RIVA_ANATOMY_PART_NAMES) {
+    assert.equal(heroine.parts[name].source.masterFile, `assets/generated/riva-v2.9-sources/${name}-openai-v1.png`);
+  }
+  for (const forbidden of ['arm-near', 'arm-far', 'legs', 'boots', 'pulse-cannon', 'body-core', 'firing-arm']) {
+    assert.equal(heroine.parts[forbidden], undefined);
+  }
+  assert.deepEqual(RIVA_EFFECT_PART_NAMES.map(name => heroine.parts[name].source.atlasCell), [7, 8]);
+  assert.equal(heroine.rig.canonicalReference.masterFile, 'assets/generated/riva-v2.9-sources/riva-canonical-openai-v1.png');
+});
+
+test('les 4 visuels narratifs OpenAI sont opaques, 16:9 et traces', async () => {
+  const runtime = await runtimePromise;
+  assert.deepEqual(Object.keys(runtime.manifest.narrative), [...NARRATIVE_NAMES]);
+  const narrative = Object.values(runtime.manifest.narrative);
+  assert.ok(narrative.every(asset => asset.width === 1280 && asset.height === 720 && asset.alpha === false));
+  assert.ok(narrative.every(asset => asset.focalPoint && asset.safeTextZone));
+  assert.equal(new Set(narrative.map(asset => asset.src)).size, EXPECTED_COUNTS.narrative);
+  assert.equal(new Set(narrative.map(asset => asset.source.masterFile)).size, EXPECTED_COUNTS.narrative);
+  for (const name of NARRATIVE_NAMES) {
+    assert.equal(runtime.manifest.narrative[name].src, `assets/generated/v2.9.0/narrative/${name}.webp`);
+    assert.equal(runtime.manifest.narrative[name].source.masterFile, `assets/generated/narrative-v2.9-sources/${name}-openai-v1.png`);
+  }
+});
+
+test('les 42 masters OpenAI sont traces mais jamais publies', async () => {
   const runtime = await runtimePromise;
   assert.equal(runtime.manifest.sourceMasters.length, EXPECTED_COUNTS.masters);
   assert.equal(runtime.masterFiles.length, EXPECTED_COUNTS.masters);
   assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('forge-arenas-')).length, 6);
+  assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('riva-') && master.promptId.includes('v2.9')).length, 14);
+  assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('narrative-')).length, 4);
   assert.ok(runtime.files.includes(ASSET_MANIFEST_PATH));
-  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.7.0/')));
+  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.9.0/')));
   assert.ok(runtime.entries.every(entry => entry.src.endsWith('.webp')));
   assert.ok(runtime.masterFiles.every(file => file.endsWith('.png') && !runtime.files.includes(file)));
-  assert.ok(runtime.entries.every(entry => !/assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources)\//.test(entry.src)));
+  assert.ok(runtime.entries.every(entry => !/assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources|riva-v2\.9-sources|narrative-v2\.9-sources)\//.test(entry.src)));
   assert.equal(new Set(runtime.entries.map(entry => entry.src)).size, EXPECTED_COUNTS.runtimeFiles);
 });
 
@@ -93,5 +152,5 @@ test('le build copie le catalogue et les assets declares sans copie recursive de
   assert.match(build, /validateRuntimeAssets\(root, \{ validateMasters: validateSourceMasters \}\)/);
   assert.match(build, /\.\.\.runtimeAssets\.files/);
   assert.doesNotMatch(build, /cp\(resolve\(root, 'assets'/);
-  assert.doesNotMatch(build, /assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources)/);
+  assert.doesNotMatch(build, /assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources|riva-v2\.9-sources|narrative-v2\.9-sources)/);
 });

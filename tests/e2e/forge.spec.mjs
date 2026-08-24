@@ -16,15 +16,42 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
   await expect(page.locator('#boss-grid [data-boss-id]')).toHaveCount(30);
 
   const diagnostics = await page.evaluate(() => window.__GEARSTORM_QA__.getRigDiagnostics());
+  const expectedAnatomy = [
+    'boot-far', 'boot-near', 'forearm-cannon-near', 'forearm-far', 'head', 'pelvis',
+    'shin-far', 'shin-near', 'thigh-far', 'thigh-near', 'torso', 'upper-arm-far', 'upper-arm-near'
+  ];
+  expect(diagnostics.heroine.parts).toBe(15);
+  expect(diagnostics.heroine.anatomyParts).toBe(13);
+  expect(diagnostics.heroine.effectParts).toBe(2);
+  expect([...diagnostics.heroine.anatomyPartNames].sort()).toEqual(expectedAnatomy);
+  expect(diagnostics.heroine.partNames).not.toContain('body-core');
+  expect(diagnostics.heroine.partNames).not.toContain('firing-arm');
+  expect(diagnostics.heroine.loadedParts).toBe(15);
+  expect(diagnostics.heroine.artReady).toBe(true);
+  expect(diagnostics.heroine.feet).toBeCloseTo(36, 5);
+  expect(diagnostics.heroine.feetLocalY).toBeCloseTo(36, 5);
+  expect(diagnostics.heroine.renderScale).toBeCloseTo(1.10, 5);
+  expect(diagnostics.heroine.footOffset).toBeCloseTo(3.6, 5);
   expect(diagnostics.heroine.renderedFeetLocalY).toBeCloseTo(diagnostics.heroine.hitbox.groundLocalY, 1);
-  expect(diagnostics.heroine.visibleArmSources.body).toContain('body-core');
-  expect(diagnostics.heroine.visibleArmSources.firingArm).toContain('firing-arm');
+  const zValues = diagnostics.heroine.zOrder.map(entry => entry.z);
+  expect(zValues).toEqual([...zValues].sort((left, right) => left - right));
+  expect(diagnostics.activeArenaId).toBe('rammer');
+  expect(diagnostics.visualOffsetY).toBe(80);
+  expect(diagnostics.heroine.visualOffsetY).toBe(80);
+  expect(diagnostics.arenaVisualOffsets.rammer).toBe(80);
+  expect(diagnostics.arenaVisualOffsets['bastion-ricochet']).toBe(28);
 
   const overflow = await page.evaluate(() => ({
     width: document.documentElement.clientWidth,
     scrollWidth: document.documentElement.scrollWidth
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.width + 1);
+
+  const forgeOffset = await page.evaluate(() => {
+    window.__GEARSTORM_QA__.launchBoss('bastion-ricochet', { phase: 1 });
+    return window.__GEARSTORM_QA__.getRigDiagnostics().visualOffsetY;
+  });
+  expect(forgeOffset).toBe(28);
 });
 
 test('les 24 boss Forge ont un système propre et démarrent dans leurs trois phases', async ({ page }, testInfo) => {

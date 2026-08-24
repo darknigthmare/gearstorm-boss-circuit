@@ -11,14 +11,17 @@ from __future__ import annotations
 from collections import deque
 from hashlib import sha256
 from pathlib import Path
+from shutil import rmtree
 import json
 
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageOps
 
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "assets" / "generated"
-ASSET_RELEASE = "v2.7.0"
+RIVA_SOURCE_ROOT = SOURCE_ROOT / "riva-v2.9-sources"
+NARRATIVE_SOURCE_ROOT = SOURCE_ROOT / "narrative-v2.9-sources"
+ASSET_RELEASE = "v2.9.0"
 OUTPUT_ROOT = SOURCE_ROOT / ASSET_RELEASE
 MANIFEST_PATH = OUTPUT_ROOT / "asset-manifest.json"
 
@@ -39,7 +42,35 @@ BOSS_PARTS = {
     "cyclotron": ("furnace-torso", "cockpit", "piston-left", "piston-right", "leg-left", "leg-right", "stacks-hopper", "molten-core", "overarmor"),
     "omega": ("crown-hull", "throne-cockpit", "battery-left", "battery-right", "stabilizers", "blade-ring", "combined-arsenal", "omega-core", "ruptured-armor"),
 }
-HERO_PARTS = ("head", "torso", "arm-near", "arm-far", "legs", "boots", "pulse-cannon", "dash-trail", "overload-halo")
+RIVA_ANATOMY_PARTS = (
+    "thigh-far", "shin-far", "boot-far", "upper-arm-far", "forearm-far",
+    "pelvis", "torso", "thigh-near", "shin-near", "boot-near",
+    "upper-arm-near", "forearm-cannon-near", "head",
+)
+RIVA_EFFECT_PARTS = ("dash-trail", "overload-halo")
+HERO_PARTS = RIVA_ANATOMY_PARTS + RIVA_EFFECT_PARTS
+RIVA_PART_CONTRACTS = {
+    "thigh-far": {"extent": 145, "pivotFraction": (0.50, 0.12), "joint": (-7, 5), "parent": "pelvis", "side": "far", "z": 10, "motion": "leg-far"},
+    "shin-far": {"extent": 150, "pivotFraction": (0.50, 0.12), "joint": (-10, 20), "parent": "thigh-far", "side": "far", "z": 11, "motion": "leg-far"},
+    "boot-far": {"extent": 112, "pivotFraction": (0.50, 0.20), "joint": (-11, 32), "parent": "shin-far", "side": "far", "z": 12, "motion": "leg-far"},
+    "upper-arm-far": {"extent": 128, "pivotFraction": (0.50, 0.14), "joint": (-11, -37), "parent": "torso", "side": "far", "z": 13, "motion": "arm-far"},
+    "forearm-far": {"extent": 132, "pivotFraction": (0.50, 0.12), "joint": (-22, -18), "parent": "upper-arm-far", "side": "far", "z": 14, "motion": "arm-far"},
+    "pelvis": {"extent": 126, "pivotFraction": (0.50, 0.50), "joint": (0, 0), "parent": None, "side": "center", "z": 30, "motion": "pelvis"},
+    "torso": {"extent": 205, "pivotFraction": (0.50, 0.86), "joint": (0, -9), "parent": "pelvis", "side": "center", "z": 40, "motion": "torso"},
+    "thigh-near": {"extent": 145, "pivotFraction": (0.50, 0.12), "joint": (7, 5), "parent": "pelvis", "side": "near", "z": 50, "motion": "leg-near"},
+    "shin-near": {"extent": 150, "pivotFraction": (0.50, 0.12), "joint": (10, 20), "parent": "thigh-near", "side": "near", "z": 51, "motion": "leg-near"},
+    "boot-near": {"extent": 112, "pivotFraction": (0.50, 0.20), "joint": (12, 32), "parent": "shin-near", "side": "near", "z": 52, "motion": "leg-near"},
+    "upper-arm-near": {"extent": 128, "pivotFraction": (0.50, 0.14), "joint": (12, -37), "parent": "torso", "side": "near", "z": 60, "motion": "arm-near"},
+    "forearm-cannon-near": {"extent": 210, "pivotFraction": (0.78, 0.18), "joint": (25, -34), "parent": "upper-arm-near", "side": "near", "z": 70, "motion": "cannon-recoil"},
+    "head": {"extent": 132, "pivotFraction": (0.68, 0.92), "joint": (0, -53), "parent": "torso", "side": "center", "z": 80, "motion": "head"},
+}
+NARRATIVE = ("intro-broadcast", "prologue-m0", "campaign-ending", "forge-ending")
+NARRATIVE_LAYOUTS = {
+    "intro-broadcast": {"focalPoint": {"x": 0.20, "y": 0.70}, "safeTextZone": {"x": 0.07, "y": 0.06, "width": 0.36, "height": 0.32}},
+    "prologue-m0": {"focalPoint": {"x": 0.22, "y": 0.58}, "safeTextZone": {"x": 0.60, "y": 0.10, "width": 0.34, "height": 0.62}},
+    "campaign-ending": {"focalPoint": {"x": 0.82, "y": 0.45}, "safeTextZone": {"x": 0.04, "y": 0.06, "width": 0.36, "height": 0.32}},
+    "forge-ending": {"focalPoint": {"x": 0.25, "y": 0.63}, "safeTextZone": {"x": 0.67, "y": 0.10, "width": 0.28, "height": 0.60}},
+}
 VFX = (
     "muzzle-cyan", "impact-metal", "shield-hit", "magnetic-spark",
     "smoke", "rivet-sparks", "electric-arcs", "molten-splash",
@@ -157,6 +188,41 @@ def normalize_sprite(image: Image.Image, max_extent: int) -> Image.Image:
     return canvas
 
 
+def alpha_geometry(image: Image.Image) -> tuple[list[int], int]:
+    alpha = image.getchannel("A")
+    bounds = alpha.getbbox()
+    if not bounds:
+        raise ValueError("Generated sprite contains no visible pixels")
+    left, top, right, bottom = bounds
+    coverage = sum(1 for value in alpha.get_flattened_data() if value > 8)
+    return [left, top, right - left, bottom - top], coverage
+
+
+def normalize_riva_part(image: Image.Image, contract: dict) -> tuple[Image.Image, dict]:
+    rgba = extract_alpha(image)
+    bounds = rgba.getchannel("A").getbbox()
+    if not bounds:
+        raise ValueError("Riva part contains no visible pixels")
+    crop = rgba.crop(bounds)
+    extent = int(contract["extent"])
+    crop.thumbnail((extent, extent), Image.Resampling.LANCZOS)
+    canvas = Image.new("RGBA", (418, 418), (0, 0, 0, 0))
+    left = (418 - crop.width) // 2
+    top = (418 - crop.height) // 2
+    canvas.alpha_composite(crop, (left, top))
+    fraction_x, fraction_y = contract["pivotFraction"]
+    pivot = [
+        left + round((crop.width - 1) * fraction_x),
+        top + round((crop.height - 1) * fraction_y),
+    ]
+    bbox, coverage = alpha_geometry(canvas)
+    return canvas, {"pivot": pivot, "bbox": bbox, "coveragePixels": coverage}
+
+
+def normalize_narrative(image: Image.Image) -> Image.Image:
+    return ImageOps.fit(image.convert("RGB"), (1280, 720), Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+
+
 def remove_alpha_islands(image: Image.Image, minimum_pixels: int) -> Image.Image:
     rgba = image.convert("RGBA")
     width, height = rgba.size
@@ -210,6 +276,18 @@ def source_record(path: Path, prompt_id: str | None = None) -> dict:
     if prompt_id:
         record["promptId"] = prompt_id
     return record
+
+
+def provenance_record(path: Path, prompt_id: str | None = None, **details) -> dict:
+    record = source_record(path, prompt_id)
+    provenance = {
+        "masterFile": record["file"],
+        "masterSha256": record["sha256"],
+    }
+    if prompt_id:
+        provenance["promptId"] = prompt_id
+    provenance.update(details)
+    return provenance
 
 
 def find_floor_line(image: Image.Image) -> int:
@@ -352,8 +430,21 @@ def master_inventory() -> list[dict]:
     for boss in CORE_BOSSES:
         records.append(source_record(SOURCE_ROOT / "arenas" / f"{boss}-parallax-openai-v1.png"))
         records.append(source_record(SOURCE_ROOT / "bosses" / f"{boss}-parts-openai-v1.png"))
-    for name in ("riva-parts-openai-v1.png", "riva-body-core-openai-v4.png", "riva-firing-arm-openai-v4.png"):
-        records.append(source_record(SOURCE_ROOT / "riva" / name))
+    records.append(source_record(SOURCE_ROOT / "riva" / "riva-parts-openai-v1.png", "riva-effects-openai-v1"))
+    records.append(source_record(
+        RIVA_SOURCE_ROOT / "riva-canonical-openai-v1.png",
+        "riva-canonical-v2.9-v1",
+    ))
+    for part in RIVA_ANATOMY_PARTS:
+        records.append(source_record(
+            RIVA_SOURCE_ROOT / f"{part}-openai-v1.png",
+            f"riva-{part}-v2.9-v1",
+        ))
+    for narrative in NARRATIVE:
+        records.append(source_record(
+            NARRATIVE_SOURCE_ROOT / f"{narrative}-openai-v1.png",
+            f"narrative-{narrative}-v2.9-v1",
+        ))
     records.append(source_record(SOURCE_ROOT / "vfx" / "circuit-vfx-openai-v1.png"))
     for first in (7, 13, 19, 25):
         records.append(source_record(SOURCE_ROOT / "expansion-sources" / f"bosses-{first:02d}-{first + 5:02d}-source.png"))
@@ -366,10 +457,12 @@ def master_inventory() -> list[dict]:
 
 
 def main() -> None:
+    if OUTPUT_ROOT.exists():
+        rmtree(OUTPUT_ROOT)
     manifest: dict = {
-        "schemaVersion": 2,
-        "release": "2.7.0",
-        "generator": "OpenAI ImageGen built-in + deterministic Pillow segmentation",
+        "schemaVersion": 3,
+        "release": ASSET_RELEASE.removeprefix("v"),
+        "generator": "OpenAI ImageGen built-in + deterministic Pillow extraction and normalization",
         "license": "Original project artwork",
         "viewport": {"width": 1280, "height": 720, "groundY": 620},
         "sourcePolicy": "Masters are provenance-only and are never runtime files.",
@@ -378,6 +471,7 @@ def main() -> None:
         "bosses": {},
         "heroine": {"id": "riva-spark", "parts": {}},
         "vfx": {},
+        "narrative": {},
     }
 
     for boss in CORE_BOSSES:
@@ -392,7 +486,7 @@ def main() -> None:
             layers[layer]["speed"] = speed
         manifest["arenas"][boss] = {
             "kind": "parallax", "viewport": {"width": 1280, "height": 720},
-            "groundY": 620, "layers": layers,
+            "groundY": 620, "visualOffsetY": 80, "layers": layers,
         }
 
     arena_source_root = SOURCE_ROOT / "forge-arena-sources"
@@ -404,7 +498,7 @@ def main() -> None:
             asset = save_runtime(backdrop, f"arenas/{boss_id}/backdrop.webp", False, quality=80)
             manifest["arenas"][boss_id] = {
                 "kind": "backdrop", "viewport": {"width": 1280, "height": 720},
-                "groundY": 620, "telegraphSafe": True, "backdrop": asset,
+                "groundY": 620, "visualOffsetY": 28, "telegraphSafe": True, "backdrop": asset,
                 "source": {
                     "masterSha256": sha256(master_path.read_bytes()).hexdigest(),
                     **crop_metadata,
@@ -419,16 +513,79 @@ def main() -> None:
             parts[part] = save_runtime(crop, f"bosses/{boss}/{part}.webp", True)
         manifest["bosses"][boss] = {"parts": parts}
 
-    hero = source(SOURCE_ROOT / "riva" / "riva-parts-openai-v1.png")
-    for index, part in enumerate(HERO_PARTS):
-        crop = extract_alpha(hero.crop(cell_box(hero.size, 3, 3, index)))
-        manifest["heroine"]["parts"][part] = save_runtime(crop, f"heroine/riva-spark/{part}.webp", True)
-    for name, source_name, extent in (
-        ("body-core", "riva-body-core-openai-v4.png", 400),
-        ("firing-arm", "riva-firing-arm-openai-v4.png", 370),
-    ):
-        runtime = normalize_sprite(source(SOURCE_ROOT / "riva" / source_name), extent)
-        manifest["heroine"]["parts"][name] = save_runtime(runtime, f"heroine/riva-spark/{name}.webp", True)
+    hero_rig_parts = []
+    for part in RIVA_ANATOMY_PARTS:
+        contract = RIVA_PART_CONTRACTS[part]
+        master_path = RIVA_SOURCE_ROOT / f"{part}-openai-v1.png"
+        prompt_id = f"riva-{part}-v2.9-v1"
+        runtime, geometry = normalize_riva_part(source(master_path), contract)
+        asset = save_runtime(runtime, f"heroine/riva-spark/{part}.webp", True)
+        asset.update({
+            "role": "anatomy",
+            "nativePart": True,
+            "source": provenance_record(master_path, prompt_id),
+        })
+        manifest["heroine"]["parts"][part] = asset
+        hero_rig_parts.append({
+            "name": part,
+            "parent": contract["parent"],
+            "side": contract["side"],
+            "joint": list(contract["joint"]),
+            "pivot": geometry["pivot"],
+            "bbox": geometry["bbox"],
+            "scale": 0.30,
+            "z": contract["z"],
+            "motion": contract["motion"],
+            "coveragePixels": geometry["coveragePixels"],
+        })
+
+    effect_master_path = SOURCE_ROOT / "riva" / "riva-parts-openai-v1.png"
+    effect_master = source(effect_master_path)
+    effect_contracts = {
+        "dash-trail": {"atlasCell": 7, "joint": [-25, -5], "pivot": [209, 209], "scale": 0.34, "z": 5, "motion": "trail"},
+        "overload-halo": {"atlasCell": 8, "joint": [0, -20], "pivot": [209, 209], "scale": 0.32, "z": 90, "motion": "halo"},
+    }
+    for part in RIVA_EFFECT_PARTS:
+        contract = effect_contracts[part]
+        crop = extract_alpha(effect_master.crop(cell_box(effect_master.size, 3, 3, contract["atlasCell"])))
+        bbox, coverage = alpha_geometry(crop)
+        asset = save_runtime(crop, f"heroine/riva-spark/{part}.webp", True)
+        asset.update({
+            "role": "effect",
+            "source": provenance_record(effect_master_path, "riva-effects-openai-v1", atlasCell=contract["atlasCell"]),
+        })
+        manifest["heroine"]["parts"][part] = asset
+        hero_rig_parts.append({
+            "name": part, "parent": None, "side": "center",
+            "joint": contract["joint"], "pivot": contract["pivot"],
+            "bbox": bbox, "scale": contract["scale"], "z": contract["z"],
+            "motion": contract["motion"], "coveragePixels": coverage,
+        })
+
+    anatomy_specs = [part for part in hero_rig_parts if part["name"] in RIVA_ANATOMY_PARTS]
+    measured_feet = max(
+        part["joint"][1]
+        + (part["bbox"][1] + part["bbox"][3] - part["pivot"][1]) * part["scale"]
+        for part in anatomy_specs
+    )
+    root_offset_y = round(36 - measured_feet, 3)
+    for part in hero_rig_parts:
+        part["joint"][1] = round(part["joint"][1] + root_offset_y, 3)
+
+    hero_rig_parts.sort(key=lambda part: part["z"])
+    canonical_path = RIVA_SOURCE_ROOT / "riva-canonical-openai-v1.png"
+    manifest["heroine"]["rig"] = {
+        "schemaVersion": 1,
+        "canvas": {"width": 418, "height": 418},
+        "coordinateSpace": "player-local-pixels",
+        "feetLocalY": 36,
+        "rootOffsetY": root_offset_y,
+        "ground": {"physicalY": 620, "localY": 36},
+        "muzzle": [60, -44],
+        "canonicalReference": provenance_record(canonical_path, "riva-canonical-v2.9-v1"),
+        "renderOrder": [part["name"] for part in hero_rig_parts],
+        "parts": hero_rig_parts,
+    }
 
     expansion_root = SOURCE_ROOT / "expansion-sources"
     for start in range(0, len(EXPANSION_BOSSES), 6):
@@ -459,6 +616,17 @@ def main() -> None:
         crop = extract_alpha(vfx.crop(cell_box(vfx.size, 4, 4, index)))
         manifest["vfx"][effect] = save_runtime(crop, f"vfx/{effect}.webp", True)
 
+    for narrative in NARRATIVE:
+        master_path = NARRATIVE_SOURCE_ROOT / f"{narrative}-openai-v1.png"
+        prompt_id = f"narrative-{narrative}-v2.9-v1"
+        runtime = normalize_narrative(source(master_path))
+        asset = save_runtime(runtime, f"narrative/{narrative}.webp", False, quality=82)
+        asset.update({
+            **NARRATIVE_LAYOUTS[narrative],
+            "source": provenance_record(master_path, prompt_id),
+        })
+        manifest["narrative"][narrative] = asset
+
     entries = []
     for arena in manifest["arenas"].values():
         if arena["kind"] == "parallax":
@@ -469,6 +637,7 @@ def main() -> None:
         entries.extend(boss["parts"].values())
     entries.extend(manifest["heroine"]["parts"].values())
     entries.extend(manifest["vfx"].values())
+    entries.extend(manifest["narrative"].values())
     manifest["summary"] = {
         "masters": len(manifest["sourceMasters"]),
         "runtimeFiles": len(entries),
@@ -477,6 +646,7 @@ def main() -> None:
         "bossParts": len(CORE_BOSSES) * 9 + len(EXPANSION_BOSSES) * len(EXPANSION_PARTS),
         "heroineParts": len(manifest["heroine"]["parts"]),
         "vfx": len(manifest["vfx"]),
+        "narrative": len(manifest["narrative"]),
         "totalBytes": sum(entry["bytes"] for entry in entries),
     }
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)

@@ -30,21 +30,21 @@ const [packageJson, manifest, serviceWorker, vercel, vercelIgnore, ci, buildScri
   readFile('.github/workflows/ci.yml', 'utf8'),
   readFile('scripts/build.mjs', 'utf8'),
   readFile('scripts/check-release.mjs', 'utf8'),
-  readFile('pwa-update-v2.8.0.js', 'utf8'),
+  readFile('pwa-update-v2.9.0.js', 'utf8'),
   readFile('index.html', 'utf8'),
 ]);
 
-test('la version application 2.8 reste separee des assets immuables 2.7', () => {
+test('la version application et le pack OpenAI convergent en 2.9', () => {
   assert.equal(packageJson.version, APP_RELEASE);
-  assert.equal(APP_RELEASE, '2.8.0');
-  assert.equal(ASSET_RELEASE, '2.7.0');
-  assert.notEqual(APP_RELEASE, STORY_CONTENT_VERSION);
+  assert.equal(APP_RELEASE, '2.9.0');
+  assert.equal(ASSET_RELEASE, '2.9.0');
+  assert.equal(STORY_CONTENT_VERSION, '2.9.0');
   assert.match(buildScript, /packageJson\.version !== APP_RELEASE/);
   assert.match(buildScript, /release: ASSET_RELEASE/);
   assert.match(buildScript, new RegExp(`saveSchemaVersion:\\s*SAVE_SCHEMA_VERSION`));
   assert.equal(SAVE_SCHEMA_VERSION, 5);
   assert.equal(STORY_SCHEMA_VERSION, 1);
-  assert.equal(STORY_CONTENT_VERSION, '1.0.0');
+  assert.equal(STORY_CONTENT_VERSION, '2.9.0');
   assert.equal(CAMPAIGN_BOSS_COUNT, 6);
   assert.equal(FORGE_BOSS_COUNT, 24);
   assert.equal(PLAYABLE_BOSS_COUNT, 30);
@@ -55,7 +55,7 @@ test('la version application 2.8 reste separee des assets immuables 2.7', () => 
 });
 
 test('le build reste une liste blanche reproductible et minimale', () => {
-  assert.match(buildScript, /const publicFiles = \['index\.html', 'pwa-update-v2\.8\.0\.js', 'styles\.css', 'story\.js', 'expansion-story\.js', 'boss-roster\.js', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
+  assert.match(buildScript, /const publicFiles = \['index\.html', 'pwa-update-v2\.9\.0\.js', 'styles\.css', 'story\.js', 'expansion-story\.js', 'boss-roster\.js', 'game\.js', 'manifest\.webmanifest', 'sw\.js'\]/);
   assert.match(buildScript, /const shellAssets = \['gearstorm-icon\.svg', 'gearstorm-icon-192\.png', 'gearstorm-icon-512\.png', 'gearstorm-key-art\.png'\]/);
   assert.match(buildScript, /\.\.\.runtimeAssets\.files/);
   assert.match(buildScript, /validateApplicationContract/);
@@ -67,7 +67,7 @@ test('le build reste une liste blanche reproductible et minimale', () => {
   assert.match(releaseScript, /SHA-256 incoherent/);
 });
 
-test('la PWA est installable, versionnee et ne precache pas les 225 WebP', () => {
+test('la PWA est installable, versionnee et ne precache pas tout le pack runtime', () => {
   assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
   assert.equal(manifest.launch_handler?.client_mode, 'navigate-existing');
   assert.ok(manifest.icons.some(icon => icon.purpose.includes('maskable')));
@@ -76,19 +76,19 @@ test('la PWA est installable, versionnee et ne precache pas les 225 WebP', () =>
   assert.equal(keyArt?.sizes, '1672x941');
   assert.ok(manifest.shortcuts.some(shortcut => shortcut.url === './?mode=forge'));
   assert.ok(manifest.shortcuts.some(shortcut => shortcut.url === './?mode=forgeRush'));
-  assert.match(serviceWorker, /const APP_VERSION = '2\.8\.0'/);
+  assert.match(serviceWorker, /const APP_VERSION = '2\.9\.0'/);
   assert.match(serviceWorker, /'\.\/story\.js'/);
   assert.match(serviceWorker, /'\.\/expansion-story\.js'/);
   assert.match(serviceWorker, /'\.\/boss-roster\.js'/);
-  assert.match(serviceWorker, /'\.\/pwa-update-v2\.8\.0\.js'/);
-  assert.match(serviceWorker, /const ASSET_VERSION = '2\.7\.0'/);
+  assert.match(serviceWorker, /'\.\/pwa-update-v2\.9\.0\.js'/);
+  assert.match(serviceWorker, /const ASSET_VERSION = '2\.9\.0'/);
   assert.match(serviceWorker, /cacheFirstRuntime/);
   assert.match(serviceWorker, /staleWhileRevalidateShell/);
   assert.match(serviceWorker, /networkFirstNavigation/);
   const coreAssets = serviceWorker.slice(serviceWorker.indexOf('const CORE_ASSETS'), serviceWorker.indexOf('const CORE_PATHS'));
   assert.doesNotMatch(coreAssets, /\.webp/);
-  assert.ok(indexHtml.indexOf('pwa-update-v2.8.0.js') < indexHtml.indexOf('game.js'));
-  assert.match(pwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_8__/);
+  assert.ok(indexHtml.indexOf('pwa-update-v2.9.0.js') < indexHtml.indexOf('game.js'));
+  assert.match(pwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_9__/);
   assert.match(pwaBootstrap, /registration\.waiting/);
   assert.match(pwaBootstrap, /SKIP_WAITING/);
   assert.match(pwaBootstrap, /controllerchange/);
@@ -97,15 +97,16 @@ test('la PWA est installable, versionnee et ne precache pas les 225 WebP', () =>
 test('Vercel, la CI Linux et les exclusions satisfont le contrat infrastructure', () => {
   assert.doesNotThrow(() => validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore }));
   assert.match(ci, /concurrency:[\s\S]+cancel-in-progress: true/);
-  assert.match(ci, /name: gearstorm-web-v2\.8\.0/);
+  assert.match(ci, /name: gearstorm-web-v2\.9\.0/);
   assert.match(vercelIgnore, /^\.env\*$/m);
-  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.7\.0\/$/m);
+  assert.match(vercelIgnore, /^assets\/generated\/v2\.7\.0\/$/m);
+  assert.doesNotMatch(vercelIgnore, /^assets\/generated\/v2\.9\.0\/$/m);
 });
 
 test('les scripts npm couvrent syntaxe, tests, build et verification release', () => {
   assert.match(packageJson.scripts.check, /node --check expansion-story\.js/);
   assert.match(packageJson.scripts.check, /node --check boss-roster\.js/);
-  assert.match(packageJson.scripts.check, /node --check pwa-update-v2\.8\.0\.js/);
+  assert.match(packageJson.scripts.check, /node --check pwa-update-v2\.9\.0\.js/);
   assert.match(packageJson.scripts.check, /node --check sw\.js/);
   assert.match(packageJson.scripts.check, /scripts\/app-contract\.mjs/);
   assert.match(packageJson.scripts.check, /scripts\/infrastructure-contract\.mjs/);

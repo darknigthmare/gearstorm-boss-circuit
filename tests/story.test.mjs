@@ -25,7 +25,7 @@ test('story.js est un script classique autonome, compatible VM sans DOM', () => 
   const story = loadStory();
   assert.ok(story, 'globalThis.GEARSTORM_STORY doit etre expose');
   assert.equal(story.schemaVersion, 1);
-  assert.equal(story.contentVersion, '1.0.0');
+  assert.equal(story.contentVersion, '2.9.0');
   assert.ok(Object.isFrozen(story));
   assert.ok(Object.isFrozen(story.acts));
   assert.ok(Object.isFrozen(story.acts[0].codex));
@@ -117,6 +117,48 @@ test('introduction, prologue, revelation, contre-plan et epilogue ferment l arc'
   assert.match(story.epilogue.cassianFate, /détention/i);
   assert.match(story.epilogue.rivaChoice, /refuse la Couronne/i);
   assert.match(story.epilogue.lines.at(-1).text, /Pour ceux qui y vivent/);
+});
+
+test('le contrat meta diegetique couvre les surfaces narratives sans contaminer le Canal civil', () => {
+  const story = loadStory();
+  const metaVocabulary = /\b(?:boss|phases?|HUD|menu|pattern|checkpoint|script|build|Codex|générique|retries?|interface|joueuse|compteur|progression)\b|barre de vie|écran de|meilleur temps|mise en scène|suite cachée|zone sûre/i;
+  const forbiddenCivilVocabulary = /\b(?:boss|phases?|HUD|menu|pattern|checkpoint|script|build|Codex|générique|retries?|interface|joueuse|progression)\b|barre de vie|mise en scène|suite cachée/i;
+
+  assert.match(story.intro.lines.map(entry => entry.text).join(' '), metaVocabulary);
+  assert.match(story.prologue.lines.map(entry => entry.text).join(' '), metaVocabulary);
+  assert.match(JSON.stringify(story.epilogue), metaVocabulary);
+
+  for (const act of story.acts) {
+    const label = act.bossId;
+    assert.match(act.preFight.map(entry => entry.text).join(' '), metaVocabulary, `${label}: pre-combat non meta`);
+    assert.match(act.rivaJournal, metaVocabulary, `${label}: journal non meta`);
+    assert.match(
+      act.interlude.find(entry => entry.speaker === 'Riva')?.text || '',
+      metaVocabulary,
+      `${label}: sortie d'arene non meta`
+    );
+    for (const transition of act.phaseTransitions) {
+      assert.match(
+        transition.lines.map(entry => entry.text).join(' '),
+        metaVocabulary,
+        `${label}: transition ${transition.toPhase} non meta`
+      );
+    }
+    const civilLine = act.interlude.find(entry => entry.speaker === 'Canal civil');
+    assert.ok(civilLine, `${label}: Canal civil absent`);
+    assert.doesNotMatch(civilLine.text, forbiddenCivilVocabulary, `${label}: Canal civil doit rester premier degre`);
+  }
+});
+
+test('les objectifs et methodes restent litteraux malgre la couche meta', () => {
+  const story = loadStory();
+  assert.equal(story.prologue.objective, 'Réactiver les six relais de sécurité et reprendre la Couronne.');
+  assert.equal(story.prologue.method, 'Lire · Esquiver · Exposer · Surcharger');
+  for (const act of story.acts) {
+    for (const contract of act.masteryContracts) {
+      assert.doesNotMatch(contract.objective, /quatrième mur|générique|menu titre|suite cachée/i);
+    }
+  }
 });
 
 test('les textes corrigent les incoherences de lore et correspondent aux mecaniques annoncees', () => {

@@ -1,0 +1,5719 @@
+{
+  "schemaVersion": 3,
+  "release": "2.9.0",
+  "generator": "OpenAI ImageGen built-in + deterministic Pillow extraction and normalization",
+  "license": "Original project artwork",
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "groundY": 620
+  },
+  "sourcePolicy": "Masters are provenance-only and are never runtime files.",
+  "sourceMasters": [
+    {
+      "file": "assets/generated/arenas/rammer-parallax-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2147321,
+      "sha256": "a504639616553a0491389b8d447ce28475af6a507546a2b8d27587d4ad663555"
+    },
+    {
+      "file": "assets/generated/bosses/rammer-parts-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2112940,
+      "sha256": "e488e61ac1e80ac5c4ac02445686dcea123da4e99f16a02540e67b7df1f2257d"
+    },
+    {
+      "file": "assets/generated/arenas/kraken-parallax-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2620728,
+      "sha256": "2a9b8f2c12477565e7648d4355b170578a2f8a004d61b8b310a48fbcf980b05e"
+    },
+    {
+      "file": "assets/generated/bosses/kraken-parts-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1850874,
+      "sha256": "1aea33b08af9e8fe5e608bdc3c93d7e59b3e7698d9f649bd8ae624bf23b313d6"
+    },
+    {
+      "file": "assets/generated/arenas/drill-parallax-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2324083,
+      "sha256": "cf006ea9a9e314bd553a22eaa917762b3e30debbb7bd38ddf9a20dd761af7d81"
+    },
+    {
+      "file": "assets/generated/bosses/drill-parts-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1945670,
+      "sha256": "d505f17101d48f8f06e1c8a3e723d032adf9f4d459927ea8352d60da858e658d"
+    },
+    {
+      "file": "assets/generated/arenas/mantis-parallax-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2436404,
+      "sha256": "9133ab5e3d8ee70597a7dc21dbc8be72a461df116b68f015f3a84ba4310f2b96"
+    },
+    {
+      "file": "assets/generated/bosses/mantis-parts-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1667339,
+      "sha256": "12d26e785d982951880f1f620936221c52608212a41b96cefccee9d55977ee93"
+    },
+    {
+      "file": "assets/generated/arenas/cyclotron-parallax-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2402107,
+      "sha256": "9c8209d2d83ad30e81474bcae681e578ff21cde1c6cee8a25fa939830dc0ddf4"
+    },
+    {
+      "file": "assets/generated/bosses/cyclotron-parts-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2184467,
+      "sha256": "b9207a2a2c5eb58ad07a78a0d0e9a1fd4daced24666e15f5ee8d3c90510eeaba"
+    },
+    {
+      "file": "assets/generated/arenas/omega-parallax-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2751929,
+      "sha256": "b693b4a8b513a70c589c13309b5394d7c1869b81eee8522635e1a33628fca606"
+    },
+    {
+      "file": "assets/generated/bosses/omega-parts-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1896076,
+      "sha256": "be3902afad20f91dacbe11f6c4120d336aa4203b317daad30c91146ce6bc102c"
+    },
+    {
+      "file": "assets/generated/riva/riva-parts-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1744178,
+      "sha256": "f94b897670b9f99fc597bbc6538921cf0d883a6e1329def8c22b3f2d39509d9d",
+      "promptId": "riva-effects-openai-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/riva-canonical-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1752624,
+      "sha256": "4ecfd8861884d909c5fa6e5be1dad7a1fd4f1c189f5acdd577abbf6536443e84",
+      "promptId": "riva-canonical-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/thigh-far-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1370099,
+      "sha256": "1c50e5fd2619d3397fed84d58f3a0d6d1a050e2a8ec6cec2c8edf713645ebfb1",
+      "promptId": "riva-thigh-far-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/shin-far-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1343624,
+      "sha256": "b59d3f4923a36ac088c967ea7666236b4d686831208e4352aa99ea738afafd75",
+      "promptId": "riva-shin-far-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/boot-far-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1373458,
+      "sha256": "49d4a684c7a64ea424fb8b019a699570a2913feca75f7e5938af746aee3a7102",
+      "promptId": "riva-boot-far-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/upper-arm-far-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1186776,
+      "sha256": "27b7e11b5e4d9088f4a4d1c132bae21a006fb1d0e5d14487e094135a0547270c",
+      "promptId": "riva-upper-arm-far-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/forearm-far-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1240837,
+      "sha256": "4ddce977d6a52ebde73452324dfec28f77dfaac2357e172b3d9e90dc81c2272a",
+      "promptId": "riva-forearm-far-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/pelvis-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1590286,
+      "sha256": "470ad263429a35a5d34b2cdeaeb4e0080309c86d357867f2fb7051585952bbf1",
+      "promptId": "riva-pelvis-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/torso-openai-v1.png",
+      "width": 1122,
+      "height": 1402,
+      "bytes": 1636854,
+      "sha256": "6a37f67d116385a75f03715b67c1acd51d31faeb97c8b04d2875b06d6a293a1a",
+      "promptId": "riva-torso-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/thigh-near-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1368633,
+      "sha256": "4a9f1df6e607a177b73ed241063188c0b8e06c62ee53d9f46f3e92c773d02487",
+      "promptId": "riva-thigh-near-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/shin-near-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1266651,
+      "sha256": "1a3b95b2ecd41535f159778d26e64b0fb2878d29b6a79f64ab8b918465b90f3d",
+      "promptId": "riva-shin-near-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/boot-near-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1373321,
+      "sha256": "6603e36dea4dadadf0f3c7ea97bad6fba7db7dba64dbc97fa45207cbb4b731c9",
+      "promptId": "riva-boot-near-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/upper-arm-near-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1327751,
+      "sha256": "e829e82e87fbd9a78ac3c2321e839fb6a73f0a6b97a4ce189d58e9ce00ca2b18",
+      "promptId": "riva-upper-arm-near-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/forearm-cannon-near-openai-v1.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1355786,
+      "sha256": "706451a0c476e0ac7b9e12ac35105ff58a2084ead5dab29000212f1ff013edb9",
+      "promptId": "riva-forearm-cannon-near-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/riva-v2.9-sources/head-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1465119,
+      "sha256": "3f1d002598e5c70820c18177b3e463f218dc4dd0dac48f459937945d6c8e1589",
+      "promptId": "riva-head-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/narrative-v2.9-sources/intro-broadcast-openai-v1.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2283777,
+      "sha256": "47bd0ae2a442a894971ab700cb3d0546d770b2356819a47ca92bc77c6691c3d5",
+      "promptId": "narrative-intro-broadcast-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/narrative-v2.9-sources/prologue-m0-openai-v1.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1997737,
+      "sha256": "a86e3e1f0c2e8961b2b239b959a1f4ec28c3d71199d069d63c66ed9facd08d08",
+      "promptId": "narrative-prologue-m0-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/narrative-v2.9-sources/campaign-ending-openai-v1.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2353796,
+      "sha256": "804113d6f83a8145b80a3574ee7774d018c8cab0473636611bc0e08db7adf8ba",
+      "promptId": "narrative-campaign-ending-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/narrative-v2.9-sources/forge-ending-openai-v1.png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2233347,
+      "sha256": "fb042e2e6a6343ce2e983fd550915916f09dedd55367b262d65266541f9d5e1f",
+      "promptId": "narrative-forge-ending-v2.9-v1"
+    },
+    {
+      "file": "assets/generated/vfx/circuit-vfx-openai-v1.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1770541,
+      "sha256": "f4ab6f25b895366bf84d236b23d6e583f1b21e35ac231d48cda0ca24a2f51116"
+    },
+    {
+      "file": "assets/generated/expansion-sources/bosses-07-12-source.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2584211,
+      "sha256": "9e6d1f319a1678b2d5dbb5133109220893f89ba0d827526c32a1d725e8d8dd5a"
+    },
+    {
+      "file": "assets/generated/expansion-sources/bosses-13-18-source.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2469069,
+      "sha256": "68e430a484a9e534e814261a1660d6eb242e50d7b9585f13fecec1ae9b6eb7c1"
+    },
+    {
+      "file": "assets/generated/expansion-sources/bosses-19-24-source.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2217281,
+      "sha256": "aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60"
+    },
+    {
+      "file": "assets/generated/expansion-sources/bosses-25-30-source.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2583894,
+      "sha256": "0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae"
+    },
+    {
+      "file": "assets/generated/forge-arena-sources/forge-arenas-07-10-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2538012,
+      "sha256": "5f0d792b52ef18924f3b5e77d8bfe95b676f61bea192e7d9657b7b019f1bd30f",
+      "promptId": "forge-arenas-07-10-v1"
+    },
+    {
+      "file": "assets/generated/forge-arena-sources/forge-arenas-11-14-openai-v1.png",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 2273536,
+      "sha256": "05385ecd9b765f6344869ced5875a8d73372739f957694763a2ce63ecbb3b511",
+      "promptId": "forge-arenas-11-14-v1"
+    },
+    {
+      "file": "assets/generated/forge-arena-sources/forge-arenas-15-18-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2522528,
+      "sha256": "164e36f612d0a114c72746165d28403b80bdab8751b249a39e7672f24a346c69",
+      "promptId": "forge-arenas-15-18-v1"
+    },
+    {
+      "file": "assets/generated/forge-arena-sources/forge-arenas-19-22-openai-v1.png",
+      "width": 1448,
+      "height": 1086,
+      "bytes": 2240544,
+      "sha256": "c9cca3e0f0301537d8223e4e50b67e268d4a396d90ba240a9cce38b82e647a98",
+      "promptId": "forge-arenas-19-22-v1"
+    },
+    {
+      "file": "assets/generated/forge-arena-sources/forge-arenas-23-26-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2493390,
+      "sha256": "6cecfe68229664a159330074358d137d52c9ce7e0791327705a2e300bec5262e",
+      "promptId": "forge-arenas-23-26-v1"
+    },
+    {
+      "file": "assets/generated/forge-arena-sources/forge-arenas-27-30-openai-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2834918,
+      "sha256": "077a1b676e82ffc5b7e92f38757574ffe63975947b1f92a7f4f712d3d3d154c7",
+      "promptId": "forge-arenas-27-30-v1"
+    }
+  ],
+  "arenas": {
+    "rammer": {
+      "kind": "parallax",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 80,
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.9.0/arenas/rammer/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 67854,
+          "sha256": "bf83cf33dc3e3e2d15c402b6d3e7961f5eb7d9d8ec1311f1311abaf16b6a8971",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.9.0/arenas/rammer/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 248258,
+          "sha256": "a52bacda06239c60d9b9856368f5293c3019b5b77895373d53c817dc063223c2",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.9.0/arenas/rammer/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 240196,
+          "sha256": "bb94f35faeaceee32e67702ce2446f222cf93db9647c91dc0828300ae1c579e2",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.9.0/arenas/rammer/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 286080,
+          "sha256": "6f3a3904f46e89b9c63619153b3083f14b99cd03afdafeae5c8cc41b77b66971",
+          "speed": 0.19
+        }
+      }
+    },
+    "kraken": {
+      "kind": "parallax",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 80,
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.9.0/arenas/kraken/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 84154,
+          "sha256": "d99a2b5000c74fc3df67edb712be8d94be07a3a06213f14a132b49db7159eebe",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.9.0/arenas/kraken/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 394130,
+          "sha256": "9161e65dcfe776037a2406e8fbc5ab2744a5d2ca02efd4b2bd6b53602b6ca424",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.9.0/arenas/kraken/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 222446,
+          "sha256": "e11aabfc434795eeabf6b3c37a3021b39511b1fb875a25fd455a04a64de2c82d",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.9.0/arenas/kraken/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 310718,
+          "sha256": "055cd74a70004918911a9fe254697208963b5e0ebcb3947237c35424905177fb",
+          "speed": 0.19
+        }
+      }
+    },
+    "drill": {
+      "kind": "parallax",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 80,
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.9.0/arenas/drill/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 91318,
+          "sha256": "71a18819f6551ac2fbf0d26f75420098ff1c8ecae9a439693a84bd98d43c3447",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.9.0/arenas/drill/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 311760,
+          "sha256": "c1086bd33256a9e055856f37e7841bd7b7202eed2e584fd327fe8035f181da8a",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.9.0/arenas/drill/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 207272,
+          "sha256": "f1b3f6046f64a71d27e422b8607191a811cf899ff00caee7850a3f652d05c29d",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.9.0/arenas/drill/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 220172,
+          "sha256": "df8a073fa5db2a012ee0543c6596ab510f0fd4f7fc5ef92b1f68a7604d160d25",
+          "speed": 0.19
+        }
+      }
+    },
+    "mantis": {
+      "kind": "parallax",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 80,
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.9.0/arenas/mantis/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 116954,
+          "sha256": "a1808f4a810b40dc41dedcdf05d0aed06fbabf853117bfafb993a42a1eeb9ef0",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.9.0/arenas/mantis/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 375128,
+          "sha256": "c5fd52623eb43a91f786977b039430cbbd775297272a5933cc4dc6c5977853f3",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.9.0/arenas/mantis/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 149808,
+          "sha256": "75b12a9c82cbbb712cf9dd2e955baea47644a5fb708ad2cf2b35eaf9fc9cdfa0",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.9.0/arenas/mantis/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 290332,
+          "sha256": "35eec1c51fe4b2c4917b6605346317066544d67a4ee133dcdd32aa5b273d1d5b",
+          "speed": 0.19
+        }
+      }
+    },
+    "cyclotron": {
+      "kind": "parallax",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 80,
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.9.0/arenas/cyclotron/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 78398,
+          "sha256": "9e0c51944589267608003ccbd345588542855e691565687557a0b6d37b398ea1",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.9.0/arenas/cyclotron/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 280750,
+          "sha256": "f587d22eff77846de0387e160e3fd4a5cb26000158f532083d849f92de7078f7",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.9.0/arenas/cyclotron/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 189534,
+          "sha256": "42e26115b9f15e08eaa3bdfe403c4226cc089c4b1505976bd4cf3593d3260fcc",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.9.0/arenas/cyclotron/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 254450,
+          "sha256": "d9cbea252f40f6872af692a58d0a49edc3c6a18b18ea7de62d9e68457079c085",
+          "speed": 0.19
+        }
+      }
+    },
+    "omega": {
+      "kind": "parallax",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 80,
+      "layers": {
+        "far": {
+          "src": "assets/generated/v2.9.0/arenas/omega/far.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": false,
+          "bytes": 99634,
+          "sha256": "e6f88e490fee993748f1aa0d5e91fbe3c40039218edbc2ae4a7bcc8a2757c232",
+          "speed": 0.015
+        },
+        "mid": {
+          "src": "assets/generated/v2.9.0/arenas/omega/mid.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 361444,
+          "sha256": "045726385de6e993f0fc0df30b937a44d5db465fe3f26a73b0a12d942fc38719",
+          "speed": 0.055
+        },
+        "ground": {
+          "src": "assets/generated/v2.9.0/arenas/omega/ground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 169786,
+          "sha256": "fe9f7b9310a15d5137147af2c5ecd84a490b671c76c32b88f27c53bbcf3e1240",
+          "speed": 0.12
+        },
+        "foreground": {
+          "src": "assets/generated/v2.9.0/arenas/omega/foreground.webp",
+          "width": 768,
+          "height": 512,
+          "alpha": true,
+          "bytes": 302540,
+          "sha256": "d1e72d174b07ed218bf8f0fcc06127d962a028c8698eb7348f79ff9b94e2ac7f",
+          "speed": 0.19
+        }
+      }
+    },
+    "bastion-ricochet": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/bastion-ricochet/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 54758,
+        "sha256": "c1fd0c3ad8b83ac2a50ee893e19ea42a95d4ed162281bee06f9d9162beec4548"
+      },
+      "source": {
+        "masterSha256": "5f0d792b52ef18924f3b5e77d8bfe95b676f61bea192e7d9657b7b019f1bd30f",
+        "atlasCell": 0,
+        "sourceBox": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 80,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "hydraulic-warden": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/hydraulic-warden/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 40144,
+        "sha256": "6ae670d7b6526d030e58ed8b9e7c40fba4ca9bba0e300ef11eec1f4221c385c1"
+      },
+      "source": {
+        "masterSha256": "5f0d792b52ef18924f3b5e77d8bfe95b676f61bea192e7d9657b7b019f1bd30f",
+        "atlasCell": 1,
+        "sourceBox": {
+          "x": 768,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 80,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "hive-foreman": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/hive-foreman/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 49138,
+        "sha256": "e72182c3c49b963f5f4f0700de92723392e1d6fb19e420dceae51c3fe75a9594"
+      },
+      "source": {
+        "masterSha256": "5f0d792b52ef18924f3b5e77d8bfe95b676f61bea192e7d9657b7b019f1bd30f",
+        "atlasCell": 2,
+        "sourceBox": {
+          "x": 0,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 61,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "echo-fencer": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/echo-fencer/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 38596,
+        "sha256": "bde831570dcbcad808aa2855ab7e484730a321a3403a3377815a8e1d1e044a4a"
+      },
+      "source": {
+        "masterSha256": "5f0d792b52ef18924f3b5e77d8bfe95b676f61bea192e7d9657b7b019f1bd30f",
+        "atlasCell": 3,
+        "sourceBox": {
+          "x": 768,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 61,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "breaker-array": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/breaker-array/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 50002,
+        "sha256": "7c70e0f49e8169f1759b14a994559b696857cf07830010ba21ae9b6b41bca058"
+      },
+      "source": {
+        "masterSha256": "05385ecd9b765f6344869ced5875a8d73372739f957694763a2ce63ecbb3b511",
+        "atlasCell": 0,
+        "sourceBox": {
+          "x": 0,
+          "y": 0,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 96,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "vertical-verdict": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/vertical-verdict/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 32550,
+        "sha256": "af48b269f88dbd834c56643b39604ff3af136865a8adb3b38faa5e07f379b92c"
+      },
+      "source": {
+        "masterSha256": "05385ecd9b765f6344869ced5875a8d73372739f957694763a2ce63ecbb3b511",
+        "atlasCell": 1,
+        "sourceBox": {
+          "x": 724,
+          "y": 0,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 129,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "rail-tyrant": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/rail-tyrant/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 43172,
+        "sha256": "3d2b287d53ffa25ea9f29374b228b252cf3a272693fe4dc6eea842510075b577"
+      },
+      "source": {
+        "masterSha256": "05385ecd9b765f6344869ced5875a8d73372739f957694763a2ce63ecbb3b511",
+        "atlasCell": 2,
+        "sourceBox": {
+          "x": 0,
+          "y": 543,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 47,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "triplex-hunter": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/triplex-hunter/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 39310,
+        "sha256": "c19536ee581ce0779514c1c3af01abc2c9b6a952894f2c10c778ec99c8041072"
+      },
+      "source": {
+        "masterSha256": "05385ecd9b765f6344869ced5875a8d73372739f957694763a2ce63ecbb3b511",
+        "atlasCell": 3,
+        "sourceBox": {
+          "x": 724,
+          "y": 543,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 20,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "ground-eater": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/ground-eater/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 45962,
+        "sha256": "32ad50d6d5cc91232a75ee0bb529778483cf150f43393e62ea8df4e8660f5cf3"
+      },
+      "source": {
+        "masterSha256": "164e36f612d0a114c72746165d28403b80bdab8751b249a39e7672f24a346c69",
+        "atlasCell": 0,
+        "sourceBox": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 23,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "floodline-leviathan": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/floodline-leviathan/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 34000,
+        "sha256": "73601999abf98adc6a4f02f901abcccdbd4ef7b97e704d143d90c92cfd47b680"
+      },
+      "source": {
+        "masterSha256": "164e36f612d0a114c72746165d28403b80bdab8751b249a39e7672f24a346c69",
+        "atlasCell": 1,
+        "sourceBox": {
+          "x": 768,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 15,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "centrifuge-zero": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/centrifuge-zero/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 46810,
+        "sha256": "42e6736bd43ee36e2ad192806b9b9346eaa3f9a53f6995452631bc84f4fb23d8"
+      },
+      "source": {
+        "masterSha256": "164e36f612d0a114c72746165d28403b80bdab8751b249a39e7672f24a346c69",
+        "atlasCell": 2,
+        "sourceBox": {
+          "x": 0,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 22,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "tempest-regulator": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/tempest-regulator/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 36554,
+        "sha256": "15186a9d16e936b3cdbda3857f01dce60ca6196a79b45099359d9797272d0aed"
+      },
+      "source": {
+        "masterSha256": "164e36f612d0a114c72746165d28403b80bdab8751b249a39e7672f24a346c69",
+        "atlasCell": 3,
+        "sourceBox": {
+          "x": 768,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 26,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "ascension-frame": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/ascension-frame/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 37480,
+        "sha256": "9b1ffb5a633ce0e5b473b492e0758b86109237f95df3e5bc96c22c2e3388135d"
+      },
+      "source": {
+        "masterSha256": "c9cca3e0f0301537d8223e4e50b67e268d4a396d90ba240a9cce38b82e647a98",
+        "atlasCell": 0,
+        "sourceBox": {
+          "x": 0,
+          "y": 0,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 130,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "counterforge": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/counterforge/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 34060,
+        "sha256": "9b6ce0b796386f6badb13fc9fdee835a26d5b10297ee8a51007121fb64fe3993"
+      },
+      "source": {
+        "masterSha256": "c9cca3e0f0301537d8223e4e50b67e268d4a396d90ba240a9cce38b82e647a98",
+        "atlasCell": 1,
+        "sourceBox": {
+          "x": 724,
+          "y": 0,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 136,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "carrier-cathedral": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/carrier-cathedral/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 34252,
+        "sha256": "ad5eec8bbf2e94deb32de49bcc905224efc3bc8369dd6fd37d9ea1f872719392"
+      },
+      "source": {
+        "masterSha256": "c9cca3e0f0301537d8223e4e50b67e268d4a396d90ba240a9cce38b82e647a98",
+        "atlasCell": 2,
+        "sourceBox": {
+          "x": 0,
+          "y": 543,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 53,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "twin-governors": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/twin-governors/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 43356,
+        "sha256": "0687df001a5b47c2c21469bdfc7efbe57e4179ab9f44f789d3f4b181bcb936e1"
+      },
+      "source": {
+        "masterSha256": "c9cca3e0f0301537d8223e4e50b67e268d4a396d90ba240a9cce38b82e647a98",
+        "atlasCell": 3,
+        "sourceBox": {
+          "x": 724,
+          "y": 543,
+          "width": 724,
+          "height": 543
+        },
+        "crop": {
+          "x": 4,
+          "y": 71,
+          "width": 716,
+          "height": 403
+        }
+      }
+    },
+    "loadout-reactor": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/loadout-reactor/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 48570,
+        "sha256": "5ab9e00278bb18ce7020606e523aec893fa874a678755c19726b7ec2b2e73259"
+      },
+      "source": {
+        "masterSha256": "6cecfe68229664a159330074358d137d52c9ce7e0791327705a2e300bec5262e",
+        "atlasCell": 0,
+        "sourceBox": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 69,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "orbital-famine": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/orbital-famine/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 40738,
+        "sha256": "e282dfe60d373aa765c68541042256dbc86ff90c2ca3200330aac14a1cce4706"
+      },
+      "source": {
+        "masterSha256": "6cecfe68229664a159330074358d137d52c9ce7e0791327705a2e300bec5262e",
+        "atlasCell": 1,
+        "sourceBox": {
+          "x": 768,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 4,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "logic-crucible": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/logic-crucible/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 41326,
+        "sha256": "ef90b76a47e2733e5b03c71f5e9b9f49b45e90eba878aa27694573bec06111a6"
+      },
+      "source": {
+        "masterSha256": "6cecfe68229664a159330074358d137d52c9ce7e0791327705a2e300bec5262e",
+        "atlasCell": 2,
+        "sourceBox": {
+          "x": 0,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 77,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "vector-vault": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/vector-vault/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 46800,
+        "sha256": "b522b50331eacfbd43330906b19baad45077761d1b3b1cff9fe39eb283fc7c36"
+      },
+      "source": {
+        "masterSha256": "6cecfe68229664a159330074358d137d52c9ce7e0791327705a2e300bec5262e",
+        "atlasCell": 3,
+        "sourceBox": {
+          "x": 768,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 80,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "skyborne-battery": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/skyborne-battery/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 58786,
+        "sha256": "5220b991a7df557b175f3efe7b4f1074204905b97a37e85f31d5ac0e652f69c2"
+      },
+      "source": {
+        "masterSha256": "077a1b676e82ffc5b7e92f38757574ffe63975947b1f92a7f4f712d3d3d154c7",
+        "atlasCell": 0,
+        "sourceBox": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 11,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "endurance-engine": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/endurance-engine/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 52602,
+        "sha256": "1b561b59b9e49d4b7c9de2cb3240c7104efc9e6f149807e0e8aa7187774ad095"
+      },
+      "source": {
+        "masterSha256": "077a1b676e82ffc5b7e92f38757574ffe63975947b1f92a7f4f712d3d3d154c7",
+        "atlasCell": 1,
+        "sourceBox": {
+          "x": 768,
+          "y": 0,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 21,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "adaptive-archivist": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/adaptive-archivist/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 58668,
+        "sha256": "f1f684b0fd3ae8a67329b9c4f6f6911431109b68815034394875f5c11bc3d8fe"
+      },
+      "source": {
+        "masterSha256": "077a1b676e82ffc5b7e92f38757574ffe63975947b1f92a7f4f712d3d3d154c7",
+        "atlasCell": 2,
+        "sourceBox": {
+          "x": 0,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 54,
+          "width": 760,
+          "height": 428
+        }
+      }
+    },
+    "null-crown": {
+      "kind": "backdrop",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "groundY": 620,
+      "visualOffsetY": 28,
+      "telegraphSafe": true,
+      "backdrop": {
+        "src": "assets/generated/v2.9.0/arenas/null-crown/backdrop.webp",
+        "width": 768,
+        "height": 432,
+        "alpha": false,
+        "bytes": 46578,
+        "sha256": "bf07b4cb934556393ebe9b01f71dc764d20121256b4888e16e670ed47da88dfa"
+      },
+      "source": {
+        "masterSha256": "077a1b676e82ffc5b7e92f38757574ffe63975947b1f92a7f4f712d3d3d154c7",
+        "atlasCell": 3,
+        "sourceBox": {
+          "x": 768,
+          "y": 512,
+          "width": 768,
+          "height": 512
+        },
+        "crop": {
+          "x": 4,
+          "y": 61,
+          "width": 760,
+          "height": 428
+        }
+      }
+    }
+  },
+  "bosses": {
+    "rammer": {
+      "parts": {
+        "wheel": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/wheel.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 185424,
+          "sha256": "5520b1ecd49eb0c7cfee173ef6f3640e56e8303ef28a85a9e8f227dc93e8c60d"
+        },
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 130610,
+          "sha256": "25beaf452190811a2fc65bdce66327be2e974670447a0c082d46485e4a33fbe6"
+        },
+        "ram": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/ram.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 119160,
+          "sha256": "4da3df34ee4e46a43deae1585bcc045791089a666427f61f374f08e0ceea2ff3"
+        },
+        "hammer-left": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/hammer-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 115896,
+          "sha256": "87fa6d4a672680aad2c83c7e49058f6edac05d599f22f26c39d8cc63cc0f0652"
+        },
+        "hammer-right": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/hammer-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 109004,
+          "sha256": "54fc13a088e01afb6a898d903b03751bb1e0031ecc676c512722bf1f94fd79af"
+        },
+        "rivet-pod": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/rivet-pod.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 92106,
+          "sha256": "88d7ca98d8a7cf95c02106232c921ec72b6734b24fa808a89bf7d31a1865d3f4"
+        },
+        "mine-seismic": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/mine-seismic.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 123718,
+          "sha256": "761c782ecd9727ddaa8dca083214c0a330dc87b6716928af08e6e5860797cc44"
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 136996,
+          "sha256": "46736cf0e2c48ef1bf116e4f15cf29091e82b93a3f7146a55f483803a6c0d6a8"
+        },
+        "overdrive": {
+          "src": "assets/generated/v2.9.0/bosses/rammer/overdrive.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 130412,
+          "sha256": "f2e27f5a23fcecbb8c92d1d2867857316278f07b4cc4893ef801060f0d38bcb4"
+        }
+      }
+    },
+    "kraken": {
+      "parts": {
+        "fuselage": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/fuselage.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 91218,
+          "sha256": "5281c16246d9df206c92d9bb751bb26cfae09ee42b7f5a3d83fb1f4d1a9bf76f"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 85668,
+          "sha256": "4cb072a75cb1e23ebe1d13c022b7313ee5c95fd4ce5e666a9c4c96ecba49fbd3"
+        },
+        "wing-left": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/wing-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 105046,
+          "sha256": "94a9e27cbc5ca5677cbd8b4840047bb317eeec853ba4d739e4e9db8891aeaa23"
+        },
+        "wing-right": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/wing-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 99650,
+          "sha256": "c36c8eba637e637281b29085254589ebd937c33dd19b9042dc9ff14bdff12971"
+        },
+        "tail-thruster": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/tail-thruster.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 108072,
+          "sha256": "037d6ce1771ee34eb4c751537860e71beeb690926efa644c06d9b37257016612"
+        },
+        "ion-emitter": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/ion-emitter.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 106346,
+          "sha256": "afb22486201e0d3187fa5abb79241399ccbf60a8384059f2d272116255e92033"
+        },
+        "bomb-pod": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/bomb-pod.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 58406,
+          "sha256": "50f93172dcddc4349adb2f919edd4b09a87bc9b78ce52a22b6732da34155b772"
+        },
+        "laser-blades": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/laser-blades.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 105154,
+          "sha256": "f98495f49f60858e770ad8eb97fe740f646dd8413fdc0858d5703d4e441306c8"
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/kraken/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 133562,
+          "sha256": "9a02a075da944cc79b600fdc3e7a59af6b066859d9ad21b91997bc65fb4b27ae"
+        }
+      }
+    },
+    "drill": {
+      "parts": {
+        "carapace": {
+          "src": "assets/generated/v2.9.0/bosses/drill/carapace.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 135648,
+          "sha256": "5fc7a2d21911986bc0da4340fcda9f14a19feee5224fed143c13b81066669f91"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.9.0/bosses/drill/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 99592,
+          "sha256": "485b83751032a1d0ed64b32a2d1b001edc231b9668fe2232b05c49eb76c55b08"
+        },
+        "legs-front-left": {
+          "src": "assets/generated/v2.9.0/bosses/drill/legs-front-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 90194,
+          "sha256": "586fe09842598db78d061cbba65c3b7dd8942031f10d98d2d24a1bf557128f89"
+        },
+        "legs-front-right": {
+          "src": "assets/generated/v2.9.0/bosses/drill/legs-front-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 82234,
+          "sha256": "0d80c698e152359e6d5115cab46e3f154d5b39164f885d69ddc9f0a2b1e70063"
+        },
+        "legs-rear": {
+          "src": "assets/generated/v2.9.0/bosses/drill/legs-rear.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 100908,
+          "sha256": "8288012b3b258b633dda82d834d85609babd8229863a0e12cc9054a555896402"
+        },
+        "magnetic-coil": {
+          "src": "assets/generated/v2.9.0/bosses/drill/magnetic-coil.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 118774,
+          "sha256": "1cac11d41961b181fe2bb457e0c35586b28c897cbfa1caaa02ad278c01d67c75"
+        },
+        "polarity-claws": {
+          "src": "assets/generated/v2.9.0/bosses/drill/polarity-claws.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 111254,
+          "sha256": "78337e62724386ac3670764cc56074a9d683467a1447750b8775e53d66d9f5e4"
+        },
+        "scrap-ring": {
+          "src": "assets/generated/v2.9.0/bosses/drill/scrap-ring.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 91162,
+          "sha256": "39228c0e64b125bcaf6962af2a493b474519d5f5bfdc9e361f531785edc1005e"
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/drill/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 142110,
+          "sha256": "fa24b11a882535ea1137fd5275bed7871da335d6e5dc551e2aa0f9472b36248c"
+        }
+      }
+    },
+    "mantis": {
+      "parts": {
+        "torso": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/torso.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 90138,
+          "sha256": "9819b9c3dc0109a34b632fef81fde491a3971a426989311858ccf0ff2f790b35"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 86956,
+          "sha256": "f0be63078edd9609590db38e78694c196e2b8353981cb03b5273016087390dcf"
+        },
+        "scythe-left": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/scythe-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 72620,
+          "sha256": "233aa77107c6a647740476b72a15821dc9b87fb37ea75ee47ee10d2106cdb076"
+        },
+        "scythe-right": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/scythe-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 69032,
+          "sha256": "70ce1016fe0ceb9d745706898029a459c1799b9dea984e2a2ac6cfaf61fbfe87"
+        },
+        "legs-left": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/legs-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 61112,
+          "sha256": "910b1f3f95154603aacecc23d25ee1d7b6af59893b5ef30c6cec9c669c9354bf"
+        },
+        "legs-right": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/legs-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 59864,
+          "sha256": "b0be9e0ce6f4fff42179b6a94fc4080b6a2276f2b0fee4dde6b95850f19d1490"
+        },
+        "chrono-halo": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/chrono-halo.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 117078,
+          "sha256": "3757aab54139a8e60ec3a1099d65a394aba886c29d9a39ad99da9da8d111731c"
+        },
+        "time-emitter": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/time-emitter.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 65110,
+          "sha256": "d8e9c9aa1c63f3e1395b75709c4e02176ca4b9e5589e1fbbc08b5b7a186a238d"
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/mantis/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 122934,
+          "sha256": "8c491ad23f2190bc0eea28d4b55667170c32cb90fda5f5665efd1f7bc0c49778"
+        }
+      }
+    },
+    "cyclotron": {
+      "parts": {
+        "furnace-torso": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/furnace-torso.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 181168,
+          "sha256": "35b93020b53769942ec8b20a014c2065f14fbaf495b0220076751b0aa9e12a38"
+        },
+        "cockpit": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 95350,
+          "sha256": "873ee43d736a114e44b7bb2037c57991e66b4f3ad058f38b0065aabfcfe5a27a"
+        },
+        "piston-left": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/piston-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 135374,
+          "sha256": "cb8a8057f85256eaff5783c852fa9d159288ce0286f3277402a517ac273fcf14"
+        },
+        "piston-right": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/piston-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 109808,
+          "sha256": "2b48f3be17732bafd7022630e736c510f9ca2edde93f11fa915be714feafad7e"
+        },
+        "leg-left": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/leg-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 114372,
+          "sha256": "0ad7316b4d803bd87c1eb10c8d228db7633619d74478c8d0628db92c37dc5bac"
+        },
+        "leg-right": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/leg-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 115354,
+          "sha256": "db34e3322fb9b4a5b3effa9f17ee56e4093a35764f7e6ee536f5d6c6d853ad87"
+        },
+        "stacks-hopper": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/stacks-hopper.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 164810,
+          "sha256": "2b6457891df3dd0f053de6aa1cba93182ef9e4a20432d5502fc744d7a7745c6a"
+        },
+        "molten-core": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/molten-core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 159430,
+          "sha256": "73b28ac342bc4f24c6437094c1bed370beecdc61be87f4eee4f583c815702c80"
+        },
+        "overarmor": {
+          "src": "assets/generated/v2.9.0/bosses/cyclotron/overarmor.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 191438,
+          "sha256": "8a8edd7eb48d27e5e28904d675d185d37e9352d0cede80ee52692173850ad636"
+        }
+      }
+    },
+    "omega": {
+      "parts": {
+        "crown-hull": {
+          "src": "assets/generated/v2.9.0/bosses/omega/crown-hull.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 158484,
+          "sha256": "769546ae9db8a8618f502fb1b4730411c5ba10143a93b45e0072653e6e9fa657"
+        },
+        "throne-cockpit": {
+          "src": "assets/generated/v2.9.0/bosses/omega/throne-cockpit.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 116964,
+          "sha256": "61929dc4528594d40fbd5b786e7882f50faffd82ec08b86ea6aeb5c53eae8680"
+        },
+        "battery-left": {
+          "src": "assets/generated/v2.9.0/bosses/omega/battery-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 107404,
+          "sha256": "28dd425af48fe2e1a2fa21a1be91422913409b3fb9d5262f366f18d7eca332a3"
+        },
+        "battery-right": {
+          "src": "assets/generated/v2.9.0/bosses/omega/battery-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 95328,
+          "sha256": "a2067b04e02b2c58076bc4692224e5b29a35844153abe4897473b5c400e3c906"
+        },
+        "stabilizers": {
+          "src": "assets/generated/v2.9.0/bosses/omega/stabilizers.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 88056,
+          "sha256": "248e4e7a30db9e27ff0974af785388fbe5b0a5ad1985ee08c047283fb5eac42a"
+        },
+        "blade-ring": {
+          "src": "assets/generated/v2.9.0/bosses/omega/blade-ring.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 84884,
+          "sha256": "060c4dcf7373fc0da3a0d3ad88096805a12e5456961dd8e385ecda73067545ee"
+        },
+        "combined-arsenal": {
+          "src": "assets/generated/v2.9.0/bosses/omega/combined-arsenal.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 131106,
+          "sha256": "2872e9b7389d4a152f45132111cc1a846c7619eb38eb61beeb2b4018623e7f10"
+        },
+        "omega-core": {
+          "src": "assets/generated/v2.9.0/bosses/omega/omega-core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 117630,
+          "sha256": "5b3e423300fc180e7673827b44ae44327cf8ba029c81c0282ef4a291a2d06cd6"
+        },
+        "ruptured-armor": {
+          "src": "assets/generated/v2.9.0/bosses/omega/ruptured-armor.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 133228,
+          "sha256": "faef58818fe955411e99069b61dd9706634ad8398838b1cff008455b65872d7c"
+        }
+      }
+    },
+    "bastion-ricochet": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4412,
+          "y": 0.4844,
+          "radius": 0.1053
+        },
+        "coveragePixels": {
+          "chassis": 53499,
+          "core": 6075,
+          "appendage-left": 20750,
+          "appendage-right": 23335
+        },
+        "sourceMasterSha256": "9e6d1f319a1678b2d5dbb5133109220893f89ba0d827526c32a1d725e8d8dd5a",
+        "sourceCell": 0,
+        "compositeSha256": "b9f8290fff48a99b1a3059795ad5f046379ebf689b381cec2adc112fb2bcfa49"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 99594,
+          "sha256": "6ae2106a2efa63e4c2362d5aa11fdb866b7b652eb5c72ea74c9de13246e62501",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 12798,
+          "sha256": "bb9ad7096281f3fc62938a7b0ed90e0c1574dd13fd4599cb40d595f7cf0c306e",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4412,
+            "y": 0.4844
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 44442,
+          "sha256": "47eb57b8ac2401ff8a1efe32ae0d7eb75dad0656c26751d8e40f45e7970ee2de",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 51944,
+          "sha256": "b8249c4064994e560d82df6ff70f43faad09471cc5f55b2aa13f3151e5cc3c16",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "hydraulic-warden": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4556,
+          "y": 0.4796,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 32313,
+          "core": 4976,
+          "appendage-left": 26681,
+          "appendage-right": 19803
+        },
+        "sourceMasterSha256": "9e6d1f319a1678b2d5dbb5133109220893f89ba0d827526c32a1d725e8d8dd5a",
+        "sourceCell": 1,
+        "compositeSha256": "4d3c5a36f108dad84e7d11b1ba0a5c874a73c079af1f18fac9983c42768882f5"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 65460,
+          "sha256": "247cd61456a9b8bd543037ae218a3dae344a1e65729253d9f3e4527715cfc0ef",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 10706,
+          "sha256": "756539263add3a07b4fd4dafd904f42c4ee448c21aea1a7993c9ed3794175161",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4556,
+            "y": 0.4796
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 50718,
+          "sha256": "fa7b9cd96dd5bf8e3c9bbc5edf322d2cd4896ecbdca262d838361a94cbc64f46",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 38448,
+          "sha256": "f8740b85ca5e07ad46f1e10fc463baee31307c58ee8676b0e61184d0da2d39bb",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "hive-foreman": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4724,
+          "y": 0.5276,
+          "radius": 0.1053
+        },
+        "coveragePixels": {
+          "chassis": 33282,
+          "core": 6077,
+          "appendage-left": 23854,
+          "appendage-right": 17918
+        },
+        "sourceMasterSha256": "9e6d1f319a1678b2d5dbb5133109220893f89ba0d827526c32a1d725e8d8dd5a",
+        "sourceCell": 2,
+        "compositeSha256": "09cd211bc9c20a449f3be20d04ba502d843c9c6eb5c5a86c51a8691813638133"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/hive-foreman/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 69538,
+          "sha256": "67e0cd8b720017237bdb368e4b43e2ae48ee5c12dc04d3e01f5918a2e679d66e",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/hive-foreman/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 13764,
+          "sha256": "4cb19dea3a6bbf2c466938d750dccbae12a075b8f5418653301d090b3269dde4",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4724,
+            "y": 0.5276
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/hive-foreman/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 46678,
+          "sha256": "65c5aa08dce7b4b8a018b64f82627933abfc995607de4147f267c3f1f35f22f1",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/hive-foreman/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 42292,
+          "sha256": "2635912a61d1736bf0a843f5f62b9c898e1d193bfe1feae4268cc476d5c9585f",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "echo-fencer": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5228,
+          "y": 0.4197,
+          "radius": 0.0909
+        },
+        "coveragePixels": {
+          "chassis": 22840,
+          "core": 4358,
+          "appendage-left": 18677,
+          "appendage-right": 2833
+        },
+        "sourceMasterSha256": "9e6d1f319a1678b2d5dbb5133109220893f89ba0d827526c32a1d725e8d8dd5a",
+        "sourceCell": 3,
+        "compositeSha256": "45e1d2c4ade89e2eae94ecf8cca99790eb6e08107e55f3e9db30bfb75cbb7fec"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/echo-fencer/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 55636,
+          "sha256": "d13028ef4e0358f6af784c5359cb3b2f0c98bbfb2fa7d9f8578e2749fa5f1352",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/echo-fencer/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 11028,
+          "sha256": "02822b94497b07d362dcd38b3fb4f8681fc954ff78e2d418d851c50b44fcabcb",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5228,
+            "y": 0.4197
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/echo-fencer/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 45126,
+          "sha256": "c55fd8b52b0b1394daae588c30842d14d7dcad53263b30e72b4b0635e122db1a",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/echo-fencer/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 8076,
+          "sha256": "c649e21bbf251678f532e373865231b74fb41ecdebca05eaad44e610f4fb1a94",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "breaker-array": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4988,
+          "y": 0.4556,
+          "radius": 0.1053
+        },
+        "coveragePixels": {
+          "chassis": 36836,
+          "core": 6077,
+          "appendage-left": 23116,
+          "appendage-right": 17961
+        },
+        "sourceMasterSha256": "9e6d1f319a1678b2d5dbb5133109220893f89ba0d827526c32a1d725e8d8dd5a",
+        "sourceCell": 4,
+        "compositeSha256": "2cf8d2e11aa5df44dc89026d55662feae70a84636a32845fed1cf556b76190c9"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/breaker-array/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 78102,
+          "sha256": "89f5c6cad2996fc21ace223882fcbc02358009ac2393826a6d6353133b144157",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/breaker-array/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 13624,
+          "sha256": "4480afdcc828efa1bdabe21a5597d3a0cc1b233bb9e77d878bbe2c271aaa749b",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4988,
+            "y": 0.4556
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/breaker-array/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 51512,
+          "sha256": "d909831fc5a6aa8ca7aa330e9c70d059e210ded652ca75927a1dafc102835898",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/breaker-array/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 39656,
+          "sha256": "d94301a61942470480bc76637330b6ae770b02f8a46217b1fb86e3902ac0c4b9",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "vertical-verdict": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5348,
+          "y": 0.3669,
+          "radius": 0.0909
+        },
+        "coveragePixels": {
+          "chassis": 46265,
+          "core": 4513,
+          "appendage-left": 18210,
+          "appendage-right": 16799
+        },
+        "sourceMasterSha256": "9e6d1f319a1678b2d5dbb5133109220893f89ba0d827526c32a1d725e8d8dd5a",
+        "sourceCell": 5,
+        "compositeSha256": "99b570822eeb4648ac670ee459035ec0ca9c8e7adbb41c0012289699006aa1fb"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 83196,
+          "sha256": "74256fb006e2e60dff3565429eb93b9690fe91bdfd3f50e37933b424e3a502f4",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 9802,
+          "sha256": "0487906c8aea527156649da44eef1bc5e52dc98e041a6a24337611513e2a7a28",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5348,
+            "y": 0.3669
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 36462,
+          "sha256": "2471e95e41ebbef4bdacfb0147b920d0886536822ab1fe1296bfa34e6591a31a",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 40650,
+          "sha256": "cfe70585ec67e35376b8521c16ff9459405919199cbcbe6b9427bba1af3ea2c5",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "rail-tyrant": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4988,
+          "y": 0.458,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 31801,
+          "core": 5025,
+          "appendage-left": 19337,
+          "appendage-right": 10295
+        },
+        "sourceMasterSha256": "68e430a484a9e534e814261a1660d6eb242e50d7b9585f13fecec1ae9b6eb7c1",
+        "sourceCell": 0,
+        "compositeSha256": "dd753e9f0c4e4d5e68715416d591108ff4cb05eacad66e9508b124ddc1479882"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 68220,
+          "sha256": "b86548c90829d92cdc02e0144cf8e66a21d144bd3443266e4234cf01b45d8989",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 10404,
+          "sha256": "6f79618bb780596c45bce64f8e1e7bcda22ef052f06e80000555d98ab75309c2",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4988,
+            "y": 0.458
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 40508,
+          "sha256": "e178bf5a0641dc83b3c05ee253cf53c842f696a5a5e10767f75c9efb8a530d45",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 21828,
+          "sha256": "2d3512d97d72abd1759fde65639bd37ee7225da79d13244f7a59fcad9092a906",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "triplex-hunter": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4365,
+          "y": 0.5012,
+          "radius": 0.0909
+        },
+        "coveragePixels": {
+          "chassis": 20318,
+          "core": 4378,
+          "appendage-left": 12672,
+          "appendage-right": 12540
+        },
+        "sourceMasterSha256": "68e430a484a9e534e814261a1660d6eb242e50d7b9585f13fecec1ae9b6eb7c1",
+        "sourceCell": 1,
+        "compositeSha256": "9d6574cf916969a617b071dc6d63bc912a73bb787a0e5db51539ecb2de2eae78"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 46116,
+          "sha256": "a2d5b897a3a648c0d39c2f755f901b44e456b81eaede366ac800d84a216bf9b5",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 9248,
+          "sha256": "67788f01a15ee07af44999238f43ef518cd91323a5ee485e65f059ab09840470",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4365,
+            "y": 0.5012
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 27510,
+          "sha256": "01e95676b01648883517e9b6747e2e0ab54ceac10b508811d3faabf5f24f7a01",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 27042,
+          "sha256": "83683b60821cc8441f39437bdeee92285a9563f09256a9c4f0bc8805d0aa9016",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "ground-eater": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.494,
+          "y": 0.5516,
+          "radius": 0.1005
+        },
+        "coveragePixels": {
+          "chassis": 29535,
+          "core": 5525,
+          "appendage-left": 14676,
+          "appendage-right": 22473
+        },
+        "sourceMasterSha256": "68e430a484a9e534e814261a1660d6eb242e50d7b9585f13fecec1ae9b6eb7c1",
+        "sourceCell": 2,
+        "compositeSha256": "07c6ff87a43b76789d0281a6ab413e743842bccee90296691b07f352c44634e6"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/ground-eater/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 62002,
+          "sha256": "cae0cbdd23a29fe48978fc07f9096062deeca7d2c3b6b4c0c040305975bcd9b2",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/ground-eater/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 11440,
+          "sha256": "6f3468f1a51690298f368e1f3d702fbe440f4a30fa01fc082c598a9a14aa4816",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.494,
+            "y": 0.5516
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/ground-eater/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 30394,
+          "sha256": "bf0f4622f39e858fe963d33f3d4eace64a0f249c0144d3329f0afbddc9a565de",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/ground-eater/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 50436,
+          "sha256": "4161adafc6dde5fbae37eba948e3ddc7b38694d37f7ef3c0e615ab1e9ee8d02e",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "floodline-leviathan": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5396,
+          "y": 0.53,
+          "radius": 0.1005
+        },
+        "coveragePixels": {
+          "chassis": 40511,
+          "core": 5525,
+          "appendage-left": 23156,
+          "appendage-right": 16700
+        },
+        "sourceMasterSha256": "68e430a484a9e534e814261a1660d6eb242e50d7b9585f13fecec1ae9b6eb7c1",
+        "sourceCell": 3,
+        "compositeSha256": "df30dd59c576a6bc8389de955ada40fd2a3dfb8ed8d333230753d10e29021491"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 85704,
+          "sha256": "47e753c429e3c9a12d49eff7bd89ddc2a934d3cf143038d625f05cc6125a9295",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 10986,
+          "sha256": "98ea86fc47974a9f46e6b6aa43a856652af31e4869687a50883ec39bc3787ded",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5396,
+            "y": 0.53
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 48860,
+          "sha256": "dad48b6943caa5d37b05b35c96e265461a8fe6df51bdbf68a8b9935e56101d5e",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 35268,
+          "sha256": "c3ecbeec587f98d8c1f3aa34a290be5cc81a5f7764b27b9acf11273ed71bce4c",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "centrifuge-zero": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5492,
+          "y": 0.4964,
+          "radius": 0.1005
+        },
+        "coveragePixels": {
+          "chassis": 40757,
+          "core": 5480,
+          "appendage-left": 20590,
+          "appendage-right": 20718
+        },
+        "sourceMasterSha256": "68e430a484a9e534e814261a1660d6eb242e50d7b9585f13fecec1ae9b6eb7c1",
+        "sourceCell": 4,
+        "compositeSha256": "7e545a40d0e422badacc995876f0e1166c76984f7c2dcb3175acff869861f913"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 88084,
+          "sha256": "f2b1b0af3a98285aeb4a56683404250770b3415a1b5a32057a5ffb5bf29fbf4b",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 11700,
+          "sha256": "cdf112a5326f2e0ebea702f9dced0ddcd9067b488db68d817d576fea78597918",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5492,
+            "y": 0.4964
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 44004,
+          "sha256": "615642296e96cee34899543a70eaa7d61d511ed16a9e334fa07946adfe0b55ef",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 44886,
+          "sha256": "9e8d1c5aa7e60dbb92c0d3e7e8f9099d5fc246b75a7d00b5423ff8bc121d22c2",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "tempest-regulator": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5564,
+          "y": 0.5564,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 47832,
+          "core": 4917,
+          "appendage-left": 22012,
+          "appendage-right": 14212
+        },
+        "sourceMasterSha256": "68e430a484a9e534e814261a1660d6eb242e50d7b9585f13fecec1ae9b6eb7c1",
+        "sourceCell": 5,
+        "compositeSha256": "a70558221f3b8df2b8566c766a59df3e885955eeb43c4f0057bbb89ba7d504d4"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 98020,
+          "sha256": "50bb6386e38a9779ed2b3c335202e071fecdfe15f4951a5c11e177a9cbcfeb6a",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 11266,
+          "sha256": "305d5c07a6527849b121e5310206515b01beb61636d2f3ec8dedb1963900db65",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5564,
+            "y": 0.5564
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 48068,
+          "sha256": "6bb9635b9a3640a7a5bb1e377557b3e3731a49283d9ac6ba0cadf15c19f1af86",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 32138,
+          "sha256": "5080bade2c91bdcce3b3ef95fd52a90f6dbb497f3e4c12b5c582169cbbc18eac",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "ascension-frame": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5564,
+          "y": 0.4293,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 41572,
+          "core": 4971,
+          "appendage-left": 8179,
+          "appendage-right": 18603
+        },
+        "sourceMasterSha256": "aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60",
+        "sourceCell": 0,
+        "compositeSha256": "94028d7d9e789f20dfda2eb9f19dec90b77cbf079d2ae52dff60eb7c3b57d1e1"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/ascension-frame/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 86006,
+          "sha256": "44361ecc7e93e325c2e74ab0279e7dc0b2d09afeb5675a306677cb9664c77173",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/ascension-frame/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 11864,
+          "sha256": "e0248a01fcb3d53643c9119b9fc6b0bfacfdbdc25ece1076dfcd4796cb5d785a",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5564,
+            "y": 0.4293
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/ascension-frame/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 19720,
+          "sha256": "dac7943f40eb85067e95584e8e8f384a6ab84bd583900245a6e6229c3c9ba2c3",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/ascension-frame/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 42206,
+          "sha256": "552705cd661e079cc571344811930f5ac7aff874e4f591e4298132955ed18f40",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "counterforge": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5779,
+          "y": 0.5276,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 27185,
+          "core": 5025,
+          "appendage-left": 5921,
+          "appendage-right": 4761
+        },
+        "sourceMasterSha256": "aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60",
+        "sourceCell": 1,
+        "compositeSha256": "307db3d7c43d5a5a71b18c106d9cab4c1f3e0707011d17c6c30aa31184ddf7ba"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/counterforge/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 56396,
+          "sha256": "3f41c943100204e8b16499424c57a14bfd512476e2ae488bf9990336422e0608",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/counterforge/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 10826,
+          "sha256": "ece18d0d5fb87d27f9ab2b6ee2ca52c171a9bba0e690a98559c47afa241a503a",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5779,
+            "y": 0.5276
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/counterforge/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 14802,
+          "sha256": "a966b6c1b7cdfc9cdfc1c4ed676821c5867a92e86d1fa0f3223796881081e529",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/counterforge/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 11144,
+          "sha256": "d072e54ab6e440f19c18b57b8adbe8c0283fd5e2af83e6c1e2534dc312b6dca2",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "carrier-cathedral": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5444,
+          "y": 0.482,
+          "radius": 0.1005
+        },
+        "coveragePixels": {
+          "chassis": 46783,
+          "core": 5525,
+          "appendage-left": 14870,
+          "appendage-right": 12936
+        },
+        "sourceMasterSha256": "aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60",
+        "sourceCell": 2,
+        "compositeSha256": "13e5f73cba5ad8c94ca7f669c18ed0a0cb1f5c3b205cdfb1e39042ea990f5804"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 87662,
+          "sha256": "eb9f2567a945c57f970e55a595cebc9a75b75ef06117aa950452da86d36ee72c",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 12210,
+          "sha256": "531d79357d6f4dfff02281e2e615d68798ef76edb94871441293e78c045437de",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5444,
+            "y": 0.482
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 30974,
+          "sha256": "18aeffafaf968b6f3231d8e6b97665082dbbad9e8d0026407895c1f31ffecd67",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 27644,
+          "sha256": "ec917fc7ba2da4a9ae1a1866911d2f38d25d7d068a484d909e0ccc193cf5d4ee",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "twin-governors": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4604,
+          "y": 0.4652,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 16527,
+          "core": 3722,
+          "appendage-left": 20992,
+          "appendage-right": 18827
+        },
+        "sourceMasterSha256": "aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60",
+        "sourceCell": 3,
+        "compositeSha256": "19f03ff9c4b61561f50cbcae249d268a4040fb6572c4feec7ae870ee30d46845"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/twin-governors/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 37606,
+          "sha256": "43c238e1dc641d05a1d78e130ff21e1f373893d34bd92024a19ced9c0c55a1a8",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/twin-governors/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 8930,
+          "sha256": "5323564d463b26e4d9d502c1178b51d7ab0aae64db4295c76578997eac305e27",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4604,
+            "y": 0.4652
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/twin-governors/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 41450,
+          "sha256": "5b450db09059c61077ac79eb4dd5b24f9de785002c8d003e69abf33801df09f2",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/twin-governors/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 44722,
+          "sha256": "0d402e5905d6a4c407489ec7e43d5a86a5221486d7ef4000b3789da3da0ce620",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "loadout-reactor": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5324,
+          "y": 0.554,
+          "radius": 0.1053
+        },
+        "coveragePixels": {
+          "chassis": 29841,
+          "core": 6074,
+          "appendage-left": 7262,
+          "appendage-right": 18299
+        },
+        "sourceMasterSha256": "aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60",
+        "sourceCell": 4,
+        "compositeSha256": "a387d0b98ea1dd406aa0d31a32a54a27019194c872c72794061e7043b9ae6c93"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 58708,
+          "sha256": "743825dff75e1f9fd70dcbd996fa9920f3114ff1f938cd0c625f0e0ea2a48704",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 12660,
+          "sha256": "cfcb693d0a6533ca78e59e3ea4207e3a34146cdbd15eb3b31ab6aef7da638fe9",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5324,
+            "y": 0.554
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 18502,
+          "sha256": "a31aa59c903f8d3cb169ec68057271ce437f0fb6c56e335eeb702e2d584bd571",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 39588,
+          "sha256": "070c02b37b0902e3d5abd1d5cabbaa54cc5ea89c9960836f517843f0edca1cd8",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "orbital-famine": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.542,
+          "y": 0.482,
+          "radius": 0.1005
+        },
+        "coveragePixels": {
+          "chassis": 25438,
+          "core": 5525,
+          "appendage-left": 11479,
+          "appendage-right": 22818
+        },
+        "sourceMasterSha256": "aa474da74bf90ce205d7a4f3edb13f08c678c46afc60a70a354c005425981e60",
+        "sourceCell": 5,
+        "compositeSha256": "153365824b9b5bafa19012a81dcc9daea32bc43d666b98daaf1131675144aaf2"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/orbital-famine/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 56132,
+          "sha256": "7205e2f9783cec7b77b48538fac5259655aa7c621ca3e4d36897d3ba99031b06",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/orbital-famine/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 10796,
+          "sha256": "0e573c10ffa63fd3b25f352c3cd0935bde51b06275db35703dae609c4d866903",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.542,
+            "y": 0.482
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/orbital-famine/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 24656,
+          "sha256": "8d94fd03a4f92ca2bf4f66bcfd40f0a7320b87ef76fe141591772ede82415f81",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/orbital-famine/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 44600,
+          "sha256": "5a6577904fcece99d792f67d02d37210a6d8aa98d7dbe8db99ad91d61be3291e",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "logic-crucible": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4628,
+          "y": 0.6283,
+          "radius": 0.1053
+        },
+        "coveragePixels": {
+          "chassis": 53279,
+          "core": 6077,
+          "appendage-left": 17717,
+          "appendage-right": 25904
+        },
+        "sourceMasterSha256": "0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae",
+        "sourceCell": 0,
+        "compositeSha256": "aaf93de9460f4562c46ee084ce07ddee37e44b14d3106b7fc15bcb972ea47699"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/logic-crucible/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 95092,
+          "sha256": "70e590956853a43356db626285fa3ee8748c74bc548daf09a6d6d3d81d52518b",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/logic-crucible/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 12400,
+          "sha256": "44249fa241981db857fbfaee686e661304869d5837ea87f0f62d527fcdd85863",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4628,
+            "y": 0.6283
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/logic-crucible/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 34134,
+          "sha256": "6e7c440db608b41a5ef35197956cc2d9ee4fb8373773efff3b07a0a6f2561919",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/logic-crucible/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 47072,
+          "sha256": "39b7106d624a2b80d162547a1d2effd5d083a230b66473e587f913ee5dac0cde",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "vector-vault": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4964,
+          "y": 0.5156,
+          "radius": 0.1053
+        },
+        "coveragePixels": {
+          "chassis": 52452,
+          "core": 6049,
+          "appendage-left": 21678,
+          "appendage-right": 21894
+        },
+        "sourceMasterSha256": "0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae",
+        "sourceCell": 1,
+        "compositeSha256": "ec938b2a67087472b7696e22140c67aaff0ae78d71eb017774b31f71de8404e7"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/vector-vault/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 103216,
+          "sha256": "db8de81a05795c3935e19454e22a71e790550cd306cd89c39d7c541aa65b381b",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/vector-vault/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 14254,
+          "sha256": "d95419ef43ab89c396c37ce17fded3ee14040ce4740070fb73ee54feb8f20bb7",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4964,
+            "y": 0.5156
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/vector-vault/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 48040,
+          "sha256": "b71d5539a30e527cda4885ff2352ff208937f6f03f1a425960f3f9e0dface3ac",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/vector-vault/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 41734,
+          "sha256": "7747e9553baf5ff49450346a6b2bc1561296533bdaba4d6f1ec38814368866f7",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "skyborne-battery": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.6235,
+          "y": 0.5492,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 43543,
+          "core": 4990,
+          "appendage-left": 15621,
+          "appendage-right": 16311
+        },
+        "sourceMasterSha256": "0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae",
+        "sourceCell": 2,
+        "compositeSha256": "cad13d0baf90d23302ff2e14e73387e0abfe99e1cfc39ab41bd8aa2fd5c8002b"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 84760,
+          "sha256": "2a09645c6acfe95a272e12b67be3cbbaa3f310441f8d51b98e1f0f9e4caa03f7",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 10104,
+          "sha256": "76f97d6bdd24d75a2b93737aa937513c8187a1db758b7d3b439944dea89c39ba",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.6235,
+            "y": 0.5492
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 31780,
+          "sha256": "e8237551951eccde4c64de2265c3d1c2ae07e27aa7c9b14527f0c57f20e2df82",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 32676,
+          "sha256": "9159716149ebe7b85e5c8144f48f4a037ef325d122ed875e0991a65e51885e41",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "endurance-engine": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.4197,
+          "y": 0.4964,
+          "radius": 0.1005
+        },
+        "coveragePixels": {
+          "chassis": 54168,
+          "core": 5525,
+          "appendage-left": 24486,
+          "appendage-right": 24215
+        },
+        "sourceMasterSha256": "0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae",
+        "sourceCell": 3,
+        "compositeSha256": "3b179f5021f8d8a3f9854231df74db15f2fcfe376d540406c6cc0196d1910a5a"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/endurance-engine/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 99840,
+          "sha256": "b8fefafa79307a31f268a7a38ed03579dcf40e5783527d990c96d8d09f82ad84",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/endurance-engine/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 11634,
+          "sha256": "de612ef45815c157bc60e10fb43a4bc692280dc7fb50adf6a6519835ac0c8239",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.4197,
+            "y": 0.4964
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/endurance-engine/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 50376,
+          "sha256": "ececaa370c7e865243d8476cdd3c75e04d8c5562688e29b8542bfa536bb9ee49",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/endurance-engine/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 48224,
+          "sha256": "b2e00340b4793d68369b24b9f16ecc2429ea50f384b830efedad11a2adbf41fe",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "adaptive-archivist": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5036,
+          "y": 0.5947,
+          "radius": 0.0957
+        },
+        "coveragePixels": {
+          "chassis": 46308,
+          "core": 4995,
+          "appendage-left": 20704,
+          "appendage-right": 6904
+        },
+        "sourceMasterSha256": "0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae",
+        "sourceCell": 4,
+        "compositeSha256": "43d39f71a70da6ae30f8f7852bc5429bc61675264ba26a88a9762c377902a1ee"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 88348,
+          "sha256": "74ccd8f3ad5e0f72bba5531fc345d788b43a021d6c31d6db15f25821988b838e",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 9960,
+          "sha256": "4721f488343db64f272318994b6325989d2776b15966c318d4b427cf1180cac7",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5036,
+            "y": 0.5947
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 41476,
+          "sha256": "b21a836c4223a474d06a17ba629ea22258992c1aa03d24ed9fb2d907d3b6f982",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 16150,
+          "sha256": "977710b5cf9d554a3823fabbeec24fd95a1c361d3a22193da3fc17885bb9ba7f",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    },
+    "null-crown": {
+      "rig": {
+        "canvas": {
+          "width": 418,
+          "height": 418
+        },
+        "origin": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "drawSize": {
+          "width": 236,
+          "height": 236
+        },
+        "weakCore": {
+          "part": "core",
+          "x": 0.5635,
+          "y": 0.5947,
+          "radius": 0.1148
+        },
+        "coveragePixels": {
+          "chassis": 52186,
+          "core": 7213,
+          "appendage-left": 28263,
+          "appendage-right": 19972
+        },
+        "sourceMasterSha256": "0cc939597d5175ba0b4781d89ab6ba6b1ea0fa63cc7afa710ae279c4d7b4c4ae",
+        "sourceCell": 5,
+        "compositeSha256": "d1eb6c4e238ff631c7e4b1531e4a3aaaed8af5abb7924684767521d7f6604540"
+      },
+      "parts": {
+        "chassis": {
+          "src": "assets/generated/v2.9.0/bosses/null-crown/chassis.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 101388,
+          "sha256": "38d407e66e9039b717d88899eb3420acf5b18a79ec6cc08f15210d3352f50a06",
+          "role": "chassis",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5,
+            "y": 0.58
+          },
+          "z": 0,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          }
+        },
+        "core": {
+          "src": "assets/generated/v2.9.0/bosses/null-crown/core.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 15652,
+          "sha256": "5e9bab920b977d4de7849a81251076a733fbf1a01a7a3107150dae8f224e02c6",
+          "role": "weak-core",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.5635,
+            "y": 0.5947
+          },
+          "z": 2,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "weakCore": true
+        },
+        "appendage-left": {
+          "src": "assets/generated/v2.9.0/bosses/null-crown/appendage-left.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 61438,
+          "sha256": "0a7938f660a52ca8cb1811692520457bc629a78187c74f19eaaada60375ce04e",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.38,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "left"
+        },
+        "appendage-right": {
+          "src": "assets/generated/v2.9.0/bosses/null-crown/appendage-right.webp",
+          "width": 418,
+          "height": 418,
+          "alpha": true,
+          "bytes": 38942,
+          "sha256": "4f7fcd231053d5fb7daa3715969e21ed33133adcf2f9877ea373e5691235ba07",
+          "role": "appendage",
+          "pivot": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "joint": {
+            "x": 0.62,
+            "y": 0.52
+          },
+          "z": 1,
+          "drawSize": {
+            "width": 236,
+            "height": 236
+          },
+          "side": "right"
+        }
+      }
+    }
+  },
+  "heroine": {
+    "id": "riva-spark",
+    "parts": {
+      "thigh-far": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/thigh-far.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 12266,
+        "sha256": "135eae1af270f32e5893749269c270674e551286e23367a0d37d5ddc04c83273",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/thigh-far-openai-v1.png",
+          "masterSha256": "1c50e5fd2619d3397fed84d58f3a0d6d1a050e2a8ec6cec2c8edf713645ebfb1",
+          "promptId": "riva-thigh-far-v2.9-v1"
+        }
+      },
+      "shin-far": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/shin-far.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 12680,
+        "sha256": "a1ba86b5648b7669a6ad574c14920f3e36f081c857a162616e09fde27e9c667f",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/shin-far-openai-v1.png",
+          "masterSha256": "b59d3f4923a36ac088c967ea7666236b4d686831208e4352aa99ea738afafd75",
+          "promptId": "riva-shin-far-v2.9-v1"
+        }
+      },
+      "boot-far": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/boot-far.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 12896,
+        "sha256": "6f134d1c3aec7f69dc00f20c468ca172b623e41206d297e68e5d5c7df0d54fc7",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/boot-far-openai-v1.png",
+          "masterSha256": "49d4a684c7a64ea424fb8b019a699570a2913feca75f7e5938af746aee3a7102",
+          "promptId": "riva-boot-far-v2.9-v1"
+        }
+      },
+      "upper-arm-far": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/upper-arm-far.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 12476,
+        "sha256": "d02dd8c5c4bbdcb076f5296c3d2782ead88a8952019e3b615ba8a8116a0385fb",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/upper-arm-far-openai-v1.png",
+          "masterSha256": "27b7e11b5e4d9088f4a4d1c132bae21a006fb1d0e5d14487e094135a0547270c",
+          "promptId": "riva-upper-arm-far-v2.9-v1"
+        }
+      },
+      "forearm-far": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/forearm-far.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 9966,
+        "sha256": "6ebdf7690cdff34fe7cf3edc1c4bd05e2640aa2ab6625c2e6d68eb68f164ba49",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/forearm-far-openai-v1.png",
+          "masterSha256": "4ddce977d6a52ebde73452324dfec28f77dfaac2357e172b3d9e90dc81c2272a",
+          "promptId": "riva-forearm-far-v2.9-v1"
+        }
+      },
+      "pelvis": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/pelvis.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 16824,
+        "sha256": "aecef304320110f64cfed4b524fe292e2c641c024aacaec681da0a3745eab58a",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/pelvis-openai-v1.png",
+          "masterSha256": "470ad263429a35a5d34b2cdeaeb4e0080309c86d357867f2fb7051585952bbf1",
+          "promptId": "riva-pelvis-v2.9-v1"
+        }
+      },
+      "torso": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/torso.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 47872,
+        "sha256": "218c6f886782b24863d4756789b1e77c3235f624a49b0421d1be5dd5ac9d80eb",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/torso-openai-v1.png",
+          "masterSha256": "6a37f67d116385a75f03715b67c1acd51d31faeb97c8b04d2875b06d6a293a1a",
+          "promptId": "riva-torso-v2.9-v1"
+        }
+      },
+      "thigh-near": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/thigh-near.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 11686,
+        "sha256": "b23861099c545aa4ad22264533327eb5e8045eff699e5b1693049be555456999",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/thigh-near-openai-v1.png",
+          "masterSha256": "4a9f1df6e607a177b73ed241063188c0b8e06c62ee53d9f46f3e92c773d02487",
+          "promptId": "riva-thigh-near-v2.9-v1"
+        }
+      },
+      "shin-near": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/shin-near.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 11450,
+        "sha256": "cfe0d90f60088cfc8fb7f96e077eafa464d2918c901f919bab8b56a96d487095",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/shin-near-openai-v1.png",
+          "masterSha256": "1a3b95b2ecd41535f159778d26e64b0fb2878d29b6a79f64ab8b918465b90f3d",
+          "promptId": "riva-shin-near-v2.9-v1"
+        }
+      },
+      "boot-near": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/boot-near.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 13986,
+        "sha256": "afcf88d24836a766de33081d4a65de72a7f8bf17165f9082dcfbe4bff2d2c7aa",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/boot-near-openai-v1.png",
+          "masterSha256": "6603e36dea4dadadf0f3c7ea97bad6fba7db7dba64dbc97fa45207cbb4b731c9",
+          "promptId": "riva-boot-near-v2.9-v1"
+        }
+      },
+      "upper-arm-near": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/upper-arm-near.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 11302,
+        "sha256": "c5556aa76f6fad7ed0a63856c76fbaffe82009297ad6c23eadb8fe7b35754380",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/upper-arm-near-openai-v1.png",
+          "masterSha256": "e829e82e87fbd9a78ac3c2321e839fb6a73f0a6b97a4ce189d58e9ce00ca2b18",
+          "promptId": "riva-upper-arm-near-v2.9-v1"
+        }
+      },
+      "forearm-cannon-near": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/forearm-cannon-near.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 33640,
+        "sha256": "b188d64e5764df8986eccfcd5ec213de937333f198c3116db722ef24ca2f7800",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/forearm-cannon-near-openai-v1.png",
+          "masterSha256": "706451a0c476e0ac7b9e12ac35105ff58a2084ead5dab29000212f1ff013edb9",
+          "promptId": "riva-forearm-cannon-near-v2.9-v1"
+        }
+      },
+      "head": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/head.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 22626,
+        "sha256": "6a52b703121ca0cb2729ac0aeec44b1d14b60e5da8b715dc2d065e55aa7ab7b6",
+        "role": "anatomy",
+        "nativePart": true,
+        "source": {
+          "masterFile": "assets/generated/riva-v2.9-sources/head-openai-v1.png",
+          "masterSha256": "3f1d002598e5c70820c18177b3e463f218dc4dd0dac48f459937945d6c8e1589",
+          "promptId": "riva-head-v2.9-v1"
+        }
+      },
+      "dash-trail": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/dash-trail.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 85410,
+        "sha256": "85d08f45735e4d089927722f63b191b3b61cf2344ed0a892a940f61f53676d64",
+        "role": "effect",
+        "source": {
+          "masterFile": "assets/generated/riva/riva-parts-openai-v1.png",
+          "masterSha256": "f94b897670b9f99fc597bbc6538921cf0d883a6e1329def8c22b3f2d39509d9d",
+          "promptId": "riva-effects-openai-v1",
+          "atlasCell": 7
+        }
+      },
+      "overload-halo": {
+        "src": "assets/generated/v2.9.0/heroine/riva-spark/overload-halo.webp",
+        "width": 418,
+        "height": 418,
+        "alpha": true,
+        "bytes": 119228,
+        "sha256": "ec0a5e51a9eb36c6d70a65e1a6d7ef8928c77dcf928dfc58c9d6907d165780a3",
+        "role": "effect",
+        "source": {
+          "masterFile": "assets/generated/riva/riva-parts-openai-v1.png",
+          "masterSha256": "f94b897670b9f99fc597bbc6538921cf0d883a6e1329def8c22b3f2d39509d9d",
+          "promptId": "riva-effects-openai-v1",
+          "atlasCell": 8
+        }
+      }
+    },
+    "rig": {
+      "schemaVersion": 1,
+      "canvas": {
+        "width": 418,
+        "height": 418
+      },
+      "coordinateSpace": "player-local-pixels",
+      "feetLocalY": 36,
+      "rootOffsetY": -23.6,
+      "ground": {
+        "physicalY": 620,
+        "localY": 36
+      },
+      "muzzle": [
+        60,
+        -44
+      ],
+      "canonicalReference": {
+        "masterFile": "assets/generated/riva-v2.9-sources/riva-canonical-openai-v1.png",
+        "masterSha256": "4ecfd8861884d909c5fa6e5be1dad7a1fd4f1c189f5acdd577abbf6536443e84",
+        "promptId": "riva-canonical-v2.9-v1"
+      },
+      "renderOrder": [
+        "dash-trail",
+        "thigh-far",
+        "shin-far",
+        "boot-far",
+        "upper-arm-far",
+        "forearm-far",
+        "pelvis",
+        "torso",
+        "thigh-near",
+        "shin-near",
+        "boot-near",
+        "upper-arm-near",
+        "forearm-cannon-near",
+        "head",
+        "overload-halo"
+      ],
+      "parts": [
+        {
+          "name": "dash-trail",
+          "parent": null,
+          "side": "center",
+          "joint": [
+            -25,
+            -28.6
+          ],
+          "pivot": [
+            209,
+            209
+          ],
+          "bbox": [
+            0,
+            51,
+            418,
+            236
+          ],
+          "scale": 0.34,
+          "z": 5,
+          "motion": "trail",
+          "coveragePixels": 36424
+        },
+        {
+          "name": "thigh-far",
+          "parent": "pelvis",
+          "side": "far",
+          "joint": [
+            -7,
+            -18.6
+          ],
+          "pivot": [
+            208,
+            153
+          ],
+          "bbox": [
+            183,
+            136,
+            51,
+            145
+          ],
+          "scale": 0.3,
+          "z": 10,
+          "motion": "leg-far",
+          "coveragePixels": 5164
+        },
+        {
+          "name": "shin-far",
+          "parent": "thigh-far",
+          "side": "far",
+          "joint": [
+            -10,
+            -3.6
+          ],
+          "pivot": [
+            208,
+            152
+          ],
+          "bbox": [
+            188,
+            134,
+            42,
+            150
+          ],
+          "scale": 0.3,
+          "z": 11,
+          "motion": "leg-far",
+          "coveragePixels": 5030
+        },
+        {
+          "name": "boot-far",
+          "parent": "shin-far",
+          "side": "far",
+          "joint": [
+            -11,
+            8.4
+          ],
+          "pivot": [
+            208,
+            175
+          ],
+          "bbox": [
+            168,
+            153,
+            81,
+            112
+          ],
+          "scale": 0.3,
+          "z": 12,
+          "motion": "leg-far",
+          "coveragePixels": 5562
+        },
+        {
+          "name": "upper-arm-far",
+          "parent": "torso",
+          "side": "far",
+          "joint": [
+            -11,
+            -60.6
+          ],
+          "pivot": [
+            208,
+            163
+          ],
+          "bbox": [
+            180,
+            145,
+            57,
+            128
+          ],
+          "scale": 0.3,
+          "z": 13,
+          "motion": "arm-far",
+          "coveragePixels": 5042
+        },
+        {
+          "name": "forearm-far",
+          "parent": "upper-arm-far",
+          "side": "far",
+          "joint": [
+            -22,
+            -41.6
+          ],
+          "pivot": [
+            208,
+            159
+          ],
+          "bbox": [
+            181,
+            143,
+            55,
+            132
+          ],
+          "scale": 0.3,
+          "z": 14,
+          "motion": "arm-far",
+          "coveragePixels": 3111
+        },
+        {
+          "name": "pelvis",
+          "parent": null,
+          "side": "center",
+          "joint": [
+            0,
+            -23.6
+          ],
+          "pivot": [
+            208,
+            208
+          ],
+          "bbox": [
+            146,
+            160,
+            126,
+            97
+          ],
+          "scale": 0.3,
+          "z": 30,
+          "motion": "pelvis",
+          "coveragePixels": 6906
+        },
+        {
+          "name": "torso",
+          "parent": "pelvis",
+          "side": "center",
+          "joint": [
+            0,
+            -32.6
+          ],
+          "pivot": [
+            208,
+            281
+          ],
+          "bbox": [
+            120,
+            106,
+            177,
+            205
+          ],
+          "scale": 0.3,
+          "z": 40,
+          "motion": "torso",
+          "coveragePixels": 23673
+        },
+        {
+          "name": "thigh-near",
+          "parent": "pelvis",
+          "side": "near",
+          "joint": [
+            7,
+            -18.6
+          ],
+          "pivot": [
+            209,
+            153
+          ],
+          "bbox": [
+            183,
+            136,
+            52,
+            145
+          ],
+          "scale": 0.3,
+          "z": 50,
+          "motion": "leg-near",
+          "coveragePixels": 5103
+        },
+        {
+          "name": "shin-near",
+          "parent": "thigh-near",
+          "side": "near",
+          "joint": [
+            10,
+            -3.6
+          ],
+          "pivot": [
+            208,
+            152
+          ],
+          "bbox": [
+            185,
+            134,
+            47,
+            150
+          ],
+          "scale": 0.3,
+          "z": 51,
+          "motion": "leg-near",
+          "coveragePixels": 4614
+        },
+        {
+          "name": "boot-near",
+          "parent": "shin-near",
+          "side": "near",
+          "joint": [
+            12,
+            8.4
+          ],
+          "pivot": [
+            209,
+            175
+          ],
+          "bbox": [
+            167,
+            153,
+            84,
+            112
+          ],
+          "scale": 0.3,
+          "z": 52,
+          "motion": "leg-near",
+          "coveragePixels": 6008
+        },
+        {
+          "name": "upper-arm-near",
+          "parent": "torso",
+          "side": "near",
+          "joint": [
+            12,
+            -60.6
+          ],
+          "pivot": [
+            208,
+            163
+          ],
+          "bbox": [
+            185,
+            145,
+            47,
+            128
+          ],
+          "scale": 0.3,
+          "z": 60,
+          "motion": "arm-near",
+          "coveragePixels": 4053
+        },
+        {
+          "name": "forearm-cannon-near",
+          "parent": "upper-arm-near",
+          "side": "near",
+          "joint": [
+            25,
+            -57.6
+          ],
+          "pivot": [
+            252,
+            142
+          ],
+          "bbox": [
+            130,
+            104,
+            158,
+            210
+          ],
+          "scale": 0.3,
+          "z": 70,
+          "motion": "cannon-recoil",
+          "coveragePixels": 13340
+        },
+        {
+          "name": "head",
+          "parent": "torso",
+          "side": "center",
+          "joint": [
+            0,
+            -76.6
+          ],
+          "pivot": [
+            232,
+            262
+          ],
+          "bbox": [
+            143,
+            145,
+            132,
+            128
+          ],
+          "scale": 0.3,
+          "z": 80,
+          "motion": "head",
+          "coveragePixels": 8411
+        },
+        {
+          "name": "overload-halo",
+          "parent": null,
+          "side": "center",
+          "joint": [
+            0,
+            -43.6
+          ],
+          "pivot": [
+            209,
+            209
+          ],
+          "bbox": [
+            0,
+            6,
+            364,
+            303
+          ],
+          "scale": 0.32,
+          "z": 90,
+          "motion": "halo",
+          "coveragePixels": 50846
+        }
+      ]
+    }
+  },
+  "vfx": {
+    "muzzle-cyan": {
+      "src": "assets/generated/v2.9.0/vfx/muzzle-cyan.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 16240,
+      "sha256": "f0aaf757696f4c7bc38d69213b226e0fa0d80c77483794214592f4b79d2519f2"
+    },
+    "impact-metal": {
+      "src": "assets/generated/v2.9.0/vfx/impact-metal.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 52946,
+      "sha256": "87485fa470580b030928981c59a77aa4d250ee842db0919d4c294685527ff1e8"
+    },
+    "shield-hit": {
+      "src": "assets/generated/v2.9.0/vfx/shield-hit.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 59256,
+      "sha256": "bd77131a53822606b1455dc72f595d59a68c1e27e8d85cfaa51013af939c01d9"
+    },
+    "magnetic-spark": {
+      "src": "assets/generated/v2.9.0/vfx/magnetic-spark.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 47844,
+      "sha256": "e27bf35d1262255417cd6186055a8e3b39359ae0e70f3095240fe8b5143c726c"
+    },
+    "smoke": {
+      "src": "assets/generated/v2.9.0/vfx/smoke.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 33962,
+      "sha256": "d8bc30895183c41eb33bd48259af0f0832157557d3078be46d75b7a7b5dfcb8a"
+    },
+    "rivet-sparks": {
+      "src": "assets/generated/v2.9.0/vfx/rivet-sparks.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 33910,
+      "sha256": "58139420eb6cba224eeb2b0bb07879ab2b9e1e021bb8ad6c80252137c917a62e"
+    },
+    "electric-arcs": {
+      "src": "assets/generated/v2.9.0/vfx/electric-arcs.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 38558,
+      "sha256": "e1921bc1401997968426a0a829296233f983cab677c2ef6e7cf0f996c40c3a1f"
+    },
+    "molten-splash": {
+      "src": "assets/generated/v2.9.0/vfx/molten-splash.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 31456,
+      "sha256": "a9ed794de0f82b079b2164116f704b3929160ce98680b7eda34eefd88fd0f26e"
+    },
+    "warning-pulse": {
+      "src": "assets/generated/v2.9.0/vfx/warning-pulse.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 54040,
+      "sha256": "4c46ed81877ed201654a3591d7f446a1391d33cf53c8acd4038badff54aa8471"
+    },
+    "dash-shockwave": {
+      "src": "assets/generated/v2.9.0/vfx/dash-shockwave.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 57924,
+      "sha256": "65a1484d7a67a0200a6d9de62e4c04a9cc4c9c00352efdc18db4da23379dbcd3"
+    },
+    "overload-bloom": {
+      "src": "assets/generated/v2.9.0/vfx/overload-bloom.webp",
+      "width": 313,
+      "height": 313,
+      "alpha": true,
+      "bytes": 88746,
+      "sha256": "333b758843dbd77573f5017913770b8ea588e2d124e6fd3736b43bd837871d7e"
+    },
+    "chrono-fracture": {
+      "src": "assets/generated/v2.9.0/vfx/chrono-fracture.webp",
+      "width": 314,
+      "height": 313,
+      "alpha": true,
+      "bytes": 75162,
+      "sha256": "c70ddd5ed20830894f9fc86abc755f31b7fee8fe297339251474d428695c3365"
+    },
+    "explosion-small": {
+      "src": "assets/generated/v2.9.0/vfx/explosion-small.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 57354,
+      "sha256": "e682f3b2f3f1848664f7c42f1b8cf0fa622b2a65a8e2b745652783633ae42606"
+    },
+    "explosion-core": {
+      "src": "assets/generated/v2.9.0/vfx/explosion-core.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 100320,
+      "sha256": "a712674fe4a362d1f70b6e79205a2d04fb639a67221c8e255862e36dc6c4aa64"
+    },
+    "explosion-final": {
+      "src": "assets/generated/v2.9.0/vfx/explosion-final.webp",
+      "width": 313,
+      "height": 314,
+      "alpha": true,
+      "bytes": 114294,
+      "sha256": "97eb0d43c633618394ccb0c8cad1f613ac76b071b90a3101f8d14b1c41ebcfd3"
+    },
+    "scrap-glow": {
+      "src": "assets/generated/v2.9.0/vfx/scrap-glow.webp",
+      "width": 314,
+      "height": 314,
+      "alpha": true,
+      "bytes": 47220,
+      "sha256": "801b9a8db052890e6be403029eee79cc9cc07a8bd17b11fa51d3f2351e7740bb"
+    }
+  },
+  "narrative": {
+    "intro-broadcast": {
+      "src": "assets/generated/v2.9.0/narrative/intro-broadcast.webp",
+      "width": 1280,
+      "height": 720,
+      "alpha": false,
+      "bytes": 123842,
+      "sha256": "b052038517189fafa7ec37cf2b2e55ac53f136f0b27d5189b4f436324fa17086",
+      "focalPoint": {
+        "x": 0.2,
+        "y": 0.7
+      },
+      "safeTextZone": {
+        "x": 0.07,
+        "y": 0.06,
+        "width": 0.36,
+        "height": 0.32
+      },
+      "source": {
+        "masterFile": "assets/generated/narrative-v2.9-sources/intro-broadcast-openai-v1.png",
+        "masterSha256": "47bd0ae2a442a894971ab700cb3d0546d770b2356819a47ca92bc77c6691c3d5",
+        "promptId": "narrative-intro-broadcast-v2.9-v1"
+      }
+    },
+    "prologue-m0": {
+      "src": "assets/generated/v2.9.0/narrative/prologue-m0.webp",
+      "width": 1280,
+      "height": 720,
+      "alpha": false,
+      "bytes": 79772,
+      "sha256": "b31ea1dc6d11cc05c8d2d636d8809e3152778b950817882a8555460bf161c6c7",
+      "focalPoint": {
+        "x": 0.22,
+        "y": 0.58
+      },
+      "safeTextZone": {
+        "x": 0.6,
+        "y": 0.1,
+        "width": 0.34,
+        "height": 0.62
+      },
+      "source": {
+        "masterFile": "assets/generated/narrative-v2.9-sources/prologue-m0-openai-v1.png",
+        "masterSha256": "a86e3e1f0c2e8961b2b239b959a1f4ec28c3d71199d069d63c66ed9facd08d08",
+        "promptId": "narrative-prologue-m0-v2.9-v1"
+      }
+    },
+    "campaign-ending": {
+      "src": "assets/generated/v2.9.0/narrative/campaign-ending.webp",
+      "width": 1280,
+      "height": 720,
+      "alpha": false,
+      "bytes": 124590,
+      "sha256": "82ee42c8d5b95d48e77d900fb93ad816b6fa7f756d77a72933410b39c1c9164f",
+      "focalPoint": {
+        "x": 0.82,
+        "y": 0.45
+      },
+      "safeTextZone": {
+        "x": 0.04,
+        "y": 0.06,
+        "width": 0.36,
+        "height": 0.32
+      },
+      "source": {
+        "masterFile": "assets/generated/narrative-v2.9-sources/campaign-ending-openai-v1.png",
+        "masterSha256": "804113d6f83a8145b80a3574ee7774d018c8cab0473636611bc0e08db7adf8ba",
+        "promptId": "narrative-campaign-ending-v2.9-v1"
+      }
+    },
+    "forge-ending": {
+      "src": "assets/generated/v2.9.0/narrative/forge-ending.webp",
+      "width": 1280,
+      "height": 720,
+      "alpha": false,
+      "bytes": 111204,
+      "sha256": "855678b231ca70689b66d8a9865f7bdab7d2e72e1c875deb4b8384556d42e175",
+      "focalPoint": {
+        "x": 0.25,
+        "y": 0.63
+      },
+      "safeTextZone": {
+        "x": 0.67,
+        "y": 0.1,
+        "width": 0.28,
+        "height": 0.6
+      },
+      "source": {
+        "masterFile": "assets/generated/narrative-v2.9-sources/forge-ending-openai-v1.png",
+        "masterSha256": "fb042e2e6a6343ce2e983fd550915916f09dedd55367b262d65266541f9d5e1f",
+        "promptId": "narrative-forge-ending-v2.9-v1"
+      }
+    }
+  },
+  "summary": {
+    "masters": 42,
+    "runtimeFiles": 233,
+    "arenaLayers": 24,
+    "arenaBackdrops": 24,
+    "bossParts": 150,
+    "heroineParts": 15,
+    "vfx": 16,
+    "narrative": 4,
+    "totalBytes": 18175510
+  }
+}

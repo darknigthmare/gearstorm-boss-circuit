@@ -1,5 +1,17 @@
 # Historique des versions
 
+## 2.9.0 — La route retrouve Riva
+
+- Remplacement du composite de Riva par un rig natif de treize pièces anatomiques indépendantes, plus la traînée de ruée et le halo de Surcharge.
+- Calage du rig sur `rootOffsetY = -23.6` et `feetLocalY = 36`, avec contrôle de la limite alpha réelle des bottes sur la ligne de contact.
+- Conservation du sol physique à `y = 620` et correction de perspective par offsets purement visuels : `+80 px` pour les six arènes de campagne et `+28 px` pour les backdrops Forge.
+- Nouveau manifeste artistique v2.9.0 : 42 masters originaux OpenAI, 233 WebP runtime et 18 175 510 octets, répartis en 48 assets d’arène, 150 pièces de boss, 15 assets héroïne, 16 VFX et 4 images narratives.
+- Ajout de quatre images narratives dédiées à l’intro, au prologue, à la fin de campagne et à la fin du Circuit Forge.
+- Archivage permanent des 24 interludes et `metaLine` Forge dans le Codex, structurés autour des quatre anneaux et repris dans les résultats de combat.
+- Extension du ton méta aux surfaces de jeu et de narration ; les tutoriels, aides, objectifs critiques et libellés d’accessibilité restent explicites et non méta.
+- La sauvegarde reste en schéma v5 et les 30 boss, 90 phases et 90 contrats restent stables.
+- Cette entrée décrit l’état source du candidat ; elle ne certifie ni QA finale, ni commit, ni push, ni déploiement public.
+
 ## 2.8.0 — Circuit fiable
 
 - ENDURANCE ENGINE déroule désormais ses six manches : les seuils de phase exigent les manches 2, 4 puis 6, ce qui empêche un haut DPS de court-circuiter son épreuve.

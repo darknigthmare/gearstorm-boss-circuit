@@ -80,7 +80,7 @@ test('expansion-story.js est autonome, immuable et intégré au runtime', () => 
   const story = loadExpansionStory();
   assert.ok(story, 'globalThis.GEARSTORM_EXPANSION_STORY doit etre expose');
   assert.equal(story.schemaVersion, 1);
-  assert.equal(story.contentVersion, '1.0.0');
+  assert.equal(story.contentVersion, '2.9.0');
   assert.equal(story.status, 'runtime-integrated');
   assert.equal(story.runtimeIntegrated, true);
   assert.equal(story.expansionPremise.runtimeIntegrated, true);
@@ -112,7 +112,7 @@ test('chaque boss jouable fournit un contrat narratif et mécanique complet', ()
   const story = loadExpansionStory();
   for (const boss of story.bosses) {
     const label = `${boss.code}/${boss.id}`;
-    for (const field of ['name', 'district', 'civicFunction', 'shortIntro', 'journal', 'objective', 'mechanic', 'restoration']) {
+    for (const field of ['name', 'district', 'civicFunction', 'shortIntro', 'metaLine', 'journal', 'objective', 'mechanic', 'restoration']) {
       assert.equal(typeof boss[field], 'string', `${label}: ${field} manquant`);
       const minimum = ['name', 'district'].includes(field) ? 4 : 18;
       assert.ok(boss[field].trim().length > minimum, `${label}: ${field} incomplet`);
@@ -160,6 +160,30 @@ test('quatre vagues de six boss restent ordonnees et immuables', () => {
     3, 3, 3, 3, 3, 3,
     4, 4, 4, 4, 4, 4
   ]);
+});
+
+test('le contrat meta diegetique v2.9 couvre chaque boss et chaque anneau', () => {
+  const story = loadExpansionStory();
+  const metaVocabulary = /\b(?:boss|hitbox|jeu|scénario|spam|directeur|niveau|budget|combat|jauge|option|phase|checkpoint|frame|interface|build|barre|puzzle|retry|final|GEARSTORM)\b|level design|caméra|écran|télégraphe|prévisualisée|illisible/i;
+  const forbiddenCivilVocabulary = /\b(?:boss|hitbox|jeu|spam|level design|checkpoint|frame|HUD|interface|build|retry|GEARSTORM)\b|barre de vie|quatrième mur|menu titre|suite cachée/i;
+  const metaLines = [];
+
+  for (const boss of story.bosses) {
+    assert.match(boss.metaLine, metaVocabulary, `${boss.code}: metaLine sans marqueur meta`);
+    assert.doesNotMatch(boss.metaLine, /\b(?:Sonic|SEGA|Mario|Eggman|OpenAI)\b/i, `${boss.code}: référence externe interdite`);
+    const civilLine = boss.interlude.find(entry => entry.speaker === 'Canal civil');
+    assert.ok(civilLine, `${boss.code}: Canal civil absent`);
+    assert.doesNotMatch(civilLine.text, forbiddenCivilVocabulary, `${boss.code}: Canal civil doit rester premier degre`);
+    metaLines.push(boss.metaLine);
+  }
+
+  assert.equal(new Set(metaLines).size, 24, 'chaque boss Forge doit posseder une ligne meta propre');
+  for (const wave of story.waves) {
+    assert.match(wave.title, / · /, `${wave.id}: titre d'anneau non meta`);
+    assert.match(wave.premise, metaVocabulary, `${wave.id}: premise d'anneau non meta`);
+  }
+  assert.match(story.expansionPremise.title, /jeu continue/i);
+  assert.match(story.expansionPremise.playerPromise, /Codex/i);
 });
 
 test('trois contrats de maitrise uniques existent pour chacun des 24 boss', () => {
@@ -254,6 +278,10 @@ test('le Circuit Forge ordonne les 24 boss et ses quatre checkpoints de vague', 
   }
   assert.match(circuit.epilogue.summary, /vingt-quatre services/i);
   assert.match(circuit.epilogue.outcome, /Cassian reste détenu/);
+  assert.match(circuit.epilogue.outcome, /NULL CROWN est neutralisée/i);
+  assert.match(circuit.epilogue.outcome, /vingt-quatre services restent actifs/i);
+  assert.match(circuit.epilogue.outcome, /six districts/i);
+  assert.match(circuit.epilogue.outcome, /aucun boss caché/i);
 });
 
 test('les helpers sont deterministes et ne renvoient aucun conteneur mutable', () => {

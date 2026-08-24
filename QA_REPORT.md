@@ -1,6 +1,29 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.8.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.9.0
 
-Validation locale et production effectuée le 21 août 2026 sur GEARSTORM v2.8.0. Ce rapport distingue les gates locales, la CI distante et les vérifications réellement observées sur l’URL publique.
+Préparation du candidat : 24 août 2026.
+
+## Statut du candidat v2.9.0 — validation en attente
+
+Aucune réussite de gate, CI, commit, push ou publication Vercel n’est revendiquée ici pour la v2.9.0. Le manifeste et les sources ont seulement été relus statiquement pendant la préparation documentaire.
+
+| Surface v2.9 | État au moment de cette mise à jour |
+| --- | --- |
+| Inventaire artistique | Manifeste local : 42 masters, 233 WebP runtime, 18 175 510 octets |
+| Répartition | 48 arènes, 150 boss, 15 héroïne, 16 VFX, 4 narratifs |
+| Rig Riva | Manifeste : 13 pièces anatomiques + 2 effets, `rootOffsetY = -23.6`, `feetLocalY = 36` |
+| Perspective | Sol physique 620 ; offsets visuels campagne `+80`, Forge `+28` |
+| Contenu | 24 interludes, 24 `metaLine` et quatre anneaux présents dans les registres/surfaces |
+| Tests Node / build / audit npm | À exécuter sur l’état final assemblé |
+| QA navigateur et captures finales | À exécuter |
+| GitHub / CI / Vercel / HTTP public | Non vérifiés pour v2.9.0 |
+
+Cette lecture statique ne prouve ni le contact visuel final de Riva, ni l’absence de régression, ni le comportement PWA. Les résultats v2.9 devront être ajoutés après exécution réelle des gates.
+
+---
+
+# Annexe historique — validation observée de la v2.8.0
+
+Validation locale et production effectuée le 21 août 2026 sur GEARSTORM v2.8.0. Les résultats ci-dessous sont conservés comme historique et ne valent pas validation du candidat v2.9.0.
 
 ## Environnement vérifié
 

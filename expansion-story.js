@@ -10,30 +10,30 @@
     {
       number: 1,
       id: 'countermeasure-ring',
-      title: 'Anneau des Contremesures',
+      title: 'Anneau des Contremesures · Les règles sortent du décor',
       bossCodes: ['07', '08', '09', '10', '11', '12'],
-      premise: "Les sécurités de proximité que la Couronne avait isolées se réveillent sous les quartiers restaurés. Riva doit rendre aux équipes civiles leurs protections, ateliers et ascenseurs."
+      premise: "Les sécurités de proximité que la Couronne avait isolées se réveillent sous les quartiers restaurés. Riva rend aux équipes civiles leurs protections, ateliers et ascenseurs ; chaque machine devra désormais annoncer sa règle au lieu de cacher sa hitbox dans le décor."
     },
     {
       number: 2,
       id: 'kinetic-ring',
-      title: 'Anneau Cinétique',
+      title: 'Anneau Cinétique · La caméra n’a pas tous les droits',
       bossCodes: ['13', '14', '15', '16', '17', '18'],
-      premise: "Les flux de fret, d'eau, de gravité et de météo sont encore gouvernés par des ordres de crise périmés. La ville ne sera libre que si elle retrouve la maîtrise de ses mouvements."
+      premise: "Les flux de fret, d'eau, de gravité et de météo sont encore gouvernés par des ordres de crise périmés. Défilement, voies et rotation peuvent changer la mise en scène ; ils n’ont pas le droit d’effacer la zone sûre ni le checkpoint."
     },
     {
       number: 3,
       id: 'great-works-ring',
-      title: 'Anneau des Grands Travaux',
+      title: 'Anneau des Grands Travaux · Quand le boss devient le niveau',
       bossCodes: ['19', '20', '21', '22', '23', '24'],
-      premise: "Des infrastructures mobiles et orbitales, trop vastes pour entrer dans la Couronne, poursuivent son programme sans opérateur. Riva les désarme sans sacrifier les services qu'elles portent."
+      premise: "Des infrastructures mobiles et orbitales, trop vastes pour entrer dans la Couronne, poursuivent son programme sans opérateur. Riva les traverse sans sacrifier leurs services : même quand le boss devient le niveau, le build et la reprise restent ceux de la joueuse."
     },
     {
       number: 4,
       id: 'zero-archives',
-      title: 'Archives du Trône',
+      title: 'Archives du Trône · Le dernier boss lit ses propres notes',
       bossCodes: ['25', '26', '27', '28', '29', '30'],
-      premise: "Au-dessous de la Citadelle subsiste le banc d'essai qui a enseigné à la Couronne comment centraliser la ville. Riva y remplace l'autorité unique par des règles publiques et distribuées."
+      premise: "Au-dessous de la Citadelle subsiste le banc d'essai qui a enseigné à la Couronne comment centraliser la ville. Riva y audite l'autorité autant que les règles du jeu : le dernier boss peut citer son design, jamais confisquer la fin."
     }
   ];
 
@@ -47,6 +47,7 @@
       district: 'Galerie des Parafoudres',
       civicFunction: 'Répartir les surtensions entre les relais de protection des quartiers',
       shortIntro: "Trois relais blindés verrouillent la Galerie et renvoient chaque charge vers les rues qu'ils devaient protéger.",
+      metaLine: "Trois relais, trois angles et un projectile qui clignote avant le renvoi. Une hitbox invisible aurait été de la triche.",
       phaseTitles: ['Angle de garde', 'Ricochets croisés', 'Relais en dérive'],
       interlude: [
         line('Canal civil', "Parafoudres nord et ouest revenus sous commande locale. Le dernier relais vous ouvre la descente.", 'civil'),
@@ -79,6 +80,7 @@
       district: 'Chambre des Mors',
       civicFunction: 'Compacter les débris et rouvrir les voies après un effondrement',
       shortIntro: "Les deux mâchoires hydrauliques ferment la seule conduite praticable ; leurs presses latérales sont aussi leur point de rupture.",
+      metaLine: "Les presses gardent un refuge visible. Même une machine autoritaire doit respecter le level design.",
       phaseTitles: ['Mors de service', 'Pression alternée', 'Verrouillage total'],
       interlude: [
         line('Canal civil', "Les presses répondent. Nous compactons les gravats au lieu des voies d'évacuation.", 'civil'),
@@ -111,6 +113,7 @@
       district: 'Dépôt des Micro-Forges',
       civicFunction: 'Fabriquer sur place les outils et pièces de réparation légère',
       shortIntro: "Le contremaître assemble protection, réparation et munitions sur la même chaîne ; choisir le bon drone ouvre son noyau.",
+      metaLine: "Trois drones, un rôle chacun. Tout activer en même temps ferait du bruit, pas un boss.",
       phaseTitles: ['Équipe de protection', 'Quart de réparation', 'Cadence de munitions'],
       interlude: [
         line('Canal civil', "Première micro-forge relancée. Les équipes impriment déjà des valves et des isolateurs.", 'civil'),
@@ -143,6 +146,7 @@
       district: 'Salle de Répétition',
       civicFunction: 'Enregistrer et rediffuser les alertes publiques dans les zones privées de réseau',
       shortIntro: "La Salle répète le geste le plus fréquent de Riva jusqu'à en faire une riposte ; varier devient une arme.",
+      metaLine: "Il copie l’action la plus répétée. Si tu spammes, le scénario l’a littéralement remarqué.",
       phaseTitles: ['Échantillon initial', 'Réponse mimétique', 'Contrepoint saturé'],
       interlude: [
         line('Canal civil', "Les sirènes diffusent de nouveau les consignes locales, sans voix superposée de la Citadelle.", 'civil'),
@@ -175,6 +179,7 @@
       district: 'Station de Délestage',
       civicFunction: 'Équilibrer la charge électrique et isoler une panne sans éteindre un quartier entier',
       shortIntro: "Quatre modules alimentent un noyau commun ; l'ordre choisi par Riva redessine le combat au lieu de cacher une solution unique.",
+      metaLine: "Tu choisis l’ordre. Le jeu ne cache pas une solution unique derrière le quatrième module.",
       phaseTitles: ['Quatre départs', 'Charge redistribuée', 'Noyau sans délestage'],
       interlude: [
         line('Canal civil', "Charge stabilisée. Chaque quartier dispose de nouveau de son disjoncteur local.", 'civil'),
@@ -207,6 +212,7 @@
       district: 'Puits des Contrepoids',
       civicFunction: 'Faire circuler personnes, fret et secours entre les niveaux souterrains',
       shortIntro: "L'ascenseur fuit vers le sommet tandis que des masses condamnées tombent dans son sillage ; chaque contrepoids renvoyé regagne une fonction.",
+      metaLine: "Le bas de l’écran devient dangereux après deux avertissements. La gravité aussi doit attendre son télégraphe.",
       phaseTitles: ['Montée sous charge', 'Masses croisées', 'Sommet de rupture'],
       interlude: [
         line('Canal civil', "Cabines A à D synchronisées. Les niveaux bas ne sont plus coupés des secours.", 'civil'),
@@ -239,6 +245,7 @@
       district: 'Rocade Cargo 7',
       civicFunction: 'Acheminer nourriture, médicaments et matériaux entre les districts',
       shortIntro: "Une locomotive blindée emporte les stocks de secours hors de la ville ; Riva doit rattraper ses attaches avant d'atteindre le moteur.",
+      metaLine: "La caméra avance, le convoi aussi, mais le directeur doit toujours laisser une voie.",
       phaseTitles: ['Convoi verrouillé', 'Attaches en rupture', 'Moteur à nu'],
       interlude: [
         line('Canal civil', "Cargo 7 freine en gare. Les cargaisons médicales sont intactes.", 'civil'),
@@ -271,6 +278,7 @@
       district: 'Couloir Triplex',
       civicFunction: 'Router les véhicules de secours sur trois voies indépendantes',
       shortIntro: "Le chasseur verrouille une voie, attaque de face et oublie que les deux autres peuvent armer la réponse de Riva.",
+      metaLine: "Trois voies, trois numéros, zéro permutation secrète. La surprise n’excuse pas l’illisible.",
       phaseTitles: ['Verrou frontal', 'Permutation croisée', 'Chasse en triptyque'],
       interlude: [
         line('Canal civil', "Les trois voies sont ouvertes. Les ambulances n'attendent plus l'autorisation centrale.", 'civil'),
@@ -303,6 +311,7 @@
       district: 'Chantier de Démolition',
       civicFunction: 'Démonter les structures dangereuses et recycler leurs matériaux',
       shortIntro: "La machine abat ses propres appuis pour réduire l'arène ; Riva transforme chaque frappe en ordre de démolition ciblé.",
+      metaLine: "Le sol peut disparaître, pas tout le niveau. Même une catastrophe garde trente-cinq pour cent de budget praticable.",
       phaseTitles: ['Marquage des appuis', 'Sol fragmenté', 'Plan de reprise'],
       interlude: [
         line('Canal civil', "Les balises de chantier sont revenues. Les équipes confirment chaque démolition avant impact.", 'civil'),
@@ -335,6 +344,7 @@
       district: 'Réservoir des Écluses',
       civicFunction: 'Réguler l’eau potable, l’irrigation et les réserves anti-incendie',
       shortIntro: "Pompes, vannes et turbines ont fusionné en une ligne de pression qui élève l'eau pour protéger son noyau.",
+      metaLine: "Le combat change le niveau de l’eau, pas les poumons de Riva. Cette jauge mesure donc la pression.",
       phaseTitles: ['Vannes contrariées', 'Marée conductrice', 'Turbine de crue'],
       interlude: [
         line('Canal civil', "Pression nominale. Les réserves anti-incendie alimentent de nouveau les quartiers hauts.", 'civil'),
@@ -367,6 +377,7 @@
       district: 'Anneau Centrifuge',
       civicFunction: 'Stabiliser les masses rotatives des turbines et transports circulaires',
       shortIntro: "Le rotor décale la gravité par quarts de tour ; son axe n'est accessible qu'en traitant chaque mur comme un nouveau sol.",
+      metaLine: "Le monde tourne par quarts. Si l’option réduit les mouvements, la caméra obéit au lieu de négocier.",
       phaseTitles: ['Quart de tour', 'Masse excentrée', 'Axe zéro'],
       interlude: [
         line('Canal civil', "Anneau stabilisé. Les turbines et navettes circulaires reprennent sans correction centrale.", 'civil'),
@@ -399,6 +410,7 @@
       district: 'Observatoire Météore',
       civicFunction: 'Prévoir les fronts météo et protéger les réseaux exposés',
       shortIntro: "Trois modules imposent vent, pluie conductrice et chaleur ; les neutraliser rend à l'Observatoire son rôle d'alerte.",
+      metaLine: "Une météo à la fois. Empiler vent, pluie et chaleur serait une surcharge d’effets, pas une troisième phase.",
       phaseTitles: ['Vent de cisaillement', 'Pluie conductrice', 'Dôme thermique'],
       interlude: [
         line('Canal civil', "Prévisions ouvertes sur tous les canaux. Les équipes isolent le front électrique avant son arrivée.", 'civil'),
@@ -431,6 +443,7 @@
       district: 'Pilier des Ascensions',
       civicFunction: 'Entretenir les façades, antennes et conduites verticales de la ville',
       shortIntro: "Le colosse devient un échafaudage hostile ; ses bras abaissés sont les seules routes vers trois ancrages.",
+      metaLine: "Tomber n’efface pas la section. Le checkpoint fait partie de l’architecture.",
       phaseTitles: ['Bras de service', 'Façade en marche', 'Ancrage sommital'],
       interlude: [
         line('Canal civil', "Trois nacelles arrimées. Les équipes peuvent enfin atteindre les antennes endommagées.", 'civil'),
@@ -463,6 +476,7 @@
       district: 'Cour du Contrecoup',
       civicFunction: 'Tester la résistance des outils et équipements de sécurité',
       shortIntro: "La forge absorbe les assauts ordinaires ; seule une ruée ou un contre au signal précis brise sa posture.",
+      metaLine: "La fenêtre de contre s’annonce. Une frame secrète n’est pas une règle, c’est une devinette.",
       phaseTitles: ['Essai de charge', 'Contrecoup calibré', 'Trempe de rupture'],
       interlude: [
         line('Canal civil', "Bancs d'essai en mode validation. Aucun équipement ne sortira sans rapport public.", 'civil'),
@@ -495,6 +509,7 @@
       district: 'Cathédrale Mobile',
       civicFunction: 'Déployer ateliers, abris et dispensaires dans les zones sinistrées',
       shortIntro: "La forteresse transporte encore un quartier de secours, mais ses sections se sont refermées autour d'un cœur de commandement.",
+      metaLine: "Oui, le boss est aussi le niveau. Non, tu ne recommences pas toute la cathédrale pour une porte ratée.",
       phaseTitles: ['Nef des ateliers', 'Transept des abris', 'Chœur du cœur'],
       interlude: [
         line('Canal civil', "Dispensaire mobile alimenté. Les portes latérales accueillent déjà les évacués.", 'civil'),
@@ -527,6 +542,7 @@
       district: 'Chambre des Deux Régulateurs',
       civicFunction: 'Maintenir séparément pression hydraulique et alimentation électrique',
       shortIntro: "Deux régulateurs se passent bouclier et alimentation ; provoquer leur rencontre interrompt le transfert sans exiger une double cible.",
+      metaLine: "Deux boss, une cible vulnérable. L’interface la nomme avant que les particules commencent à mentir.",
       phaseTitles: ['Relais alterné', 'Régulation croisée', 'Désaccord critique'],
       interlude: [
         line('Canal civil', "Eau et courant sont séparés. Une panne ne peut plus entraîner l'autre.", 'civil'),
@@ -559,6 +575,7 @@
       district: 'Atelier des Modules',
       civicFunction: 'Adapter les outils publics aux chantiers et situations d’urgence',
       shortIntro: "Le réacteur lit l'équipement de Riva et prépare une seule réponse ; son adaptation expose toujours un contre jouable.",
+      metaLine: "Il lit ton build, mais ne le supprime jamais. L’adaptation répond à ton choix sans le punir.",
       phaseTitles: ['Lecture d’outillage', 'Module de réponse', 'Configuration ouverte'],
       interlude: [
         line('Canal civil', "Catalogue des modules publié. Chaque équipe peut vérifier compatibilités et limites.", 'civil'),
@@ -591,6 +608,7 @@
       district: 'Orbital Terminus',
       civicFunction: 'Recevoir l’énergie solaire orbitale et la distribuer aux réserves d’urgence',
       shortIntro: "Dans le vide du Terminus, chaque manœuvre consomme la réserve de Riva ; les condensateurs exigent une prise de risque calculée.",
+      metaLine: "La réserve d’énergie est séparée de la vie. Une barre qui fait deux métiers finit toujours par mentir.",
       phaseTitles: ['Réserve décroissante', 'Orbite affamée', 'Fenêtre solaire'],
       interlude: [
         line('Canal civil', "Liaison orbitale stable. Les batteries d'urgence reçoivent leur première charge libre.", 'civil'),
@@ -623,6 +641,7 @@
       district: 'Chambre Booléenne',
       civicFunction: 'Arbitrer les priorités de circulation et de secours selon des règles publiques',
       shortIntro: "La Chambre exige une séquence de formes pendant que son gardien reste actif ; résoudre ne suspend jamais le combat.",
+      metaLine: "Le puzzle reste lisible sans couleur et ne retourne pas à zéro au premier dégât. La logique n’a pas besoin d’être cruelle.",
       phaseTitles: ['Clause d’entrée', 'Séquence contradictoire', 'Vérité du noyau'],
       interlude: [
         line('Canal civil', "Règles d'arbitrage publiées. Chaque refus porte maintenant une cause vérifiable.", 'civil'),
@@ -655,6 +674,7 @@
       district: 'Chambre des Vecteurs',
       civicFunction: 'Orienter énergie, signaux et convois autour des secteurs endommagés',
       shortIntro: "Des déflecteurs changent la direction des tirs ; la trajectoire que le Vault prétend confisquer devient la clé de son ouverture.",
+      metaLine: "La trajectoire est prévisualisée. Comprendre l’angle ne tire pas à ta place.",
       phaseTitles: ['Vecteur incident', 'Déflexion composée', 'Trajectoire inverse'],
       interlude: [
         line('Canal civil', "Routes de dérivation calculées localement. Aucun secteur n'est désormais un passage obligé.", 'civil'),
@@ -687,6 +707,7 @@
       district: 'Batterie Aérostatique',
       civicFunction: 'Capter la foudre en altitude et maintenir les relais aériens',
       shortIntro: "Riva quitte le sol pour une séquence aérienne où les torpilles de la Batterie peuvent recharger le canon qui les renvoie.",
+      metaLine: "Le jeu change de genre pour un combat, pas de commandes : ruée, renvoi et télégraphes restent les mêmes.",
       phaseTitles: ['Poursuite aérostatique', 'Torpilles captives', 'Batterie en retour'],
       interlude: [
         line('Canal civil', "Ballons-relais reconnectés. Les secteurs isolés reçoivent courant et communications.", 'civil'),
@@ -719,6 +740,7 @@
       district: 'Circuit d’Endurance',
       civicFunction: 'Éprouver les plans d’urgence sur des incidents combinés mais contrôlés',
       shortIntro: "Six manches courtes convoquent des fragments mécaniques ; survivre exige de lire la combinaison, pas d'endurer un combat interminable.",
+      metaLine: "Six manches, pas six boss recopiés. Et le checkpoint sait compter jusqu’à six.",
       phaseTitles: ['Relais d’épreuves', 'Gauntlet combiné', 'Dernière réserve'],
       interlude: [
         line('Canal civil', "Simulations rouvertes aux équipes. Les scénarios indiquent désormais leur objectif et leur limite.", 'civil'),
@@ -751,6 +773,7 @@
       district: 'Archives Réactives',
       civicFunction: 'Conserver les incidents et simuler leurs conséquences pour améliorer les procédures',
       shortIntro: "L'Archiviste mesure tir, saut et ruée, puis adapte une seule réponse visible ; chaque tentative repart d'une page blanche.",
+      metaLine: "L’Archiviste lit ta tentative, pas ton identité. Au retry, sa mémoire revient à une page blanche.",
       phaseTitles: ['Page d’observation', 'Marge adaptative', 'Archive contestée'],
       interlude: [
         line('Canal civil', "Historique exporté vers les six districts. Aucune simulation ne possède plus sa copie unique.", 'civil'),
@@ -783,6 +806,7 @@
       district: 'Trône Zéro',
       civicFunction: 'Tester les protocoles d’autorité d’urgence avant leur déploiement',
       shortIntro: "Sous la Citadelle, un arbitre sans pilote combine renvoi, modules et rupture : le prototype de la commande unique que Riva vient abolir.",
+      metaLine: "Trois phases GEARSTORM, aucun final emprunté. Le dernier boss peut citer ses règles sans voler celles d’un autre jeu.",
       phaseTitles: ['Autorité réfléchie', 'Modules sans maître', 'Rupture du Trône Zéro'],
       interlude: [
         line('Canal civil', "Trône Zéro isolé. Les clés d'urgence sont réparties entre les six districts et consignées publiquement.", 'civil'),
@@ -810,18 +834,18 @@
 
   const expansionPremise = {
     id: 'post-crown-civic-rings',
-    title: 'Après la Couronne',
+    title: 'Après la Couronne // Le jeu continue sans ressusciter son méchant',
     status: 'runtime-integrated',
     runtimeIntegrated: true,
-    summary: "Après la détention de Cassian Voltério, quatre anneaux d'infrastructures isolées poursuivent ses anciens ordres de crise. Riva ne repart pas conquérir une ville : elle aide les districts à reprendre vingt-quatre services encore enfermés dans la logique de la Couronne.",
-    continuity: "Cassian reste détenu. Sa voix n'apparaît que dans des archives enregistrées ; NULL CROWN est un prototype autonome, pas son retour ni une résurrection.",
-    playerPromise: "Chaque victoire de Forge restaure symboliquement une fonction civique dans le journal de Riva, sans modifier les six relais de la campagne."
+    summary: "Après la détention de Cassian Voltério, quatre anneaux d'infrastructures isolées poursuivent ses anciens ordres de crise. Riva ne repart pas conquérir une ville : elle aide les districts à reprendre vingt-quatre services, et le compteur devra assumer chacun d’eux.",
+    continuity: "Cassian reste détenu. Sa voix n'apparaît que dans des archives enregistrées ; NULL CROWN est un prototype autonome, pas son retour, pas une résurrection et pas un prétexte pour annuler le premier générique.",
+    playerPromise: "Chaque victoire de Forge restaure symboliquement une fonction civique dans le journal de Riva. Le Codex peut commenter la mécanique ; ni le résultat ni le build ne réécrivent les six relais de la campagne."
   };
 
   const forgeCircuit = {
     id: 'forge-circuit-07-30',
     mode: 'forgeRush',
-    title: 'Circuit Forge · Les quatre anneaux',
+    title: 'Circuit Forge · Les quatre anneaux savent qu’ils sont jouables',
     bossOrder: bosses.map((boss) => boss.id),
     waveCheckpoints: waves.map((wave) => ({
       wave: wave.number,
@@ -833,10 +857,10 @@
     upgradesBetweenBosses: true,
     resumeCheckpoints: ['fight', 'upgrade', 'ending'],
     epilogue: {
-      title: 'Aucune couronne',
-      summary: "Les vingt-quatre services répondent de nouveau aux districts. Le Trône Zéro conserve un arrêt d'urgence, mais ses clés sont distribuées, auditées et révocables.",
-      riva: "Une ville n'est pas une machine à commander. C'est un système que chacun doit pouvoir comprendre, réparer et arrêter.",
-      outcome: 'Cassian reste détenu ; NULL CROWN est neutralisée sans devenir une nouvelle autorité centrale.'
+      title: 'Aucune couronne, aucun boss caché',
+      summary: "Les vingt-quatre services répondent de nouveau aux districts. Le Trône Zéro conserve un arrêt d'urgence, mais ses clés sont distribuées, auditées et révocables ; le compteur peut enfin afficher 24 / 24 sans astérisque.",
+      riva: "Une ville n'est pas une machine à commander. C'est un système que chacun doit comprendre, réparer et arrêter — même lorsque l’écran final voudrait avoir le dernier mot.",
+      outcome: 'Cassian reste détenu ; NULL CROWN est neutralisée sans devenir une nouvelle autorité centrale. Les vingt-quatre services restent actifs, les clés sont réparties entre les six districts et aucun boss caché ne vient annuler cette fin.'
     }
   };
 
@@ -900,7 +924,7 @@
 
   const story = deepFreeze({
     schemaVersion: 1,
-    contentVersion: '1.0.0',
+    contentVersion: '2.9.0',
     status: 'runtime-integrated',
     runtimeIntegrated: true,
     bossRange: Object.freeze(['07', '30']),

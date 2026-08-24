@@ -1,18 +1,18 @@
 # GEARSTORM — Contrat d’expansion des boss
 
-Statut du document : implémentation Forge v2.8 livrée et feuille de raffinement
+Statut du document : implémentation Forge v2.9 assemblée et feuille de raffinement ; QA finale en attente
 
 Portée : 30 boss originaux jouables, dont 6 en campagne et 24 dans la Forge libre ou le Circuit Forge
 
-Référence technique actuelle : GEARSTORM v2.8.0, sauvegarde v5, manifeste d’assets générés 2.7.0
+Référence technique actuelle : GEARSTORM v2.9.0, sauvegarde v5, manifeste d’assets générés 2.9.0 (schéma 3)
 
 ## 1. Objet et limites
 
 Ce document transforme l’étude des grandes mécaniques de boss de la série Sonic en une feuille de route originale pour GEARSTORM. Il décrit des verbes de jeu, des structures d’arène et des méthodes de production. Il n’autorise ni la copie d’une apparence, ni la reprise d’un nom, d’une silhouette, d’un personnage, d’un décor ou d’un asset Sega.
 
-La v2.8 intègre les vingt-quatre boss des vagues 1 à 4 dans une Forge séparée de la campagne. Les trente machines sont sélectionnables et combattables, possèdent trois phases, des télégraphes, des valeurs propres, un objectif et une fiche narrative. Le Circuit Forge enchaîne 07 à 30 en quatre vagues, propose des améliorations entre les boss, sauvegarde sa reprise en v5 et se conclut par une restauration dédiée.
+La v2.9 conserve les vingt-quatre boss des vagues 1 à 4 dans une Forge séparée de la campagne. Les trente machines sont sélectionnables et combattables, possèdent trois phases, des télégraphes, des valeurs propres, un objectif et une fiche narrative. Le Circuit Forge enchaîne 07 à 30 en quatre vagues, propose des améliorations entre les boss, sauvegarde sa reprise en v5 et se conclut par une restauration dédiée. Les 24 interludes et 24 `metaLine` sont archivés dans le Codex sous un panorama des quatre anneaux.
 
-Les 24 profils Forge possèdent 24 `mechanicId` et 72 signatures d’état uniques. Ces signatures enrichissent huit familles de mécaniques communes : elles ne constituent pas vingt-quatre IA entièrement indépendantes. Chaque machine charge quatre pièces OpenAI et un backdrop propre ; les animations secondaires, hazards et transitions restent composés par le moteur partagé, et les backdrops Forge ne sont pas des décors parallaxe à quatre couches. La campagne, ses six relais et son épilogue restent volontairement séparés.
+Les 24 profils Forge possèdent 24 `mechanicId` et 72 signatures d’état uniques. Ces signatures enrichissent huit familles de mécaniques communes : elles ne constituent pas vingt-quatre IA entièrement indépendantes. Chaque machine charge quatre pièces OpenAI et un backdrop propre ; les animations secondaires, hazards et transitions restent composés par le moteur partagé, et les backdrops Forge ne sont pas des décors parallaxe à quatre couches. La v2.9 ajoute un rig Riva natif de treize pièces anatomiques, corrige la perspective par offsets de décor et conserve la campagne, ses six relais et son épilogue volontairement séparés.
 
 La mention IP-safe désigne ici un ensemble de garde-fous internes. Elle ne remplace pas une validation juridique lorsqu’une diffusion commerciale l’exige.
 
@@ -150,7 +150,7 @@ Objectif : introduire des changements de genre courts, un gauntlet, une adaptati
 | 29 | ADAPTIVE ARCHIVIST | Forge jouable | Archives Réactives | Observe la fréquence de tir, saut et ruée puis change une seule réponse | L’adaptation est locale au combat, visible dans l’interface et remise à zéro à chaque tentative. |
 | 30 | NULL CROWN | Forge jouable | Trône Zéro | Prototype secret composite clôturant le Circuit Forge, combinant renvoi, modules et rupture | Trois phases avec checkpoint d’entraînement ; aucune phase ne copie l’apparence ou l’ordre d’un final de franchise existant. |
 
-Dans la v2.8, le statut secret de NULL CROWN est narratif : FORGE 30 reste accessible dans la sélection libre et conclut le Circuit Forge avec sauvegarde, Codex et épilogue dédiés. Toute future condition de déblocage devra être migrée et documentée avant activation.
+Dans la v2.9, le statut secret de NULL CROWN est narratif : FORGE 30 reste accessible dans la sélection libre et conclut le Circuit Forge avec sauvegarde, Codex, transmission méta et épilogue dédiés. Toute future condition de déblocage devra être migrée et documentée avant activation.
 
 ## 5. Architecture moteur livrée et cible
 
@@ -287,14 +287,17 @@ La Forge libre et le Laboratoire peuvent enrichir temps, rangs, maîtrise ou Cod
 
 ### 6.1 Manifeste actuel
 
-Le manifeste 2.7.0, de schéma 2, référence vingt-six masters de provenance et 225 WebP runtime :
+Le manifeste 2.9.0, de schéma 3, référence 42 masters de provenance et 233 WebP runtime pour 18 175 510 octets :
 
-- 24 couches de parallaxe pour les six arènes de campagne ;
-- 54 pièces pour les six boss de campagne ;
-- 96 pièces Forge, soit châssis, noyau et deux appendices pour chacun des boss 07–30 ;
-- 24 backdrops Forge dédiés ;
-- 11 pièces de Riva et 16 VFX ;
+- 48 assets d’arène : 24 couches de parallaxe campagne et 24 backdrops Forge ;
+- 150 pièces de boss : 54 campagne et 96 Forge ;
+- 15 assets Riva : treize pièces anatomiques, une traînée et un halo ;
+- 16 VFX partagés et 4 images narratives ;
+- `rootOffsetY = -23.6`, `feetLocalY = 36`, joints, pivots, boîtes utiles, ordre de dessin et SHA-256 pour le rig Riva ;
+- `groundY = 620`, `visualOffsetY = 80` pour les arènes campagne et `visualOffsetY = 28` pour les backdrops Forge ;
 - largeur, hauteur, poids, transparence et SHA-256 pour chaque sortie.
+
+La limite alpha inférieure des bottes est mesurée à `feetLocalY = 36`. Les offsets d’arène restent purement visuels et ne changent ni sol physique, ni collision, ni télégraphe.
 
 Les masters ne sont jamais des fichiers runtime. Les bundles sont chargés à la demande et gardent un fallback Canvas en cas d’absence ou d’échec de décodage.
 
@@ -328,9 +331,9 @@ Les masters ne sont jamais des fichiers runtime. Les bundles sont chargés à la
 
 Les noms sont adaptés à la machine réelle. Aucun fichier vide ou asset générique dupliqué ne doit être ajouté pour satisfaire artificiellement le contrat.
 
-### 6.3 Métadonnées de manifeste à ajouter
+### 6.3 Métadonnées actuelles et cible
 
-Une future révision de schéma pourra compléter chaque entrée avec :
+Le schéma 3 fournit déjà dimensions, alpha, poids, hachages, joints et pivots du rig héroïne. Une future révision pourra généraliser à chaque boss les métadonnées suivantes :
 
 - anchor et pivot ;
 - boîte englobante utile ;
@@ -577,7 +580,7 @@ Un concept trop proche est rejeté puis reconstruit depuis sa fonction industrie
 - libération des bitmaps d’un boss quitté, sauf bundle explicitement conservé ;
 - possibilité de réduire particules et secousses sans modifier la difficulté.
 
-## 11. Limites et backlog après v2.8
+## 11. Limites et backlog après v2.9
 
 La base jouable, narrative, artistique et télémétrique est livrée ; les limites restantes sont explicites :
 
@@ -616,14 +619,14 @@ Les sources servent à inventorier les jeux et à comprendre des familles géné
 
 ## 13. État livré des 30 boss
 
-Le contrat de base est atteint dans la v2.8 :
+Le contrat de base est atteint dans les sources du candidat v2.9 :
 
 - six boss de campagne et vingt-quatre boss Forge sont présents dans le registre ;
 - les trente rencontres totalisent quatre-vingt-dix phases et sont lançables depuis l’interface ;
 - le Circuit Forge parcourt 07–30 en quatre vagues, avec améliorations, sauvegarde v5, reprise et fin dédiée ;
 - les extensions exposent 24 `mechanicId` et 72 signatures d’état uniques au-dessus de huit familles déterministes ;
-- le manifeste 2.7.0 publie 24 backdrops et 96 pièces Forge dans un total de 225 WebP issus de 26 masters ;
-- `expansion-story.js` fournit quatre vagues, journaux, objectifs, Codex, restaurations et 72/72 contrats instrumentés ;
+- le manifeste 2.9.0 publie 24 backdrops et 96 pièces Forge dans un total de 233 WebP issus de 42 masters ;
+- `expansion-story.js` fournit quatre vagues, journaux, objectifs, Codex, restaurations, 24 interludes, 24 `metaLine` et 72/72 contrats instrumentés ;
 - les résultats et checkpoints Forge n’avancent jamais les six relais de campagne.
 
 Ce document ne certifie pas à lui seul la QA, la publication ou le comportement sur matériel physique. Les limites de mutualisation moteur, de profondeur des rigs, de parallaxe, de sauvegarde locale et de validation matérielle sont consignées en section 11.

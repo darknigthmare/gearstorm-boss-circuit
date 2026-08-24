@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit — conception v2.8.0
+# GEARSTORM: Boss Circuit — conception v2.9.0
 
 ## Pitch
 
@@ -34,13 +34,13 @@ Chaque extension possède trois phases. Le registre attribue 24 `mechanicId` et 
 
 ENDURANCE ENGINE ajoute six manches internes. La progression de ses points de vie ne suffit pas : la phase 1 doit avoir atteint la manche 2, la phase 2 la manche 4 et la fin la manche 6. Cette barrière fait de la survie aux cycles la règle centrale du boss, même avec un build offensif puissant.
 
-Le Circuit Forge sauvegarde en v5 le combat, le choix de module ou la fin à reprendre. Un module est proposé entre les boss ; la dernière victoire ouvre la restauration des quatre anneaux et enregistre le meilleur temps. `boss-roster.js` porte les règles de combat et `expansion-story.js` les objectifs, journaux, restaurations et 72 contrats instrumentés.
+Le Circuit Forge sauvegarde en v5 le combat, le choix de module ou la fin à reprendre. Un module est proposé entre les boss ; la dernière victoire ouvre la restauration des quatre anneaux et enregistre le meilleur temps. `boss-roster.js` porte les règles de combat et `expansion-story.js` les objectifs, journaux, restaurations, 24 interludes, 24 `metaLine` et 72 contrats instrumentés. Le Codex conserve ces transmissions par anneau après déverrouillage.
 
-## Progression et reprise v2.8
+## Progression et reprise v2.9
 
 Onze modules couvrent cadence, noyau, ruée, tir multiple, dégâts, Surcharge, bouclier, mobilité, précision, combo et auto-réparation de phase. Ils ne persistent que pendant le Circuit en cours ; leurs limites de cumul empêchent de dépasser le niveau prévu.
 
-La sauvegarde locale reste en schéma v5. Elle conserve déblocages, meilleurs temps, rangs, maîtrise et reprises séparées de campagne et de Forge. La v2.8 complète les checkpoints avec deux invariants :
+La sauvegarde locale reste en schéma v5. Elle conserve déblocages, meilleurs temps, rangs, maîtrise et reprises séparées de campagne et de Forge. La v2.9 conserve les deux invariants de checkpoint introduits en v2.8 :
 
 - `currentBossRetries` survit au rechargement, afin de préserver pénalités, score et rang ;
 - `upgradeOffer` est figée au checkpoint `upgrade`, afin qu’une reprise retrouve exactement les trois choix déjà proposés.
@@ -57,11 +57,22 @@ Sur une sauvegarde neuve seulement, le runtime initialise mouvement réduit et c
 
 Les cartes déverrouillées montrent une miniature WebP décorative du boss sans remplacer le texte ni l’état accessible. Les cartes verrouillées n’exposent pas cette illustration. Sur mobile portrait, le paysage est recommandé pour conserver la largeur tactique de l’arène.
 
-## Direction artistique v2.7.0
+## Direction artistique v2.9.0
 
-La version applicative est v2.8.0, mais la production visuelle reste le lot immuable v2.7.0. Les 26 masters OpenAI retenus produisent 225 WebP runtime : 24 couches de décor de campagne, 54 pièces pour les six boss historiques, 24 backdrops Forge, 96 pièces Forge, 11 pièces de Riva et 16 VFX. Le manifeste 2.7.0 conserve dimensions, alpha, poids et SHA-256 ; les masters servent uniquement à la provenance.
+Le manifeste v2.9.0, de schéma 3, référence 42 masters OpenAI et 233 WebP runtime pour 18 175 510 octets : 48 assets d’arène, 150 pièces de boss, 15 assets héroïne, 16 VFX et 4 images narratives. Il conserve dimensions, alpha, poids et SHA-256 ; les masters restent réservés à la provenance.
 
-Riva utilise un corps v4 cohérent et un seul bras-canon indépendant. Le pivot de semelles tombe sur le plancher logique, le torse n’est composé qu’une fois et l’ombre est une petite ellipse de contact. Chaque boss Forge possède un backdrop et quatre pièces transparentes ; leurs animations secondaires restent pilotées par les huit familles moteur. Le moteur conserve ses fallbacks si une ressource ne charge pas.
+| Famille | Masters | Runtime |
+| --- | ---: | ---: |
+| Arènes campagne / Forge | 12 | 48 |
+| Boss campagne / Forge | 10 | 150 |
+| Riva Spark | 15 | 15 |
+| VFX partagés | 1 | 16 |
+| Narration | 4 | 4 |
+| **Total** | **42** | **233** |
+
+Riva utilise treize pièces anatomiques indépendantes et deux couches d’effet. `rootOffsetY = -23.6` place les pixels utiles des bottes sur `feetLocalY = 36` ; cette limite alpha est mesurée dans le contrat d’assets. La tête, le torse et le bassin ne sont plus fusionnés, et l’avant-bras-canon possède son pivot propre.
+
+Le sol physique reste `y = 620`. Le rendu applique `+80 px` aux six décors de campagne et `+28 px` aux backdrops Forge pour aligner les routes peintes sans déplacer la simulation. Chaque boss Forge conserve quatre pièces transparentes et un backdrop ; ses animations secondaires restent pilotées par les huit familles moteur. Le fallback Canvas demeure disponible.
 
 ## Progression narrative
 
@@ -82,7 +93,7 @@ Cassian traite d’abord Riva comme une candidate imprévue, puis transforme ses
 | 05 | Fournaise des Pistons | Fabrication, réparation et alimentation industrielle | Riva injecte une contre-phase M-0 et coupe l’énergie externe de la Couronne. |
 | 06 | Citadelle Voltério | Coordination et commandes de sécurité | La contre-phase neutralise le commandement exclusif sans condamner les infrastructures. |
 
-Le Codex sépare connaissance et progression : une analyse de Laboratoire peut enrichir un dossier sans libérer artificiellement un district.
+Le Codex sépare connaissance et progression : une analyse de Laboratoire peut enrichir un dossier sans libérer artificiellement un district. Son volet Forge expose les quatre anneaux et conserve, pour chaque profil déverrouillé, l’interlude, la lecture hors cadre (`metaLine`) et le record associé.
 
 ## Parcours UX
 
@@ -92,7 +103,7 @@ Le Codex sépare connaissance et progression : une analyse de Laboratoire peut e
 - **Pause** : objectif, build, commandes et sorties explicites.
 - **Résultat et interlude** : performance, journal de Riva, conséquence locale et décision suivante.
 - **Atelier** : offre déterministe de trois modules parmi les onze disponibles.
-- **Codex** : dossiers Riva/Voltério, six fiches civiles et archives M-0.
+- **Codex** : dossiers Riva/Voltério, six fiches civiles, archives M-0, panorama des quatre anneaux et 24 transmissions Forge permanentes.
 - **Épilogues** : restauration des six relais pour la campagne et des quatre anneaux pour la Forge.
 
 Les cartes de Forge conservent leur nom, leur état verrouillé/déverrouillé et leur libellé accessible même lorsque la miniature ne charge pas. Les options rendent les contrôles d’export/import ; le bouton de mise à jour PWA reste masqué jusqu’à la détection d’un worker en attente.

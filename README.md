@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit v2.8.0
+# GEARSTORM: Boss Circuit v2.9.0
 
 GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables de la campagne de Cassian Voltério, puis affronte vingt-quatre profils supplémentaires dans la Forge : 30 boss jouables, 90 phases et 90 contrats de maîtrise.
 
@@ -20,7 +20,15 @@ Le mode `file://` reste un repli jouable, mais l’installation PWA, le service 
 - Dépôt GitHub prévu : https://github.com/darknigthmare/gearstorm-boss-circuit
 - URL Vercel prévue : https://gearstorm-boss-circuit.vercel.app
 
-Ces identifiants décrivent les cibles du projet. Ce document ne confirme ni l’état Git distant, ni un déploiement Vercel, ni la disponibilité publique du candidat v2.8.0.
+Ces identifiants décrivent les cibles du projet. Ce document ne confirme ni l’état Git distant, ni un déploiement Vercel, ni la disponibilité publique du candidat v2.9.0.
+
+## Passe v2.9.0 — perspective, art séparé et contenu méta
+
+Riva est désormais assemblée par un rig natif de treize pièces anatomiques indépendantes, complété par deux effets de personnage. Le manifeste fixe `rootOffsetY` à `-23.6` et `feetLocalY` à `36` ; la limite alpha réelle des bottes est mesurée sur cette ligne de contact.
+
+Le sol physique reste à `y = 620`. Les six décors de campagne reçoivent un décalage visuel de `+80 px` et les vingt-quatre backdrops Forge de `+28 px`, sans déplacer collisions, hitboxes ni télégraphes.
+
+Les vingt-quatre profils Forge conservent maintenant leur interlude et leur `metaLine` dans le Codex, organisés en quatre anneaux. Quatre illustrations narratives originales OpenAI couvrent l’intro, le prologue et les deux fins. Les tutoriels, aides et libellés d’accessibilité restent factuels.
 
 ## Contenu
 
@@ -36,7 +44,7 @@ Ces identifiants décrivent les cibles du projet. Ce document ne confirme ni l�
 - Mouvement réduit, contraste renforcé et réglage des tremblements.
 - PWA installable avec cache hors ligne et fallback Canvas.
 
-## Correctifs de fiabilité v2.8.0
+## Correctifs de fiabilité conservés depuis v2.8.0
 
 ### ENDURANCE ENGINE
 
@@ -78,11 +86,11 @@ Les 72 contrats Forge sont instrumentés par la télémétrie réelle du combat.
 
 La campagne suit **Intro → Prologue → Boss → Résultat → Interlude → Atelier**. Voltério a centralisé six services civils dans la Couronne ; Riva réactive la ligne manuelle M-0 et rend chaque relais à son district sans devenir une nouvelle autorité centrale.
 
-Le Codex sépare la connaissance de la progression : une victoire de Laboratoire peut documenter une machine, mais ne libère jamais son relais. La Forge libre et le Circuit Forge ont eux aussi leur progression propre et n’altèrent pas la campagne.
+Le Codex sépare la connaissance de la progression : une victoire de Laboratoire peut documenter une machine, mais ne libère jamais son relais. La Forge libre et le Circuit Forge ont eux aussi leur progression propre et n’altèrent pas la campagne. La v2.9 y archive les 24 interludes et `metaLine` Forge, ainsi qu’un panorama des quatre anneaux, afin que ce commentaire de conception reste consultable après chaque victoire.
 
 ## Direction artistique
 
-La version applicative est v2.8.0, mais le pack artistique reste volontairement immuable en **v2.7.0**. Vingt-six masters originaux produits avec OpenAI Image Generation alimentent **225 WebP runtime** :
+Le pack artistique v2.9.0 est dérivé de **42 masters originaux OpenAI** vers **233 WebP runtime**, soit **18 175 510 octets** déclarés par le manifeste :
 
 | Famille | Masters | Assets runtime |
 | --- | ---: | ---: |
@@ -90,13 +98,16 @@ La version applicative est v2.8.0, mais le pack artistique reste volontairement 
 | Six boss de campagne, neuf pièces articulables chacun | 6 | 54 |
 | Vingt-quatre boss Forge, quatre pièces transparentes chacun | 4 planches | 96 |
 | Vingt-quatre arènes Forge, un backdrop dédié chacune | 6 planches | 24 |
-| Riva Spark : atlas historique, corps cohérent v4 et bras-canon v4 | 3 | 11 |
+| Riva Spark : référence canonique et pièces séparées | 15 | 15 |
 | Effets visuels de combat | 1 | 16 |
-| **Total** | **26** | **225** |
+| Intro, prologue, fin campagne et fin Forge | 4 | 4 |
+| **Total** | **42** | **233** |
 
-Le rig de Riva compose une seule fois le corps, raccorde un bras-canon indépendant au socket d’épaule et aligne le pivot des semelles sur le plancher logique. Chaque machine Forge possède quatre pièces et un backdrop ; les transformations secondaires restent pilotées par les huit familles communes et les arènes Forge ne sont pas revendiquées comme des décors parallaxe multicouches.
+Le rig de Riva n’utilise plus un corps complet fusionné : tête, torse, bassin, bras, avant-bras, canon, cuisses, tibias et bottes sont treize pièces anatomiques natives. Deux couches d’effet — traînée de ruée et halo de Surcharge — portent le total héroïne à quinze. L’assemblage conserve le bras-canon indépendant et pose le bas alpha mesuré des bottes à `feetLocalY = 36` après `rootOffsetY = -23.6`.
 
-Le rendu Canvas reste disponible si une image manque ou ne se décode pas. Le service worker garde le shell et le manifeste artistique, puis met les WebP utiles en cache à la demande au lieu de précacher les 225 fichiers.
+Les offsets visuels `+80` (campagne) et `+28` (Forge) rapprochent les routes peintes du sol physique `620` sans altérer la simulation. Chaque machine Forge garde quatre pièces et un backdrop ; les transformations secondaires restent pilotées par les huit familles communes et les arènes Forge ne sont pas revendiquées comme des décors parallaxe multicouches.
+
+Le rendu Canvas reste disponible si une image manque ou ne se décode pas. Le service worker garde le shell et le manifeste artistique, puis met les WebP utiles en cache à la demande au lieu de précacher les 233 fichiers.
 
 ## Commandes
 
@@ -120,7 +131,7 @@ Le dépôt contient un workflow CI Node 22.x. Playwright exécute par défaut Ch
 Le fichier `tests/e2e/forge.spec.mjs` couvre :
 
 - l’ouverture du menu et de la Forge, la grille de 30 cartes et l’absence de débordement horizontal ;
-- les diagnostics de contact au sol et de composition des bras de Riva ;
+- les diagnostics du rig natif de Riva, de ses treize pièces anatomiques et de son contact au sol déclaré ;
 - les 24 boss Forge lancés dans leurs trois phases, soit 72 états de démarrage ;
 - le démarrage du Circuit Forge et la création de son premier checkpoint.
 
@@ -162,7 +173,7 @@ Les contrôles ciblés restent `npm test`, `npm run build` et `npm run check:rel
 - `story.js` : campagne narrative des six districts.
 - `expansion-story.js` : quatre vagues Forge, journaux, objectifs et 72 contrats instrumentés.
 - `boss-roster.js` : registre des 30 machines, 24 `mechanicId`, 72 états Forge et huit familles partagées.
-- `assets/generated/v2.7.0/` : pack runtime immuable de 225 WebP.
+- `assets/generated/v2.9.0/` : pack runtime de 233 WebP et manifeste de provenance/assemblage.
 - `manifest.webmanifest`, `sw.js` : installation et fonctionnement hors ligne.
 - `server.js` : serveur local à surface publique restreinte.
 - `scripts/` : build, contrats et garde-fous de release.

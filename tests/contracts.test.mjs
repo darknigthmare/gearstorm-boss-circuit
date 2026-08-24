@@ -24,7 +24,7 @@ const [html, css, story, expansionStorySource, game, bossRosterSource, readme, d
   readFile('DESIGN.md', 'utf8'),
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
-  readFile('assets/generated/v2.7.0/asset-manifest.json', 'utf8').then(JSON.parse),
+  readFile('assets/generated/v2.9.0/asset-manifest.json', 'utf8').then(JSON.parse),
 ]);
 
 const rosterContext = {};
@@ -98,7 +98,7 @@ test('tous les identifiants DOM utilises par le moteur existent et sont uniques'
   const references = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   assert.ok(references.length > 30);
   for (const id of references) assert.ok(ids.has(id), `id manquant: ${id}`);
-  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.8 manquante: ${id}`);
+  for (const id of REQUIRED_UI_IDS) assert.ok(ids.has(id), `surface v2.9 manquante: ${id}`);
 });
 
 test('la sauvegarde v5 migre v4 a v2 et porte les deux reprises', () => {
@@ -125,8 +125,30 @@ test('le guidage, le codex et le recapitulatif de campagne sont cables', () => {
   assert.match(css, /codex|combat-hint|campaign-progress/);
 });
 
+test('la passe meta v2.9 reste visible dans la Forge et les quatre tableaux narratifs', () => {
+  for (const marker of ['buildForgeCodex', 'syncForgeResultTransmission']) {
+    assert.match(game, new RegExp(`\\b${marker}\\b`));
+  }
+  for (const id of ['result-forge-transmission', 'result-forge-transmission-label', 'result-forge-transmission-copy', 'forge-codex-section', 'forge-codex-progress', 'forge-codex-grid', 'forge-codex-empty']) {
+    assert.match(html, new RegExp(`id=["']${id}["']`));
+  }
+  for (const filename of ['intro-broadcast', 'prologue-m0', 'campaign-ending', 'forge-ending']) {
+    assert.match(css, new RegExp(`assets/generated/v2\\.9\\.0/narrative/${filename}\\.webp`));
+  }
+  const expansion = rosterContext.GEARSTORM_EXPANSION_STORY;
+  assert.equal(expansion.bosses.length, 24);
+  assert.equal(new Set(expansion.bosses.map(boss => boss.metaLine)).size, 24);
+  assert.ok(expansion.bosses.every(boss => boss.metaLine.length > 24));
+  assert.ok(expansion.bosses.every(boss => boss.interlude.length >= 3));
+  assert.equal(expansion.waves.length, 4);
+  assert.ok(expansion.waves.every(wave => wave.title.length > 4 && wave.premise.length > 24));
+  assert.ok(expansion.forgeCircuit.epilogue.outcome.length > 40);
+  assert.match(game, /profile\.interlude/);
+  assert.match(game, /profile\.metaLine/);
+});
+
 test('les rigs generes et leur diagnostic QA sont explicites', () => {
-  for (const marker of ['HERO_RIG', 'BOSS_RIGS', 'drawRigPart', 'getRigDiagnostics']) {
+  for (const marker of ['heroineRigParts', 'heroAnatomyPose', 'getArenaVisualOffset', 'BOSS_RIGS', 'drawRigPart', 'getRigDiagnostics']) {
     assert.match(game, new RegExp(`\\b${marker}\\b`));
   }
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
@@ -140,19 +162,21 @@ test('les rigs generes et leur diagnostic QA sont explicites', () => {
   assert.match(game, /qaAllowed[\s\S]+127\.0\.0\.1[\s\S]+localhost/);
 });
 
-test('le rig composite OpenAI v2.7 de Riva garde les semelles et l avant-bras coherents', () => {
+test('le rig anatomique OpenAI v2.9 de Riva garde treize pieces et un contact visuel coherent', () => {
   const playerRenderer = game.slice(game.indexOf('function drawGeneratedPlayer'), game.indexOf('function bossRigPose'));
-  assert.match(playerRenderer, /drawRigPart\(parts\['body-core'\]/);
-  assert.match(playerRenderer, /drawRigPart\(parts\['firing-arm'\]/);
-  for (const legacyPart of ['head', 'torso', 'legs', 'boots', 'arm-near', 'pulse-cannon', 'arm-far']) {
-    assert.doesNotMatch(playerRenderer, new RegExp("drawRigPart\\(parts(?:\\.|\\[')" + legacyPart));
-  }
-  assert.match(game, /'body-core': rigPart\('body-core', 1, \[0, 36\], \[209, 409\], 0\.3, \[138, 9, 280, 409\], 'body'\)/);
-  assert.match(game, /'firing-arm': rigPart\('firing-arm', 1, \[16, -56\], \[70, 180\], 0\.135, \[24, 119, 394, 298\], 'weapon'\)/);
-  assert.match(game, /assets\/generated\/v2\.7\.0\/asset-manifest\.json/);
-  assert.match(game, /visibleArmSources:[\s\S]+body-core:openai-v4[\s\S]+firing-arm:openai-v4/);
+  assert.match(playerRenderer, /heroineRigParts\(\)/);
+  assert.match(playerRenderer, /heroRigContext/);
+  assert.match(playerRenderer, /drawRigPart\(parts\[spec\.name\]/);
+  assert.match(game, /rigParts\.length === 15/);
+  assert.match(game, /anatomyParts\.length === 13/);
+  assert.match(game, /const RIVA_RENDER_SCALE = 1\.10/);
+  assert.match(game, /const RIVA_FOOT_OFFSET = 3\.6/);
+  assert.match(game, /assets\/generated\/v2\.9\.0\/asset-manifest\.json/);
+  assert.doesNotMatch(game, /body-core|firing-arm/);
+  assert.match(game, /visualOffsetY/);
   const shadow = game.slice(game.indexOf('function drawPlayer()'), game.indexOf('const blink', game.indexOf('function drawPlayer()')));
-  assert.match(shadow, /ellipse\(player\.x, GROUND \+ 1, 18 \* shadowScale, 3 \* shadowScale/);
+  assert.match(shadow, /ellipse\(player\.x, GROUND - 3, 28 \* shadowScale, 6 \* shadowScale/);
+  assert.match(shadow, /shadowBlur = 4/);
   assert.doesNotMatch(shadow, /ctx\.stroke\(\)/);
 });
 
@@ -204,7 +228,7 @@ test('le registre data-driven livre les 30 boss et les 24 contrats Forge', () =>
   }
   assert.equal(mechanicIds.size, 24);
   assert.equal(signatureStates.size, 72);
-  assert.equal(artManifest.release, '2.7.0');
+  assert.equal(artManifest.release, '2.9.0');
 });
 
 test('les huit familles ont des boucles, telegraphes et handlers distincts', () => {
@@ -427,8 +451,21 @@ test('le récit de campagne reste distinct du Laboratoire', () => {
   assert.match(openingFlow, /showPrologueStory/);
   assert.match(openingFlow, /renderStoryScene\(STORY\.prologue/);
 
+  const archiveBlock = game.slice(game.indexOf('function buildStoryArchive'), game.indexOf('function showRadioExchange'));
+  assert.match(archiveBlock, /STORY\.intro/);
+  assert.match(archiveBlock, /STORY\.prologue/);
+  assert.match(archiveBlock, /STORY\.epilogue/);
+
   const phaseBlock = game.slice(game.indexOf('function phaseNarrative'), game.indexOf('function syncCampaignUi'));
   assert.match(phaseBlock, /runMode !== 'rush'/);
+  assert.match(phaseBlock, /profile\.metaLine/);
+  assert.doesNotMatch(phaseBlock, /text: profile\.mechanic/);
+
+  assert.match(game, /snapshot\.bossIndex \+ 2/);
+  assert.doesNotMatch(game, /snapshot\.bossIndex - FORGE_START_INDEX \+ 2/);
+  assert.match(html, /Campagne · machines débloquées/);
+  assert.match(html, /Catalogue intégral donne accès aux 30 boss/);
+  assert.match(bossRosterSource, /Boss final du Circuit Forge : trois phases annoncées/);
 
   const introBlock = game.slice(game.indexOf('function configureIntro'), game.indexOf('function startMasteryCycle'));
   assert.match(introBlock, /runMode === 'rush'/);

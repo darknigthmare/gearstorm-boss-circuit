@@ -1,17 +1,19 @@
-# Audit professionnel du jeu — v2.8.0
+# Audit professionnel du jeu — v2.9.0
 
-Date : 21 août 2026
+Date : 24 août 2026
 Portée : revue statique du code, des données, des documents, du manifeste artistique et des surfaces de tests présentes dans le dépôt. Cet audit ne constitue ni une exécution finale de QA, ni un test matériel, ni une vérification de déploiement.
 
 ## Verdict
 
 GEARSTORM est un boss rush web structuré et largement jouable, et non un simple prototype d’écran. Le contenu déclaré est cohérent dans ses sources : 30 boss, 90 phases et 90 contrats de maîtrise. La campagne de six machines, le Laboratoire, la Forge libre et le Circuit Forge 07–30 disposent de progressions séparées, d’une sauvegarde v5, de modules, de difficultés, de fins et d’un registre narratif.
 
-La v2.8.0 corrige plusieurs écarts de fiabilité réels : ENDURANCE ENGINE ne peut plus être court-circuité, les checkpoints préservent retries et offres d’Atelier, les préférences système s’appliquent au premier lancement, les cartes utilisent les assets réels et les chemins runtime d’import/export et de mise à jour PWA sont normalisés et consentis.
+La v2.9.0 traite deux écarts visuels et éditoriaux observés dans les sources : Riva passe d’un corps composite à treize pièces anatomiques indépendantes, et les routes peintes sont rapprochées du sol physique par des offsets visuels distincts. Le sol de simulation reste inchangé à `y = 620`.
+
+Le contenu Forge conserve désormais les 24 interludes et 24 `metaLine` dans le Codex, regroupés en quatre anneaux. Quatre illustrations narratives complètent l’intro, le prologue et les deux fins. Les tutoriels, aides et objectifs critiques restent non méta.
 
 Le jeu ne doit toutefois pas encore être qualifié de release commerciale matériellement validée. Les 24 boss Forge spécialisent huit familles partagées, l’audio reste synthétique, les records ne sont pas segmentés, les contrôles n’ont pas été certifiés sur appareils physiques et le portrait mobile reste une présentation contrainte pour laquelle le paysage est recommandé.
 
-## État factuel v2.8.0
+## État factuel v2.9.0
 
 | Surface | État observé |
 | --- | --- |
@@ -21,12 +23,23 @@ Le jeu ne doit toutefois pas encore être qualifié de release commerciale maté
 | Forge | 4 vagues de 6 boss ; sélection libre séparée |
 | Mécaniques Forge | 24 `mechanicId`, 72 signatures, 8 familles moteur partagées |
 | Sauvegarde | Schéma local v5, migrations et normalisation conservées |
-| Art | Manifeste v2.7.0 inchangé, 26 masters de provenance, 225 WebP runtime |
+| Art | Manifeste v2.9.0, 42 masters, 233 WebP runtime, 18 175 510 octets |
 | Audio | Web Audio synthétique, sans banque sonore distante |
 | E2E présents | Chromium desktop/mobile : rig, grille 30, matrice 24 × 3, checkpoint Forge, accessibilité, sauvegarde portable, Gamepad simulé et offline |
 | Publication | Non vérifiée dans cette revue |
 
-## Corrigé dans la v2.8.0
+## Corrigé dans la v2.9.0
+
+- Rig natif de Riva : treize pièces anatomiques, traînée et halo séparés ; tête, torse, bassin et avant-bras-canon ne sont plus fusionnés.
+- Contact déclaré et mesuré : `rootOffsetY = -23.6`, bas alpha des bottes à `feetLocalY = 36`.
+- Perspective : offsets de rendu `+80 px` pour les arènes campagne et `+28 px` pour les backdrops Forge, sans mutation du sol physique `620`.
+- Pack OpenAI courant : 48 assets d’arène, 150 de boss, 15 héroïne, 16 VFX et 4 narratifs.
+- Contenu : 24 interludes et 24 `metaLine` persistants dans le Codex, panorama des quatre anneaux et transmission Forge au résultat.
+- Ton : surfaces de jeu et narration méta ; tutoriels, aide, accessibilité et objectifs critiques maintenus factuels.
+
+Ces points sont observés statiquement dans le candidat. Leur validation navigateur et leur publication restent à établir dans `QA_REPORT.md`.
+
+## Fiabilité héritée de la v2.8.0
 
 ### Gameplay et équité
 
@@ -65,10 +78,10 @@ Le jeu ne doit toutefois pas encore être qualifié de release commerciale maté
 
 ### Visuel et robustesse
 
-- Pack runtime immuable de 225 WebP avec provenance, dimensions, alpha, poids et SHA-256.
-- Six arènes de campagne à quatre couches, rigs des boss historiques, 24 backdrops et 96 pièces Forge, rig cohérent de Riva et 16 VFX.
+- Pack runtime v2.9 de 233 WebP avec provenance, dimensions, alpha, poids et SHA-256.
+- Six arènes de campagne à quatre couches, 24 backdrops Forge, 150 pièces de boss, 15 assets Riva, 16 VFX et 4 images narratives.
 - Lazy loading, cache à la demande et fallback Canvas si une image manque.
-- Le corps de Riva est composé une seule fois, son bras-canon est indépendant et ses semelles suivent le sol logique.
+- Le rig natif de Riva sépare treize pièces anatomiques ; ses bottes déclarent et mesurent leur contact alpha sur `feetLocalY = 36`.
 
 ### Accessibilité et automatisation disponibles
 
@@ -82,7 +95,7 @@ Le jeu ne doit toutefois pas encore être qualifié de release commerciale maté
 - Contrats Node présents pour le consentement PWA face à un worker `waiting`.
 - Workflow GitHub Actions prévu pour Node 22.x, QA, navigateur et audit de dépendances.
 
-L’existence de ces fichiers ne prouve pas qu’ils ont tous réussi sur le candidat v2.8.0.
+L’existence de ces fichiers ne prouve pas qu’ils ont tous réussi sur le candidat v2.9.0.
 
 ## Risques restant — P0
 

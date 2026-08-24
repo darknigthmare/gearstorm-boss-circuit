@@ -2,26 +2,28 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 
-export const ASSET_RELEASE = '2.7.0';
+export const ASSET_RELEASE = '2.9.0';
 export const ASSET_DIRECTORY = 'v' + ASSET_RELEASE;
-export const ASSET_MANIFEST_PATH = 'assets/generated/v2.7.0/asset-manifest.json';
+export const ASSET_MANIFEST_PATH = 'assets/generated/v2.9.0/asset-manifest.json';
 export const ASSET_BUDGET_BYTES = 22 * 1024 * 1024;
 export const EXPECTED_COUNTS = Object.freeze({
-  runtimeFiles: 225,
+  runtimeFiles: 233,
   arenaLayers: 24,
   arenaBackdrops: 24,
   bossParts: 150,
-  heroineParts: 11,
+  heroineParts: 15,
   vfx: 16,
-  alpha: 195,
-  opaque: 30,
-  masters: 26,
+  narrative: 4,
+  alpha: 199,
+  opaque: 34,
+  masters: 42,
 });
 export const CATEGORY_BUDGETS = Object.freeze({
   arena: 512 * 1024,
   boss: 256 * 1024,
   heroine: 256 * 1024,
   vfx: 128 * 1024,
+  narrative: 2 * 1024 * 1024,
 });
 export const CORE_BOSS_IDS = Object.freeze(['rammer', 'kraken', 'drill', 'mantis', 'cyclotron', 'omega']);
 export const EXPANSION_BOSS_IDS = Object.freeze([
@@ -32,6 +34,21 @@ export const EXPANSION_BOSS_IDS = Object.freeze([
 ]);
 export const BOSS_IDS = Object.freeze([...CORE_BOSS_IDS, ...EXPANSION_BOSS_IDS]);
 export const EXPANSION_PART_NAMES = Object.freeze(['chassis', 'core', 'appendage-left', 'appendage-right']);
+export const RIVA_ANATOMY_PART_NAMES = Object.freeze([
+  'thigh-far', 'shin-far', 'boot-far', 'upper-arm-far', 'forearm-far',
+  'pelvis', 'torso', 'thigh-near', 'shin-near', 'boot-near',
+  'upper-arm-near', 'forearm-cannon-near', 'head',
+]);
+export const RIVA_EFFECT_PART_NAMES = Object.freeze(['dash-trail', 'overload-halo']);
+export const RIVA_PART_NAMES = Object.freeze([...RIVA_ANATOMY_PART_NAMES, ...RIVA_EFFECT_PART_NAMES]);
+export const RIVA_RENDER_ORDER = Object.freeze([
+  'dash-trail',
+  'thigh-far', 'shin-far', 'boot-far', 'upper-arm-far', 'forearm-far',
+  'pelvis', 'torso', 'thigh-near', 'shin-near', 'boot-near',
+  'upper-arm-near', 'forearm-cannon-near', 'head',
+  'overload-halo',
+]);
+export const NARRATIVE_NAMES = Object.freeze(['intro-broadcast', 'prologue-m0', 'campaign-ending', 'forge-ending']);
 const ARENA_LAYERS = Object.freeze(['far', 'mid', 'ground', 'foreground']);
 const WEBP_HEADER = Buffer.from('WEBP');
 const RIFF_HEADER = Buffer.from('RIFF');
@@ -54,6 +71,93 @@ function hasChunk(bytes, chunk) {
 function normalizedPoint(value, label) {
   invariant(value && Number.isFinite(value.x) && Number.isFinite(value.y), label + ': point absent');
   invariant(value.x >= 0 && value.x <= 1 && value.y >= 0 && value.y <= 1, label + ': point hors canevas');
+}
+
+function pixelPair(value, label, bounded = false) {
+  invariant(Array.isArray(value) && value.length === 2 && value.every(Number.isFinite), label + ': paire de pixels absente');
+  if (bounded) invariant(value.every(coordinate => coordinate >= 0 && coordinate < 418), label + ': pivot hors canevas');
+}
+
+function pixelBounds(value, label) {
+  invariant(Array.isArray(value) && value.length === 4 && value.every(Number.isInteger), label + ': bbox [x,y,w,h] absente');
+  const [x, y, width, height] = value;
+  invariant(x >= 0 && y >= 0 && width > 0 && height > 0 && x + width <= 418 && y + height <= 418, label + ': bbox hors canevas');
+}
+
+function normalizedRect(value, label) {
+  invariant(value && [value.x, value.y, value.width, value.height].every(Number.isFinite), label + ': rectangle absent');
+  invariant(value.x >= 0 && value.y >= 0 && value.width > 0 && value.height > 0, label + ': rectangle invalide');
+  invariant(value.x + value.width <= 1 && value.y + value.height <= 1, label + ': rectangle hors image');
+}
+
+function validateHeroineRig(heroine) {
+  invariant(heroine?.id === 'riva-spark', 'Heroine riva-spark attendue');
+  keysMatch(heroine.parts, RIVA_PART_NAMES, 'Pieces heroine v2.9');
+  const rig = heroine.rig;
+  invariant(rig?.schemaVersion === 1, 'Riva: schema rig 1 attendu');
+  invariant(rig?.canvas?.width === 418 && rig?.canvas?.height === 418, 'Riva: canevas rig 418x418 attendu');
+  invariant(rig?.coordinateSpace === 'player-local-pixels', 'Riva: espace de coordonnees invalide');
+  invariant(rig?.feetLocalY === 36, 'Riva: pieds locaux a 36 attendus');
+  invariant(Number.isFinite(rig?.rootOffsetY) && rig.rootOffsetY < 0 && rig.rootOffsetY > -100, 'Riva: calibration verticale absente');
+  invariant(rig?.ground?.physicalY === 620 && rig?.ground?.localY === 36, 'Riva: contrat sol 620/36 invalide');
+  pixelPair(rig?.muzzle, 'Riva: muzzle');
+  invariant(rig.muzzle[0] === 60 && rig.muzzle[1] === -44, 'Riva: muzzle [60,-44] attendu');
+  invariant(Array.isArray(rig.parts) && rig.parts.length === EXPECTED_COUNTS.heroineParts, 'Riva: 15 specs rig attendues');
+  invariant(JSON.stringify(rig.renderOrder) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: renderOrder incoherent');
+  invariant(JSON.stringify(rig.parts.map(part => part.name)) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: specs non triees par z');
+
+  const names = new Set();
+  let previousZ = -Infinity;
+  for (const spec of rig.parts) {
+    invariant(!names.has(spec.name), 'Riva: spec dupliquee ' + spec.name);
+    names.add(spec.name);
+    invariant(RIVA_PART_NAMES.includes(spec.name), 'Riva: spec inconnue ' + spec.name);
+    pixelPair(spec.joint, 'Riva ' + spec.name + ': joint');
+    pixelPair(spec.pivot, 'Riva ' + spec.name + ': pivot', true);
+    pixelBounds(spec.bbox, 'Riva ' + spec.name);
+    invariant(Number.isFinite(spec.scale) && spec.scale >= 0.05 && spec.scale <= 0.6, 'Riva ' + spec.name + ': scale invalide');
+    invariant(Number.isInteger(spec.z) && spec.z > previousZ, 'Riva ' + spec.name + ': z non strictement croissant');
+    previousZ = spec.z;
+    invariant(typeof spec.motion === 'string' && spec.motion.length > 0, 'Riva ' + spec.name + ': motion absent');
+    invariant([null, ...RIVA_ANATOMY_PART_NAMES].includes(spec.parent) && spec.parent !== spec.name, 'Riva ' + spec.name + ': parent invalide');
+    invariant(['far', 'near', 'center'].includes(spec.side), 'Riva ' + spec.name + ': side invalide');
+    invariant(Number.isInteger(spec.coveragePixels) && spec.coveragePixels >= 64, 'Riva ' + spec.name + ': couverture insuffisante');
+  }
+
+  const measuredFeet = Math.max(...rig.parts
+    .filter(spec => RIVA_ANATOMY_PART_NAMES.includes(spec.name))
+    .map(spec => spec.joint[1] + (spec.bbox[1] + spec.bbox[3] - spec.pivot[1]) * spec.scale));
+  invariant(Math.abs(measuredFeet - rig.feetLocalY) <= 0.05,
+    'Riva: bas alpha reel ' + measuredFeet + ' different de feetLocalY ' + rig.feetLocalY);
+
+  const anatomySources = new Set();
+  for (const name of RIVA_ANATOMY_PART_NAMES) {
+    const part = heroine.parts[name];
+    invariant(part.role === 'anatomy' && part.nativePart === true, 'Riva ' + name + ': piece anatomique native attendue');
+    invariant(part.source?.masterFile === 'assets/generated/riva-v2.9-sources/' + name + '-openai-v1.png', 'Riva ' + name + ': master natif incorrect');
+    invariant(/^[a-f0-9]{64}$/.test(part.source?.masterSha256 || ''), 'Riva ' + name + ': hash master absent');
+    anatomySources.add(part.source.masterFile);
+  }
+  invariant(anatomySources.size === RIVA_ANATOMY_PART_NAMES.length, 'Riva: chaque anatomie doit venir de son propre master');
+
+  const effectCells = { 'dash-trail': 7, 'overload-halo': 8 };
+  for (const name of RIVA_EFFECT_PART_NAMES) {
+    const part = heroine.parts[name];
+    invariant(part.role === 'effect', 'Riva ' + name + ': role effect attendu');
+    invariant(part.source?.masterFile === 'assets/generated/riva/riva-parts-openai-v1.png', 'Riva ' + name + ': atlas effet incorrect');
+    invariant(part.source?.atlasCell === effectCells[name], 'Riva ' + name + ': cellule effet incorrecte');
+  }
+  invariant(rig.canonicalReference?.masterFile === 'assets/generated/riva-v2.9-sources/riva-canonical-openai-v1.png', 'Riva: reference canonique absente');
+  invariant(/^[a-f0-9]{64}$/.test(rig.canonicalReference?.masterSha256 || ''), 'Riva: hash canonique absent');
+}
+
+function validateProvenance(asset, mastersByFile, label) {
+  const provenance = asset.source || asset;
+  invariant(typeof provenance?.masterFile === 'string', label + ': masterFile absent');
+  const master = mastersByFile.get(provenance.masterFile);
+  invariant(master, label + ': master non declare ' + provenance.masterFile);
+  invariant(master.sha256 === provenance.masterSha256, label + ': hash de provenance incoherent');
+  if (provenance.promptId) invariant(master.promptId === provenance.promptId, label + ': promptId de provenance incoherent');
 }
 
 export function readWebpMetadata(bytes, label = 'WebP') {
@@ -125,6 +229,9 @@ export function flattenAssetManifest(manifest) {
   for (const [name, asset] of Object.entries(manifest.vfx || {})) {
     entries.push({ id: 'vfx:' + name, kind: 'vfx', owner: 'combat', name, ...asset });
   }
+  for (const [name, asset] of Object.entries(manifest.narrative || {})) {
+    entries.push({ id: 'narrative:' + name, kind: 'narrative', owner: 'story', name, ...asset });
+  }
   return entries;
 }
 
@@ -143,8 +250,10 @@ function validateDimensions(entry) {
     invariant(entry.width === expected[0] && entry.height === expected[1], entry.id + ': dimensions arene ' + expected.join('x') + ' attendues');
   } else if (entry.kind === 'boss' || entry.kind === 'heroine') {
     invariant(entry.width === 418 && entry.height === 418, entry.id + ': une piece articulee doit mesurer 418x418');
-  } else {
+  } else if (entry.kind === 'vfx') {
     invariant([313, 314].includes(entry.width) && [313, 314].includes(entry.height), entry.id + ': un VFX doit mesurer 313 ou 314 px par cote');
+  } else {
+    invariant(entry.kind === 'narrative' && entry.width === 1280 && entry.height === 720, entry.id + ': un visuel narratif doit mesurer 1280x720');
   }
 }
 
@@ -182,7 +291,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   const manifestFile = resolve(root, ASSET_MANIFEST_PATH);
   const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
 
-  invariant(manifest.schemaVersion === 2, 'asset-manifest: schemaVersion 2 attendu');
+  invariant(manifest.schemaVersion === 3, 'asset-manifest: schemaVersion 3 attendu');
   invariant(manifest.release === ASSET_RELEASE, 'asset-manifest: release ' + ASSET_RELEASE + ' attendue');
   invariant(typeof manifest.generator === 'string' && manifest.generator.length > 0, 'asset-manifest: generateur absent');
   invariant(typeof manifest.license === 'string' && manifest.license.length > 0, 'asset-manifest: licence absente');
@@ -194,7 +303,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   for (const bossId of CORE_BOSS_IDS) {
     const arena = manifest.arenas[bossId];
     invariant(arena.kind === 'parallax', 'Arene core ' + bossId + ': parallax attendu');
-    invariant(arena.groundY === 620, 'Arene core ' + bossId + ': groundY 620 attendu');
+    invariant(arena.groundY === 620 && arena.visualOffsetY === 80, 'Arene core ' + bossId + ': sol 620 / offset visuel 80 attendus');
     keysMatch(arena.layers, ARENA_LAYERS, 'Couches arene ' + bossId);
     invariant(Object.keys(manifest.bosses[bossId].parts || {}).length === 9, 'Boss ' + bossId + ': 9 pieces attendues');
     for (const [layer, asset] of Object.entries(arena.layers)) {
@@ -206,24 +315,34 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   for (const bossId of EXPANSION_BOSS_IDS) {
     const arena = manifest.arenas[bossId];
     invariant(arena.kind === 'backdrop', 'Arene Forge ' + bossId + ': backdrop attendu');
-    invariant(arena.groundY === 620 && arena.telegraphSafe === true, 'Arene Forge ' + bossId + ': contrat gameplay invalide');
+    invariant(arena.groundY === 620 && arena.visualOffsetY === 28 && arena.telegraphSafe === true, 'Arene Forge ' + bossId + ': contrat sol/offset gameplay invalide');
     invariant(arena.backdrop?.alpha === false, 'Arene Forge ' + bossId + ': backdrop opaque attendu');
     invariant(/^[a-f0-9]{64}$/.test(arena.source?.masterSha256 || ''), 'Arene Forge ' + bossId + ': provenance master invalide');
     invariant(Number.isInteger(arena.source?.atlasCell) && arena.source.atlasCell >= 0 && arena.source.atlasCell < 4, 'Arene Forge ' + bossId + ': cellule atlas invalide');
     validateExpansionRig(bossId, manifest.bosses[bossId]);
   }
 
-  invariant(manifest.heroine?.id === 'riva-spark', 'Heroine riva-spark attendue');
-  invariant(Object.keys(manifest.heroine.parts || {}).length === EXPECTED_COUNTS.heroineParts, '11 pieces heroine attendues');
+  validateHeroineRig(manifest.heroine);
   invariant(Object.keys(manifest.vfx || {}).length === EXPECTED_COUNTS.vfx, '16 VFX attendus');
+  keysMatch(manifest.narrative, NARRATIVE_NAMES, 'Visuels narratifs');
+  for (const name of NARRATIVE_NAMES) {
+    const asset = manifest.narrative[name];
+    invariant(asset.alpha === false && asset.width === 1280 && asset.height === 720, 'Narratif ' + name + ': WebP opaque 1280x720 attendu');
+    normalizedPoint(asset.focalPoint, 'Narratif ' + name + ': focalPoint');
+    normalizedRect(asset.safeTextZone, 'Narratif ' + name + ': safeTextZone');
+    invariant(asset.source?.masterFile === 'assets/generated/narrative-v2.9-sources/' + name + '-openai-v1.png', 'Narratif ' + name + ': master incorrect');
+    invariant(/^[a-f0-9]{64}$/.test(asset.source?.masterSha256 || ''), 'Narratif ' + name + ': hash master absent');
+  }
 
   invariant(Array.isArray(manifest.sourceMasters) && manifest.sourceMasters.length === EXPECTED_COUNTS.masters, EXPECTED_COUNTS.masters + ' masters de provenance attendus');
   const masterFiles = new Set();
+  const mastersByFile = new Map();
   for (const master of manifest.sourceMasters) {
     invariant(typeof master.file === 'string' && /^assets\/generated\/.+\.png$/.test(master.file), 'Master: chemin PNG invalide');
-    invariant(!master.file.includes('/v2.7.0/'), 'Master publie dans le runtime: ' + master.file);
+    invariant(!master.file.includes('/' + ASSET_DIRECTORY + '/'), 'Master publie dans le runtime: ' + master.file);
     invariant(!masterFiles.has(master.file), 'Master duplique: ' + master.file);
     masterFiles.add(master.file);
+    mastersByFile.set(master.file, master);
     invariant(/^[a-f0-9]{64}$/.test(master.sha256 || ''), 'Master: SHA-256 invalide ' + master.file);
     if (!validateMasters) continue;
     const bytes = await readFile(resolve(root, master.file));
@@ -233,11 +352,24 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
     invariant(png.width === master.width && png.height === master.height, 'Master: dimensions incoherentes ' + master.file);
   }
 
+  invariant(manifest.sourceMasters.filter(master => master.file.startsWith('assets/generated/riva-v2.9-sources/')).length === 14, '14 masters Riva v2.9 attendus');
+  invariant(manifest.sourceMasters.filter(master => master.file.startsWith('assets/generated/narrative-v2.9-sources/')).length === 4, '4 masters narratifs v2.9 attendus');
+  for (const [name, asset] of Object.entries(manifest.heroine.parts)) {
+    validateProvenance(asset, mastersByFile, 'Riva ' + name);
+  }
+  validateProvenance(manifest.heroine.rig.canonicalReference, mastersByFile, 'Riva canonique');
+  for (const [name, asset] of Object.entries(manifest.narrative)) {
+    validateProvenance(asset, mastersByFile, 'Narratif ' + name);
+  }
+
   const entries = flattenAssetManifest(manifest);
   invariant(entries.length === EXPECTED_COUNTS.runtimeFiles, EXPECTED_COUNTS.runtimeFiles + ' assets runtime attendus, recu ' + entries.length);
   invariant(entries.filter(entry => entry.kind === 'arena' && entry.name !== 'backdrop').length === EXPECTED_COUNTS.arenaLayers, '24 couches arene attendues');
   invariant(entries.filter(entry => entry.kind === 'arena' && entry.name === 'backdrop').length === EXPECTED_COUNTS.arenaBackdrops, '24 backdrops Forge attendus');
   invariant(entries.filter(entry => entry.kind === 'boss').length === EXPECTED_COUNTS.bossParts, '150 pieces boss attendues');
+  invariant(entries.filter(entry => entry.kind === 'heroine').length === EXPECTED_COUNTS.heroineParts, '15 pieces heroine attendues');
+  invariant(entries.filter(entry => entry.kind === 'vfx').length === EXPECTED_COUNTS.vfx, '16 VFX attendus');
+  invariant(entries.filter(entry => entry.kind === 'narrative').length === EXPECTED_COUNTS.narrative, '4 visuels narratifs attendus');
 
   const ids = new Set();
   const sources = new Set();
@@ -249,7 +381,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   for (const entry of entries) {
     invariant(!ids.has(entry.id), 'Identifiant duplique: ' + entry.id);
     ids.add(entry.id);
-    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.7\.0\/.+\.webp$/.test(entry.src), entry.id + ': chemin runtime invalide');
+    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.9\.0\/.+\.webp$/.test(entry.src), entry.id + ': chemin runtime invalide');
     invariant(!entry.src.includes('..') && !entry.src.includes('\\'), entry.id + ': chemin non securise');
     invariant(!sources.has(entry.src), 'Source dupliquee: ' + entry.src);
     sources.add(entry.src);
@@ -286,6 +418,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
     bossParts: EXPECTED_COUNTS.bossParts,
     heroineParts: EXPECTED_COUNTS.heroineParts,
     vfx: EXPECTED_COUNTS.vfx,
+    narrative: EXPECTED_COUNTS.narrative,
     totalBytes,
   };
   for (const [key, expected] of Object.entries(expectedSummary)) {

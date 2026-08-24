@@ -280,7 +280,7 @@
   const storyArchiveProgress = document.querySelector('#story-archive-progress');
 
 
-  const ART_MANIFEST_URL = 'assets/generated/v2.7.0/asset-manifest.json';
+  const ART_MANIFEST_URL = 'assets/generated/v2.9.0/asset-manifest.json';
   const artLoader = document.querySelector('#art-loader');
   const artLoaderLabel = document.querySelector('#art-loader-label');
   const artLoaderProgress = document.querySelector('#art-loader-progress');
@@ -300,11 +300,14 @@
     initialPromise: null
   };
 
-  const RIVA_RENDER_SCALE = 1;
-  const RIVA_FOOT_OFFSET = 0;
+  const RIVA_RENDER_SCALE = 1.10;
+  const RIVA_FOOT_OFFSET = 3.6;
   const RIVA_MUZZLE = Object.freeze({ x: 45, y: -8 });
-  // Le bord droit alpha du firing-arm v4 donne le canon a x ~= 60.
-  const RIVA_GENERATED_MUZZLE = Object.freeze({ x: 60, y: -56 });
+  const HERO_EFFECT_PARTS = Object.freeze(new Set(['dash-trail', 'overload-halo']));
+  const HERO_RIG_BUFFER_SIZE = 512;
+  const heroRigCanvas = document.createElement('canvas');
+  heroRigCanvas.width = heroRigCanvas.height = HERO_RIG_BUFFER_SIZE;
+  const heroRigContext = heroRigCanvas.getContext('2d');
   const BOSS_WEAK_POINTS = Object.freeze({
     rammer: Object.freeze({ x: 20, y: -42, r: 30, part: 'core' }),
     kraken: Object.freeze({ x: 0, y: 5, r: 34, part: 'core' }),
@@ -326,15 +329,6 @@
       sourceRect: sourceRect ? Object.freeze(sourceRect) : null
     });
   }
-
-  const HERO_RIG = Object.freeze({
-    'dash-trail': rigPart('dash-trail', 1, [-46, 0], [209, 169], 0.27, [0, 51, 418, 287], 'trail'),
-    'overload-halo': rigPart('overload-halo', 1, [0, -8], [182, 158], 0.3, [0, 6, 364, 309], 'halo'),
-    // Composite OpenAI v4 : un corps unique fixe les semelles au sol ; seul
-    // l'avant-bras/canon reste independant pour le recul au socket de tir.
-    'body-core': rigPart('body-core', 1, [0, 36], [209, 409], 0.3, [138, 9, 280, 409], 'body'),
-    'firing-arm': rigPart('firing-arm', 1, [16, -56], [70, 180], 0.135, [24, 119, 394, 298], 'weapon')
-  });
 
   const BOSS_RIGS = Object.freeze({
     rammer: Object.freeze({
@@ -576,38 +570,111 @@
     return true;
   }
 
-  function drawRigPart(entry, spec, pose = {}) {
+  function drawRigPart(entry, spec, pose = {}, target = ctx) {
     const image = generatedImage(entry);
     if (!image || !spec) return false;
     const joint = pose.joint || spec.joint;
     const scale = spec.scale * (pose.scale ?? 1);
-    ctx.save();
-    ctx.translate(joint[0] + (pose.x || 0), joint[1] + (pose.y || 0));
-    ctx.rotate((pose.rotation || 0) + (pose.baseRotation || 0));
-    ctx.scale((pose.flipX ? -1 : 1) * scale, scale);
-    ctx.globalAlpha *= pose.alpha ?? 1;
-    ctx.imageSmoothingEnabled = true;
+    target.save();
+    target.translate(joint[0] + (pose.x || 0), joint[1] + (pose.y || 0));
+    target.rotate((pose.rotation || 0) + (pose.baseRotation || 0));
+    target.scale((pose.flipX ? -1 : 1) * scale, scale);
+    target.globalAlpha *= pose.alpha ?? 1;
+    target.imageSmoothingEnabled = true;
     // Le carre 418 px reste intact en memoire, mais le pivot semantique compense
     // sa marge alpha asymetrique. Aucun master ni atlas source n'est dessine.
     if (spec.sourceRect) {
       const [sx, sy, sw, sh] = spec.sourceRect;
-      ctx.drawImage(image, sx, sy, sw, sh, sx - spec.pivot[0], sy - spec.pivot[1], sw, sh);
+      target.drawImage(image, sx, sy, sw, sh, sx - spec.pivot[0], sy - spec.pivot[1], sw, sh);
     } else {
-      ctx.drawImage(image, -spec.pivot[0], -spec.pivot[1]);
+      target.drawImage(image, -spec.pivot[0], -spec.pivot[1]);
     }
-    ctx.restore();
+    target.restore();
     return true;
+  }
+
+  function heroineRigParts() {
+    const declared = artRuntime.manifest?.heroine?.rig?.parts;
+    const specs = Array.isArray(declared) ? declared : Object.values(declared || {});
+    return specs
+      .filter(spec => spec
+        && typeof spec.name === 'string'
+        && Array.isArray(spec.joint) && spec.joint.length === 2 && spec.joint.every(Number.isFinite)
+        && Array.isArray(spec.pivot) && spec.pivot.length === 2 && spec.pivot.every(Number.isFinite)
+        && Array.isArray(spec.bbox) && spec.bbox.length === 4 && spec.bbox.every(Number.isFinite)
+        && Number.isFinite(spec.scale) && spec.scale > 0)
+      .sort((left, right) => (Number(left.z) || 0) - (Number(right.z) || 0));
+  }
+
+  function isHeroEffectPart(spec) {
+    return HERO_EFFECT_PARTS.has(spec?.name) || ['trail', 'halo'].includes(spec?.motion);
+  }
+
+  function heroineAnatomyParts() {
+    return heroineRigParts().filter(spec => !isHeroEffectPart(spec));
+  }
+
+  function heroineRigMuzzle() {
+    const declared = artRuntime.manifest?.heroine?.rig?.muzzle;
+    const x = Array.isArray(declared) ? Number(declared[0]) : Number(declared?.x);
+    const y = Array.isArray(declared) ? Number(declared[1]) : Number(declared?.y);
+    return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
+  }
+
+  function renderedHeroMuzzle() {
+    const declared = heroineRigMuzzle();
+    if (!declared) return { ...RIVA_MUZZLE };
+    return {
+      x: declared.x * RIVA_RENDER_SCALE,
+      y: declared.y * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET
+    };
+  }
+
+  function getArenaVisualOffset(id) {
+    const value = Number(artRuntime.manifest?.arenas?.[id]?.visualOffsetY);
+    return Number.isFinite(value) ? clamp(value, -H, H) : 0;
+  }
+
+  function drawArenaImageWithOffset(image, x, y, width, height, offsetY, fillTop = false) {
+    const shiftedY = y + offsetY;
+    if (fillTop && shiftedY > 0) {
+      const sourceWidth = image.naturalWidth || image.width;
+      const sourceHeight = image.naturalHeight || image.height;
+      const gapHeight = Math.min(H, shiftedY);
+      const sourceGap = Math.max(1, Math.min(sourceHeight, Math.ceil(gapHeight * sourceHeight / Math.max(1, height))));
+      ctx.drawImage(image, 0, 0, sourceWidth, sourceGap, x, 0, width, gapHeight);
+    }
+    ctx.drawImage(image, x, shiftedY, width, height);
+  }
+
+  function heroAnatomyPose(spec, gait, speedPose, airborne, firing) {
+    const key = ((spec.motion || '') + ' ' + spec.name).toLowerCase();
+    const side = spec.name.endsWith('-far') ? -1 : 1;
+    const stride = gait * speedPose;
+    const pose = { rotation: 0 };
+    if (key.includes('head')) pose.rotation = -stride * 0.006 - airborne * 0.006;
+    else if (key.includes('torso')) pose.rotation = stride * 0.008 - airborne * 0.018;
+    else if (key.includes('pelvis')) pose.rotation = -stride * 0.006;
+    else if (key.includes('upper-arm')) pose.rotation = side * stride * 0.018 - (key.includes('near') ? firing * 0.012 : 0);
+    else if (key.includes('forearm')) {
+      pose.rotation = -side * stride * 0.014 - (key.includes('cannon') ? firing * 0.024 : 0);
+      if (key.includes('cannon') && firing) pose.x = -2.5;
+    } else if (key.includes('thigh')) pose.rotation = side * stride * 0.024;
+    else if (key.includes('shin')) pose.rotation = -side * stride * 0.018;
+    else if (key.includes('boot')) pose.rotation = side * stride * 0.009;
+    return pose;
   }
 
   function drawGeneratedArena(data) {
     const arena = artRuntime.manifest?.arenas?.[data.id];
     if (!arena) return false;
     void preloadGeneratedBossBundle(data.id);
+    const visualOffsetY = getArenaVisualOffset(data.id);
     const backdrop = generatedImage(arena.backdrop);
     if (backdrop) {
       ctx.save();
       ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(backdrop, 0, 0, W, H);
+      drawArenaImageWithOffset(backdrop, 0, 0, W, H, visualOffsetY, true);
       ctx.restore();
       return true;
     }
@@ -626,7 +693,7 @@
       ctx.save();
       ctx.globalAlpha = combatFade;
       ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(image, -margin + shift, -margin * 0.3, W + margin * 2, H + margin * 0.6);
+      drawArenaImageWithOffset(image, -margin + shift, -margin * 0.3, W + margin * 2, H + margin * 0.6, visualOffsetY, layerName === 'far');
       ctx.restore();
       painted = true;
     }
@@ -635,45 +702,51 @@
 
   function heroArtReady() {
     const parts = artRuntime.manifest?.heroine?.parts;
-    return !!parts && ['body-core', 'firing-arm'].every(name => generatedImage(parts[name]));
+    const rigParts = heroineRigParts();
+    const anatomyParts = rigParts.filter(spec => !isHeroEffectPart(spec));
+    return !!parts
+      && !!heroRigContext
+      && rigParts.length === 15
+      && anatomyParts.length === 13
+      && rigParts.every(spec => generatedImage(parts[spec.name]));
   }
 
   function drawGeneratedPlayer() {
     const parts = artRuntime.manifest?.heroine?.parts;
     if (!heroArtReady()) return false;
-    ctx.save();
-    // Le pivot du body-core est sa semelle : local y=36 reste exactement au sol.
-    ctx.translate(0, -RIVA_FOOT_OFFSET);
-    ctx.scale(RIVA_RENDER_SCALE, RIVA_RENDER_SCALE);
-    const gait = player.onGround ? Math.sin(player.anim) : 0;
+    const rigParts = heroineRigParts();
+    const center = HERO_RIG_BUFFER_SIZE / 2;
+    const gait = save.settings.reduceMotion || !player.onGround ? 0 : Math.sin(player.anim);
     const speedPose = Math.min(1, Math.abs(player.vx) / Math.max(1, runBuild.maxSpeed));
     const airborne = player.onGround ? 0 : clamp(player.vy / 900, -0.65, 0.65);
-    const firing = player.shotCooldown > runBuild.fireRate * 0.5 ? 1 : 0;
+    const firing = save.settings.reduceMotion ? 0 : player.shotCooldown > runBuild.fireRate * 0.5 ? 1 : 0;
 
-    if (player.dashTime > 0) {
-      drawRigPart(parts['dash-trail'], HERO_RIG['dash-trail'], {
-        scale: 1 + speedPose * 0.1,
-        alpha: 0.84
-      });
+    heroRigContext.clearRect(0, 0, HERO_RIG_BUFFER_SIZE, HERO_RIG_BUFFER_SIZE);
+    heroRigContext.save();
+    heroRigContext.translate(center, center - RIVA_FOOT_OFFSET);
+    heroRigContext.scale(RIVA_RENDER_SCALE, RIVA_RENDER_SCALE);
+    heroRigContext.rotate((player.dashTime > 0 ? -0.11 : 0) + airborne * 0.065);
+    for (const spec of rigParts) {
+      let pose;
+      if (spec.name === 'dash-trail') {
+        if (player.dashTime <= 0) continue;
+        pose = { scale: save.settings.reduceMotion ? 1 : 1 + speedPose * 0.1, alpha: 0.84 };
+      } else if (spec.name === 'overload-halo') {
+        if (player.overloadTime <= 0) continue;
+        const pulse = save.settings.reduceMotion ? 1 : 1 + Math.sin(player.anim * 2.4) * 0.055;
+        pose = { scale: pulse, alpha: 0.9 };
+      } else {
+        pose = heroAnatomyPose(spec, gait, speedPose, airborne, firing);
+      }
+      drawRigPart(parts[spec.name], spec, pose, heroRigContext);
     }
-    if (player.overloadTime > 0) {
-      const pulse = save.settings.reduceMotion ? 1 : 1 + Math.sin(player.anim * 2.4) * 0.055;
-      drawRigPart(parts['overload-halo'], HERO_RIG['overload-halo'], { scale: pulse, alpha: 0.9 });
-    }
+    heroRigContext.restore();
 
     ctx.save();
     ctx.filter = save.settings.highContrast
       ? 'drop-shadow(0px 3px 2px rgba(0,0,0,1)) drop-shadow(0px 0px 4px rgba(255,255,255,0.9))'
       : 'drop-shadow(0px 3px 2px rgba(0,0,0,0.96)) drop-shadow(0px 0px 3px rgba(102,235,255,0.44))';
-    ctx.rotate((player.dashTime > 0 ? -0.11 : 0) + airborne * 0.065);
-    drawRigPart(parts['body-core'], HERO_RIG['body-core'], {
-      rotation: gait * 0.008 * speedPose - airborne * 0.018
-    });
-    drawRigPart(parts['firing-arm'], HERO_RIG['firing-arm'], {
-      x: firing ? -2.5 : 0,
-      rotation: gait * 0.012 * speedPose - firing * 0.022
-    });
-    ctx.restore();
+    ctx.drawImage(heroRigCanvas, -center, -center);
     ctx.restore();
     return true;
   }
@@ -848,10 +921,13 @@
     return true;
   }
 
-  function staticRigBounds(specs) {
+  function staticRigBounds(specs, bboxFormat = 'ltrb') {
+    if (!specs.length) return { left: 0, top: 0, right: 0, bottom: 0 };
     const bounds = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
     for (const spec of specs) {
-      const [left, top, right, bottom] = spec.bbox;
+      const [left, top, third, fourth] = spec.bbox;
+      const right = bboxFormat === 'xywh' ? left + third : third;
+      const bottom = bboxFormat === 'xywh' ? top + fourth : fourth;
       bounds.left = Math.min(bounds.left, spec.joint[0] + (left - spec.pivot[0]) * spec.scale);
       bounds.top = Math.min(bounds.top, spec.joint[1] + (top - spec.pivot[1]) * spec.scale);
       bounds.right = Math.max(bounds.right, spec.joint[0] + (right - spec.pivot[0]) * spec.scale);
@@ -861,9 +937,19 @@
   }
 
   function getRigDiagnostics() {
-    const bodyParts = Object.values(HERO_RIG).filter(spec => !['trail', 'halo'].includes(spec.motion));
-    const bodyCore = HERO_RIG['body-core'];
-    const feetLocalY = bodyCore.joint[1] + (bodyCore.bbox[3] - bodyCore.pivot[1]) * bodyCore.scale;
+    const heroParts = heroineRigParts();
+    const anatomyParts = heroParts.filter(spec => !isHeroEffectPart(spec));
+    const bootParts = anatomyParts.filter(spec => spec.name.startsWith('boot-'));
+    const measuredFeet = bootParts.length
+      ? Math.max(...bootParts.map(spec => spec.joint[1] + (spec.bbox[1] + spec.bbox[3] - spec.pivot[1]) * spec.scale))
+      : 36;
+    const declaredFeet = Number(artRuntime.manifest?.heroine?.rig?.feetLocalY);
+    const feetLocalY = Number.isFinite(declaredFeet) ? declaredFeet : measuredFeet;
+    const activeArenaId = boss?.data?.id || artRuntime.activeBossId || 'rammer';
+    const visualOffsetY = getArenaVisualOffset(activeArenaId);
+    const arenaVisualOffsets = Object.fromEntries(Object.keys(artRuntime.manifest?.arenas || {})
+      .map(id => [id, getArenaVisualOffset(id)]));
+    const muzzle = heroineRigMuzzle() || RIVA_MUZZLE;
     const bossHitboxes = {
       rammer: [190, 160], kraken: [190, 160], drill: [190, 160],
       mantis: [190, 160], cyclotron: [230, 160], omega: [190, 220]
@@ -907,17 +993,29 @@
     }
     return {
       heroine: {
-        parts: Object.keys(HERO_RIG).length,
-        bodyBounds: staticRigBounds(bodyParts),
+        parts: heroParts.length,
+        anatomyParts: anatomyParts.length,
+        effectParts: heroParts.length - anatomyParts.length,
+        partNames: heroParts.map(spec => spec.name),
+        anatomyPartNames: anatomyParts.map(spec => spec.name),
+        zOrder: heroParts.map(spec => ({ name: spec.name, z: Number(spec.z) || 0 })),
+        bodyBounds: staticRigBounds(anatomyParts, 'xywh'),
         hitbox: { width: 42, height: 72, groundLocalY: 36 },
+        feet: Math.round(feetLocalY * 10) / 10,
         feetLocalY: Math.round(feetLocalY * 10) / 10,
         renderScale: RIVA_RENDER_SCALE,
+        footOffset: RIVA_FOOT_OFFSET,
         renderedFeetLocalY: Math.round((feetLocalY * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET) * 10) / 10,
-        muzzle: { ...RIVA_MUZZLE },
-        renderedMuzzle: { ...RIVA_GENERATED_MUZZLE },
-        visibleArmSources: Object.freeze({ body: 'body-core:openai-v4', firingArm: 'firing-arm:openai-v4', excluded: 'head,torso,legs,boots,arm-near,pulse-cannon,arm-far' }),
+        muzzle: { ...muzzle },
+        renderedMuzzle: renderedHeroMuzzle(),
+        loadedParts: heroParts.filter(spec => generatedImage(artRuntime.manifest?.heroine?.parts?.[spec.name])).length,
+        artReady: heroArtReady(),
+        visualOffsetY,
         facingMirroredAtRoot: true
       },
+      activeArenaId,
+      visualOffsetY,
+      arenaVisualOffsets,
       bosses
     };
   }
@@ -1170,7 +1268,7 @@
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify(save));
     } catch {
-      showToast('Sauvegarde locale indisponible');
+      showToast('SAUVEGARDE HORS CADRE // LE CHECKPOINT N’A PAS DE DISQUE', 'Sauvegarde locale indisponible.');
       return false;
     }
     syncContinueRun();
@@ -1190,10 +1288,10 @@
       link.click();
       link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 0);
-      showToast('SAUVEGARDE EXPORTÉE · JSON V5');
+      showToast('SAUVEGARDE EXPORTÉE // LE CHECKPOINT QUITTE LE NAVIGATEUR', 'Sauvegarde exportée au format JSON version 5.');
       return true;
     } catch {
-      showToast('Export de sauvegarde impossible');
+      showToast('EXPORT BLOQUÉ // LE CHECKPOINT RESTE DANS CET ÉCRAN', 'Export de sauvegarde impossible.');
       return false;
     }
   }
@@ -1207,7 +1305,7 @@
       save = imported;
       if (!persistSave()) {
         save = previousSave;
-        showToast('IMPORT ANNULE - STOCKAGE LOCAL INDISPONIBLE');
+        showToast('IMPORT ANNULÉ // LE CHECKPOINT REFUSE UNE FAUSSE ENTRÉE', 'Import annulé : stockage local indisponible.');
         announce('Import valide, mais stockage local indisponible. Progression inchangee.');
         return false;
       }
@@ -1217,11 +1315,11 @@
       buildStoryArchive();
       syncContinueRun();
       syncContinueForge();
-      showToast('SAUVEGARDE IMPORTÉE · DONNÉES VALIDÉES');
+      showToast('SAUVEGARDE IMPORTÉE // LE MENU RELIT SON CHECKPOINT', 'Sauvegarde GEARSTORM importée et validée.');
       announce('Sauvegarde GEARSTORM importée et validée.');
       return true;
     } catch {
-      showToast('IMPORT REFUSÉ · FICHIER INVALIDE');
+      showToast('IMPORT REFUSÉ // CE FICHIER N’ENTRE PAS DANS LE CANON', 'Import refusé. Le fichier de sauvegarde est invalide.');
       announce('Import refusé. Le fichier de sauvegarde est invalide.');
       return false;
     }
@@ -1303,13 +1401,13 @@
       const title = button.querySelector('.button-copy strong');
       const detail = button.querySelector('.button-copy small, [data-forge-continue-detail]');
       if (title) title.textContent = snapshot?.checkpoint === 'ending'
-        ? 'Clore le Circuit Forge'
-        : snapshot?.checkpoint === 'upgrade' ? 'Continuer le Circuit Forge' : 'Reprendre le Circuit Forge';
+        ? 'Lire la fin Forge déjà acquise'
+        : snapshot?.checkpoint === 'upgrade' ? 'Reprendre l’Atelier · offre intacte' : 'Reprendre la Forge · le checkpoint attend';
       if (detail && snapshot) detail.textContent = snapshot.checkpoint === 'ending'
-        ? 'Afficher la restauration des quatre anneaux'
+        ? 'Le compteur confirme 24 / 24 · aucun astérisque'
         : snapshot.checkpoint === 'upgrade'
-          ? 'Choisir un module avant FORGE ' + String(snapshot.bossIndex - FORGE_START_INDEX + 2).padStart(2, '0')
-          : 'Reprendre au début de ' + BOSSES[snapshot.bossIndex].name;
+          ? 'L’offre figée précède FORGE ' + String(snapshot.bossIndex + 2).padStart(2, '0')
+          : 'La barre de vie de ' + BOSSES[snapshot.bossIndex].name + ' revient au début';
     }
     const liveIndex = runMode === 'forgeRush' ? currentBossIndex : snapshot?.bossIndex;
     const entry = Number.isInteger(liveIndex) ? BOSSES[liveIndex] : null;
@@ -1317,11 +1415,13 @@
       ? Math.max(0, liveIndex - FORGE_START_INDEX + (['result', 'upgrade', 'ending'].includes(state) ? 1 : 0))
       : snapshot?.completedBosses || save.forgeCleared.length;
     if (summary) summary.textContent = save.forgeCompleted
-      ? 'Circuit Forge terminé · meilleur temps ' + formatTime(save.bestForgeRush)
-      : snapshot ? completed + ' / 24 machines neutralisées · build ' + snapshot.installed.length + ' modules' : '24 machines · quatre anneaux · sauvegarde entre chaque combat';
+      ? 'Circuit Forge terminé · la fin retient ' + formatTime(save.bestForgeRush)
+      : snapshot
+        ? completed + ' / 24 boss archivés · le checkpoint retient ' + snapshot.installed.length + ' modules'
+        : '24 boss · quatre anneaux · le menu promet de ne couper aucun combat';
     if (progress) {
       const wave = entry?.wave || Math.min(4, Math.floor(completed / 6) + 1);
-      progress.textContent = 'Vague ' + wave + ' / 4 · ' + Math.min(24, completed + 1) + ' / 24';
+      progress.textContent = 'ANNEAU ' + wave + ' / 4 // PROCHAINE BARRE DE VIE ' + Math.min(24, completed + 1) + ' / 24';
       progress.setAttribute('aria-valuenow', String(completed));
       progress.setAttribute('aria-valuemax', '24');
     }
@@ -1338,9 +1438,9 @@
     const title = button.querySelector('.button-copy strong');
     const detail = document.querySelector('#continue-run-detail');
     const labels = {
-      fight: ['Reprendre le Rush', 'Reprendre au début de MACHINE ' + machine],
-      interlude: ['Continuer l’histoire', 'Lire la transmission après MACHINE ' + machine],
-      upgrade: ['Continuer le Circuit', 'Choisir le module avant MACHINE ' + String(Math.min(CAMPAIGN_BOSSES.length, snapshot.bossIndex + 2)).padStart(2, '0')]
+      fight: ['Reprendre le direct', 'La barre de vie de MACHINE ' + machine + ' revient au début'],
+      interlude: ['Lire la scène suivante', 'La transmission après MACHINE ' + machine + ' attend hors combat'],
+      upgrade: ['Reprendre l’Atelier', 'L’offre figée précède MACHINE ' + String(Math.min(CAMPAIGN_BOSSES.length, snapshot.bossIndex + 2)).padStart(2, '0')]
     };
     const [heading, copy] = labels[snapshot.checkpoint] || labels.fight;
     if (title) title.textContent = heading;
@@ -1371,13 +1471,13 @@
     applySettings();
     if (snapshot.checkpoint === 'interlude') {
       showInterlude(snapshot.bossIndex);
-      showToast('Circuit restauré · transmission sécurisée');
+      showToast('CHECKPOINT RELU // LA TRANSMISSION REPREND SA LIGNE', 'Circuit restauré. Transmission sécurisée.');
     } else if (snapshot.checkpoint === 'upgrade') {
       showUpgradeSelection();
-      showToast('Circuit restauré · choisis le prochain module');
+      showToast('CHECKPOINT RELU // L’ATELIER GARDE LA MÊME OFFRE', 'Circuit restauré. Choisissez le prochain module.');
     } else {
       startFight(snapshot.bossIndex, { preserveRetries: true });
-      showToast('Circuit restauré · MACHINE ' + String(snapshot.bossIndex + 1).padStart(2, '0'));
+      showToast('CHECKPOINT RELU // MACHINE ' + String(snapshot.bossIndex + 1).padStart(2, '0') + ' REMET SA BARRE DE VIE', 'Circuit restauré. Machine ' + String(snapshot.bossIndex + 1).padStart(2, '0') + '.');
     }
     return true;
   }
@@ -1407,13 +1507,13 @@
     applySettings();
     if (snapshot.checkpoint === 'ending') {
       showForgeEnding(snapshot.rushElapsedBeforeBoss);
-      showToast('Circuit Forge restauré · conclusion sécurisée');
+      showToast('CHECKPOINT FORGE RELU // LA FIN RESTE ACQUISE', 'Circuit Forge restauré. Conclusion sécurisée.');
     } else if (snapshot.checkpoint === 'upgrade' && snapshot.bossIndex < FORGE_FINAL_INDEX) {
       showUpgradeSelection();
-      showToast('Circuit Forge restauré · choisis le prochain module');
+      showToast('CHECKPOINT FORGE RELU // L’ATELIER NE REROLL PAS', 'Circuit Forge restauré. Choisissez le prochain module.');
     } else {
       startFight(snapshot.bossIndex, { preserveRetries: true });
-      showToast('Circuit Forge restauré · ' + BOSSES[snapshot.bossIndex].name);
+      showToast('CHECKPOINT FORGE RELU // ' + BOSSES[snapshot.bossIndex].name + ' RECHARGE SON PATTERN', 'Circuit Forge restauré. ' + BOSSES[snapshot.bossIndex].name + '.');
     }
     syncContinueForge();
     return true;
@@ -1491,14 +1591,16 @@
     document.querySelector('#story-kicker').textContent = options.kicker || 'ARCHIVE NARRATIVE // LIGNE M-0';
     document.querySelector('#story-chapter').textContent = scene.chapter || 'TRANSMISSION';
     document.querySelector('#story-status').textContent = options.status || 'SIGNAL RESTAURÉ';
-    document.querySelector('#story-title').textContent = scene.title;
+    document.querySelector('#story-title').textContent = scene.title + (options.titleSuffix || '');
     document.querySelector('#story-location').textContent = options.location || 'Réseau civil du Circuit';
-    summary.textContent = scene.summary || '';
+    summary.textContent = (scene.summary || '') + (options.metaSummary || '');
     dialogue.textContent = '';
     for (const line of scene.lines || []) dialogue.appendChild(createStoryLine(line));
     consequence.textContent = options.consequence || '';
     consequence.hidden = !options.consequence;
     panel.dataset.tone = options.tone || 'signal';
+    const storyScreen = document.querySelector('#story-screen');
+    if (storyScreen) storyScreen.dataset.narrativeScene = options.art || 'intro';
     currentStoryKey = options.storyKey || scene.id;
     pendingStoryAction = options.onContinue || null;
     if (storyContinue) storyContinue.textContent = options.continueLabel || 'Continuer';
@@ -1510,12 +1612,15 @@
 
   function showIntroStory() {
     return renderStoryScene(STORY.intro, {
+      art: 'intro',
+      titleSuffix: ' — le jeu ouvre enfin sa première scène',
+      metaSummary: ' Le prologue sait déjà que cette conduite mènera au premier boss.',
       kicker: 'INTRODUCTION // ÉMISSION PERMANENTE',
       status: 'LIGNE M-0',
       location: 'Circuit central · Minuit réseau',
       storyKey: STORY.intro.id,
-      continueLabel: 'Ouvrir la ligne M-0 →',
-      consequence: 'Une ligne manuelle relie encore les six relais civils. Elle ne répond qu’à Riva.',
+      continueLabel: 'Couper le direct · ouvrir la ligne M-0 →',
+      consequence: 'Une ligne manuelle relie encore les six relais civils. Elle ne répond qu’à Riva. Le menu appelle cela une route critique.',
       allowBack: true,
       onContinue: () => {
         markStorySeen(STORY.intro.id);
@@ -1527,12 +1632,15 @@
 
   function showPrologueStory() {
     return renderStoryScene(STORY.prologue, {
+      art: 'prologue',
+      titleSuffix: ' — six actes, aucune ellipse',
+      metaSummary: ' Le jeu annonce six boss et promet de ne pas cacher le septième dans une ligne de dialogue.',
       kicker: STORY.prologue.kicker,
       status: STORY.prologue.status,
       location: STORY.prologue.location,
       storyKey: STORY.prologue.id,
-      continueLabel: STORY.prologue.continueLabel,
-      consequence: STORY.prologue.objective + ' · ' + STORY.prologue.method,
+      continueLabel: 'Valider le prologue · entrer dans le Circuit →',
+      consequence: STORY.prologue.objective + ' · ' + STORY.prologue.method + ' · La mission affiche sa méthode avant de demander de jouer.',
       tone: 'mission',
       allowBack: true,
       onContinue: () => {
@@ -1554,12 +1662,14 @@
       lines: act.interlude
     };
     return renderStoryScene(scene, {
+      titleSuffix: ' — le résultat rend la scène à la ville',
+      metaSummary: ' L’interlude existe à l’écran : aucun district n’est libéré hors champ.',
       kicker: 'DISTRICT RESTAURÉ // LIGNE M-0',
       status: act.civicFunction,
       location: act.district,
       storyKey: act.id,
-      continueLabel: index === CAMPAIGN_BOSSES.length - 1 ? 'Reprendre la Couronne →' : 'Accéder à l’atelier →',
-      consequence: act.restoration,
+      continueLabel: index === CAMPAIGN_BOSSES.length - 1 ? 'Lire la fin sans boss caché →' : 'Ouvrir l’Atelier · offre figée →',
+      consequence: act.restoration + ' · Le jeu archive cette restauration avant la prochaine barre de vie.',
       tone: index === CAMPAIGN_BOSSES.length - 1 ? 'resolution' : 'district',
       allowBack: false,
       onContinue: () => {
@@ -1578,6 +1688,7 @@
     if (!storyArchive) return;
     const entries = [
       { id: STORY.intro.id, chapter: STORY.intro.chapter, title: STORY.intro.title },
+      { id: STORY.prologue.id, chapter: STORY.prologue.chapter, title: STORY.prologue.title },
       ...STORY.acts.map((act, index) => ({
         id: act.id,
         chapter: 'INTERLUDE ' + String(index + 1).padStart(2, '0'),
@@ -1595,11 +1706,11 @@
       const chapter = document.createElement('span');
       chapter.textContent = unlocked ? entry.chapter : 'SIGNAL CHIFFRÉ';
       const title = document.createElement('strong');
-      title.textContent = unlocked ? entry.title : 'Transmission non restaurée';
+      title.textContent = unlocked ? entry.title : 'Transmission encore hors champ';
       item.append(chapter, title);
       storyArchive.appendChild(item);
     }
-    if (storyArchiveProgress) storyArchiveProgress.textContent = restored + ' / ' + entries.length + ' transmissions';
+    if (storyArchiveProgress) storyArchiveProgress.textContent = restored + ' / ' + entries.length + ' transmissions · aucune scène inventée';
   }
 
   function showRadioExchange(title, lines, duration = 5.2) {
@@ -1623,7 +1734,7 @@
       return {
         toPhase: phase,
         title,
-        lines: [{ speaker: 'Riva', text: profile.mechanic, channel: 'maintenance' }]
+        lines: [{ speaker: 'Riva', text: `${profile.metaLine} PHASE ${phase}/3 · ${title} entre dans le cadre.`, channel: 'maintenance' }]
       };
     }
     if (runMode !== 'rush') return null;
@@ -1645,25 +1756,119 @@
     const campaignNext = document.querySelector('#campaign-next');
     const labProgress = document.querySelector('#lab-progress');
     const startButton = document.querySelector('#start-rush');
-    if (campaignProgress) campaignProgress.textContent = liberated + ' / ' + CAMPAIGN_BOSSES.length + ' districts libérés';
+    if (campaignProgress) campaignProgress.textContent = liberated + ' / ' + CAMPAIGN_BOSSES.length + ' districts libérés · le compteur assume la progression';
     if (campaignNext) {
       campaignNext.textContent = next
-        ? 'Prochaine cible : ' + next.arena + ' · ' + next.name
-        : 'Circuit libéré · les six commandes civiles répondent';
+        ? 'Prochaine scène jouable : ' + next.arena + ' · ' + next.name
+        : 'Circuit libéré · six commandes civiles · aucun boss caché';
     }
-    if (startButton) startButton.firstChild.textContent = save.completed ? 'Rejouer le Circuit complet ' : 'Lancer un nouveau Circuit ';
+    if (startButton) startButton.firstChild.textContent = save.completed ? 'Rejouer sans annuler la fin ' : 'Relancer le prologue · Nouveau Circuit ';
     if (labProgress) {
       const files = save.codexUnlocked.length;
-      labProgress.textContent = save.unlocked + ' machine' + (save.unlocked > 1 ? 's' : '') + ' analysée' + (save.unlocked > 1 ? 's' : '') + ' sur ' + CAMPAIGN_BOSSES.length + ' · ' + BOSSES.length + ' profils Forge · ' + files + ' dossier' + (files > 1 ? 's' : '') + ' Codex.';
+      labProgress.textContent = save.unlocked + ' / ' + CAMPAIGN_BOSSES.length + ' boss de campagne relus · ' + BOSSES.length + ' profils jouables · ' + files + ' dossier' + (files > 1 ? 's' : '') + ' que le Codex accepte de montrer.';
     }
   }
 
+  function buildForgeCodex() {
+    const grid = document.querySelector('#forge-codex-grid');
+    const progress = document.querySelector('#forge-codex-progress');
+    if (!grid) return;
+    const section = document.querySelector('#forge-codex-section');
+    let ringOverview = section?.querySelector('.forge-ring-overview');
+    if (section && !ringOverview) {
+      ringOverview = document.createElement('div');
+      ringOverview.className = 'forge-ring-overview';
+      section.insertBefore(ringOverview, grid);
+    }
+    if (ringOverview) {
+      const ringFragment = document.createDocumentFragment();
+      for (const wave of Array.from(EXPANSION_STORY?.waves || [])) {
+        const ring = document.createElement('article');
+        const title = document.createElement('h4');
+        const premise = document.createElement('p');
+        title.textContent = wave.title;
+        premise.textContent = wave.premise;
+        ring.append(title, premise);
+        ringFragment.appendChild(ring);
+      }
+      ringOverview.replaceChildren(ringFragment);
+    }
+    const profiles = Array.from(EXPANSION_STORY?.bosses || []);
+    const unlockedIds = new Set(save.codexUnlocked);
+    let unlockedCount = 0;
+    const fragment = document.createDocumentFragment();
+
+    for (const profile of profiles) {
+      const unlocked = unlockedIds.has(profile.id);
+      if (unlocked) unlockedCount += 1;
+      const entry = BOSSES.find(candidate => candidate.id === profile.id);
+      const earned = save.mastery[profile.id] || [];
+      const card = document.createElement('article');
+      card.className = 'forge-codex-card';
+      card.dataset.bossId = profile.id;
+      card.dataset.state = unlocked ? 'available' : 'encrypted';
+
+      const header = document.createElement('header');
+      const number = document.createElement('span');
+      const status = document.createElement('strong');
+      number.textContent = 'FORGE ' + String(profile.number).padStart(2, '0') + ' · ANNEAU ' + profile.wave;
+      status.textContent = unlocked ? 'RELU' : 'CHIFFRÉ';
+      header.append(number, status);
+
+      const title = document.createElement('h3');
+      title.textContent = profile.codex?.title || entry?.name || profile.id;
+      const arena = document.createElement('p');
+      arena.textContent = profile.district + ' · ' + profile.civicFunction;
+      card.append(header, title, arena);
+
+      if (unlocked) {
+        const meta = document.createElement('p');
+        meta.className = 'meta-line';
+        meta.textContent = profile.metaLine;
+        const details = document.createElement('dl');
+        for (const [label, value] of [
+          ['Origine', profile.codex?.origin],
+          ['Détournement', profile.codex?.hijack],
+          ['Lecture', profile.codex?.reading],
+          ['Impact', profile.codex?.impact]
+        ]) {
+          const term = document.createElement('dt');
+          const copy = document.createElement('dd');
+          term.textContent = label;
+          copy.textContent = value || 'Donnée indisponible.';
+          details.append(term, copy);
+        }
+        const record = document.createElement('p');
+        record.className = 'codex-record';
+        record.textContent = 'Record relu : rang ' + (save.bestRanks[profile.id] || '—')
+          + ' · ' + formatTime(save.bestTimes[profile.id])
+          + ' · Maîtrise ' + earned.length + '/' + (profile.masteryContracts?.length || 3);
+        const transmission = document.createElement('p');
+        transmission.className = 'codex-transmission';
+        transmission.textContent = 'Transmission restaurée · ' + (profile.interlude || [])
+          .map(line => line.speaker + ' — ' + line.text).join('  ·  ');
+        card.append(meta, transmission, details, record);
+      } else {
+        const lock = document.createElement('p');
+        lock.className = 'meta-line';
+        lock.textContent = 'Dossier chiffré · cette règle attend encore sa victoire à l’écran.';
+        card.append(lock);
+      }
+      fragment.appendChild(card);
+    }
+
+    grid.replaceChildren(fragment);
+    if (progress) {
+      progress.textContent = unlockedCount + ' / ' + profiles.length
+        + ' dossiers relus · ' + (profiles.length - unlockedCount) + ' règles encore hors cadre';
+    }
+  }
   function buildCodex() {
     const grid = document.querySelector('#codex-grid');
     const progress = document.querySelector('#codex-progress');
     const meter = document.querySelector('#codex-progress-meter');
     const unlockedCount = save.codexUnlocked.filter(id => LEGACY_BOSS_IDS.has(id)).length;
-    if (progress) progress.textContent = unlockedCount + ' / ' + CAMPAIGN_BOSSES.length + ' machines identifiées';
+    if (progress) progress.textContent = unlockedCount + ' / ' + CAMPAIGN_BOSSES.length + ' machines identifiées · la campagne relit ses propres règles';
     if (meter) {
       meter.max = CAMPAIGN_BOSSES.length;
       meter.value = unlockedCount;
@@ -1689,7 +1894,8 @@
           details.innerHTML = '<dt>Origine</dt><dd>' + act.codex.origin + '</dd>'
             + '<dt>Détournement</dt><dd>' + act.codex.hijack + '</dd>'
             + '<dt>Lecture</dt><dd>' + act.codex.reading + '</dd>'
-            + '<dt>Impact</dt><dd>' + act.codex.impact + '</dd>';
+            + '<dt>Impact</dt><dd>' + act.codex.impact + '</dd>'
+            + '<dt>Hors cadre</dt><dd>' + act.rivaJournal + '</dd>';
         }
         let record = card.querySelector('.codex-record');
         if (!record) {
@@ -1704,6 +1910,7 @@
         }
       });
     }
+    buildForgeCodex();
     buildStoryArchive();
     syncCampaignUi();
   }
@@ -1819,11 +2026,11 @@
       if (save.settings.combatHints) setTextIfChanged(combatHint, hint);
     }
   }
-  function showToast(message) {
+  function showToast(message, announcement = message) {
     toast.textContent = message;
     toast.classList.add('visible');
     toastTimer = 2.3;
-    announce(message);
+    announce(announcement);
   }
 
   function hideToast() {
@@ -1876,21 +2083,22 @@
       const expansionStory = campaignEntry ? null : EXPANSION_STORY?.getBossById?.(entry.id);
       const intro = expansionStory?.shortIntro || entry.description;
       const objective = expansionStory?.objective || entry.description;
-      const cardCopy = intro + (objective && objective !== intro ? ' OBJECTIF · ' + objective : '');
+      const metaCopy = expansionStory?.metaLine || 'Le Laboratoire rejoue cette barre de vie sans réécrire le district.';
+      const cardCopy = intro + (objective && objective !== intro ? ' OBJECTIF · ' + objective : '') + ' HORS CADRE · ' + metaCopy;
       const button = document.createElement('button');
       button.className = 'boss-card';
       button.dataset.bossId = entry.id;
       button.dataset.bossEngine = entry.engine || (campaignEntry ? 'legacy' : 'expanded');
       button.style.setProperty('--boss-color', entry.color);
       button.disabled = !unlocked;
-      const number = (forge ? 'FORGE ' : 'MACHINE ') + String(visibleIndex + 1).padStart(2, '0');
+      const number = (campaignEntry ? 'MACHINE ' : 'FORGE ') + String(index + 1).padStart(2, '0');
       const status = forge && !campaignEntry ? ' · SIMULATION ACTIVE' : '';
       button.setAttribute('aria-label', unlocked
         ? number + ' · ' + entry.name + ' · ' + objective
         : 'Machine ' + String(visibleIndex + 1).padStart(2, '0') + ' verrouillée');
       const artPart = LEGACY_CARD_ART_PARTS[entry.id] || 'chassis';
       const artMarkup = unlocked
-        ? '<img class="boss-card-art" src="assets/generated/v2.7.0/bosses/' + entry.id + '/' + artPart + '.webp" alt="" aria-hidden="true" width="192" height="192" loading="lazy" decoding="async" draggable="false">'
+        ? '<img class="boss-card-art" src="assets/generated/v2.9.0/bosses/' + entry.id + '/' + artPart + '.webp" alt="" aria-hidden="true" width="192" height="192" loading="lazy" decoding="async" draggable="false">'
         : '';
       button.innerHTML = artMarkup + '<span><span class="boss-number">' + (unlocked ? number + status : 'VERROUILLÉE') + '</span>'
         + '<strong>' + (unlocked ? entry.name : 'SIGNATURE INCONNUE') + '</strong>'
@@ -1909,12 +2117,12 @@
     const eyebrow = document.querySelector('#boss-select-eyebrow');
     const title = document.querySelector('#boss-select-title');
     const progress = document.querySelector('#boss-select-progress, #lab-progress');
-    if (eyebrow) eyebrow.textContent = forge ? 'FORGE ÉTENDUE // 30 MACHINES' : 'MODE ENTRAÎNEMENT // CAMPAGNE';
-    if (title) title.textContent = forge ? 'Forge intégrale' : 'Laboratoire de campagne';
+    if (eyebrow) eyebrow.textContent = forge ? 'CATALOGUE INTÉGRAL // 30 BOSS QUI CONNAISSENT LE MENU' : 'LABORATOIRE // LE CANON N’AVANCE PAS';
+    if (title) title.textContent = forge ? 'Catalogue intégral · aucune machine hors champ' : 'Laboratoire de campagne · rejouer sans réécrire';
     if (progress) progress.textContent = forge
-      ? BOSSES.length + ' profils jouables · 6 machines historiques + ' + (BOSSES.length - CAMPAIGN_BOSSES.length) + ' machines Forge avec rigs et arènes OpenAI v2.7.'
-      : Math.min(save.unlocked, CAMPAIGN_BOSSES.length) + ' / ' + CAMPAIGN_BOSSES.length + ' machines de campagne accessibles en entraînement.';
-    grid.setAttribute('aria-label', forge ? 'Forge complète des 30 boss' : 'Machines de campagne débloquées');
+      ? BOSSES.length + ' profils jouables · 6 actes + ' + (BOSSES.length - CAMPAIGN_BOSSES.length) + ' boss Forge · chaque rig et chaque arène vient du manifeste OpenAI v2.9.'
+      : Math.min(save.unlocked, CAMPAIGN_BOSSES.length) + ' / ' + CAMPAIGN_BOSSES.length + ' boss relus · le Laboratoire n’altère aucun district.';
+    grid.setAttribute('aria-label', forge ? 'Catalogue complet des 30 boss' : 'Machines de campagne débloquées');
     document.querySelectorAll('#boss-select-screen [data-gearstorm-mode]').forEach(tab => {
       const tabMode = BOSS_REGISTRY?.resolveLaunchMode?.(tab.dataset.gearstormMode || tab.dataset.bossMode);
       tab.setAttribute('aria-pressed', String(tabMode === selectionMode));
@@ -2108,7 +2316,7 @@
       scoreAtBossStart = score;
       if (runMode === 'rush') saveRushSnapshot();
       else saveForgeRushSnapshot();
-      showToast('Retry : +' + RUSH_RETRY_PENALTY + ' s · -' + RUSH_RETRY_SCORE_PENALTY + ' pts');
+      showToast('RETRY // +' + RUSH_RETRY_PENALTY + ' s · -' + RUSH_RETRY_SCORE_PENALTY + ' pts · LE CHECKPOINT A TOUT COMPTÉ', 'Nouvelle tentative. Pénalité de ' + RUSH_RETRY_PENALTY + ' secondes et ' + RUSH_RETRY_SCORE_PENALTY + ' points.');
     }
   }
 
@@ -2116,17 +2324,25 @@
     const data = BOSSES[currentBossIndex];
     const act = runMode === 'rush' ? STORY.getActByOrder(currentBossIndex + 1) : null;
     const expansionStory = data.engine === 'expanded' ? EXPANSION_STORY?.getBossById?.(data.id) : null;
+    const wave = expansionStory ? EXPANSION_STORY?.waves?.find(entry => entry.number === expansionStory.wave) : null;
+    const firstInWave = !!expansionStory && EXPANSION_STORY?.forgeCircuit?.waveCheckpoints
+      ?.some(checkpoint => checkpoint.firstBossId === data.id);
     const functionLabel = expansionStory?.civicFunction || act?.civicFunction || data.epithet || data.arena;
+    const ringPrelude = firstInWave && wave ? wave.premise + ' · ' : '';
     const briefing = expansionStory
-      ? expansionStory.shortIntro + ' · OBJECTIF — ' + expansionStory.objective
-      : act?.preFight?.map(line => line.speaker + ' — ' + line.text).join('  ·  ') || data.quote;
-    document.getElementById('intro-index').textContent = data.arena + ' · MACHINE ' + String(currentBossIndex + 1).padStart(2, '0');
+      ? ringPrelude + expansionStory.shortIntro + ' · OBJECTIF — ' + expansionStory.objective
+        + ' · HORS CADRE — ' + expansionStory.metaLine
+      : act?.preFight?.map(line => line.speaker + ' — ' + line.text).join('  ·  ')
+        || data.quote + ' · HORS CADRE — Le Laboratoire garde la barre de vie et retire les conséquences.';
+    document.getElementById('intro-index').textContent = expansionStory
+      ? 'FORGE ' + String(expansionStory.number).padStart(2, '0') + ' · ANNEAU ' + expansionStory.wave
+      : data.arena + ' · MACHINE ' + String(currentBossIndex + 1).padStart(2, '0');
     document.getElementById('intro-name').textContent = data.name;
-    document.getElementById('intro-epithet').textContent = functionLabel;
+    document.getElementById('intro-epithet').textContent = wave ? wave.title + ' · ' + functionLabel : functionLabel;
     document.getElementById('intro-quote').textContent = briefing;
     bossIntro.classList.add('visible');
     bossIntro.setAttribute('aria-hidden', 'false');
-    introTimer = retry ? 1.25 : (matchMedia('(max-width: 820px)').matches ? 5.2 : 3.8);
+    introTimer = retry ? 1.25 : expansionStory ? (matchMedia('(max-width: 820px)').matches ? 7.4 : 6) : (matchMedia('(max-width: 820px)').matches ? 5.2 : 3.8);
     announce(data.name + '. ' + functionLabel);
   }
 
@@ -2263,7 +2479,7 @@
   }
 
   function playerMuzzlePosition() {
-    const muzzle = heroArtReady() ? RIVA_GENERATED_MUZZLE : RIVA_MUZZLE;
+    const muzzle = heroArtReady() ? renderedHeroMuzzle() : RIVA_MUZZLE;
     return {
       x: player.x + player.facing * muzzle.x,
       y: player.y + muzzle.y
@@ -3635,7 +3851,7 @@
     boss.collisionEnabled = false;
     if (boss.runtime) boss.runtime.environment = 'stable';
     if (isExpandedBoss()) { boss.state = 'defeat'; boss.hidden = true; }
-    if (runMode !== 'forge') unlockCodexEntry(boss.data.id);
+    unlockCodexEntry(boss.data.id);
     enemyShots = [];
     playerShots = [];
     transitionTimer = 2.45;
@@ -4032,8 +4248,8 @@
       card.dataset.supported = String(contract.supported !== false);
       const status = document.createElement('span');
       status.textContent = contract.supported === false
-        ? 'NON ÉVALUÉE · TÉLÉMÉTRIE ABSENTE'
-        : contract.earnedNow ? 'NOUVEAU · +500' : unlocked ? 'ARCHIVÉ' : 'À REFAIRE';
+        ? 'NON ÉVALUÉE · TÉLÉMÉTRIE ABSENTE · LE CONTRAT REFUSE SON SOUS-TITRE'
+        : contract.earnedNow ? 'NOUVEAU · +500 · LE SCORE A LU LA CONDITION' : unlocked ? 'ARCHIVÉ · LE JEU S’EN SOUVIENT' : 'À REFAIRE · LE CONTRAT RESTE À L’ÉCRAN';
       const title = document.createElement('strong');
       title.textContent = contract.title;
       const objective = document.createElement('small');
@@ -4054,7 +4270,7 @@
   }
 
   function describeBuild() {
-    if (!runBuild.installed.length) return 'Configuration d’origine';
+    if (!runBuild.installed.length) return 'Configuration d’origine · aucun module hors champ';
     const counts = new Map();
     for (const id of runBuild.installed) counts.set(id, (counts.get(id) || 0) + 1);
     return [...counts].map(([id, count]) => {
@@ -4063,6 +4279,26 @@
     }).join(' · ');
   }
 
+  function syncForgeResultTransmission(profile) {
+    const article = document.querySelector('#result-forge-transmission');
+    const label = document.querySelector('#result-forge-transmission-label');
+    const copy = document.querySelector('#result-forge-transmission-copy');
+    if (!article) return;
+    article.hidden = !profile;
+    if (!profile) {
+      if (copy) copy.textContent = '';
+      return;
+    }
+    const wave = EXPANSION_STORY?.waves?.find(entry => entry.number === profile.wave);
+    if (label) label.textContent = (wave?.title || 'Transmission Forge')
+      + ' // le résultat rend la règle publique';
+    if (copy) {
+      const restoredLines = (profile.interlude || [])
+        .map(line => line.speaker + ' — ' + line.text)
+        .join('  ·  ');
+      copy.textContent = restoredLines + '  ·  HORS CADRE — ' + profile.metaLine;
+    }
+  }
   function showResult() {
     hideToast();
     hideRadioExchange();
@@ -4079,24 +4315,31 @@
     recordBestRank(BOSSES[currentBossIndex].id, medal);
     const masteryResults = evaluateMasteryContracts(rankedTime);
     document.getElementById('result-eyebrow').textContent = practiceResult
-      ? 'SIMULATION TERMINÉE'
-      : forgeComplete ? 'TRÔNE ZÉRO NEUTRALISÉ' : rushComplete ? 'COURONNE NEUTRALISÉE' : 'MACHINE NEUTRALISÉE';
+      ? 'SIMULATION TERMINÉE // LE LABO N’ÉCRIT PAS LE CANON'
+      : forgeComplete
+        ? 'TRÔNE ZÉRO NEUTRALISÉ // 24 / 24 SANS ASTÉRISQUE'
+        : rushComplete ? 'COURONNE NEUTRALISÉE // LE GÉNÉRIQUE PEUT COMMENCER' : 'MACHINE NEUTRALISÉE // LE DISTRICT QUITTE L’ARÈNE';
     document.getElementById('result-title').textContent = forgeComplete
-      ? 'NULL CROWN rend ses clés'
-      : rushComplete ? 'Crown Engine Ω est tombé' : BOSSES[currentBossIndex].name;
-    document.getElementById('result-summary').textContent = expansionStory?.restoration
+      ? 'NULL CROWN rend ses clés · la fin reste acquise'
+      : rushComplete ? 'Crown Engine Ω est tombé · aucun second final' : BOSSES[currentBossIndex].name + ' · barre de vie archivée';
+    const resultSummary = expansionStory?.restoration
       || (practiceResult
         ? 'Données de combat archivées. La progression de campagne reste inchangée.'
         : act?.districtConsequence || BOSSES[currentBossIndex].transmission);
+    document.getElementById('result-summary').textContent = resultSummary
+      + (practiceResult ? ' · Le Laboratoire referme cette parenthèse.' : ' · L’écran de résultat accepte enfin de rendre la suite.');
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = true;
     const resultBuild = document.querySelector('#result-build');
     if (resultBuild) resultBuild.textContent = describeBuild();
-    if (resultLoreLabel) resultLoreLabel.textContent = expansionStory ? 'Journal de Riva · Forge' : practiceResult ? 'Rapport du Laboratoire' : 'Journal de Riva';
+    if (resultLoreLabel) resultLoreLabel.textContent = expansionStory
+      ? 'Journal de Riva // Forge et commentaire de design'
+      : practiceResult ? 'Rapport du Laboratoire // canon intact' : 'Journal de Riva // après-combat';
     if (resultLore) resultLore.textContent = expansionStory?.journal
       || (practiceResult
         ? 'Profil mécanique : ' + BOSSES[currentBossIndex].description
         : act?.rivaJournal || BOSSES[currentBossIndex].transmission);
+    syncForgeResultTransmission(expansionStory);
     renderMasteryResults(masteryResults);
 
     if (runMode === 'rush') {
@@ -4114,15 +4357,15 @@
     buildCodex();
     syncContinueForge();
     const timeLabel = lastBossRetryPenalty > 0 ? formatTime(rankedTime) + ' (+' + lastBossRetryPenalty + ' s)' : formatTime(rankedTime);
-    document.getElementById('result-stats').innerHTML = '<div><strong>' + timeLabel + '</strong><small>Temps classé</small></div>'
-      + '<div><strong>' + score.toLocaleString('fr-FR') + '</strong><small>Score · combo max ×' + maxCombo + '</small></div>'
-      + '<div><strong>' + medal + '</strong><small>Rang · ' + difficulty().name + '</small></div>';
+    document.getElementById('result-stats').innerHTML = '<div><strong>' + timeLabel + '</strong><small>Temps classé · checkpoint compris</small></div>'
+      + '<div><strong>' + score.toLocaleString('fr-FR') + '</strong><small>Score · le HUD a tout compté · combo max ×' + maxCombo + '</small></div>'
+      + '<div><strong>' + medal + '</strong><small>Rang · ' + difficulty().name + ' · le résultat signe</small></div>';
     announce(boss.data.name + ' neutralisé. Rang ' + medal + '. Temps ' + formatTime(rankedTime) + '.');
 
     const continueButton = document.getElementById('continue-button');
     continueButton.textContent = runMode === 'forgeRush'
-      ? forgeComplete ? 'Restaurer les quatre anneaux' : 'Accéder à l’atelier Forge'
-      : runMode !== 'rush' ? 'Retour au Laboratoire' : 'Lire la transmission';
+      ? forgeComplete ? 'Lire la fin des quatre anneaux' : 'Ouvrir l’Atelier · offre figée'
+      : runMode !== 'rush' ? 'Revenir au catalogue · progression intacte' : 'Lire la transmission · le district continue';
     continueButton.hidden = false;
     showScreen('result-screen');
   }
@@ -4183,7 +4426,7 @@
     }
     lastUpgradeOffer = choices.map(choice => choice.id);
     if (!choices.length) {
-      showToast('BUILD MAXIMAL · PROCHAINE MACHINE');
+      showToast('BUILD MAXIMAL // LE MENU N’A PLUS RIEN À AJOUTER', 'Build maximal. Lancement de la prochaine machine.');
       startFight(currentBossIndex + 1);
       return;
     }
@@ -4197,21 +4440,30 @@
     const summary = document.querySelector('#upgrade-screen .result-summary');
     const nextBoss = BOSSES[Math.min(currentBossIndex + 1, BOSSES.length - 1)];
     const waveChanged = runMode === 'forgeRush' && nextBoss?.wave > BOSSES[currentBossIndex]?.wave;
+    const nextWave = runMode === 'forgeRush'
+      ? EXPANSION_STORY?.waves?.find(entry => entry.number === nextBoss?.wave)
+      : null;
     if (summary) summary.textContent = waveChanged
-      ? 'Vague ' + BOSSES[currentBossIndex].wave + ' restaurée. Build : ' + describeBuild() + '. Prépare le prochain anneau.'
-      : 'Build actuel : ' + describeBuild() + '. Choisis un module pour la prochaine machine.';
-    if (waveChanged) showToast('ANNEAU ' + BOSSES[currentBossIndex].wave + ' RESTAURÉ · CHECKPOINT SÉCURISÉ');
+      ? (nextWave?.title || 'Anneau suivant') + '. ' + (nextWave?.premise || '')
+        + ' · Build conservé par le checkpoint : ' + describeBuild() + '.'
+      : 'Le build relit sa propre fiche : ' + describeBuild() + '. Choisis le module que le checkpoint devra conserver.';
+    if (waveChanged) showToast(
+      (nextWave?.title || 'ANNEAU SUIVANT').toUpperCase() + ' // CHECKPOINT SÉCURISÉ',
+      'Anneau suivant. Checkpoint sécurisé.'
+    );
     const upgradeProgress = document.querySelector('#upgrade-progress');
     const upgradeBuild = document.querySelector('#upgrade-build');
     const nextRoster = runMode === 'forgeRush' ? BOSSES : CAMPAIGN_BOSSES;
     const nextEntry = nextRoster[Math.min(currentBossIndex + 1, nextRoster.length - 1)];
-    if (upgradeProgress) upgradeProgress.textContent = (runMode === 'forgeRush' ? 'Circuit Forge · vague ' + (nextEntry?.wave || 4) + ' · ' : 'Prochaine étape : ') + (nextEntry?.arena || 'Trône Zéro');
-    if (upgradeBuild) upgradeBuild.textContent = 'Build actuel : ' + describeBuild();
+    if (upgradeProgress) upgradeProgress.textContent = runMode === 'forgeRush'
+      ? (nextWave?.title || 'Anneau ' + (nextEntry?.wave || 4)) + ' · prochaine barre de vie : ' + (nextEntry?.arena || 'Trône Zéro')
+      : 'Prochaine scène jouable : ' + (nextEntry?.arena || 'Citadelle');
+    if (upgradeBuild) upgradeBuild.textContent = 'Build relu par le checkpoint : ' + describeBuild();
     for (const upgrade of choices) {
       const button = document.createElement('button');
       button.className = 'upgrade-card';
       const stacks = runBuild.installed.filter(id => id === upgrade.id).length;
-      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.7.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
+      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.9.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
       button.addEventListener('click', () => installUpgrade(upgrade));
       grid.appendChild(button);
     }
@@ -4223,7 +4475,7 @@
     if (stacks >= upgrade.maxStacks) return;
     upgrade.apply(runBuild);
     runBuild.installed.push(upgrade.id);
-    showToast(upgrade.name + ' installé');
+    showToast(upgrade.name.toUpperCase() + ' // LE BUILD RESTE CANON', upgrade.name + ' installé.');
     startFight(currentBossIndex + 1);
   }
 
@@ -4241,19 +4493,23 @@
     persistSave();
     buildCodex();
     const epilogue = EXPANSION_STORY?.forgeCircuit?.epilogue;
+    const title = document.querySelector('#forge-ending-title');
+    const transmission = document.querySelector('#forge-ending-screen .ending-transmission');
     const summary = document.querySelector('#forge-ending-summary');
     const stats = document.querySelector('#forge-ending-stats');
+    if (title && epilogue) title.textContent = epilogue.title;
+    if (transmission && epilogue) transmission.textContent = 'Riva — ' + epilogue.riva;
     if (summary) summary.textContent = epilogue
-      ? epilogue.summary + ' ' + epilogue.riva
+      ? epilogue.summary + ' ' + epilogue.outcome
       : 'Les quatre anneaux et leurs vingt-quatre services répondent de nouveau aux districts.';
     if (stats) {
       const masteryTotal = Object.values(save.mastery).reduce((sum, contracts) => sum + (Array.isArray(contracts) ? contracts.length : 0), 0);
       const cards = [
-        ['Machines', '24 / 24'],
-        ['Temps', formatTime(total)],
-        ['Score', score.toLocaleString('fr-FR')],
-        ['Contrats', Math.min(90, masteryTotal) + ' / 90'],
-        ['Reprises', runRetryCount.toLocaleString('fr-FR')]
+        ['Boss archivés', '24 / 24'],
+        ['Temps que la fin retient', formatTime(total)],
+        ['Score que le HUD assume', score.toLocaleString('fr-FR')],
+        ['Contrats réellement lus', Math.min(90, masteryTotal) + ' / 90'],
+        ['Reprises conservées', runRetryCount.toLocaleString('fr-FR')]
       ];
       const fragment = document.createDocumentFragment();
       for (const [label, value] of cards) {
@@ -4291,7 +4547,7 @@
     persistSave();
     buildCodex();
 
-    document.getElementById('ending-title').textContent = STORY.epilogue.title;
+    document.getElementById('ending-title').textContent = STORY.epilogue.title + ' · le générique rend la ville';
     const transmission = document.querySelector('.ending-transmission');
     if (transmission) transmission.textContent = STORY.epilogue.lines.map(line => line.speaker + ' — ' + line.text).join('  ·  ');
     const resolution = document.querySelector('.ending-resolution');
@@ -4308,8 +4564,9 @@
         districts.appendChild(item);
       });
     }
-    document.getElementById('ending-summary').textContent = 'Temps du Circuit : ' + formatTime(total)
-      + ' · Score final : ' + score.toLocaleString('fr-FR') + ' · Tentatives relancées : ' + runRetryCount + ' · Build : ' + describeBuild() + '.';
+    document.getElementById('ending-summary').textContent = STORY.epilogue.summary
+      + ' · Temps que le générique retient : ' + formatTime(total)
+      + ' · Score final : ' + score.toLocaleString('fr-FR') + ' · Reprises conservées : ' + runRetryCount + ' · Build final : ' + describeBuild() + '.';
     announce('Circuit libéré en ' + formatTime(total) + '. Score final ' + score + '.');
     player = null;
     boss = null;
@@ -4337,7 +4594,7 @@
     if (briefing) briefing.hidden = true;
     bossIntro.classList.remove('visible');
     bossIntro.setAttribute('aria-hidden', 'true');
-    const bestRushText = save.bestRush ? 'Meilleur Circuit : ' + formatTime(save.bestRush) : 'Progression locale activée';
+    const bestRushText = save.bestRush ? 'Le menu se souvient du meilleur Circuit : ' + formatTime(save.bestRush) : 'Sauvegarde locale // le checkpoint se souvient';
     document.getElementById('save-note').textContent = bestRushText;
     syncContinueForge();
     showScreen('title-screen');
@@ -4582,9 +4839,11 @@
     const airborneHeight = Math.max(0, GROUND - (player.y + player.h / 2));
     const shadowScale = clamp(1 - airborneHeight / 420, 0.48, 1);
     ctx.save();
-    ctx.fillStyle = save.settings.highContrast ? 'rgba(0,0,0,0.94)' : 'rgba(0,0,0,0.68)';
+    ctx.fillStyle = 'rgba(0,0,0,0.52)';
+    ctx.shadowColor = 'rgba(0,0,0,0.52)';
+    ctx.shadowBlur = 4;
     ctx.beginPath();
-    ctx.ellipse(player.x, GROUND + 1, 18 * shadowScale, 3 * shadowScale, 0, 0, TAU);
+    ctx.ellipse(player.x, GROUND - 3, 28 * shadowScale, 6 * shadowScale, 0, 0, TAU);
     ctx.fill();
     ctx.restore();
     const blink = player.invuln > 0 && Math.floor(player.invuln * 16) % 2 === 0;
@@ -5377,7 +5636,7 @@
   });
   document.getElementById('reset-save').addEventListener('click',()=>{
     if(!confirm('Réinitialiser les boss débloqués et tous les meilleurs temps ?'))return;
-    const settings={...save.settings};save=structuredClone(DEFAULT_SAVE);save.settings=settings;persistSave();applySettings();buildBossGrid();buildCodex();syncContinueRun();syncContinueForge();showToast('Progression réinitialisée');
+    const settings={...save.settings};save=structuredClone(DEFAULT_SAVE);save.settings=settings;persistSave();applySettings();buildBossGrid();buildCodex();syncContinueRun();syncContinueForge();showToast('PROGRESSION RÉINITIALISÉE // LE MENU OUBLIE SES CHECKPOINTS', 'Progression réinitialisée.');
   });
 
   BOSS_REGISTRY?.installDomHooks?.({
@@ -5491,9 +5750,68 @@
     })
   });
 
+  function registerInstallPrompt() {
+    const button = document.querySelector('#install-app');
+    if (!button) return;
+    let promptEvent = null;
+    const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    button.hidden = true;
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      promptEvent = event;
+      button.hidden = isStandalone();
+      button.disabled = false;
+    });
+    window.addEventListener('appinstalled', () => {
+      promptEvent = null;
+      button.hidden = true;
+      showToast('INSTALLATION TERMINÉE // LE CIRCUIT GARDE SON PROPRE ÉCRAN', 'GEARSTORM est installé.');
+    });
+    button.addEventListener('click', async () => {
+      if (!promptEvent) return;
+      button.disabled = true;
+      try {
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice;
+        promptEvent = null;
+        button.hidden = choice?.outcome === 'accepted';
+        if (choice?.outcome !== 'accepted') showToast('INSTALLATION REPORTÉE // LE CIRCUIT RESTE DANS CET ONGLET', 'Installation annulée.');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+
+  function syncFullscreenControl() {
+    const button = document.querySelector('#fullscreen-toggle');
+    if (!button) return;
+    const target = document.documentElement;
+    if (typeof target.requestFullscreen !== 'function' || typeof document.exitFullscreen !== 'function') {
+      button.hidden = true;
+      return;
+    }
+    const syncLabel = () => {
+      const active = Boolean(document.fullscreenElement);
+      button.setAttribute('aria-pressed', String(active));
+      button.textContent = active
+        ? 'Quitter le plein écran · revenir au cadre'
+        : 'Plein écran · agrandir l’arène';
+    };
+    button.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await target.requestFullscreen();
+      } catch {
+        showToast('PLEIN ÉCRAN REFUSÉ // LE CADRE RESTE VISIBLE', 'Le plein écran est indisponible.');
+      }
+    });
+    document.addEventListener('fullscreenchange', syncLabel);
+    syncLabel();
+  }
+
   function registerGearstormServiceWorker() {
     if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
-    const marker = '__GEARSTORM_PWA_UPDATE_V2_8__';
+    const marker = '__GEARSTORM_PWA_UPDATE_V2_9__';
     if (globalThis[marker]) return;
     globalThis[marker] = true;
     const updateButton = document.querySelector('#update-app');
@@ -5511,7 +5829,7 @@
       if (!waiting) return;
       updateAccepted = true;
       updateButton.disabled = true;
-      updateButton.textContent = 'Mise à jour…';
+      updateButton.textContent = 'Mise à jour · le shell change de scène…';
       waiting.postMessage({ type: 'SKIP_WAITING' });
     });
     navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -5536,11 +5854,13 @@
 
   applySettings();
   artRuntime.initialPromise = initializeGeneratedArt();
+  registerInstallPrompt();
+  syncFullscreenControl();
   buildBossGrid();
   buildCodex();
   syncContinueRun();
   syncContinueForge();
-  const bestRushText=save.bestRush?`Meilleur Circuit : ${formatTime(save.bestRush)}`:'Progression locale activée';
+  const bestRushText=save.bestRush?`Le menu se souvient du meilleur Circuit : ${formatTime(save.bestRush)}`:'Sauvegarde locale // le checkpoint se souvient';
   document.getElementById('save-note').textContent=bestRushText;
   if (!routeLaunchMode()) showScreen("title-screen");
   requestAnimationFrame(frame);

@@ -1,7 +1,7 @@
 {
   "name": "GEARSTORM: Boss Circuit",
   "short_name": "GEARSTORM",
-  "description": "Une campagne boss rush 2D originale en six actes et une Forge de 24 machines : 30 boss jouables, 90 phases, histoire, Codex et 90 contrats de maîtrise.",
+  "description": "30 boss jouables, 90 phases et un Circuit méta-diégétique qui annonce ses règles sans toucher à la clarté de ses aides.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
@@ -54,7 +54,7 @@
   ],
   "shortcuts": [
     {
-      "name": "Lancer le Circuit",
+      "name": "Relancer le prologue du Circuit",
       "short_name": "Circuit",
       "url": "./?mode=rush",
       "icons": [
@@ -66,7 +66,7 @@
       ]
     },
     {
-      "name": "Ouvrir le Laboratoire",
+      "name": "Ouvrir le Laboratoire sans réécrire le canon",
       "short_name": "Labo",
       "url": "./?mode=practice",
       "icons": [
@@ -78,7 +78,7 @@
       ]
     },
     {
-      "name": "Ouvrir la Forge",
+      "name": "Ouvrir la Forge des 30 boss",
       "short_name": "Forge",
       "url": "./?mode=forge",
       "icons": [
@@ -90,7 +90,7 @@
       ]
     },
     {
-      "name": "Continuer le Circuit Forge",
+      "name": "Reprendre la Forge au checkpoint",
       "short_name": "Circuit Forge",
       "url": "./?mode=forgeRush",
       "icons": [

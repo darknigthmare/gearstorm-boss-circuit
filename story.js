@@ -12,9 +12,9 @@
     title: 'L’Émission permanente',
     summary: "Cassian Voltério détourne les six infrastructures du Circuit et transforme leurs commandes civiles en spectacle coercitif.",
     lines: [
-      line('Cassian', "Habitants du Circuit, vos voies, vos communications et votre énergie sont désormais synchronisées avec une seule volonté : la mienne.", 'broadcast'),
-      line('Système', 'Six districts verrouillés. Canaux civils interrompus. Couronne en commande exclusive.', 'system'),
-      line('Riva', "Il a verrouillé le réseau principal. Pas les conduites que personne ne regarde.", 'maintenance')
+      line('Cassian', "Habitants du Circuit, vos voies, vos communications et votre énergie suivent désormais une seule volonté : la mienne. Tout spectacle a besoin d’un cadre ; celui-ci n’aura qu’un auteur.", 'broadcast'),
+      line('Système', 'Six districts verrouillés. Six actes déclarés. Canaux civils coupés ; aucun écart au script de la Couronne.', 'system'),
+      line('Riva', "Il a verrouillé le réseau principal. Pas les conduites que personne ne regarde… ni l’option « recommencer » qu’il a laissée au menu.", 'maintenance')
     ]
   };
 
@@ -30,9 +30,9 @@
     continueLabel: 'Entrer dans le Circuit →',
     summary: "Ancienne technicienne du réseau, Riva peut encore emprunter la ligne de maintenance M-0. Chaque relais restauré ouvre physiquement la voie vers le district suivant.",
     lines: [
-      line('Riva', "J’ai entretenu ces machines pour qu’elles servent la ville. Je vais les remettre à leur place.", 'maintenance'),
-      line('Système', 'Itinéraire M-0 confirmé : Rocade, Hautes-Tensions, Fosse, Horloge, Fournaise, Citadelle.', 'system'),
-      line('Cassian', "Une ligne oubliée ne conduit nulle part, technicienne. Mais j’accepte volontiers une candidate imprévue.", 'broadcast')
+      line('Riva', "J’ai entretenu ces machines pour qu’elles servent la ville. Cette fois, je vois aussi les ficelles du niveau.", 'maintenance'),
+      line('Système', 'Six actes chargés, six districts affichés, aucun boss autorisé à attendre hors écran.', 'system'),
+      line('Cassian', "Une ligne oubliée ne conduit nulle part, technicienne. Mais un prologue doit bien livrer quelqu’un au premier boss.", 'broadcast')
     ]
   };
 
@@ -47,19 +47,19 @@
       narrativeBeat: 'intrusion',
       phaseTitles: ['Salve de rivets', 'Mines sismiques', 'Ferro-impact Overdrive'],
       preFight: [
-        line('Cassian', "Une technicienne sur ma rocade ? Rivet Rex va raccompagner l’intruse avec deux marteaux et absolument aucun frein.", 'broadcast'),
-        line('Riva', "Maintenance M-0. Arrêt d’urgence demandé. Puisque tu refuses, je vais ouvrir le noyau moi-même.", 'maintenance')
+        line('Cassian', "Une technicienne sur ma rocade ? Rivet Rex : trois phases, deux marteaux, une barre de vie et absolument aucun frein.", 'broadcast'),
+        line('Riva', "Maintenance M-0. Arrêt d’urgence demandé. Puisque tu refuses, je vais ouvrir le noyau moi-même ; le HUD pourra appeler ça une victoire.", 'maintenance')
       ],
       phaseTransitions: [
-        { toPhase: 2, title: 'Verrou renforcé', lines: [line('Cassian', "Très bien. Ajoutons des mines à ton trajet de service.", 'broadcast'), line('Riva', "Tes cycles sont bruyants, Cassian. Ils sont aussi prévisibles.", 'maintenance')] },
-        { toPhase: 3, title: 'Rocade en surcharge', lines: [line('Cassian', "Overdrive total. La route se referme ici.", 'broadcast'), line('Riva', "Une route sert à laisser passer les gens, pas à les enfermer.", 'maintenance')] }
+        { toPhase: 2, title: 'Verrou renforcé', lines: [line('Cassian', "Très bien. Ajoutons des mines à ton trajet de service.", 'broadcast'), line('Riva', "Des mines en phase deux. Ton arène suit vraiment son menu de fabrication.", 'maintenance')] },
+        { toPhase: 3, title: 'Rocade en surcharge', lines: [line('Cassian', "Overdrive total. La route se referme ici.", 'broadcast'), line('Riva', "Overdrive, noyau bientôt ouvert : merci d’annoncer le pattern avant de le jouer.", 'maintenance')] }
       ],
-      rivaJournal: "La Rocade répond encore aux anciens codes. Les convois repartent et Voltério connaît maintenant mon nom. Je ne suis plus une panne dans son émission : je suis son arrêt d’urgence.",
+      rivaJournal: "La Rocade répond encore aux anciens codes. Les convois repartent et Voltério connaît maintenant mon nom. Je ne suis plus une panne dans son émission : je suis son arrêt d’urgence, et même l’écran de résultat a dû changer mon statut.",
       districtConsequence: 'Le premier verrou cède et les axes de transport recommencent à évacuer les habitants.',
       interlude: [
         line('Canal civil', "Convoi douze en mouvement. Nous voyons de nouveau les balises de sortie.", 'civil'),
         line('Cassian', "Identifiant M-0… Riva Spark. La technicienne qui écrivait mes sécurités.", 'broadcast'),
-        line('Riva', "Celles du Circuit. Elles ne t’ont jamais appartenu.", 'maintenance')
+        line('Riva', "Celles du Circuit. Elles ne t’ont jamais appartenu ; le compteur de districts le sait maintenant.", 'maintenance')
       ],
       restoration: 'La Rocade redevient une voie publique de transport et de secours.',
       codex: {
@@ -85,19 +85,19 @@
       narrativeBeat: 'recognition',
       phaseTitles: ['Salves ioniques', 'Grille de foudre', 'Condensateur déployé'],
       preFight: [
-        line('Cassian', "Le ciel est mon studio, Spark. Chaque éclair coupe une voix qui aurait pu t’encourager.", 'broadcast'),
+        line('Cassian', "Le ciel est mon studio, Spark. Les lignes au sol annoncent chaque éclair ; même un boss aérien doit respecter son télégraphe.", 'broadcast'),
         line('Riva', "Alors je vais rendre le micro aux districts.", 'maintenance')
       ],
       phaseTransitions: [
-        { toPhase: 2, title: 'Orage de contrôle', lines: [line('Cassian', "Les lignes se croisent. Choisis donc la mauvaise sortie.", 'broadcast'), line('Riva', "Je connais la différence entre une ligne de vie et ta mise en scène.", 'maintenance')] },
-        { toPhase: 3, title: 'Condensateur critique', lines: [line('Cassian', "Toute la charge du nord dans une seule machine.", 'broadcast'), line('Riva', "Parfait. Son noyau ne pourra plus rester fermé.", 'maintenance')] }
+        { toPhase: 2, title: 'Orage de contrôle', lines: [line('Cassian', "Les lignes se croisent. Choisis donc la mauvaise sortie.", 'broadcast'), line('Riva', "Tes grilles dessinent la zone sûre avant l’impact. Même ton spectacle a une règle d’équité.", 'maintenance')] },
+        { toPhase: 3, title: 'Condensateur critique', lines: [line('Cassian', "Toute la charge du nord dans une seule machine.", 'broadcast'), line('Riva', "Toute la charge du nord, un condensateur exposé et une barre de vie : je vois la phase trois.", 'maintenance')] }
       ],
-      rivaJournal: "Le nord répond. Derrière le brouillage, des milliers de voix attendaient seulement une brèche. Cassian enregistre chacun de mes mouvements ; il prépare autre chose que le prochain combat.",
+      rivaJournal: "Le nord répond. Derrière le brouillage, des milliers de voix attendaient seulement une brèche. Cassian enregistre chacun de mes mouvements ; son journal appelle ça un pattern, moi une surveillance.",
       districtConsequence: 'Le brouillage tombe et les communications civiles relient de nouveau les districts du nord.',
       interlude: [
         line('Canal civil', "Riva, les rails de la Fosse sont encore bloqués. Nous pouvons enfin vous transmettre leurs coordonnées.", 'civil'),
         line('Cassian', "Continue à bouger. La Couronne apprécie particulièrement tes corrections de trajectoire.", 'broadcast'),
-        line('Riva', "Tu ne diffuses plus seulement le combat. Tu collectes mes solutions.", 'maintenance')
+        line('Riva', "Tu ne diffuses plus seulement le combat. Tu collectes mes solutions, et le HUD ne devrait pas avoir à l’avouer à ta place.", 'maintenance')
       ],
       restoration: 'Le Couloir rétablit le courant de secours et rend les canaux de communication aux habitants.',
       codex: {
@@ -123,19 +123,19 @@
       narrativeBeat: 'suspicion',
       phaseTitles: ['Polarité souterraine', 'Éruption magnétique', 'Foreuse en surchauffe'],
       preFight: [
-        line('Cassian', "Attraction, répulsion, obéissance : la Fosse ramène toujours son public à sa place.", 'broadcast'),
+        line('Cassian', "Attraction, répulsion, obéissance : la Fosse ramène toujours son public à sa place. Trois phases devraient suffire à te le faire comprendre.", 'broadcast'),
         line('Riva', "Pas cette fois. Les trains partiront avec tous ceux que tu retenais.", 'maintenance')
       ],
       phaseTransitions: [
-        { toPhase: 2, title: 'Polarité inversée', lines: [line('Cassian', "Le sol lui-même te réclame.", 'broadcast'), line('Riva', "Une inversion a toujours un point neutre.", 'maintenance')] },
-        { toPhase: 3, title: 'Champ instable', lines: [line('Cassian', "La Fosse va broyer jusqu’à ta dernière trajectoire.", 'broadcast'), line('Riva', "Et chaque trajectoire remonte dans ton fichier Couronne.", 'maintenance')] }
+        { toPhase: 2, title: 'Polarité inversée', lines: [line('Cassian', "Le sol lui-même te réclame.", 'broadcast'), line('Riva', "Tu inverses la polarité, pas mes commandes en secret. L’interface t’oblige encore à prévenir.", 'maintenance')] },
+        { toPhase: 3, title: 'Champ instable', lines: [line('Cassian', "La Fosse va broyer jusqu’à ta dernière trajectoire.", 'broadcast'), line('Riva', "Éruption, débris, ouverture : ton pattern final tient en trois verbes.", 'maintenance')] }
       ],
-      rivaJournal: "Les trains quittent les gradins. Dans le contrôleur de Magnetron, j’ai trouvé un dossier à mon nom : CROWN / ADAPTATION PILOTE / R. SPARK. Cassian transforme ma progression en données d’entraînement.",
+      rivaJournal: "Les trains quittent les gradins. Dans le contrôleur de Magnetron, j’ai trouvé un dossier à mon nom : CROWN / ADAPTATION PILOTE / R. SPARK. Le fichier me nomme « joueuse » ; je reste technicienne.",
       districtConsequence: 'Les attaches magnétiques se relâchent et les voies d’évacuation reprennent leur service.',
       interlude: [
         line('Canal civil', "Premier train sorti de la Fosse. Les quais se vident enfin.", 'civil'),
         line('Cassian', "Tu appelles cela une fuite. Moi, j’appelle cela un échantillon propre.", 'broadcast'),
-        line('Riva', "Tu ne m’as pas laissée passer. Tu m’as mesurée.", 'maintenance')
+        line('Riva', "Tu ne m’as pas laissée passer. Tu m’as mesurée jusque dans le compteur de retries.", 'maintenance')
       ],
       restoration: 'La Fosse reprend le tri civil et reconnecte les lignes d’évacuation aux quartiers libres.',
       codex: {
@@ -161,19 +161,19 @@
       narrativeBeat: 'revelation',
       phaseTitles: ['Trajectoire chrono', 'Lames déphasées', 'Ligne de temps'],
       preFight: [
-        line('Cassian', "Une révolte sans heure n’a jamais existé. Chrono Mantis va corriger l’archive.", 'broadcast'),
+        line('Cassian', "Une révolte sans heure n’a jamais existé. Chrono Mantis va corriger l’archive — et ton meilleur temps.", 'broadcast'),
         line('Riva', "Une archive n’a pas à te flatter. Elle doit se souvenir.", 'maintenance')
       ],
       phaseTransitions: [
-        { toPhase: 2, title: 'Archive déphasée', lines: [line('Cassian', "Je peux effacer l’instant où tu croyais gagner.", 'broadcast'), line('Riva', "Pas si chaque district en conserve maintenant une copie.", 'maintenance')] },
-        { toPhase: 3, title: 'Minute zéro', lines: [line('Cassian', "Ton ancien protocole stabilise enfin ma Couronne.", 'broadcast'), line('Riva', "Tu as inversé ma sécurité et organisé ces combats pour compléter ce qui te manquait.", 'maintenance')] }
+        { toPhase: 2, title: 'Archive déphasée', lines: [line('Cassian', "Je peux effacer l’instant où tu croyais gagner.", 'broadcast'), line('Riva', "Efface l’instant si tu veux. Le checkpoint, lui, reste dans une autre couche.", 'maintenance')] },
+        { toPhase: 3, title: 'Minute zéro', lines: [line('Cassian', "Ton ancien protocole stabilise enfin ma Couronne.", 'broadcast'), line('Riva', "Minute zéro, phase trois, grand discours : même ton temps suit le script.", 'maintenance')] }
       ],
-      rivaJournal: "Les horodatages restaurés prouvent que le verrouillage était planifié. Cassian a retourné mon protocole M-0 contre le Circuit, puis m’a guidée à travers ces machines pour apprendre à la Couronne comment je le réparerais.",
+      rivaJournal: "Les horodatages restaurés prouvent que le verrouillage était planifié. Cassian a retourné mon protocole M-0 contre le Circuit, puis m’a guidée à travers ces machines. Le checkpoint conserve précisément la version qu’il voudrait effacer.",
       districtConsequence: 'Les horloges civiles et les archives authentiques redémarrent sur tous les canaux restaurés.',
       interlude: [
         line('Canal civil', "Archives répliquées. Il ne pourra plus effacer l’heure de la prise de contrôle.", 'civil'),
         line('Cassian', "Chaque victoire t’a rapprochée de moi et a perfectionné la machine qui t’attend.", 'broadcast'),
-        line('Riva', "Alors la prochaine leçon sera fausse.", 'maintenance')
+        line('Riva', "Alors la prochaine leçon sera fausse. Ton script l’apprendra une phase trop tard.", 'maintenance')
       ],
       restoration: 'L’Horloge publie des archives distribuées que la Citadelle ne peut plus réécrire.',
       codex: {
@@ -199,19 +199,19 @@
       narrativeBeat: 'counterplan',
       phaseTitles: ['Pistons en marche', 'Pluie de métal en fusion', 'Chute de presse'],
       preFight: [
-        line('Cassian', "Mon Titan recycle une ville entière. Il ne restera de ton sabotage qu’une pièce de rechange.", 'broadcast'),
+        line('Cassian', "Mon Titan recycle une ville entière. Il peut bien recycler aussi ton meilleur temps en pièce de rechange.", 'broadcast'),
         line('Riva', "La Fournaise va fabriquer une dernière chose pour toi : une mauvaise donnée.", 'maintenance')
       ],
       phaseTransitions: [
-        { toPhase: 2, title: 'Coulée forcée', lines: [line('Cassian', "Toute la production tombe sur toi.", 'broadcast'), line('Riva', "Et mon signal remonte déjà vers la Couronne.", 'maintenance')] },
-        { toPhase: 3, title: 'Presse critique', lines: [line('Cassian', "Je vois ta surcharge. Mon modèle la connaît.", 'broadcast'), line('Riva', "Il connaît exactement celle que je voulais te montrer.", 'maintenance')] }
+        { toPhase: 2, title: 'Coulée forcée', lines: [line('Cassian', "Toute la production tombe sur toi.", 'broadcast'), line('Riva', "Le sol devient orange avant de brûler. Pour une fois, ta mise en scène explique le danger.", 'maintenance')] },
+        { toPhase: 3, title: 'Presse critique', lines: [line('Cassian', "Je vois ta surcharge. Mon modèle la connaît.", 'broadcast'), line('Riva', "Ton modèle connaît ma surcharge. Il aurait dû lire la ligne où je change de build.", 'maintenance')] }
       ],
-      rivaJournal: "J’ai injecté une contre-phase M-0 dans la télémétrie avant de refroidir la Fournaise. Cassian croit posséder mon dernier mouvement. En réalité, il vient d’installer mon arrêt d’urgence au cœur de sa Couronne.",
+      rivaJournal: "J’ai injecté une contre-phase M-0 dans la télémétrie avant de refroidir la Fournaise. Cassian croit posséder mon dernier mouvement ; son modèle croit avoir lu mon build, mais il vient d’archiver une version volontairement fausse.",
       districtConsequence: 'La production coercitive s’arrête et la Citadelle perd sa dernière alimentation externe.',
       interlude: [
         line('Canal civil', "Fournaise stabilisée. Nous réaffectons les lignes à la réparation des quartiers.", 'civil'),
         line('Cassian', "Données complètes. Citadelle ouverte. Viens admirer la conclusion.", 'broadcast'),
-        line('Riva', "Ouvre grand. Tout le Circuit doit voir ce qui arrive à ta Couronne.", 'maintenance')
+        line('Riva', "Ouvre grand. Tout le Circuit doit voir ce qui arrive à ta Couronne ; même l’écran de boss sait qu’il ne reste qu’une machine.", 'maintenance')
       ],
       restoration: 'La Fournaise abandonne l’armement du spectacle et produit les pièces nécessaires à la reconstruction.',
       codex: {
@@ -237,18 +237,18 @@
       narrativeBeat: 'climax',
       phaseTitles: ['Arsenal royal', 'Échiquier laser', 'Noyau Oméga'],
       preFight: [
-        line('Cassian', "Toutes mes inventions, tes réponses, un seul trône. La conclusion était inévitable.", 'broadcast'),
-        line('Riva', "Tu as centralisé chaque sécurité autour de toi. C’est exactement pour cela qu’un seul arrêt suffira.", 'maintenance')
+        line('Cassian', "Toutes mes inventions, tes réponses, trois formes, un seul trône et une musique de final. La conclusion était annoncée depuis le menu titre.", 'broadcast'),
+        line('Riva', "Tu as centralisé chaque sécurité autour de toi. Un seul arrêt suffira, même si ta barre de vie prétend le contraire.", 'maintenance')
       ],
       phaseTransitions: [
-        { toPhase: 2, title: 'Couronne adaptative', lines: [line('Cassian', "Chaque victoire m’a appris comment tu survis.", 'broadcast'), line('Riva', "Et chaque machine m’a appris où tu cachais les coupures.", 'maintenance')] },
-        { toPhase: 3, title: 'Contre-phase M-0', lines: [line('Cassian', "Pourquoi mon noyau accepte-t-il ton signal ?", 'broadcast'), line('Riva', "Parce que tu as entraîné ta Couronne avec la panne que je t’ai donnée.", 'maintenance')] }
+        { toPhase: 2, title: 'Couronne adaptative', lines: [line('Cassian', "Chaque victoire m’a appris comment tu survis.", 'broadcast'), line('Riva', "Je reconnais les cinq patterns précédents. Ton boss final a vraiment relu le Codex.", 'maintenance')] },
+        { toPhase: 3, title: 'Contre-phase M-0', lines: [line('Cassian', "Pourquoi mon noyau accepte-t-il ton signal ?", 'broadcast'), line('Riva', "Parce que tu as confondu progression et obéissance, puis entraîné ta Couronne avec la panne que je t’ai donnée.", 'maintenance')] }
       ],
-      rivaJournal: "La Couronne est tombée sans entraîner les districts avec elle. Cassian avait fait de chaque service une scène et de chaque habitant un public captif. Nous avons conservé le réseau et coupé seulement son trône.",
+      rivaJournal: "La Couronne est tombée sans entraîner les districts avec elle. Cassian avait fait de chaque service une scène et de chaque habitant un public captif. Le générique peut attendre : nous avons conservé le réseau et coupé seulement son trône.",
       districtConsequence: 'Le commandement exclusif s’effondre et les six districts récupèrent leurs contrôles locaux.',
       interlude: [
         line('Cassian', "Sans moi, le Circuit n’aura plus de grand final.", 'broadcast'),
-        line('Riva', "Il n’avait jamais besoin d’un final. Il avait besoin de fonctionner.", 'maintenance'),
+        line('Riva', "Il n’avait jamais besoin d’un final. Il avait besoin de fonctionner — pas d’un second boss caché.", 'maintenance'),
         line('Canal civil', "Régie sécurisée. Équipes civiles dans la Citadelle. Cassian Voltério est placé en détention.", 'civil')
       ],
       restoration: 'La Citadelle devient une salle de coordination distribuée, sans commande exclusive ni diffusion forcée.',
@@ -271,11 +271,11 @@
     id: 'epilogue-free-circuit',
     chapter: 'ÉPILOGUE',
     title: 'Circuit libre',
-    summary: "Cassian est détenu, la diffusion forcée est coupée et Riva refuse de remplacer un commandement unique par un autre.",
+    summary: "Cassian est détenu, la diffusion forcée est coupée et Riva refuse de remplacer un commandement unique par un autre. Le jeu peut afficher Victoire ; la ville, elle, continue.",
     lines: [
       line('Canal civil', 'Les six relais répondent. Les commandes locales sont rendues aux équipes de chaque district.', 'civil'),
       line('Riva', "Je ne prendrai pas sa place. Nous garderons six interrupteurs, six équipes et une ligne M-0 que personne ne pourra refermer.", 'maintenance'),
-      line('Narration', 'Le Circuit tourne encore. Pas pour un spectacle. Pour ceux qui y vivent.', 'narration')
+      line('Narration', 'Le Circuit tourne encore. Pas pour un spectacle, pas pour une suite cachée. Pour ceux qui y vivent.', 'narration')
     ],
     districtRestorations: acts.map(({ bossId, district, restoration }) => ({ bossId, district, restoration })),
     cassianFate: 'Les équipes civiles désactivent son studio et placent Cassian Voltério en détention dans la Citadelle sécurisée.',
@@ -375,7 +375,7 @@
 
   const story = deepFreeze({
     schemaVersion: 1,
-    contentVersion: '1.0.0',
+    contentVersion: '2.9.0',
     title: 'GEARSTORM: Boss Circuit — La dernière émission',
     bossOrder,
     characters,

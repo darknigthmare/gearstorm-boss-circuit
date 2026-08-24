@@ -89,7 +89,7 @@ assert.equal(keyArtScreenshot?.sizes, '1672x941');
 
 const shellFiles = [
   'dist/index.html',
-  'dist/pwa-update-v2.8.0.js',
+  'dist/pwa-update-v2.9.0.js',
   'dist/styles.css',
   'dist/story.js',
   'dist/expansion-story.js',
@@ -107,7 +107,7 @@ for (const file of shellFiles) await access(file);
 
 const [distHtml, distPwaBootstrap, distStory, distExpansionStory, distBossRoster, distGame, distManifest, distRuntime] = await Promise.all([
   readFile('dist/index.html', 'utf8'),
-  readFile('dist/pwa-update-v2.8.0.js', 'utf8'),
+  readFile('dist/pwa-update-v2.9.0.js', 'utf8'),
   readFile('dist/story.js', 'utf8'),
   readFile('dist/expansion-story.js', 'utf8'),
   readFile('dist/boss-roster.js', 'utf8'),
@@ -116,7 +116,7 @@ const [distHtml, distPwaBootstrap, distStory, distExpansionStory, distBossRoster
   validateRuntimeAssets('dist', { validateMasters: false }),
 ]);
 validateApplicationContract({ game: distGame, story: distStory, expansionStory: distExpansionStory, bossRoster: distBossRoster, html: distHtml, manifest: distManifest, packageJson });
-assert.match(distPwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_8__/);
+assert.match(distPwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_9__/);
 assert.match(distPwaBootstrap, /registration\.waiting/);
 assert.match(distPwaBootstrap, /SKIP_WAITING/);
 assert.match(distPwaBootstrap, /controllerchange/);
@@ -140,7 +140,7 @@ assert.deepEqual((await readdir('dist')).sort(), [
   'game.js',
   'index.html',
   'manifest.webmanifest',
-  'pwa-update-v2.8.0.js',
+  'pwa-update-v2.9.0.js',
   'story.js',
   'styles.css',
   'sw.js',

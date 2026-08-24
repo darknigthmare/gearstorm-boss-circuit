@@ -1,15 +1,15 @@
 import vm from 'node:vm';
 
-export const APP_RELEASE = '2.8.0';
+export const APP_RELEASE = '2.9.0';
 export const SAVE_SCHEMA_VERSION = 5;
 export const SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
 export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
 export const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
 export const V2_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
 export const STORY_SCHEMA_VERSION = 1;
-export const STORY_CONTENT_VERSION = '1.0.0';
+export const STORY_CONTENT_VERSION = '2.9.0';
 export const EXPANSION_STORY_SCHEMA_VERSION = 1;
-export const EXPANSION_STORY_CONTENT_VERSION = '1.0.0';
+export const EXPANSION_STORY_CONTENT_VERSION = '2.9.0';
 export const CAMPAIGN_BOSS_COUNT = 6;
 export const FORGE_BOSS_COUNT = 24;
 export const PLAYABLE_BOSS_COUNT = CAMPAIGN_BOSS_COUNT + FORGE_BOSS_COUNT;
@@ -29,6 +29,8 @@ export const FORGE_BOSS_IDS = Object.freeze([
 export const PLAYABLE_BOSS_IDS = Object.freeze([...CAMPAIGN_BOSS_IDS, ...FORGE_BOSS_IDS]);
 
 export const REQUIRED_UI_IDS = Object.freeze([
+  'install-app',
+  'fullscreen-toggle',
   'export-save',
   'import-save',
   'import-save-file',
@@ -65,6 +67,13 @@ export const REQUIRED_UI_IDS = Object.freeze([
   'result-mastery',
   'radio-comms',
   'hints-toggle',
+  'result-forge-transmission',
+  'result-forge-transmission-label',
+  'result-forge-transmission-copy',
+  'forge-codex-section',
+  'forge-codex-progress',
+  'forge-codex-grid',
+  'forge-codex-empty',
 ]);
 
 export const REQUIRED_GAME_SYSTEMS = Object.freeze([
@@ -72,6 +81,8 @@ export const REQUIRED_GAME_SYSTEMS = Object.freeze([
   'exportSaveFile',
   'importSaveFile',
   'registerGearstormServiceWorker',
+  'registerInstallPrompt',
+  'syncFullscreenControl',
   'sanitizeUpgradeOffer',
   'enduranceRoundGateOpen',
   'sanitizeRushSnapshot',
@@ -98,7 +109,11 @@ export const REQUIRED_GAME_SYSTEMS = Object.freeze([
   'combatLabel',
   'STORY',
   'MASTERY_CONTRACT_IDS',
-  'HERO_RIG',
+  'buildForgeCodex',
+  'syncForgeResultTransmission',
+  'heroineRigParts',
+  'heroAnatomyPose',
+  'getArenaVisualOffset',
   'BOSS_RIGS',
   'BOSS_REGISTRY',
   'EXPANSION_STORY',
@@ -173,6 +188,12 @@ export function validateExpansionStoryContract(expansionStorySource) {
   invariant(bosses.length === FORGE_BOSS_COUNT, FORGE_BOSS_COUNT + ' boss Forge narratifs requis.');
   invariant(bosses.map(boss => boss.id).join(',') === FORGE_BOSS_IDS.join(','), 'Ordre narratif des 24 boss Forge invalide.');
   invariant(bosses.every(boss => Array.isArray(boss.phaseTitles) && boss.phaseTitles.length === 3), 'Trois titres de phase sont requis pour chaque boss Forge.');
+  invariant(bosses.every(boss => typeof boss.metaLine === 'string' && boss.metaLine.length > 24), 'Chaque boss Forge doit posseder une lecture meta substantielle.');
+  invariant(bosses.every(boss => Array.isArray(boss.interlude) && boss.interlude.length >= 3), 'Chaque boss Forge doit posseder un interlude permanent complet.');
+  const waves = Array.from(expansion.waves || []);
+  invariant(waves.length === 4, 'Quatre anneaux narratifs Forge sont requis.');
+  invariant(waves.every(wave => typeof wave.title === 'string' && wave.title.length > 4 && typeof wave.premise === 'string' && wave.premise.length > 24), 'Titre et premisse requis pour chaque anneau Forge.');
+  invariant(typeof expansion.forgeCircuit?.epilogue?.outcome === 'string' && expansion.forgeCircuit.epilogue.outcome.length > 40, 'Outcome complet de la Forge requis.');
 
   const contracts = bosses.flatMap(boss => Array.from(boss.masteryContracts || []));
   invariant(contracts.length === EXPANSION_MASTERY_CONTRACT_COUNT, EXPANSION_MASTERY_CONTRACT_COUNT + ' contrats Forge requis.');
@@ -244,11 +265,11 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const bossRosterContract = hasForgeSources ? validateBossRosterContract(bossRoster) : {};
 
   const ids = htmlIds(html);
-  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.8 : #${id} absent.`);
+  for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v2.9 : #${id} absent.`);
   const domReferences = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   for (const id of domReferences) invariant(ids.has(id), `Contrat DOM : #${id} reference par game.js mais absent.`);
 
-  const pwaBootstrapTag = html.search(/<script\s+src=["']pwa-update-v2\.8\.0\.js["'][^>]*><\/script>/i);
+  const pwaBootstrapTag = html.search(/<script\s+src=["']pwa-update-v2\.9\.0\.js["'][^>]*><\/script>/i);
   const storyTag = html.search(/<script\s+src=["']story\.js["'][^>]*><\/script>/i);
   const expansionStoryTag = html.search(/<script\s+src=["']expansion-story\.js["'][^>]*><\/script>/i);
   const bossRosterTag = html.search(/<script\s+src=["']boss-roster\.js["'][^>]*><\/script>/i);
@@ -277,7 +298,7 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v5.');
 
   for (const marker of REQUIRED_GAME_SYSTEMS) {
-    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.8 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v2.9 absent : ${marker}.`);
   }
 
   invariant(/new URLSearchParams\(location\.search\)/.test(game), 'Le routeur de lancement doit lire la query string.');
@@ -288,8 +309,8 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const shortcuts = new Set((manifest?.shortcuts || []).map(shortcut => shortcut.url));
   for (const url of ['./?mode=rush', './?mode=practice', './?mode=forge', './?mode=forgeRush']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
 
-  invariant(html.includes('GEARSTORM: Boss Circuit v2.8'), 'Metadonnees HTML v2.8 absentes.');
-  invariant(!/GEARSTORM: Boss Circuit v2\.[2-7]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
+  invariant(html.includes('GEARSTORM: Boss Circuit v2.9'), 'Metadonnees HTML v2.9 absentes.');
+  invariant(!/GEARSTORM: Boss Circuit v2\.[2-8]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
   invariant(/qaAllowed[\s\S]+__GEARSTORM_QA__/.test(game), 'Surface QA locale absente ou non protegee.');
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
   for (const field of ['phaseCounts', 'hitbox', 'weakPoint', 'feetLocalY', 'muzzle', 'transitionExplosionOnly']) {
@@ -297,7 +318,7 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   }
   const qaBlock = game.slice(game.indexOf("Object.defineProperty(window, '__GEARSTORM_QA__'"));
   for (const marker of ['getRigDiagnostics', 'getRushSnapshot', 'resumeRush', 'getForgeRunState', 'getForgeContractCoverage', 'processGamepad', 'startForgeRush', 'resumeForgeRush', 'setRigDebug', 'launchMode']) {
-    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.8 absent : ${marker}.`);
+    invariant(new RegExp(`\\b${marker}\\b`).test(qaBlock), `Diagnostic QA v2.9 absent : ${marker}.`);
   }
 
   return {

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080b18" />
-  <meta name="description" content="GEARSTORM: Boss Circuit v2.8, une campagne boss rush 2D originale en six actes et une Forge de 24 machines supplémentaires." />
+  <meta name="description" content="GEARSTORM: Boss Circuit v2.9 — 30 boss jouables, un vrai rig anatomique OpenAI, quatre scènes illustrées et un Circuit qui connaît ses propres règles." />
   <meta name="application-name" content="GEARSTORM" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,15 +12,15 @@
   <meta name="apple-mobile-web-app-title" content="GEARSTORM" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_FR" />
-  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.8" />
+  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.9" />
   <meta property="og:description" content="Riva Spark remonte la ligne fantôme M-0 et libère les six districts du Circuit." />
   <meta property="og:image" content="assets/gearstorm-key-art.png" />
   <meta property="og:image:alt" content="Riva Spark face aux machines du Circuit Voltério" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.8" />
+  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.9" />
   <meta name="twitter:description" content="Trente machines jouables. Quatre-vingt-dix phases. Campagne narrative et Forge d’entraînement." />
   <meta name="twitter:image" content="assets/gearstorm-key-art.png" />
-  <title>GEARSTORM: Boss Circuit v2.8</title>
+  <title>GEARSTORM: Boss Circuit v2.9</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="assets/gearstorm-icon.svg" />
   <link rel="apple-touch-icon" href="assets/gearstorm-icon-192.png" />
@@ -53,45 +53,45 @@
         </figure>
         <div class="panel hero-panel">
           <div class="release-line">
-            <p class="eyebrow">ÉDITION FORGE // V2.8</p>
-            <span class="release-status"><span aria-hidden="true"></span> Systèmes prêts</span>
+            <p class="eyebrow">PROTOCOLE MÉTA // V2.9</p>
+            <span class="release-status"><span aria-hidden="true"></span> Le jeu sait qu’il est prêt</span>
           </div>
           <h1 id="game-title"><span>GEARSTORM</span><small>BOSS CIRCUIT</small></h1>
-          <p class="tagline">Riva Spark libère les six districts du Circuit, puis éprouve vingt-quatre machines civiques réinventées dans la Forge.</p>
+          <p class="tagline">Riva Spark libère six districts, puis la Forge aligne vingt-quatre boss qui connaissent leurs règles — et te les annoncent.</p>
           <ul id="build-summary" class="build-summary" aria-label="Contenu de cette version">
-            <li><strong>30</strong><span>boss jouables</span></li>
-            <li><strong>90</strong><span>phases</span></li>
-            <li><strong>24</strong><span>systèmes Forge</span></li>
+            <li><strong>30</strong><span>boss savent qu’ils sont jouables</span></li>
+            <li><strong>90</strong><span>phases annoncent leur transition</span></li>
+            <li><strong>24</strong><span>systèmes Forge affichent leur règle</span></li>
           </ul>
           <div id="campaign-recap" class="campaign-recap" aria-labelledby="campaign-recap-title">
-            <span id="campaign-recap-title" class="recap-kicker">Opération en cours</span>
+            <span id="campaign-recap-title" class="recap-kicker">Checkpoint narratif</span>
             <strong id="campaign-progress">0 / 6 districts libérés</strong>
-            <small id="campaign-next">Prochaine cible : Rocade des Rivets · Rivet Rex</small>
+            <small id="campaign-next">Prologue prêt : Rocade des Rivets · Rivet Rex</small>
           </div>
           <div class="menu-stack" role="group" aria-label="Menu principal">
             <button id="continue-run" class="primary launch-button continue-run" aria-describedby="continue-run-detail" hidden>
-              <span class="button-copy"><strong>Continuer le Circuit</strong><small id="continue-run-detail">Reprendre au dernier district sécurisé</small></span>
+              <span class="button-copy"><strong>Reprendre l’émission</strong><small id="continue-run-detail">Le checkpoint garde le dernier district sécurisé</small></span>
               <span aria-hidden="true">→</span>
             </button>
             <button id="continue-forge" class="primary launch-button continue-run forge-launch" aria-describedby="continue-forge-detail" hidden>
-              <span class="button-copy"><strong>Reprendre le Circuit Forge</strong><small id="continue-forge-detail">Continuer à la dernière machine stabilisée</small></span>
+              <span class="button-copy"><strong>Reprendre la Forge</strong><small id="continue-forge-detail">Le checkpoint sait quelle machine vient ensuite</small></span>
               <span aria-hidden="true">→</span>
             </button>
-            <button id="start-rush" class="primary launch-button" aria-controls="story-screen">Lancer un nouveau Circuit <span aria-hidden="true">→</span></button>
+            <button id="start-rush" class="primary launch-button" aria-controls="story-screen">Relancer le prologue · Nouveau Circuit <span aria-hidden="true">→</span></button>
             <div class="menu-grid">
-              <button id="practice" aria-controls="boss-select-screen">Laboratoire campagne</button>
-              <button id="forge" data-gearstorm-mode="forge" aria-controls="boss-select-screen">Forge des 30 boss</button>
-              <button id="codex" aria-controls="codex-screen">Codex du Circuit</button>
+              <button id="practice" aria-controls="boss-select-screen">Laboratoire · Rejouer un boss</button>
+              <button id="forge" data-gearstorm-mode="forge" aria-controls="boss-select-screen">Catalogue intégral · 30 boss savent qu’ils sont jouables</button>
+              <button id="codex" aria-controls="codex-screen">Codex · Relire le jeu</button>
               <button id="how-to" aria-controls="how-screen">Commandes et règles</button>
               <button id="settings" aria-controls="settings-screen">Options et accessibilité</button>
             </div>
           </div>
           <div class="utility-actions" role="group" aria-label="Actions de l’application">
-            <button id="install-app" class="utility-button" type="button" hidden>Installer le jeu</button>
-            <button id="update-app" class="utility-button update-button" type="button" hidden>Mettre à jour le jeu</button>
-            <button id="fullscreen-toggle" class="utility-button" type="button" aria-pressed="false">Plein écran</button>
+            <button id="install-app" class="utility-button" type="button" hidden>Installer GEARSTORM · garder le Circuit hors ligne</button>
+            <button id="update-app" class="utility-button update-button" type="button" hidden>Mettre à jour · le jeu réécrit son shell</button>
+            <button id="fullscreen-toggle" class="utility-button" type="button" aria-pressed="false">Plein écran · agrandir l’arène</button>
           </div>
-          <p class="save-note" id="save-note">Progression locale activée</p>
+          <p class="save-note" id="save-note">Sauvegarde locale // le checkpoint se souvient</p>
         </div>
       </div>
     </section>
@@ -103,16 +103,16 @@
             <p id="story-kicker" class="eyebrow">INTRODUCTION // ÉMISSION PERMANENTE</p>
             <p id="story-chapter" class="chapter-mark">SIGNAL 00</p>
           </div>
-          <span id="story-status" class="story-status">LIGNE M-0</span>
+          <span id="story-status" class="story-status">DIRECT DÉTOURNÉ</span>
         </header>
-        <h2 id="story-title">Une ville sous un seul signal</h2>
+        <h2 id="story-title">Une ville sous un seul signal — et un boss au bout du prologue</h2>
         <p id="story-location" class="story-location">Circuit central · Minuit réseau</p>
-        <div id="story-summary" class="story-summary"></div>
+        <div id="story-summary" class="story-summary"><p>Cassian a pris le réseau et le cadre. La ligne M-0 reste hors champ, exactement là où un prologue jouable en a besoin.</p></div>
         <div id="story-dialogue" class="story-dialogue" role="log" aria-live="polite"></div>
         <aside id="story-consequence" class="story-consequence"></aside>
         <div class="story-actions">
-          <button id="story-continue" class="primary launch-button">Ouvrir la ligne M-0 <span aria-hidden="true">→</span></button>
-          <button id="story-back" type="button">Retour au menu</button>
+          <button id="story-continue" class="primary launch-button">Couper le direct · Ouvrir M-0 <span aria-hidden="true">→</span></button>
+          <button id="story-back" type="button">Quitter vers le menu titre</button>
         </div>
       </div>
     </section>
@@ -128,9 +128,9 @@
         <h2 id="prologue-title">La ligne fantôme</h2>
         <p id="prologue-summary" class="prologue-copy">Ancienne technicienne du réseau, Riva peut encore emprunter la ligne de maintenance M-0. Chaque relais restauré ouvre physiquement la voie vers le district suivant.</p>
         <div id="prologue-dialogue" aria-label="Transmission de la ligne M-0">
-          <blockquote><strong>Riva</strong> — J’ai entretenu ces machines pour qu’elles servent la ville. Je vais les remettre à leur place.</blockquote>
-          <blockquote><strong>Système</strong> — Itinéraire M-0 confirmé : Rocade, Hautes-Tensions, Fosse, Horloge, Fournaise, Citadelle.</blockquote>
-          <blockquote><strong>Cassian</strong> — Une ligne oubliée ne conduit nulle part, technicienne. Mais j’accepte volontiers une candidate imprévue.</blockquote>
+          <blockquote><strong>Riva</strong> — J’ai entretenu ces machines pour qu’elles servent la ville. Cette fois, je vois aussi les ficelles du niveau.</blockquote>
+          <blockquote><strong>Système</strong> — Six actes déclarés, six districts chargés, aucun boss autorisé à attendre hors écran.</blockquote>
+          <blockquote><strong>Cassian</strong> — Une ligne oubliée ne conduit nulle part, technicienne. Mais un prologue doit bien livrer quelqu’un au premier boss.</blockquote>
         </div>
         <div class="mission-brief" aria-label="Objectifs de mission">
           <span>Objectif</span><strong id="prologue-objective">Réactiver les six relais de sécurité et reprendre la Couronne.</strong>
@@ -145,8 +145,8 @@
           <li data-boss-id="omega"><span>06</span><strong>Citadelle Voltério</strong><small>Crown Engine Ω</small></li>
         </ol>
         <div class="menu-stack prologue-actions">
-          <button id="prologue-start" class="primary launch-button">Entrer dans le Circuit <span aria-hidden="true">→</span></button>
-          <button class="back-button" data-back="title-screen">Retour au menu</button>
+          <button id="prologue-start" class="primary launch-button">Valider le prologue · Entrer dans le Circuit <span aria-hidden="true">→</span></button>
+          <button class="back-button" data-back="title-screen">Annuler vers le menu titre</button>
         </div>
       </div>
     </section>
@@ -155,28 +155,28 @@
       <div class="panel wide-panel">
         <div class="screen-heading">
           <div>
-            <p id="boss-select-eyebrow" class="eyebrow">MODE ENTRAÎNEMENT</p>
-            <h2 id="boss-select-title">Laboratoire &amp; Forge</h2>
+            <p id="boss-select-eyebrow" class="eyebrow">CATALOGUE JOUABLE // LE MENU NOMME SES BOSS</p>
+            <h2 id="boss-select-title">Laboratoire &amp; catalogue intégral — aucune machine hors écran</h2>
           </div>
-          <button class="back-button" data-back="title-screen">Retour</button>
+          <button class="back-button" data-back="title-screen">Fermer le catalogue</button>
         </div>
         <div class="boss-mode-tabs" role="group" aria-label="Catalogue de machines">
-          <button type="button" data-gearstorm-mode="practice">Campagne débloquée</button>
-          <button type="button" data-gearstorm-mode="forge">Forge complète · 30 boss</button>
+          <button type="button" data-gearstorm-mode="practice">Campagne · machines débloquées</button>
+          <button type="button" data-gearstorm-mode="forge">Catalogue intégral · les 30 boss lisent leur propre fiche</button>
         </div>
         <section id="forge-circuit-card" class="forge-run-summary" aria-labelledby="forge-run-title" hidden>
           <div class="forge-run-copy">
-            <p class="eyebrow">CIRCUIT FORGE // 24 MACHINES</p>
-            <h3 id="forge-run-title">Traverser les quatre vagues</h3>
-            <p>Affronte les machines 07 à 30 dans l’ordre, conserve ton build entre les combats et sécurise un point de reprise après chaque victoire.</p>
-            <p id="forge-run-summary" class="forge-run-summary-copy">24 machines · quatre vagues · sauvegarde entre chaque combat</p>
+            <p class="eyebrow">CIRCUIT FORGE // 24 BOSS QUI LISENT LEURS RÈGLES</p>
+            <h3 id="forge-run-title">Traverser les quatre anneaux — sans ellipse de menu</h3>
+            <p>Affronte les machines 07 à 30 dans l’ordre : chacune annonce son système, le build persiste et le checkpoint prend note après chaque victoire.</p>
+            <p id="forge-run-summary" class="forge-run-summary-copy">24 boss · quatre anneaux · aucun combat hors champ</p>
           </div>
           <div class="forge-run-state">
-            <span id="forge-wave-progress">Vague 1 · 0 / 24 machines stabilisées</span>
-            <button id="forge-rush-start" type="button" class="primary launch-button">Lancer le Circuit Forge <span aria-hidden="true">→</span></button>
+            <span id="forge-wave-progress">Anneau 1 · 0 / 24 boss stabilisés · checkpoint prêt</span>
+            <button id="forge-rush-start" type="button" class="primary launch-button">Lancer la Forge · le compteur est prêt <span aria-hidden="true">→</span></button>
           </div>
         </section>
-        <p id="lab-progress" class="screen-progress" role="status" aria-live="polite">1 machine analysée sur 6 · La Forge propose 24 simulations supplémentaires.</p>
+        <p id="lab-progress" class="screen-progress" role="status" aria-live="polite">1 boss lu sur 6 · La Forge garde 24 règles supplémentaires derrière ce même menu.</p>
         <div id="boss-grid" class="boss-grid" role="group" aria-label="Machines débloquées"></div>
       </div>
     </section>
@@ -185,28 +185,28 @@
       <div class="panel wide-panel codex-panel">
         <div class="screen-heading">
           <div>
-            <p class="eyebrow">ARCHIVES DU CIRCUIT</p>
-            <h2 id="codex-title">Codex de Riva</h2>
+            <p class="eyebrow">ARCHIVES DU CIRCUIT // LE JEU RELIT SES NOTES</p>
+            <h2 id="codex-title">Codex de Riva — données, règles et conséquences</h2>
           </div>
-          <button class="back-button" data-back="title-screen">Retour</button>
+          <button class="back-button" data-back="title-screen">Refermer le Codex</button>
         </div>
 
         <div class="codex-overview">
           <article id="codex-riva" class="lore-dossier">
             <span class="dossier-label">Pilote de maintenance</span>
             <h3>Riva Spark</h3>
-            <p>Technicienne du réseau avant son verrouillage, Riva transforme ses bottes cinétiques et son canon d’impulsion en outils de libération. Elle connaît les voies de service que Voltério a oubliées.</p>
+            <p>Technicienne du réseau avant son verrouillage, Riva transforme ses bottes cinétiques et son canon d’impulsion en outils de libération. Son dossier refuse le mot « joueuse » ; le menu insiste.</p>
           </article>
           <article id="codex-volterio" class="lore-dossier antagonist">
             <span class="dossier-label">Architecte du verrouillage</span>
             <h3>Cassian Voltério</h3>
-            <p>Ingénieur devenu maître de cérémonie, il a relié six machines aux infrastructures vitales du Circuit. Chaque victoire de Riva lui retire un district, un public captif et une source d’énergie.</p>
+            <p>Ingénieur devenu maître de cérémonie, il a relié six machines aux infrastructures vitales du Circuit. Le Codex le classe antagoniste ; chaque barre de vie vide lui retire un district et un public captif.</p>
           </article>
           <div class="codex-meter" aria-labelledby="codex-progress-label">
-            <span id="codex-progress-label" class="dossier-label">Dossiers déchiffrés</span>
-            <strong id="codex-progress" aria-live="polite">0 / 6 machines identifiées</strong>
+            <span id="codex-progress-label" class="dossier-label">Dossiers de campagne déchiffrés</span>
+            <strong id="codex-progress" aria-live="polite">0 / 6 machines · le menu attend</strong>
             <progress id="codex-progress-meter" max="6" value="0" aria-labelledby="codex-progress-label codex-progress">0 sur 6</progress>
-            <small>Neutraliser une machine révèle son impact sur son district.</small>
+            <small>Neutraliser une machine révèle son impact ; le Codex ajoute ensuite sa lecture du combat.</small>
           </div>
         </div>
 
@@ -216,11 +216,25 @@
           <div class="archive-heading">
             <div>
               <span class="dossier-label">Chronologie restaurée</span>
-              <h3 id="story-archive-title">Archives de la ligne M-0</h3>
+              <h3 id="story-archive-title">Archives M-0 — huit transmissions, aucune scène coupée</h3>
             </div>
-            <strong id="story-archive-progress">0 / 8 transmissions</strong>
+            <strong id="story-archive-progress">0 / 8 transmissions · chronologie verrouillée</strong>
           </div>
           <ol id="story-archive" class="story-archive" aria-label="Introduction, interludes et épilogue"></ol>
+        </section>
+
+        <section id="forge-codex-section" class="forge-codex-section">
+          <div class="forge-codex-heading">
+            <div>
+              <span class="dossier-label">Archives Forge // règles rendues publiques</span>
+              <h3>Boss 07–30 — le Codex connaît aussi leur mécanique</h3>
+            </div>
+            <strong id="forge-codex-progress">0 / 24 dossiers relus</strong>
+          </div>
+          <p class="forge-codex-premise">Chaque fiche conserve sa fonction civique, puis laisse Riva commenter la hitbox, le checkpoint ou le pattern que la machine ne peut plus cacher.</p>
+          <div id="forge-codex-grid" class="forge-codex-grid">
+            <p id="forge-codex-empty" class="forge-codex-empty">Les dossiers 07–30 attendent que le Circuit confirme leur état de déchiffrement.</p>
+          </div>
         </section>
 
         <div id="codex-grid" class="codex-grid" role="list" aria-label="Dossiers des six machines" tabindex="0">
@@ -320,7 +334,7 @@
           </article>
           <article>
             <h3>Objectif</h3>
-            <p>Le Rush intégral enchaîne les six boss. Les meilleurs temps sont sauvegardés localement. Le Laboratoire permet de rejouer les machines débloquées.</p>
+            <p>Le Rush campagne enchaîne les six boss. Le Laboratoire rejoue les machines de campagne débloquées ; le Catalogue intégral donne accès aux 30 boss, et le Circuit Forge enchaîne les machines 07 à 30 avec ses propres checkpoints.</p>
           </article>
         </div>
         <aside id="onboarding-summary" class="manual-callout" aria-label="Tutoriel contextuel">
@@ -389,8 +403,8 @@
 
     <section id="pause-screen" class="screen compact" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1">
       <div class="panel pause-panel">
-        <p class="eyebrow">SYSTÈMES SUSPENDUS</p>
-        <h2 id="pause-title">Pause</h2>
+        <p class="eyebrow">PAUSE // LE TEMPS DE JEU ATTEND</p>
+        <h2 id="pause-title">Pause — le boss aussi</h2>
         <div class="pause-context">
           <article>
             <span>Objectif actif</span>
@@ -408,44 +422,48 @@
           <span><kbd>Échap</kbd><small>Reprendre</small></span>
         </div>
         <div class="menu-stack">
-          <button id="resume-button" class="primary">Reprendre</button>
-          <button id="retry-button">Recommencer le boss</button>
-          <button id="quit-button">Quitter vers le menu</button>
+          <button id="resume-button" class="primary">Reprendre le direct</button>
+          <button id="retry-button">Relancer ce boss · même checkpoint</button>
+          <button id="quit-button">Quitter vers le menu titre</button>
         </div>
       </div>
     </section>
 
     <section id="result-screen" class="screen compact" role="dialog" aria-modal="true" aria-labelledby="result-title" tabindex="-1">
       <div class="panel result-panel">
-        <p id="result-eyebrow" class="eyebrow">MACHINE NEUTRALISÉE</p>
-        <h2 id="result-title">Victoire</h2>
+        <p id="result-eyebrow" class="eyebrow">RÉSULTAT // LA MACHINE A LU SA BARRE DE VIE</p>
+        <h2 id="result-title">Victoire — le script ouvre la suite</h2>
         <p id="result-summary" class="result-summary"></p>
         <div id="result-stats" class="result-stats"></div>
         <div id="result-mastery" class="result-mastery" aria-label="Contrats de maîtrise"></div>
         <div class="result-story">
           <article>
-            <span id="result-lore-label">Journal de Riva</span>
-            <p id="result-lore">La machine est arrêtée. Riva consigne la restauration du district.</p>
+            <span id="result-lore-label">Journal de Riva // après-combat</span>
+            <p id="result-lore">La machine est arrêtée. Riva consigne la restauration ; l’écran de résultat peut maintenant laisser le district continuer.</p>
           </article>
           <article>
-            <span>Configuration active</span>
+            <span>Build conservé par le checkpoint</span>
             <p id="result-build">Configuration d’origine</p>
+          </article>
+          <article id="result-forge-transmission" class="result-forge-transmission" hidden>
+            <span id="result-forge-transmission-label">Transmission Forge // l’anneau prend note</span>
+            <p id="result-forge-transmission-copy">La règle du boss rejoint le Codex. La prochaine machine ne pourra pas prétendre qu’elle n’était pas annoncée.</p>
           </article>
         </div>
         <div class="menu-stack">
-          <button id="continue-button" class="primary">Continuer</button>
-          <button id="result-menu-button">Retour au menu</button>
+          <button id="continue-button" class="primary">Continuer · laisser ce résultat au passé</button>
+          <button id="result-menu-button">Quitter vers le menu titre</button>
         </div>
       </div>
     </section>
 
     <section id="upgrade-screen" class="screen" aria-labelledby="upgrade-title" tabindex="-1">
       <div class="panel wide-panel upgrade-panel">
-        <p class="eyebrow">ATELIER MOBILE DE RIVA</p>
-        <h2 id="upgrade-title">Choisis une amélioration</h2>
-        <p class="result-summary">Une seule modification peut être installée avant la prochaine machine.</p>
+        <p class="eyebrow">ATELIER MOBILE // LE BUILD PERSISTE</p>
+        <h2 id="upgrade-title">Choisir une amélioration — le menu ne relance pas l’offre</h2>
+        <p class="result-summary">Une seule modification peut être installée avant la prochaine machine ; le checkpoint conservera ce choix.</p>
         <div class="upgrade-context" aria-label="Progression du Circuit">
-          <span id="upgrade-progress">Prochaine étape : district suivant</span>
+          <span id="upgrade-progress">Checkpoint : district suivant</span>
           <strong id="upgrade-build">Build actuel : configuration d’origine</strong>
         </div>
         <div id="upgrade-grid" class="upgrade-grid" role="list" aria-label="Modules disponibles"></div>
@@ -454,12 +472,12 @@
 
     <section id="ending-screen" class="screen" aria-labelledby="ending-title" tabindex="-1">
       <div class="panel ending-panel">
-        <p class="eyebrow">ÉPILOGUE — CIRCUIT LIBÉRÉ</p>
-        <h2 id="ending-title">La tempête retombe</h2>
-        <p class="ending-transmission">« Ici Riva Spark. Les six relais répondent de nouveau aux districts. Voltério n’a plus d’arène, plus de Couronne… et surtout plus de public captif. »</p>
+        <p class="eyebrow">ÉPILOGUE // LE JEU PEUT ÉCRIRE VICTOIRE</p>
+        <h2 id="ending-title">La tempête retombe — pas de boss caché</h2>
+        <p class="ending-transmission">« Ici Riva Spark. Les six relais répondent de nouveau aux districts. Le jeu peut afficher Victoire ; la ville, elle, continue. »</p>
         <div class="ending-resolution">
-          <article><span>Citadelle</span><strong>Cassian Voltério remis aux équipes civiles</strong></article>
-          <article><span>Réseau</span><strong>Six commandes locales, aucune autorité unique</strong></article>
+          <article><span>Citadelle</span><strong>Cassian Voltério détenu — aucun retour de scénario</strong></article>
+          <article><span>Réseau</span><strong>Six commandes locales — aucun menu d’autorité unique</strong></article>
         </div>
         <p id="ending-summary" class="result-summary"></p>
         <ol id="ending-districts" class="liberation-grid" aria-label="Districts libérés">
@@ -470,46 +488,46 @@
           <li><span>05</span><strong>Fournaise</strong></li>
           <li><span>06</span><strong>Citadelle</strong></li>
         </ol>
-        <p class="ending-legacy">Le Circuit tourne encore. Pas pour un spectacle. Pour ceux qui y vivent.</p>
+        <p class="ending-legacy">Le Circuit tourne encore. Pas pour un spectacle, pas pour une suite cachée. Pour ceux qui y vivent.</p>
         <div class="menu-stack">
-          <button id="ending-lab" class="primary">Ouvrir le Laboratoire</button>
-          <button id="ending-menu">Retour au menu principal</button>
+          <button id="ending-lab" class="primary">Ouvrir le Laboratoire · rejouer sans annuler la fin</button>
+          <button id="ending-menu">Retourner au menu titre · fin conservée</button>
         </div>
       </div>
     </section>
 
     <section id="forge-ending-screen" class="screen forge-ending-screen" aria-labelledby="forge-ending-title" tabindex="-1">
       <div class="panel ending-panel forge-ending-panel">
-        <p class="eyebrow">ÉPILOGUE — PROTOCOLE SANS COURONNE</p>
-        <h2 id="forge-ending-title">La Forge rend ses clés</h2>
-        <p class="ending-transmission">« Ici Riva Spark. Trône Zéro est isolé. Les clés d’urgence sont désormais distribuées, publiques et révocables. Plus aucune crise ne donnera une voix unique au Circuit. »</p>
+        <p class="eyebrow">ÉPILOGUE FORGE // 24 / 24 SANS ASTÉRISQUE</p>
+        <h2 id="forge-ending-title">La Forge rend ses clés — aucun second trône</h2>
+        <p class="ending-transmission">« Ici Riva Spark. NULL CROWN est neutralisée. Les clés d’urgence sont distribuées, publiques et révocables ; le dernier boss n’écrit pas une nouvelle autorité. »</p>
         <div class="ending-resolution forge-resolution">
-          <article><span>Forge</span><strong>Vingt-quatre fonctions civiques restaurées</strong></article>
-          <article><span>Autorité</span><strong>Clés réparties entre les six districts</strong></article>
+          <article><span>Forge</span><strong>Vingt-quatre fonctions restaurées — le compteur confirme 24 / 24</strong></article>
+          <article><span>Autorité</span><strong>Clés réparties entre six districts — aucune phase secrète</strong></article>
         </div>
-        <p id="forge-ending-summary" class="result-summary">Les quatre vagues sont stabilisées. Chaque machine répond de nouveau à ceux qu’elle devait servir.</p>
+        <p id="forge-ending-summary" class="result-summary">Les quatre anneaux sont stabilisés. Chaque machine répond de nouveau à ceux qu’elle devait servir ; la fin ne possède pas d’astérisque.</p>
         <div id="forge-ending-stats" class="forge-ending-stats" role="status" aria-live="polite">
           <article><span>Machines</span><strong>24 / 24</strong></article>
           <article><span>Vagues</span><strong>4 / 4</strong></article>
           <article><span>Contrats</span><strong>— / 72</strong></article>
         </div>
-        <p class="ending-legacy">La Forge ne choisit plus qui commande. Elle prouve que personne ne doit commander seul.</p>
+        <p class="ending-legacy">La Forge ne choisit plus qui commande. Aucun boss caché ne vient contester cette fin.</p>
         <div class="menu-stack forge-ending-actions">
-          <button id="forge-ending-restart" class="primary">Rejouer le Circuit Forge</button>
-          <button id="forge-ending-menu">Retour au menu principal</button>
+          <button id="forge-ending-restart" class="primary">Rejouer la Forge · résultat conservé</button>
+          <button id="forge-ending-menu">Retourner au menu titre · 24 / 24 archivé</button>
         </div>
       </div>
     </section>
 
     <section id="gameover-screen" class="screen compact" role="dialog" aria-modal="true" aria-labelledby="gameover-title" tabindex="-1">
       <div class="panel pause-panel">
-        <p class="eyebrow">SIGNAL CINÉTIQUE PERDU</p>
-        <h2 id="gameover-title">Défaite</h2>
-        <p id="gameover-text" class="result-summary">La machine a conservé son cycle d’attaque. Recalibre ta trajectoire.</p>
+        <p class="eyebrow">RÉSULTAT // LE SCRIPT GARDE LE CHECKPOINT</p>
+        <h2 id="gameover-title">Défaite — pas fin de partie</h2>
+        <p id="gameover-text" class="result-summary">La machine a conservé son cycle d’attaque ; le jeu, lui, a conservé ta reprise.</p>
         <p id="gameover-hint" class="recovery-hint">Conseil : garde la ruée pour traverser le danger, puis frappe seulement quand le noyau s’ouvre.</p>
         <div class="menu-stack">
-          <button id="gameover-retry" class="primary">Réessayer</button>
-          <button id="gameover-menu">Retour au menu</button>
+          <button id="gameover-retry" class="primary">Réessayer · même boss, pattern relu</button>
+          <button id="gameover-menu">Quitter vers le menu titre</button>
         </div>
       </div>
     </section>
@@ -563,7 +581,7 @@
     </aside>
   </main>
 
-  <script src="pwa-update-v2.8.0.js"></script>
+  <script src="pwa-update-v2.9.0.js"></script>
   <script src="story.js"></script>
   <script src="expansion-story.js"></script>
   <script src="boss-roster.js"></script>
