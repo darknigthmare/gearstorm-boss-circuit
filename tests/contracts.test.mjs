@@ -402,6 +402,9 @@ test('les systemes campagne, entrees et accessibilite restent cables', () => {
   assert.doesNotMatch(css, /\.result-screen \.result-panel|\.pause-screen \.pause-panel/);
   for (const id of ['upgrade-screen', 'prologue-screen', 'ending-screen']) assert.match(html, new RegExp(`id="${id}"`));
   assert.match(html, /aria-live="polite"/);
+  assert.match(html, /id="toast"[^>]+aria-hidden="true"/);
+  assert.doesNotMatch(html, /id="toast"[^>]+aria-live/);
+  assert.match(html, /id="game-status"[^>]+aria-live="polite"/);
   assert.match(html, /prefers-reduced-motion|motion-toggle/);
   const gamepadBlock = game.slice(game.indexOf('function pollGamepad'), game.indexOf('function playerMuzzlePosition'));
   assert.match(gamepadBlock, /Array\.from\(navigator\.getGamepads/);

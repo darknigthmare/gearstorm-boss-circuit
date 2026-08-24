@@ -85,7 +85,8 @@ test('options, sauvegarde portable et focus clavier restent accessibles', async 
     buffer: Buffer.from(JSON.stringify({ version: 5, settings: { difficulty: 'overdrive' } }))
   });
   await expect(page.locator('#difficulty-select')).toHaveValue('casual');
-  await expect(page.locator('#toast')).toContainText('STOCKAGE LOCAL INDISPONIBLE');
+  await expect(page.locator('#toast')).toContainText('IMPORT ANNULÉ');
+  await expect(page.locator('#game-status')).toContainText('stockage local indisponible');
 });
 
 test('les preferences systeme initialisent seulement une nouvelle sauvegarde', async ({ page }) => {

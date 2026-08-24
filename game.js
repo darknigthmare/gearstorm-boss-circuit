@@ -1305,8 +1305,7 @@
       save = imported;
       if (!persistSave()) {
         save = previousSave;
-        showToast('IMPORT ANNULÉ // LE CHECKPOINT REFUSE UNE FAUSSE ENTRÉE', 'Import annulé : stockage local indisponible.');
-        announce('Import valide, mais stockage local indisponible. Progression inchangee.');
+        showToast('IMPORT ANNULÉ // LE CHECKPOINT REFUSE UNE FAUSSE ENTRÉE', 'Import valide, mais stockage local indisponible. Progression inchangée.');
         return false;
       }
       applySettings();
