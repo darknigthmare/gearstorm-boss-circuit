@@ -1,6 +1,6 @@
-# GEARSTORM: Boss Circuit — conception de production 2.9.0
+# GEARSTORM: Boss Circuit — conception de production 2.9.1
 
-`DESIGN.md` reste la source de vérité des règles et `story.js` celle des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise. `expansion-story.js` et `boss-roster.js` étendent ce contrat à la Forge. Ce document fixe leur intégration de production, de narration interactive et d’UX pour la version applicative 2.9.0.
+`DESIGN.md` reste la source de vérité des règles et `story.js` celle des scènes, actes, transmissions, dossiers Codex et contrats de maîtrise. `expansion-story.js` et `boss-roster.js` étendent ce contrat à la Forge. Ce document fixe leur intégration de production, de narration interactive et d’UX pour la version applicative 2.9.1.
 
 ## Invariants de jeu
 
@@ -20,7 +20,7 @@
 
 Les 24 extensions sont jouables en sélection libre et dans le Circuit Forge 07–30. Vingt-quatre `mechanicId` et 72 signatures d’état uniques spécialisent huit familles mécaniques communes : renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et puzzle/endgame. Cette mutualisation est un invariant explicite ; le jeu ne revendique pas 24 moteurs physiques sans code partagé.
 
-Chaque profil charge quatre pièces et un backdrop depuis le pack artistique v2.9.0, avec fallback procédural. Les 72 contrats Forge utilisent la télémétrie de la tentative et échouent si leur mesure est inconnue.
+Chaque profil charge quatre pièces et un backdrop depuis le pack artistique v2.9.1, avec fallback procédural. Les 72 contrats Forge utilisent la télémétrie de la tentative et échouent si leur mesure est inconnue.
 
 Chaque profil définit également un interlude et une `metaLine`. Après déverrouillage, ces deux niveaux de lecture restent accessibles dans le Codex sous l’un des quatre anneaux ; les résultats réaffichent la transmission du boss neutralisé. Les tutoriels, aides et objectifs critiques restent volontairement factuels.
 
@@ -92,7 +92,7 @@ Ces hooks sont rendus dans `index.html` et requis par le contrat applicatif v2.9
 
 Chaque carte conserve son texte et son `aria-label`. Une carte déverrouillée peut ajouter `img.boss-card-art` avec `alt=""` et `aria-hidden="true"` ; une carte verrouillée n’insère aucune miniature.
 
-- Boss Forge : `assets/generated/v2.9.0/bosses/{id}/chassis.webp`.
+- Boss Forge : `assets/generated/v2.9.1/bosses/{id}/chassis.webp`.
 - Rivet Rex : `rammer/chassis.webp`.
 - Sky Slicer : `kraken/fuselage.webp`.
 - Magnetron : `drill/carapace.webp`.
@@ -139,9 +139,9 @@ La sauvegarde reste locale au navigateur : aucune synchronisation cloud ou inter
 - Les cibles tactiles visent au moins 44 × 44 CSS px.
 - En portrait étroit, un conseil recommande le paysage ; le portrait reste un mode contraint et non la présentation tactique de référence.
 
-## Contrat artistique v2.9.0
+## Contrat artistique v2.9.1
 
-Les 42 masters originaux produits avec OpenAI Image Generation alimentent 233 assets runtime indépendants dans le manifeste 2.9.0, pour 18 175 510 octets.
+Les 42 masters originaux produits avec OpenAI Image Generation alimentent 233 assets runtime indépendants dans le manifeste 2.9.1, pour 18 175 510 octets.
 
 | Famille | Contrat | Masters | Assets runtime |
 | --- | --- | ---: | ---: |

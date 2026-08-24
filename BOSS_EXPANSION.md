@@ -4,7 +4,7 @@ Statut du document : implémentation Forge v2.9 publiée ; QA locale, CI Chromiu
 
 Portée : 30 boss originaux jouables, dont 6 en campagne et 24 dans la Forge libre ou le Circuit Forge
 
-Référence technique actuelle : GEARSTORM v2.9.0, sauvegarde v5, manifeste d’assets générés 2.9.0 (schéma 3)
+Référence technique actuelle : GEARSTORM v2.9.1, sauvegarde v5, manifeste d’assets générés 2.9.1 (schéma 3)
 
 ## 1. Objet et limites
 
@@ -287,7 +287,7 @@ La Forge libre et le Laboratoire peuvent enrichir temps, rangs, maîtrise ou Cod
 
 ### 6.1 Manifeste actuel
 
-Le manifeste 2.9.0, de schéma 3, référence 42 masters de provenance et 233 WebP runtime pour 18 175 510 octets :
+Le manifeste 2.9.1, de schéma 3, référence 42 masters de provenance et 233 WebP runtime pour 18 175 510 octets :
 
 - 48 assets d’arène : 24 couches de parallaxe campagne et 24 backdrops Forge ;
 - 150 pièces de boss : 54 campagne et 96 Forge ;
@@ -625,7 +625,7 @@ Le contrat de base est atteint dans les sources du candidat v2.9 :
 - les trente rencontres totalisent quatre-vingt-dix phases et sont lançables depuis l’interface ;
 - le Circuit Forge parcourt 07–30 en quatre vagues, avec améliorations, sauvegarde v5, reprise et fin dédiée ;
 - les extensions exposent 24 `mechanicId` et 72 signatures d’état uniques au-dessus de huit familles déterministes ;
-- le manifeste 2.9.0 publie 24 backdrops et 96 pièces Forge dans un total de 233 WebP issus de 42 masters ;
+- le manifeste 2.9.1 publie 24 backdrops et 96 pièces Forge dans un total de 233 WebP issus de 42 masters ;
 - `expansion-story.js` fournit quatre vagues, journaux, objectifs, Codex, restaurations, 24 interludes, 24 `metaLine` et 72/72 contrats instrumentés ;
 - les résultats et checkpoints Forge n’avancent jamais les six relais de campagne.
 

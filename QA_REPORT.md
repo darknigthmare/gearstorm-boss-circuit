@@ -1,31 +1,31 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.9.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.9.1
 
-Validation finale : 24 août 2026.
+Validation finale : 25 août 2026.
 
-## Statut v2.9.0 — validée, poussée et publiée
+## Statut v2.9.1 — validée, poussée et publiée
 
-La release v2.9.0 a été vérifiée localement, poussée sur `main`, validée par GitHub Actions sous Node 22 et publiée sur Vercel. Les résultats ci-dessous sont ceux réellement observés sur l’état final.
+La release v2.9.1 a été vérifiée localement, poussée sur `main`, validée par GitHub Actions sous Node 22 et publiée sur Vercel. Les résultats ci-dessous sont ceux réellement observés sur l’état final.
 
 | Surface v2.9 | État au moment de cette mise à jour |
 | --- | --- |
 | Inventaire artistique | Manifeste local : 42 masters, 233 WebP runtime, 18 175 510 octets |
 | Répartition | 48 arènes, 150 boss, 15 héroïne, 16 VFX, 4 narratifs |
-| Rig Riva | Manifeste : 13 pièces anatomiques + 2 effets, `rootOffsetY = -23.6`, `feetLocalY = 36` |
-| Perspective | Sol physique 620 ; offsets visuels campagne `+80`, Forge `+28` |
-| Contenu | 24 interludes, 24 `metaLine` et quatre anneaux présents dans les registres/surfaces |
-| Tests Node / build / audit npm | `npm run qa` réussi ; 75/75 tests Node ; build 30 boss / 90 phases / 233 WebP / 90 contrats ; `npm audit` : 0 vulnérabilité |
-| QA navigateur et captures finales | CI Chromium desktop/mobile : 13 réussis, 1 ignoré ; audit Chrome direct : 19 états finaux en 1440 × 900 et 390 × 844, plus captures de rig en 1280 × 720 |
-| GitHub / CI | Correctif runtime `1e31ebb` sur `main` ; workflow `32779812750` réussi en 2 min 22 s |
-| Vercel | Déploiement `dpl_37u6NAS5dYnb8Jy8zhGTmBCzR5oy` Ready ; alias `https://gearstorm-boss-circuit.vercel.app` |
+| Rig Riva | 13 pièces anatomiques + 2 effets ; bassin racine, 12 liens parent–enfant, hiérarchie sans cycle, museau dynamique |
+| Perspective | Riva et son ombre remontées de `10 px` ; sol physique 620 ; offsets décor campagne `+80`, Forge `+28` |
+| Contenu | Intro, prologue et phases méta mais informatifs ; aucune voix générique « Système » ; numérotation 01–30 cohérente |
+| Tests Node / build / audit npm | `npm run qa` réussi ; 76/76 tests Node ; build 30 boss / 90 phases / 233 WebP / 90 contrats / 21 701 448 octets ; `npm audit` : 0 vulnérabilité |
+| QA navigateur et captures finales | Chromium desktop/mobile : 13 réussis, 1 ignoré ; audit Chrome 1280 × 720 : intro, prologue, avant/après, course, saut, tir et ruée |
+| GitHub / CI | Commit applicatif `8bd2b29` sur `main` ; workflow `32789460141` réussi en 2 min 36 s sous Node 22 |
+| Vercel | Déploiement `dpl_7mKBMcfvbHcXF4mevKm4RYUNEdG5` Ready ; alias `https://gearstorm-boss-circuit.vercel.app` |
 | HTTP public | Racine, manifeste, pièce de Riva, illustration narrative, bootstrap PWA et service worker : HTTP 200 avec types, caches et en-têtes attendus |
 
-Le contact de Riva est couvert par le manifeste, les tests alpha/rig et les captures finales ; la PWA est couverte par les contrats Node et le parcours Chromium hors ligne de la CI. Restent hors preuve : appareils physiques, lecteur d’écran réel, Firefox/WebKit sur cette release et playtests humains prolongés.
+L'assemblage, le placement et les poses de Riva sont couverts par les contrats de hiérarchie, le muzzle articulé, la mesure `roadLift = 10`, les parcours Chromium et l'[audit illustré](docs/audits/v2.9.1/README.md). La PWA est couverte par les contrats Node et le parcours Chromium hors ligne. Restent hors preuve : appareils physiques, lecteur d'écran réel, Firefox/WebKit sur cette release et playtests humains prolongés.
 
 ---
 
 # Annexe historique — validation observée de la v2.8.0
 
-Validation locale et production effectuée le 21 août 2026 sur GEARSTORM v2.8.0. Les résultats ci-dessous sont conservés comme historique et ne valent pas validation du candidat v2.9.0.
+Validation locale et production effectuée le 21 août 2026 sur GEARSTORM v2.8.0. Les résultats ci-dessous sont conservés comme historique et ne valent pas validation du candidat v2.9.1.
 
 ## Environnement vérifié
 

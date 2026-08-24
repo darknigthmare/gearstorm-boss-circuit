@@ -1,0 +1,1359 @@
+{
+  "heroine": {
+    "parts": 15,
+    "anatomyParts": 13,
+    "effectParts": 2,
+    "partNames": [
+      "dash-trail",
+      "thigh-far",
+      "shin-far",
+      "boot-far",
+      "upper-arm-far",
+      "forearm-far",
+      "pelvis",
+      "torso",
+      "thigh-near",
+      "shin-near",
+      "boot-near",
+      "upper-arm-near",
+      "forearm-cannon-near",
+      "head",
+      "overload-halo"
+    ],
+    "anatomyPartNames": [
+      "thigh-far",
+      "shin-far",
+      "boot-far",
+      "upper-arm-far",
+      "forearm-far",
+      "pelvis",
+      "torso",
+      "thigh-near",
+      "shin-near",
+      "boot-near",
+      "upper-arm-near",
+      "forearm-cannon-near",
+      "head"
+    ],
+    "parentLinks": [
+      {
+        "child": "thigh-far",
+        "parent": "pelvis"
+      },
+      {
+        "child": "shin-far",
+        "parent": "thigh-far"
+      },
+      {
+        "child": "boot-far",
+        "parent": "shin-far"
+      },
+      {
+        "child": "upper-arm-far",
+        "parent": "torso"
+      },
+      {
+        "child": "forearm-far",
+        "parent": "upper-arm-far"
+      },
+      {
+        "child": "torso",
+        "parent": "pelvis"
+      },
+      {
+        "child": "thigh-near",
+        "parent": "pelvis"
+      },
+      {
+        "child": "shin-near",
+        "parent": "thigh-near"
+      },
+      {
+        "child": "boot-near",
+        "parent": "shin-near"
+      },
+      {
+        "child": "upper-arm-near",
+        "parent": "torso"
+      },
+      {
+        "child": "forearm-cannon-near",
+        "parent": "upper-arm-near"
+      },
+      {
+        "child": "head",
+        "parent": "torso"
+      }
+    ],
+    "hierarchy": {
+      "acyclic": true,
+      "cycles": [],
+      "missingParents": [],
+      "roots": [
+        "pelvis"
+      ],
+      "reachesPelvis": true,
+      "chains": [
+        [
+          "pelvis",
+          "torso",
+          "head"
+        ],
+        [
+          "pelvis",
+          "thigh-far",
+          "shin-far",
+          "boot-far"
+        ],
+        [
+          "pelvis",
+          "thigh-near",
+          "shin-near",
+          "boot-near"
+        ],
+        [
+          "torso",
+          "upper-arm-far",
+          "forearm-far"
+        ],
+        [
+          "torso",
+          "upper-arm-near",
+          "forearm-cannon-near"
+        ]
+      ]
+    },
+    "hierarchical": true,
+    "zOrder": [
+      {
+        "name": "dash-trail",
+        "z": 5
+      },
+      {
+        "name": "thigh-far",
+        "z": 10
+      },
+      {
+        "name": "shin-far",
+        "z": 11
+      },
+      {
+        "name": "boot-far",
+        "z": 12
+      },
+      {
+        "name": "upper-arm-far",
+        "z": 13
+      },
+      {
+        "name": "forearm-far",
+        "z": 14
+      },
+      {
+        "name": "pelvis",
+        "z": 30
+      },
+      {
+        "name": "torso",
+        "z": 40
+      },
+      {
+        "name": "thigh-near",
+        "z": 50
+      },
+      {
+        "name": "shin-near",
+        "z": 51
+      },
+      {
+        "name": "boot-near",
+        "z": 52
+      },
+      {
+        "name": "upper-arm-near",
+        "z": 60
+      },
+      {
+        "name": "forearm-cannon-near",
+        "z": 70
+      },
+      {
+        "name": "head",
+        "z": 80
+      },
+      {
+        "name": "overload-halo",
+        "z": 90
+      }
+    ],
+    "bodyBounds": {
+      "left": -36.1,
+      "top": -176.1,
+      "right": 39.8,
+      "bottom": 36
+    },
+    "hitbox": {
+      "width": 42,
+      "height": 72,
+      "groundLocalY": 36
+    },
+    "hurtboxPolicy": "forgiving-lower-core",
+    "feet": 36,
+    "feetLocalY": 36,
+    "renderScale": 1.1,
+    "footOffset": 3.6,
+    "roadLift": 10,
+    "renderedFeetLocalY": 26,
+    "muzzle": {
+      "part": "forearm-cannon-near",
+      "point": [
+        156,
+        297
+      ]
+    },
+    "renderedMuzzle": {
+      "x": 94.41470278602259,
+      "y": -109.39355172013877
+    },
+    "cannonBaseRotation": -2.16,
+    "poseState": {
+      "reduceMotion": false,
+      "gait": -0.6929379235190658,
+      "speedPose": 1,
+      "airborne": 0,
+      "jumpBlend": 0,
+      "rising": 0,
+      "falling": 0,
+      "aim": 0.047903539411743655,
+      "recoil": 0,
+      "landing": 0,
+      "dashing": false
+    },
+    "loadedParts": 15,
+    "artReady": true,
+    "visualOffsetY": 80,
+    "facingMirroredAtRoot": true
+  },
+  "activeArenaId": "rammer",
+  "visualOffsetY": 80,
+  "arenaVisualOffsets": {
+    "rammer": 80,
+    "kraken": 80,
+    "drill": 80,
+    "mantis": 80,
+    "cyclotron": 80,
+    "omega": 80,
+    "bastion-ricochet": 28,
+    "hydraulic-warden": 28,
+    "hive-foreman": 28,
+    "echo-fencer": 28,
+    "breaker-array": 28,
+    "vertical-verdict": 28,
+    "rail-tyrant": 28,
+    "triplex-hunter": 28,
+    "ground-eater": 28,
+    "floodline-leviathan": 28,
+    "centrifuge-zero": 28,
+    "tempest-regulator": 28,
+    "ascension-frame": 28,
+    "counterforge": 28,
+    "carrier-cathedral": 28,
+    "twin-governors": 28,
+    "loadout-reactor": 28,
+    "orbital-famine": 28,
+    "logic-crucible": 28,
+    "vector-vault": 28,
+    "skyborne-battery": 28,
+    "endurance-engine": 28,
+    "adaptive-archivist": 28,
+    "null-crown": 28
+  },
+  "bosses": {
+    "rammer": {
+      "parts": 9,
+      "phaseCounts": [
+        6,
+        8,
+        9
+      ],
+      "phase1Bounds": {
+        "left": -178.2,
+        "top": -79,
+        "right": 107.2,
+        "bottom": 107.4
+      },
+      "hitbox": {
+        "width": 190,
+        "height": 160
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 20,
+        "y": -42
+      },
+      "weakPoint": {
+        "x": 20,
+        "y": -42,
+        "radius": 30
+      },
+      "corePivotMeasured": [
+        225,
+        158
+      ],
+      "transitionExplosionOnly": true
+    },
+    "kraken": {
+      "parts": 9,
+      "phaseCounts": [
+        6,
+        8,
+        9
+      ],
+      "phase1Bounds": {
+        "left": -96.5,
+        "top": -44.6,
+        "right": 117.8,
+        "bottom": 64.3
+      },
+      "hitbox": {
+        "width": 190,
+        "height": 160
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": 5
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": 5,
+        "radius": 34
+      },
+      "corePivotMeasured": [
+        197,
+        201
+      ],
+      "transitionExplosionOnly": true
+    },
+    "drill": {
+      "parts": 9,
+      "phaseCounts": [
+        6,
+        8,
+        9
+      ],
+      "phase1Bounds": {
+        "left": -89.8,
+        "top": -80.6,
+        "right": 87.4,
+        "bottom": 110.1
+      },
+      "hitbox": {
+        "width": 190,
+        "height": 160
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -56
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -56,
+        "radius": 31
+      },
+      "corePivotMeasured": [
+        166,
+        154
+      ],
+      "transitionExplosionOnly": true
+    },
+    "mantis": {
+      "parts": 9,
+      "phaseCounts": [
+        7,
+        8,
+        9
+      ],
+      "phase1Bounds": {
+        "left": -97,
+        "top": -89.8,
+        "right": 103.1,
+        "bottom": 91.6
+      },
+      "hitbox": {
+        "width": 190,
+        "height": 160
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -5
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -5,
+        "radius": 31
+      },
+      "corePivotMeasured": [
+        196,
+        179
+      ],
+      "transitionExplosionOnly": true
+    },
+    "cyclotron": {
+      "parts": 9,
+      "phaseCounts": [
+        7,
+        8,
+        9
+      ],
+      "phase1Bounds": {
+        "left": -118.8,
+        "top": -77.1,
+        "right": 114,
+        "bottom": 124.6
+      },
+      "hitbox": {
+        "width": 230,
+        "height": 160
+      },
+      "corePart": "molten-core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -12
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -12,
+        "radius": 34
+      },
+      "corePivotMeasured": [
+        217,
+        184
+      ],
+      "transitionExplosionOnly": true
+    },
+    "omega": {
+      "parts": 9,
+      "phaseCounts": [
+        6,
+        8,
+        9
+      ],
+      "phase1Bounds": {
+        "left": -103.8,
+        "top": -93.4,
+        "right": 104.5,
+        "bottom": 94.8
+      },
+      "hitbox": {
+        "width": 190,
+        "height": 220
+      },
+      "corePart": "omega-core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": 8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": 8,
+        "radius": 39
+      },
+      "corePivotMeasured": [
+        213,
+        170
+      ],
+      "transitionExplosionOnly": true
+    },
+    "bastion-ricochet": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4412,
+        0.4844
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "hydraulic-warden": {
+      "parts": 4,
+      "phaseCounts": [
+        4,
+        4,
+        4
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4556,
+        0.4796
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "hive-foreman": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4724,
+        0.5276
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "echo-fencer": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5228,
+        0.4197
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "breaker-array": {
+      "parts": 6,
+      "phaseCounts": [
+        6,
+        6,
+        6
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4988,
+        0.4556
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "vertical-verdict": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5348,
+        0.3669
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "rail-tyrant": {
+      "parts": 6,
+      "phaseCounts": [
+        6,
+        6,
+        6
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4988,
+        0.458
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "triplex-hunter": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4365,
+        0.5012
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "ground-eater": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.494,
+        0.5516
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "floodline-leviathan": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5396,
+        0.53
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "centrifuge-zero": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5492,
+        0.4964
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "tempest-regulator": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5564,
+        0.5564
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "ascension-frame": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5564,
+        0.4293
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "counterforge": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5779,
+        0.5276
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "carrier-cathedral": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5444,
+        0.482
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "twin-governors": {
+      "parts": 4,
+      "phaseCounts": [
+        4,
+        4,
+        4
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4604,
+        0.4652
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "loadout-reactor": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5324,
+        0.554
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "orbital-famine": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.542,
+        0.482
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "logic-crucible": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4628,
+        0.6283
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "vector-vault": {
+      "parts": 5,
+      "phaseCounts": [
+        5,
+        5,
+        5
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4964,
+        0.5156
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "skyborne-battery": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.6235,
+        0.5492
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "endurance-engine": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.4197,
+        0.4964
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "adaptive-archivist": {
+      "parts": 2,
+      "phaseCounts": [
+        2,
+        2,
+        2
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5036,
+        0.5947
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    },
+    "null-crown": {
+      "parts": 6,
+      "phaseCounts": [
+        6,
+        6,
+        6
+      ],
+      "phase1Bounds": null,
+      "hitbox": {
+        "width": 196,
+        "height": 168
+      },
+      "corePart": "core",
+      "coreVisualTarget": {
+        "x": 0,
+        "y": -8
+      },
+      "weakPoint": {
+        "x": 0,
+        "y": -8,
+        "radius": 32
+      },
+      "corePivotMeasured": [
+        0.5635,
+        0.5947
+      ],
+      "generatedMultipartManifest": true,
+      "generatedMultipartLoaded": false,
+      "generatedPartRoles": [
+        "chassis",
+        "weak-core",
+        "appendage",
+        "appendage"
+      ],
+      "proceduralFallback": true,
+      "transitionExplosionOnly": true
+    }
+  }
+}

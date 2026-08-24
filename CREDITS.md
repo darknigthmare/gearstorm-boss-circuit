@@ -10,9 +10,9 @@ GEARSTORM: Boss Circuit est un jeu original créé pour ce projet.
 - Audio : synthèse Web Audio, sans fichier musical tiers.
 - Bibliothèques et assets tiers au runtime : aucun déclaré.
 
-## Production visuelle v2.9.0
+## Production visuelle v2.9.1
 
-La provenance déclarée du lot illustré v2.9.0 est OpenAI Image Generation intégré. Les 42 masters retenus ont été conçus pour GEARSTORM, sans reprise d’un asset existant, d’un personnage sous licence ou d’un key art tiers. Ils servent à la provenance et ne sont pas chargés au runtime.
+La provenance déclarée du lot illustré v2.9.1 est OpenAI Image Generation intégré. Les 42 masters retenus ont été conçus pour GEARSTORM, sans reprise d’un asset existant, d’un personnage sous licence ou d’un key art tiers. Ils servent à la provenance et ne sont pas chargés au runtime.
 
 | Production | Masters | Sorties runtime |
 | --- | ---: | ---: |
@@ -25,7 +25,7 @@ La provenance déclarée du lot illustré v2.9.0 est OpenAI Image Generation int
 | Narration : intro, prologue et deux fins | 4 | 4 |
 | **Total** | **42** | **233 WebP** |
 
-Le key art et les icônes d’application sont également des créations originales produites pour ce projet. Les contraintes interdisent texte intégré, logo, filigrane et imitation d’une franchise. Le pipeline segmente et normalise les sorties de façon déterministe, puis enregistre dimensions, alpha, poids et SHA-256 dans le manifeste 2.9.0. Son inventaire runtime pèse 18 175 510 octets.
+Le key art et les icônes d’application sont également des créations originales produites pour ce projet. Les contraintes interdisent texte intégré, logo, filigrane et imitation d’une franchise. Le pipeline segmente et normalise les sorties de façon déterministe, puis enregistre dimensions, alpha, poids et SHA-256 dans le manifeste 2.9.1. Son inventaire runtime pèse 18 175 510 octets.
 
 Riva utilise treize pièces anatomiques OpenAI indépendantes : tête, torse, bassin, deux bras, deux avant-bras dont le canon, deux cuisses, deux tibias et deux bottes. Une traînée de ruée et un halo de Surcharge complètent ses quinze assets. Le rig fixe `rootOffsetY = -23.6` et mesure le bas alpha des bottes à `feetLocalY = 36`.
 
@@ -33,7 +33,7 @@ Le sol physique reste `y = 620`. Les six décors campagne sont dessinés avec un
 
 Les 24 machines Forge disposent chacune de quatre pièces transparentes — châssis, noyau et deux appendices — et d’un backdrop propre. Elles ne sont pas créditées comme rigs exhaustifs ni comme décors parallaxe multicouches : leurs animations secondaires sont composées par huit familles moteur partagées, avec fallback Canvas en cas d’échec de chargement.
 
-Les masters historiques v2.7 restent documentés ; la source de vérité courante est `assets/generated/v2.9.0/asset-manifest.json`.
+Les masters historiques v2.7 restent documentés ; la source de vérité courante est `assets/generated/v2.9.1/asset-manifest.json`.
 
 ## Écriture et expérience
 
@@ -51,9 +51,9 @@ La conception UX v2.9 ajoute le commentaire méta aux surfaces de jeu et de narr
 
 Les 72 contrats Forge sont instrumentés ; leur mutualisation télémétrique par famille est assumée et aucune réussite inconnue n’est accordée par défaut. Avec les 18 contrats de campagne, le total est de 90 contrats pour 30 boss et 90 phases.
 
-Le Circuit Forge 07–30 conserve reprise, améliorations et fin dans la sauvegarde locale v5 sans avancer les six relais de campagne. La v2.9 ne modifie pas le schéma v5 et remplace le pack runtime courant par le manifeste visuel v2.9.0.
+Le Circuit Forge 07–30 conserve reprise, améliorations et fin dans la sauvegarde locale v5 sans avancer les six relais de campagne. La v2.9 ne modifie pas le schéma v5 et remplace le pack runtime courant par le manifeste visuel v2.9.1.
 
-Quatre planches 3 × 2 couvrent les boss 07–12, 13–18, 19–24 et 25–30 ; six planches supplémentaires couvrent leurs arènes par groupes de quatre. Les nouvelles sources de Riva sont consignées dans `assets/generated/riva-v2.9-sources/PROVENANCE.md` et les images narratives dans `assets/generated/narrative-v2.9-sources/PROVENANCE.md`. La segmentation ne repeint pas les sources ; le manifeste 2.9.0 est la source de vérité des 233 fichiers runtime.
+Quatre planches 3 × 2 couvrent les boss 07–12, 13–18, 19–24 et 25–30 ; six planches supplémentaires couvrent leurs arènes par groupes de quatre. Les nouvelles sources de Riva sont consignées dans `assets/generated/riva-v2.9-sources/PROVENANCE.md` et les images narratives dans `assets/generated/narrative-v2.9-sources/PROVENANCE.md`. La segmentation ne repeint pas les sources ; le manifeste 2.9.1 est la source de vérité des 233 fichiers runtime.
 
 ## Fallback procédural
 

@@ -1,5 +1,18 @@
 # Historique des versions
 
+## 2.9.1 — Riva reprend la route
+
+- Activation d'une vraie hiérarchie de rig : `pelvis` est l'unique racine, les douze liens parent–enfant sont propagés et les cycles sont refusés par contrat.
+- Recalage des pivots de tête, torse, bassin, bras, avant-bras, cuisses, tibias et bottes ; le canon ne traverse plus le buste.
+- Ajout de poses distinctes pour course, montée, sommet, chute, réception, visée, recul et ruée, avec variante stable lorsque le mouvement réduit est actif.
+- Remontée visuelle de Riva de `10 px` sur la route, ombre comprise, sans déplacer le sol physique `y = 620` ni la hurtbox tolérante.
+- Départ des tirs calculé depuis le museau du WebP `forearm-cannon-near` après transformation complète du rig.
+- Remplacement de la disparition totale en invulnérabilité par une transparence contrôlée : l'héroïne reste visible pendant la ruée et les impacts.
+- Réécriture de l'intro, du prologue et des communications de phase : narration méta portée par Riva, Cassian et les relais civils, sans voix générique « Système ».
+- Numérotation canonique des machines 01–06 et Forge 07–30 sur les cartes, reprises, résultats et entrées du Codex.
+- Nouveau runtime artistique immuable `assets/generated/v2.9.1/` : 233 WebP, manifeste et sources de provenance conservés.
+- Audit illustré 1280 × 720, 76/76 tests Node, 13 parcours Chromium réussis, audit npm sans vulnérabilité, CI GitHub verte et production Vercel Ready.
+
 ## 2.9.0 — La route retrouve Riva
 
 - Remplacement du composite de Riva par un rig natif de treize pièces anatomiques indépendantes, plus la traînée de ruée et le halo de Surcharge.

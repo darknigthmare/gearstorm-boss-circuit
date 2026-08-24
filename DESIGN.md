@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit — conception v2.9.0
+# GEARSTORM: Boss Circuit — conception v2.9.1
 
 ## Pitch
 
@@ -57,9 +57,9 @@ Sur une sauvegarde neuve seulement, le runtime initialise mouvement réduit et c
 
 Les cartes déverrouillées montrent une miniature WebP décorative du boss sans remplacer le texte ni l’état accessible. Les cartes verrouillées n’exposent pas cette illustration. Sur mobile portrait, le paysage est recommandé pour conserver la largeur tactique de l’arène.
 
-## Direction artistique v2.9.0
+## Direction artistique v2.9.1
 
-Le manifeste v2.9.0, de schéma 3, référence 42 masters OpenAI et 233 WebP runtime pour 18 175 510 octets : 48 assets d’arène, 150 pièces de boss, 15 assets héroïne, 16 VFX et 4 images narratives. Il conserve dimensions, alpha, poids et SHA-256 ; les masters restent réservés à la provenance.
+Le manifeste v2.9.1, de schéma 3, référence 42 masters OpenAI et 233 WebP runtime pour 18 175 510 octets : 48 assets d’arène, 150 pièces de boss, 15 assets héroïne, 16 VFX et 4 images narratives. Il conserve dimensions, alpha, poids et SHA-256 ; les masters restent réservés à la provenance.
 
 | Famille | Masters | Runtime |
 | --- | ---: | ---: |

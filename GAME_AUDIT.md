@@ -1,19 +1,19 @@
-# Audit professionnel du jeu — v2.9.0
+# Audit professionnel du jeu — v2.9.1
 
-Date : 24 août 2026
+Date : 25 août 2026
 Portée : revue du code, des données et du manifeste, exécution locale des gates, audit Chrome desktop/mobile, CI Chromium sous Node 22 et vérification du déploiement Vercel. Aucun test matériel n’est revendiqué.
 
 ## Verdict
 
 GEARSTORM est un boss rush web structuré et largement jouable, et non un simple prototype d’écran. Le contenu déclaré est cohérent dans ses sources : 30 boss, 90 phases et 90 contrats de maîtrise. La campagne de six machines, le Laboratoire, la Forge libre et le Circuit Forge 07–30 disposent de progressions séparées, d’une sauvegarde v5, de modules, de difficultés, de fins et d’un registre narratif.
 
-La v2.9.0 traite deux écarts visuels et éditoriaux observés dans les sources : Riva passe d’un corps composite à treize pièces anatomiques indépendantes, et les routes peintes sont rapprochées du sol physique par des offsets visuels distincts. Le sol de simulation reste inchangé à `y = 620`.
+La v2.9.1 ferme les écarts d'assemblage reproduits sur Riva : ses treize pièces anatomiques suivent une hiérarchie réelle à racine `pelvis`, le canon ne traverse plus le torse, les appuis alternent et les poses saut/tir/ruée restent lisibles. Riva et son ombre sont remontées de `10 px` sur la chaussée peinte ; le sol de simulation reste inchangé à `y = 620`.
 
-Le contenu Forge conserve désormais les 24 interludes et 24 `metaLine` dans le Codex, regroupés en quatre anneaux. Quatre illustrations narratives complètent l’intro, le prologue et les deux fins. Les tutoriels, aides et objectifs critiques restent non méta.
+L'intro, le prologue et les communications de phase portent désormais leur regard méta par Riva, Cassian et les relais civils. Chaque intervention apporte du lore, un enjeu ou une information de mission ; aucune voix générique « Système » ne parle à la joueuse. Les tutoriels, aides et objectifs critiques restent non méta.
 
 Le jeu ne doit toutefois pas encore être qualifié de release commerciale matériellement validée. Les 24 boss Forge spécialisent huit familles partagées, l’audio reste synthétique, les records ne sont pas segmentés, les contrôles n’ont pas été certifiés sur appareils physiques et le portrait mobile reste une présentation contrainte pour laquelle le paysage est recommandé.
 
-## État factuel v2.9.0
+## État factuel v2.9.1
 
 | Surface | État observé |
 | --- | --- |
@@ -23,21 +23,23 @@ Le jeu ne doit toutefois pas encore être qualifié de release commerciale maté
 | Forge | 4 vagues de 6 boss ; sélection libre séparée |
 | Mécaniques Forge | 24 `mechanicId`, 72 signatures, 8 familles moteur partagées |
 | Sauvegarde | Schéma local v5, migrations et normalisation conservées |
-| Art | Manifeste v2.9.0, 42 masters, 233 WebP runtime, 18 175 510 octets |
+| Art | Manifeste v2.9.1, 42 masters, 233 WebP runtime, 18 175 510 octets |
 | Audio | Web Audio synthétique, sans banque sonore distante |
 | E2E présents | Chromium desktop/mobile : rig, grille 30, matrice 24 × 3, checkpoint Forge, accessibilité, sauvegarde portable, Gamepad simulé et offline |
-| Publication | Correctif runtime `1e31ebb` sur `main`, CI `32779812750` verte, Vercel Ready et alias public HTTP 200 |
+| Publication | Commit `8bd2b29` sur `main`, CI `32789460141` verte, Vercel `dpl_7mKBMcfvbHcXF4mevKm4RYUNEdG5` Ready et alias public HTTP 200 |
 
-## Corrigé dans la v2.9.0
+## Corrigé dans la v2.9.1
 
-- Rig natif de Riva : treize pièces anatomiques, traînée et halo séparés ; tête, torse, bassin et avant-bras-canon ne sont plus fusionnés.
-- Contact déclaré et mesuré : `rootOffsetY = -23.6`, bas alpha des bottes à `feetLocalY = 36`.
+- Rig hiérarchique de Riva : treize pièces anatomiques, traînée et halo séparés ; `pelvis` est l'unique racine et les douze liens parent–enfant sont acycliques.
+- Assemblage recalé : tête, torse, bassin, bras et avant-bras-canon restent séparés ; le museau suit la transformation finale du canon.
+- Animation : course à appuis alternés, montée/sommet/chute/réception distincts, visée et recul visibles, ruée lisible même pendant l'invulnérabilité.
+- Placement : remontée purement visuelle de `10 px`, ombre comprise, sans mutation du sol physique `620` ni de la hurtbox tolérante.
 - Perspective : offsets de rendu `+80 px` pour les arènes campagne et `+28 px` pour les backdrops Forge, sans mutation du sol physique `620`.
 - Pack OpenAI courant : 48 assets d’arène, 150 de boss, 15 héroïne, 16 VFX et 4 narratifs.
 - Contenu : 24 interludes et 24 `metaLine` persistants dans le Codex, panorama des quatre anneaux et transmission Forge au résultat.
-- Ton : surfaces de jeu et narration méta ; tutoriels, aide, accessibilité et objectifs critiques maintenus factuels.
+- Ton : récit méta mais diégétique et utile ; tutoriels, aide, accessibilité et objectifs critiques maintenus factuels.
 
-Ces points sont confirmés par les contrats automatisés, les diagnostics du rig, les captures Chrome finales, la CI et les contrôles HTTP consignés dans `QA_REPORT.md`.
+Ces points sont confirmés par les contrats automatisés, les [captures Chrome avant/après](docs/audits/v2.9.1/README.md), les diagnostics du rig, la CI et les contrôles HTTP consignés dans `QA_REPORT.md`.
 
 ## Fiabilité héritée de la v2.8.0
 
@@ -95,7 +97,7 @@ Ces points sont confirmés par les contrats automatisés, les diagnostics du rig
 - Contrats Node présents pour le consentement PWA face à un worker `waiting`.
 - Workflow GitHub Actions exécuté sous Node 22.x pour QA, navigateur et audit de dépendances.
 
-Sur l’état final v2.9.0, la CI a exécuté 75/75 tests Node et 13 parcours Chromium réussis avec un test ignoré ; l’audit npm n’a trouvé aucune vulnérabilité.
+Sur l’état final v2.9.1, la CI a exécuté 76/76 tests Node et 13 parcours Chromium réussis avec un test ignoré ; l’audit npm n’a trouvé aucune vulnérabilité.
 
 ## Risques restant — P0
 
@@ -168,4 +170,4 @@ Action recommandée : ajouter des scénarios déterministes ciblés plutôt qu�
 
 ## Limites de preuve
 
-Cette révision s’appuie sur l’état publié le 24 août 2026. Les commandes locales, la CI GitHub, Vercel Ready et les réponses HTTP publiques sont vérifiées ; les tests matériels, Firefox/WebKit et les playtests humains prolongés restent hors preuve.
+Cette révision s’appuie sur l’état publié le 25 août 2026. Les commandes locales, la CI GitHub, Vercel Ready et les réponses HTTP publiques sont vérifiées ; les tests matériels, Firefox/WebKit et les playtests humains prolongés restent hors preuve.
