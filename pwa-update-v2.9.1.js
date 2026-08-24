@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const MARKER = '__GEARSTORM_PWA_UPDATE_V2_9__';
+  const MARKER = '__GEARSTORM_PWA_UPDATE_V2_9_1__';
   if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol) || globalThis[MARKER]) return;
   globalThis[MARKER] = true;
 

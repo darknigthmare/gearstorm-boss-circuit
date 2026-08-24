@@ -13,8 +13,8 @@
     summary: "Cassian Voltério détourne les six infrastructures du Circuit et transforme leurs commandes civiles en spectacle coercitif.",
     lines: [
       line('Cassian', "Habitants du Circuit, vos voies, vos communications et votre énergie suivent désormais une seule volonté : la mienne. Tout spectacle a besoin d’un cadre ; celui-ci n’aura qu’un auteur.", 'broadcast'),
-      line('Système', 'Six districts verrouillés. Six actes déclarés. Canaux civils coupés ; aucun écart au script de la Couronne.', 'system'),
-      line('Riva', "Il a verrouillé le réseau principal. Pas les conduites que personne ne regarde… ni l’option « recommencer » qu’il a laissée au menu.", 'maintenance')
+      line('Canal civil', "Les six districts viennent de disparaître du direct. Les issues d’évacuation ne répondent plus.", 'civil'),
+      line('Riva', "Il a pris le réseau et le cadre. Tant qu’il reste une route hors champ, il n’a pas encore écrit la fin.", 'maintenance')
     ]
   };
 
@@ -30,8 +30,8 @@
     continueLabel: 'Entrer dans le Circuit →',
     summary: "Ancienne technicienne du réseau, Riva peut encore emprunter la ligne de maintenance M-0. Chaque relais restauré ouvre physiquement la voie vers le district suivant.",
     lines: [
-      line('Riva', "J’ai entretenu ces machines pour qu’elles servent la ville. Cette fois, je vois aussi les ficelles du niveau.", 'maintenance'),
-      line('Système', 'Six actes chargés, six districts affichés, aucun boss autorisé à attendre hors écran.', 'system'),
+      line('Riva', "J’ai construit M-0 pour les jours où le centre mentirait. Ce soir, elle traverse aussi le prologue.", 'maintenance'),
+      line('Canal civil', "Six relais répondent encore. Le premier est sur la Rocade ; après lui, chaque victoire rouvrira une route.", 'civil'),
       line('Cassian', "Une ligne oubliée ne conduit nulle part, technicienne. Mais un prologue doit bien livrer quelqu’un au premier boss.", 'broadcast')
     ]
   };
@@ -295,7 +295,7 @@
       name: 'Cassian Voltério',
       role: 'Ancien architecte du réseau devenu maître de cérémonie autoritaire',
       arc: "Il transforme l’efficacité en contrôle et le contrôle en spectacle, puis perd sa Couronne en centralisant toutes ses sécurités.",
-      credo: 'Un système parfait doit avoir une seule volonté et un public permanent.'
+      credo: 'Une ville parfaite doit parler d’une seule voix — la mienne — devant un public permanent.'
     }
   };
 
@@ -375,7 +375,7 @@
 
   const story = deepFreeze({
     schemaVersion: 1,
-    contentVersion: '2.9.0',
+    contentVersion: '2.9.1',
     title: 'GEARSTORM: Boss Circuit — La dernière émission',
     bossOrder,
     characters,

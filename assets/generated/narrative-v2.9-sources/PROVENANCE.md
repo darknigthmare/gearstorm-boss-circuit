@@ -17,4 +17,4 @@ Statut : **sources OpenAI intégrées au runtime v2.9**. Ces quatre masters orig
 - composition lisible derrière les panneaux UI, avec silhouettes principales placées hors des zones de texte critiques ;
 - aucun emprunt visuel à Sonic, Mega Man ou une autre licence.
 
-Le pipeline `scripts/process-openai-art.py` normalise ces masters en quatre WebP opaques sous `assets/generated/v2.9.0/narrative/`. Les dimensions, tailles, identifiants de prompt et SHA-256 sont consignés dans le manifeste v2.9.0 ; les PNG sources ne sont jamais servis par le serveur de production.
+Le pipeline `scripts/process-openai-art.py` normalise ces masters en quatre WebP opaques sous `assets/generated/v2.9.1/narrative/`. Les dimensions, tailles, identifiants de prompt et SHA-256 sont consignés dans le manifeste v2.9.1 ; les PNG sources ne sont jamais servis par le serveur de production.

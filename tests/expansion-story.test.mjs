@@ -80,7 +80,7 @@ test('expansion-story.js est autonome, immuable et intégré au runtime', () => 
   const story = loadExpansionStory();
   assert.ok(story, 'globalThis.GEARSTORM_EXPANSION_STORY doit etre expose');
   assert.equal(story.schemaVersion, 1);
-  assert.equal(story.contentVersion, '2.9.0');
+  assert.equal(story.contentVersion, '2.9.1');
   assert.equal(story.status, 'runtime-integrated');
   assert.equal(story.runtimeIntegrated, true);
   assert.equal(story.expansionPremise.runtimeIntegrated, true);

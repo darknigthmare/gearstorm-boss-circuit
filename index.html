@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080b18" />
-  <meta name="description" content="GEARSTORM: Boss Circuit v2.9 — 30 boss jouables, un vrai rig anatomique OpenAI, quatre scènes illustrées et un Circuit qui connaît ses propres règles." />
+  <meta name="description" content="GEARSTORM: Boss Circuit v2.9.1 — 30 boss jouables, un rig anatomique OpenAI hiérarchique, quatre scènes illustrées et un Circuit qui connaît ses propres règles." />
   <meta name="application-name" content="GEARSTORM" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,15 +12,15 @@
   <meta name="apple-mobile-web-app-title" content="GEARSTORM" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_FR" />
-  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.9" />
+  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.9.1" />
   <meta property="og:description" content="Riva Spark remonte la ligne fantôme M-0 et libère les six districts du Circuit." />
   <meta property="og:image" content="assets/gearstorm-key-art.png" />
   <meta property="og:image:alt" content="Riva Spark face aux machines du Circuit Voltério" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.9" />
+  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.9.1" />
   <meta name="twitter:description" content="Trente machines jouables. Quatre-vingt-dix phases. Campagne narrative et Forge d’entraînement." />
   <meta name="twitter:image" content="assets/gearstorm-key-art.png" />
-  <title>GEARSTORM: Boss Circuit v2.9</title>
+  <title>GEARSTORM: Boss Circuit v2.9.1</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="assets/gearstorm-icon.svg" />
   <link rel="apple-touch-icon" href="assets/gearstorm-icon-192.png" />
@@ -53,7 +53,7 @@
         </figure>
         <div class="panel hero-panel">
           <div class="release-line">
-            <p class="eyebrow">PROTOCOLE MÉTA // V2.9</p>
+            <p class="eyebrow">PROTOCOLE MÉTA // V2.9.1</p>
             <span class="release-status"><span aria-hidden="true"></span> Le jeu sait qu’il est prêt</span>
           </div>
           <h1 id="game-title"><span>GEARSTORM</span><small>BOSS CIRCUIT</small></h1>
@@ -61,7 +61,7 @@
           <ul id="build-summary" class="build-summary" aria-label="Contenu de cette version">
             <li><strong>30</strong><span>boss savent qu’ils sont jouables</span></li>
             <li><strong>90</strong><span>phases annoncent leur transition</span></li>
-            <li><strong>24</strong><span>systèmes Forge affichent leur règle</span></li>
+            <li><strong>24</strong><span>règles Forge annoncées avant d’agir</span></li>
           </ul>
           <div id="campaign-recap" class="campaign-recap" aria-labelledby="campaign-recap-title">
             <span id="campaign-recap-title" class="recap-kicker">Checkpoint narratif</span>
@@ -77,10 +77,10 @@
               <span class="button-copy"><strong>Reprendre la Forge</strong><small id="continue-forge-detail">Le checkpoint sait quelle machine vient ensuite</small></span>
               <span aria-hidden="true">→</span>
             </button>
-            <button id="start-rush" class="primary launch-button" aria-controls="story-screen">Relancer le prologue · Nouveau Circuit <span aria-hidden="true">→</span></button>
+            <button id="start-rush" class="primary launch-button" aria-controls="story-screen">Nouvelle campagne · 6 boss enchaînés <span aria-hidden="true">→</span></button>
             <div class="menu-grid">
               <button id="practice" aria-controls="boss-select-screen">Laboratoire · Rejouer un boss</button>
-              <button id="forge" data-gearstorm-mode="forge" aria-controls="boss-select-screen">Catalogue intégral · 30 boss savent qu’ils sont jouables</button>
+              <button id="forge" data-gearstorm-mode="forge" aria-controls="boss-select-screen">Catalogue intégral · Choisir librement parmi 30 boss</button>
               <button id="codex" aria-controls="codex-screen">Codex · Relire le jeu</button>
               <button id="how-to" aria-controls="how-screen">Commandes et règles</button>
               <button id="settings" aria-controls="settings-screen">Options et accessibilité</button>
@@ -105,13 +105,13 @@
           </div>
           <span id="story-status" class="story-status">DIRECT DÉTOURNÉ</span>
         </header>
-        <h2 id="story-title">Une ville sous un seul signal — et un boss au bout du prologue</h2>
+        <h2 id="story-title">L’Émission permanente — Cassian croit déjà tenir le cadre</h2>
         <p id="story-location" class="story-location">Circuit central · Minuit réseau</p>
-        <div id="story-summary" class="story-summary"><p>Cassian a pris le réseau et le cadre. La ligne M-0 reste hors champ, exactement là où un prologue jouable en a besoin.</p></div>
+        <div id="story-summary" class="story-summary"><p>Cassian a pris le réseau et le cadre. Pourtant, M-0 court hors champ et refuse encore sa version des faits.</p></div>
         <div id="story-dialogue" class="story-dialogue" role="log" aria-live="polite"></div>
         <aside id="story-consequence" class="story-consequence"></aside>
         <div class="story-actions">
-          <button id="story-continue" class="primary launch-button">Couper le direct · Ouvrir M-0 <span aria-hidden="true">→</span></button>
+          <button id="story-continue" class="primary launch-button">Suivre M-0 · Ouvrir la ligne fantôme <span aria-hidden="true">→</span></button>
           <button id="story-back" type="button">Quitter vers le menu titre</button>
         </div>
       </div>
@@ -128,8 +128,8 @@
         <h2 id="prologue-title">La ligne fantôme</h2>
         <p id="prologue-summary" class="prologue-copy">Ancienne technicienne du réseau, Riva peut encore emprunter la ligne de maintenance M-0. Chaque relais restauré ouvre physiquement la voie vers le district suivant.</p>
         <div id="prologue-dialogue" aria-label="Transmission de la ligne M-0">
-          <blockquote><strong>Riva</strong> — J’ai entretenu ces machines pour qu’elles servent la ville. Cette fois, je vois aussi les ficelles du niveau.</blockquote>
-          <blockquote><strong>Système</strong> — Six actes déclarés, six districts chargés, aucun boss autorisé à attendre hors écran.</blockquote>
+          <blockquote><strong>Riva</strong> — J’ai construit M-0 pour les jours où le centre mentirait. Ce soir, elle traverse aussi le prologue.</blockquote>
+          <blockquote><strong>Canal civil</strong> — Six relais répondent encore. Le premier est sur la Rocade ; après lui, chaque victoire rouvrira une route.</blockquote>
           <blockquote><strong>Cassian</strong> — Une ligne oubliée ne conduit nulle part, technicienne. Mais un prologue doit bien livrer quelqu’un au premier boss.</blockquote>
         </div>
         <div class="mission-brief" aria-label="Objectifs de mission">
@@ -145,7 +145,7 @@
           <li data-boss-id="omega"><span>06</span><strong>Citadelle Voltério</strong><small>Crown Engine Ω</small></li>
         </ol>
         <div class="menu-stack prologue-actions">
-          <button id="prologue-start" class="primary launch-button">Valider le prologue · Entrer dans le Circuit <span aria-hidden="true">→</span></button>
+          <button id="prologue-start" class="primary launch-button">Suivre M-0 · Affronter Rivet Rex <span aria-hidden="true">→</span></button>
           <button class="back-button" data-back="title-screen">Annuler vers le menu titre</button>
         </div>
       </div>
@@ -161,22 +161,22 @@
           <button class="back-button" data-back="title-screen">Fermer le catalogue</button>
         </div>
         <div class="boss-mode-tabs" role="group" aria-label="Catalogue de machines">
-          <button type="button" data-gearstorm-mode="practice">Campagne · machines débloquées</button>
-          <button type="button" data-gearstorm-mode="forge">Catalogue intégral · les 30 boss lisent leur propre fiche</button>
+          <button type="button" data-gearstorm-mode="practice">Campagne · boss déjà débloqués</button>
+          <button type="button" data-gearstorm-mode="forge">Catalogue intégral · choisir parmi les 30 boss</button>
         </div>
         <section id="forge-circuit-card" class="forge-run-summary" aria-labelledby="forge-run-title" hidden>
           <div class="forge-run-copy">
-            <p class="eyebrow">CIRCUIT FORGE // 24 BOSS QUI LISENT LEURS RÈGLES</p>
+            <p class="eyebrow">CIRCUIT FORGE // 24 BOSS ENCHAÎNÉS</p>
             <h3 id="forge-run-title">Traverser les quatre anneaux — sans ellipse de menu</h3>
-            <p>Affronte les machines 07 à 30 dans l’ordre : chacune annonce son système, le build persiste et le checkpoint prend note après chaque victoire.</p>
+            <p>Affronte les machines 07 à 30 dans l’ordre : chacune annonce sa règle de combat, ta configuration persiste et la progression est sauvegardée après chaque victoire.</p>
             <p id="forge-run-summary" class="forge-run-summary-copy">24 boss · quatre anneaux · aucun combat hors champ</p>
           </div>
           <div class="forge-run-state">
             <span id="forge-wave-progress">Anneau 1 · 0 / 24 boss stabilisés · checkpoint prêt</span>
-            <button id="forge-rush-start" type="button" class="primary launch-button">Lancer la Forge · le compteur est prêt <span aria-hidden="true">→</span></button>
+            <button id="forge-rush-start" type="button" class="primary launch-button">Lancer le Circuit Forge <span aria-hidden="true">→</span></button>
           </div>
         </section>
-        <p id="lab-progress" class="screen-progress" role="status" aria-live="polite">1 boss lu sur 6 · La Forge garde 24 règles supplémentaires derrière ce même menu.</p>
+        <p id="lab-progress" class="screen-progress" role="status" aria-live="polite">1 boss de campagne sur 6 · Le Catalogue intégral ajoute les machines 07 à 30.</p>
         <div id="boss-grid" class="boss-grid" role="group" aria-label="Machines débloquées"></div>
       </div>
     </section>
@@ -334,7 +334,7 @@
           </article>
           <article>
             <h3>Objectif</h3>
-            <p>Le Rush campagne enchaîne les six boss. Le Laboratoire rejoue les machines de campagne débloquées ; le Catalogue intégral donne accès aux 30 boss, et le Circuit Forge enchaîne les machines 07 à 30 avec ses propres checkpoints.</p>
+            <p>La nouvelle campagne enchaîne les six boss narratifs. Le Laboratoire permet de rejouer ceux déjà débloqués. Le Catalogue intégral permet de choisir librement parmi les 30 boss. Le Circuit Forge est un défi distinct qui enchaîne les machines 07 à 30 et sauvegarde la progression après chaque victoire.</p>
           </article>
         </div>
         <aside id="onboarding-summary" class="manual-callout" aria-label="Tutoriel contextuel">
@@ -581,7 +581,7 @@
     </aside>
   </main>
 
-  <script src="pwa-update-v2.9.0.js"></script>
+  <script src="pwa-update-v2.9.1.js"></script>
   <script src="story.js"></script>
   <script src="expansion-story.js"></script>
   <script src="boss-roster.js"></script>

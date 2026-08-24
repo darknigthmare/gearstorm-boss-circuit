@@ -2,9 +2,9 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 
-export const ASSET_RELEASE = '2.9.0';
+export const ASSET_RELEASE = '2.9.1';
 export const ASSET_DIRECTORY = 'v' + ASSET_RELEASE;
-export const ASSET_MANIFEST_PATH = 'assets/generated/v2.9.0/asset-manifest.json';
+export const ASSET_MANIFEST_PATH = 'assets/generated/v2.9.1/asset-manifest.json';
 export const ASSET_BUDGET_BYTES = 22 * 1024 * 1024;
 export const EXPECTED_COUNTS = Object.freeze({
   runtimeFiles: 233,
@@ -48,6 +48,29 @@ export const RIVA_RENDER_ORDER = Object.freeze([
   'upper-arm-near', 'forearm-cannon-near', 'head',
   'overload-halo',
 ]);
+export const RIVA_ROAD_LIFT = 10;
+export const RIVA_PARENT_BY_PART = Object.freeze({
+  pelvis: null,
+  torso: 'pelvis',
+  head: 'torso',
+  'thigh-far': 'pelvis',
+  'shin-far': 'thigh-far',
+  'boot-far': 'shin-far',
+  'thigh-near': 'pelvis',
+  'shin-near': 'thigh-near',
+  'boot-near': 'shin-near',
+  'upper-arm-far': 'torso',
+  'forearm-far': 'upper-arm-far',
+  'upper-arm-near': 'torso',
+  'forearm-cannon-near': 'upper-arm-near',
+});
+export const RIVA_KINEMATIC_CHAINS = Object.freeze([
+  Object.freeze(['pelvis', 'torso', 'head']),
+  Object.freeze(['pelvis', 'thigh-far', 'shin-far', 'boot-far']),
+  Object.freeze(['pelvis', 'thigh-near', 'shin-near', 'boot-near']),
+  Object.freeze(['torso', 'upper-arm-far', 'forearm-far']),
+  Object.freeze(['torso', 'upper-arm-near', 'forearm-cannon-near']),
+]);
 export const NARRATIVE_NAMES = Object.freeze(['intro-broadcast', 'prologue-m0', 'campaign-ending', 'forge-ending']);
 const ARENA_LAYERS = Object.freeze(['far', 'mid', 'ground', 'foreground']);
 const WEBP_HEADER = Buffer.from('WEBP');
@@ -84,6 +107,64 @@ function pixelBounds(value, label) {
   invariant(x >= 0 && y >= 0 && width > 0 && height > 0 && x + width <= 418 && y + height <= 418, label + ': bbox hors canevas');
 }
 
+function validateHeroineHierarchy(parts) {
+  const anatomy = parts.filter(spec => RIVA_ANATOMY_PART_NAMES.includes(spec.name));
+  const byName = new Map(anatomy.map(spec => [spec.name, spec]));
+  const expectedParents = Object.entries(RIVA_PARENT_BY_PART);
+  invariant(anatomy.length === expectedParents.length, 'Riva: hierarchie anatomique incomplete');
+  for (const [name, expectedParent] of expectedParents) {
+    const spec = byName.get(name);
+    invariant(spec, 'Riva: piece hierarchique absente ' + name);
+    invariant(spec.parent === expectedParent, 'Riva ' + name + ': parent ' + expectedParent + ' attendu');
+  }
+  invariant(anatomy.filter(spec => spec.parent === null).map(spec => spec.name).join(',') === 'pelvis',
+    'Riva: pelvis doit etre l unique racine anatomique');
+
+  const visiting = new Set();
+  const visited = new Set();
+  function visit(name) {
+    invariant(!visiting.has(name), 'Riva: cycle hierarchique detecte via ' + name);
+    if (visited.has(name)) return;
+    visiting.add(name);
+    const parent = byName.get(name)?.parent;
+    if (parent !== null) {
+      invariant(byName.has(parent), 'Riva ' + name + ': parent anatomique absent ' + parent);
+      visit(parent);
+    }
+    visiting.delete(name);
+    visited.add(name);
+  }
+  for (const name of byName.keys()) visit(name);
+
+  for (const chain of RIVA_KINEMATIC_CHAINS) {
+    for (let index = 1; index < chain.length; index += 1) {
+      invariant(byName.get(chain[index])?.parent === chain[index - 1],
+        'Riva: chaine cinematique rompue ' + chain.join(' > '));
+    }
+  }
+
+  for (const side of ['far', 'near']) {
+    const sign = side === 'far' ? -1 : 1;
+    for (const segment of ['thigh', 'shin', 'boot', 'upper-arm']) {
+      const spec = byName.get(segment + '-' + side);
+      invariant(spec.side === side && Math.sign(spec.joint[0]) === sign,
+        'Riva ' + spec.name + ': cote/joint incoherent');
+    }
+  }
+
+  for (const [parentName, childName] of [
+    ['thigh-far', 'shin-far'], ['shin-far', 'boot-far'],
+    ['thigh-near', 'shin-near'], ['shin-near', 'boot-near'],
+    ['upper-arm-far', 'forearm-far'], ['upper-arm-near', 'forearm-cannon-near'],
+  ]) {
+    const parent = byName.get(parentName);
+    const child = byName.get(childName);
+    const distance = Math.hypot(child.joint[0] - parent.joint[0], child.joint[1] - parent.joint[1]);
+    invariant(distance >= 24 && distance <= 52,
+      'Riva: espacement articulaire ' + parentName + ' > ' + childName + ' invalide (' + distance + ')');
+  }
+}
+
 function normalizedRect(value, label) {
   invariant(value && [value.x, value.y, value.width, value.height].every(Number.isFinite), label + ': rectangle absent');
   invariant(value.x >= 0 && value.y >= 0 && value.width > 0 && value.height > 0, label + ': rectangle invalide');
@@ -100,8 +181,10 @@ function validateHeroineRig(heroine) {
   invariant(rig?.feetLocalY === 36, 'Riva: pieds locaux a 36 attendus');
   invariant(Number.isFinite(rig?.rootOffsetY) && rig.rootOffsetY < 0 && rig.rootOffsetY > -100, 'Riva: calibration verticale absente');
   invariant(rig?.ground?.physicalY === 620 && rig?.ground?.localY === 36, 'Riva: contrat sol 620/36 invalide');
-  pixelPair(rig?.muzzle, 'Riva: muzzle');
-  invariant(rig.muzzle[0] === 60 && rig.muzzle[1] === -44, 'Riva: muzzle [60,-44] attendu');
+  invariant(rig?.muzzle && typeof rig.muzzle === 'object' && !Array.isArray(rig.muzzle),
+    'Riva: muzzle articule objet attendu');
+  invariant(rig.muzzle.part === 'forearm-cannon-near', 'Riva: muzzle doit suivre le canon proche');
+  pixelPair(rig.muzzle.point, 'Riva: point muzzle', true);
   invariant(Array.isArray(rig.parts) && rig.parts.length === EXPECTED_COUNTS.heroineParts, 'Riva: 15 specs rig attendues');
   invariant(JSON.stringify(rig.renderOrder) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: renderOrder incoherent');
   invariant(JSON.stringify(rig.parts.map(part => part.name)) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: specs non triees par z');
@@ -123,6 +206,10 @@ function validateHeroineRig(heroine) {
     invariant(['far', 'near', 'center'].includes(spec.side), 'Riva ' + spec.name + ': side invalide');
     invariant(Number.isInteger(spec.coveragePixels) && spec.coveragePixels >= 64, 'Riva ' + spec.name + ': couverture insuffisante');
   }
+  validateHeroineHierarchy(rig.parts);
+  invariant(rig.parts.filter(spec => RIVA_EFFECT_PART_NAMES.includes(spec.name)).every(spec => spec.parent === null),
+    'Riva: les effets doivent rester des racines visuelles independantes');
+  invariant(rig.parts.some(spec => spec.name === rig.muzzle.part), 'Riva: piece du muzzle absente du rig');
 
   const measuredFeet = Math.max(...rig.parts
     .filter(spec => RIVA_ANATOMY_PART_NAMES.includes(spec.name))
@@ -381,7 +468,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   for (const entry of entries) {
     invariant(!ids.has(entry.id), 'Identifiant duplique: ' + entry.id);
     ids.add(entry.id);
-    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.9\.0\/.+\.webp$/.test(entry.src), entry.id + ': chemin runtime invalide');
+    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.9\.1\/.+\.webp$/.test(entry.src), entry.id + ': chemin runtime invalide');
     invariant(!entry.src.includes('..') && !entry.src.includes('\\'), entry.id + ': chemin non securise');
     invariant(!sources.has(entry.src), 'Source dupliquee: ' + entry.src);
     sources.add(entry.src);

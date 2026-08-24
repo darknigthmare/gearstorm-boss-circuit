@@ -1,6 +1,6 @@
 # GEARSTORM OpenAI art provenance
 
-Generated from 2026-08-20 through 2026-08-24 with the built-in OpenAI ImageGen tool for this original project. The current v2.9 inventory contains 42 immutable PNG production masters. `assets/generated/v2.9.0/` contains deterministic runtime derivatives produced by `scripts/process-openai-art.py`.
+Generated from 2026-08-20 through 2026-08-24 with the built-in OpenAI ImageGen tool for this original project. The current v2.9 inventory contains 42 immutable PNG production masters. `assets/generated/v2.9.1/` contains deterministic runtime derivatives produced by `scripts/process-openai-art.py`.
 
 No franchise art, stock image, external logo or third-party game asset was supplied as a source. The established GEARSTORM key art was used only as the project’s internal style direction.
 
@@ -17,7 +17,7 @@ No franchise art, stock image, external logo or third-party game asset was suppl
 | Narrative scenes | 4 dedicated illustrations | 4 WebP scenes |
 | **Total** | **42 masters** | **233 WebP** |
 
-The manifest summary records 48 arena assets, 150 boss parts, 15 heroine assets, 16 shared VFX and 4 narrative scenes, totaling 18,175,510 runtime bytes. Exact file names, dimensions, alpha flags, byte sizes and SHA-256 digests are recorded in `assets/generated/v2.9.0/asset-manifest.json`.
+The manifest summary records 48 arena assets, 150 boss parts, 15 heroine assets, 16 shared VFX and 4 narrative scenes, totaling 18,175,510 runtime bytes. Exact file names, dimensions, alpha flags, byte sizes and SHA-256 digests are recorded in `assets/generated/v2.9.1/asset-manifest.json`.
 
 Boss sheets 07–30 are documented in `expansion-sources/PROVENANCE.md`; arena sheets 07–30 in `forge-arena-sources/PROVENANCE.md`; Riva’s new separated sources in `riva-v2.9-sources/PROVENANCE.md`; narrative sources in `narrative-v2.9-sources/PROVENANCE.md`.
 

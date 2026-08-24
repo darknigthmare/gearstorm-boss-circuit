@@ -93,6 +93,10 @@
   const EXPANDED_BOSSES = BOSS_REGISTRY?.expanded?.() || [];
   const FORGE_START_INDEX = CAMPAIGN_BOSSES.length;
   const FORGE_FINAL_INDEX = BOSSES.length - 1;
+  function bossCatalogueNumber(index) {
+    const prefix = index < FORGE_START_INDEX ? 'MACHINE ' : 'FORGE ';
+    return prefix + String(index + 1).padStart(2, '0');
+  }
   const LEGACY_BOSS_IDS = new Set(BOSS_REGISTRY?.legacyIds || LEGACY_BOSSES.map(entry => entry.id));
   const LEGACY_CARD_ART_PARTS = Object.freeze({
     rammer: 'chassis',
@@ -280,7 +284,7 @@
   const storyArchiveProgress = document.querySelector('#story-archive-progress');
 
 
-  const ART_MANIFEST_URL = 'assets/generated/v2.9.0/asset-manifest.json';
+  const ART_MANIFEST_URL = 'assets/generated/v2.9.1/asset-manifest.json';
   const artLoader = document.querySelector('#art-loader');
   const artLoaderLabel = document.querySelector('#art-loader-label');
   const artLoaderProgress = document.querySelector('#art-loader-progress');
@@ -302,6 +306,9 @@
 
   const RIVA_RENDER_SCALE = 1.10;
   const RIVA_FOOT_OFFSET = 3.6;
+  const RIVA_ROAD_LIFT = 10;
+  const RIVA_CANNON_BASE_ROTATION = -2.16;
+  const RIVA_CANNON_PART = 'forearm-cannon-near';
   const RIVA_MUZZLE = Object.freeze({ x: 45, y: -8 });
   const HERO_EFFECT_PARTS = Object.freeze(new Set(['dash-trail', 'overload-halo']));
   const HERO_RIG_BUFFER_SIZE = 512;
@@ -616,17 +623,142 @@
 
   function heroineRigMuzzle() {
     const declared = artRuntime.manifest?.heroine?.rig?.muzzle;
+    if (declared && typeof declared.part === 'string' && Array.isArray(declared.point)
+      && declared.point.length === 2 && declared.point.every(Number.isFinite)) {
+      return { part: declared.part, point: [...declared.point] };
+    }
     const x = Array.isArray(declared) ? Number(declared[0]) : Number(declared?.x);
     const y = Array.isArray(declared) ? Number(declared[1]) : Number(declared?.y);
     return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
   }
 
+  function rotateRigVector(x, y, rotation) {
+    const cosine = Math.cos(rotation);
+    const sine = Math.sin(rotation);
+    return {
+      x: x * cosine - y * sine,
+      y: x * sine + y * cosine
+    };
+  }
+
+  function heroPoseInputs(subject = player) {
+    const reduceMotion = save.settings.reduceMotion;
+    const velocityY = Number(subject?.vy) || 0;
+    const onGround = subject?.onGround !== false;
+    const maxSpeed = Math.max(1, Number(runBuild?.maxSpeed) || 1);
+    return {
+      reduceMotion,
+      gait: reduceMotion || !onGround ? 0 : Math.sin(Number(subject?.anim) || 0),
+      speedPose: reduceMotion ? 0 : Math.min(1, Math.abs(Number(subject?.vx) || 0) / maxSpeed),
+      airborne: onGround ? 0 : clamp(velocityY / 900, -0.65, 0.65),
+      jumpBlend: onGround ? 0 : 1,
+      rising: onGround || reduceMotion ? 0 : clamp(-velocityY / 760, 0, 1),
+      falling: onGround || reduceMotion ? 0 : clamp(velocityY / 760, 0, 1),
+      aim: reduceMotion ? 0 : clamp(Number(subject?.poseAim) || 0, 0, 1),
+      recoil: reduceMotion ? 0 : clamp(Number(subject?.poseRecoil) || 0, 0, 1),
+      landing: reduceMotion ? 0 : clamp(Number(subject?.poseLand) || 0, 0, 1),
+      dashing: !reduceMotion && Number(subject?.dashTime) > 0
+    };
+  }
+
+  function heroRootRotation(animation) {
+    return (animation.dashing ? -0.11 : 0) + animation.airborne * 0.065;
+  }
+
+  function heroAnatomyPose(spec, animation) {
+    const name = spec.name.toLowerCase();
+    const side = spec.side === 'far' || name.endsWith('-far') ? -1 : 1;
+    const stride = animation.gait * animation.speedPose;
+    const pose = { rotation: 0, x: 0, y: 0, scale: 1, alpha: 1 };
+
+    if (name === 'pelvis') pose.rotation = -stride * 0.055 + animation.airborne * 0.018;
+    else if (name === 'torso') pose.rotation = stride * 0.045 + animation.speedPose * 0.035 - animation.airborne * 0.042 - animation.landing * 0.035;
+    else if (name === 'head') pose.rotation = -stride * 0.035 + animation.airborne * 0.025 + animation.landing * 0.025;
+    else if (name.startsWith('upper-arm')) {
+      const swing = side * stride * 0.18;
+      pose.rotation = name.endsWith('-near') ? swing * 0.38 - animation.aim * 0.055 : swing;
+    } else if (name === 'forearm-far') {
+      pose.rotation = 0.10 - side * stride * 0.14 + animation.jumpBlend * 0.055;
+    } else if (name === RIVA_CANNON_PART) {
+      pose.rotation = RIVA_CANNON_BASE_ROTATION - animation.recoil * 0.075 + animation.airborne * 0.035;
+      pose.x = -animation.recoil * 1.8;
+    } else if (name.startsWith('thigh')) {
+      pose.rotation = side * stride * 0.30 - side * animation.rising * 0.17 + side * animation.falling * 0.08 + side * animation.landing * 0.11;
+    } else if (name.startsWith('shin')) {
+      pose.rotation = -side * stride * 0.23 + Math.max(0, side * stride) * 0.12
+        + animation.jumpBlend * (side > 0 ? 0.27 : 0.16) + animation.landing * 0.16;
+    } else if (name.startsWith('boot')) {
+      pose.rotation = side * stride * 0.11 - animation.rising * 0.08 + animation.falling * 0.045 - animation.landing * 0.08;
+    }
+    return pose;
+  }
+
+  function resolveHeroRigPose(rigParts = heroineRigParts(), animation = heroPoseInputs()) {
+    const byName = new Map(rigParts.map(spec => [spec.name, spec]));
+    const resolved = new Map();
+    const resolving = new Set();
+
+    function resolve(spec) {
+      if (resolved.has(spec.name)) return resolved.get(spec.name);
+      if (resolving.has(spec.name)) return null;
+      resolving.add(spec.name);
+      let localPose;
+      if (spec.name === 'dash-trail') {
+        localPose = { rotation: 0, x: 0, y: 0, scale: 1 + animation.speedPose * 0.1, alpha: 0.84 };
+      } else if (spec.name === 'overload-halo') {
+        const pulse = animation.reduceMotion ? 1 : 1 + Math.sin((Number(player?.anim) || 0) * 2.4) * 0.055;
+        localPose = { rotation: 0, x: 0, y: 0, scale: pulse, alpha: 0.9 };
+      } else {
+        localPose = heroAnatomyPose(spec, animation);
+      }
+
+      const parentSpec = typeof spec.parent === 'string' ? byName.get(spec.parent) : null;
+      const parentPose = parentSpec ? resolve(parentSpec) : null;
+      let joint = [spec.joint[0] + (localPose.x || 0), spec.joint[1] + (localPose.y || 0)];
+      let rotation = localPose.rotation || 0;
+      if (parentSpec && parentPose) {
+        const offset = rotateRigVector(
+          spec.joint[0] - parentSpec.joint[0] + (localPose.x || 0),
+          spec.joint[1] - parentSpec.joint[1] + (localPose.y || 0),
+          parentPose.rotation
+        );
+        joint = [parentPose.joint[0] + offset.x, parentPose.joint[1] + offset.y];
+        rotation += parentPose.rotation;
+      }
+      const worldPose = { ...localPose, x: 0, y: 0, joint, rotation };
+      resolving.delete(spec.name);
+      resolved.set(spec.name, worldPose);
+      return worldPose;
+    }
+
+    for (const spec of rigParts) resolve(spec);
+    return { animation, rootRotation: heroRootRotation(animation), parts: resolved };
+  }
+
   function renderedHeroMuzzle() {
     const declared = heroineRigMuzzle();
     if (!declared) return { ...RIVA_MUZZLE };
+    if (declared.part && declared.point) {
+      const rigParts = heroineRigParts();
+      const spec = rigParts.find(candidate => candidate.name === declared.part);
+      const snapshot = resolveHeroRigPose(rigParts);
+      const pose = spec ? snapshot.parts.get(spec.name) : null;
+      if (spec && pose) {
+        const endpoint = rotateRigVector(
+          (declared.point[0] - spec.pivot[0]) * spec.scale * (pose.scale ?? 1),
+          (declared.point[1] - spec.pivot[1]) * spec.scale * (pose.scale ?? 1),
+          pose.rotation
+        );
+        const rooted = rotateRigVector(pose.joint[0] + endpoint.x, pose.joint[1] + endpoint.y, snapshot.rootRotation);
+        return {
+          x: rooted.x * RIVA_RENDER_SCALE,
+          y: rooted.y * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT
+        };
+      }
+    }
     return {
       x: declared.x * RIVA_RENDER_SCALE,
-      y: declared.y * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET
+      y: declared.y * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT
     };
   }
 
@@ -645,24 +777,6 @@
       ctx.drawImage(image, 0, 0, sourceWidth, sourceGap, x, 0, width, gapHeight);
     }
     ctx.drawImage(image, x, shiftedY, width, height);
-  }
-
-  function heroAnatomyPose(spec, gait, speedPose, airborne, firing) {
-    const key = ((spec.motion || '') + ' ' + spec.name).toLowerCase();
-    const side = spec.name.endsWith('-far') ? -1 : 1;
-    const stride = gait * speedPose;
-    const pose = { rotation: 0 };
-    if (key.includes('head')) pose.rotation = -stride * 0.006 - airborne * 0.006;
-    else if (key.includes('torso')) pose.rotation = stride * 0.008 - airborne * 0.018;
-    else if (key.includes('pelvis')) pose.rotation = -stride * 0.006;
-    else if (key.includes('upper-arm')) pose.rotation = side * stride * 0.018 - (key.includes('near') ? firing * 0.012 : 0);
-    else if (key.includes('forearm')) {
-      pose.rotation = -side * stride * 0.014 - (key.includes('cannon') ? firing * 0.024 : 0);
-      if (key.includes('cannon') && firing) pose.x = -2.5;
-    } else if (key.includes('thigh')) pose.rotation = side * stride * 0.024;
-    else if (key.includes('shin')) pose.rotation = -side * stride * 0.018;
-    else if (key.includes('boot')) pose.rotation = side * stride * 0.009;
-    return pose;
   }
 
   function drawGeneratedArena(data) {
@@ -715,29 +829,22 @@
     const parts = artRuntime.manifest?.heroine?.parts;
     if (!heroArtReady()) return false;
     const rigParts = heroineRigParts();
+    const poseSnapshot = resolveHeroRigPose(rigParts);
     const center = HERO_RIG_BUFFER_SIZE / 2;
-    const gait = save.settings.reduceMotion || !player.onGround ? 0 : Math.sin(player.anim);
-    const speedPose = Math.min(1, Math.abs(player.vx) / Math.max(1, runBuild.maxSpeed));
-    const airborne = player.onGround ? 0 : clamp(player.vy / 900, -0.65, 0.65);
-    const firing = save.settings.reduceMotion ? 0 : player.shotCooldown > runBuild.fireRate * 0.5 ? 1 : 0;
 
     heroRigContext.clearRect(0, 0, HERO_RIG_BUFFER_SIZE, HERO_RIG_BUFFER_SIZE);
     heroRigContext.save();
-    heroRigContext.translate(center, center - RIVA_FOOT_OFFSET);
+    heroRigContext.translate(center, center - RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT);
     heroRigContext.scale(RIVA_RENDER_SCALE, RIVA_RENDER_SCALE);
-    heroRigContext.rotate((player.dashTime > 0 ? -0.11 : 0) + airborne * 0.065);
+    heroRigContext.rotate(poseSnapshot.rootRotation);
     for (const spec of rigParts) {
-      let pose;
       if (spec.name === 'dash-trail') {
         if (player.dashTime <= 0) continue;
-        pose = { scale: save.settings.reduceMotion ? 1 : 1 + speedPose * 0.1, alpha: 0.84 };
       } else if (spec.name === 'overload-halo') {
         if (player.overloadTime <= 0) continue;
-        const pulse = save.settings.reduceMotion ? 1 : 1 + Math.sin(player.anim * 2.4) * 0.055;
-        pose = { scale: pulse, alpha: 0.9 };
-      } else {
-        pose = heroAnatomyPose(spec, gait, speedPose, airborne, firing);
       }
+      const pose = poseSnapshot.parts.get(spec.name);
+      if (!pose) continue;
       drawRigPart(parts[spec.name], spec, pose, heroRigContext);
     }
     heroRigContext.restore();
@@ -936,6 +1043,55 @@
     return Object.fromEntries(Object.entries(bounds).map(([key, value]) => [key, Math.round(value * 10) / 10]));
   }
 
+  function heroRigHierarchyDiagnostics(specs) {
+    const byName = new Map(specs.map(spec => [spec.name, spec]));
+    const states = new Map();
+    const cycles = [];
+    const missingParents = [];
+
+    function visit(name, trail = []) {
+      const state = states.get(name) || 0;
+      if (state === 2) return;
+      if (state === 1) {
+        cycles.push([...trail, name]);
+        return;
+      }
+      states.set(name, 1);
+      const spec = byName.get(name);
+      if (spec?.parent) {
+        if (!byName.has(spec.parent)) missingParents.push({ child: name, parent: spec.parent });
+        else visit(spec.parent, [...trail, name]);
+      }
+      states.set(name, 2);
+    }
+
+    for (const name of byName.keys()) visit(name);
+    const roots = specs.filter(spec => !spec.parent).map(spec => spec.name);
+    const reachesPelvis = specs.every(spec => {
+      let current = spec;
+      const seen = new Set();
+      while (current?.parent && !seen.has(current.name)) {
+        seen.add(current.name);
+        current = byName.get(current.parent);
+      }
+      return current?.name === 'pelvis';
+    });
+    return {
+      acyclic: cycles.length === 0,
+      cycles,
+      missingParents,
+      roots,
+      reachesPelvis,
+      chains: [
+        ['pelvis', 'torso', 'head'],
+        ['pelvis', 'thigh-far', 'shin-far', 'boot-far'],
+        ['pelvis', 'thigh-near', 'shin-near', 'boot-near'],
+        ['torso', 'upper-arm-far', 'forearm-far'],
+        ['torso', 'upper-arm-near', 'forearm-cannon-near']
+      ]
+    };
+  }
+
   function getRigDiagnostics() {
     const heroParts = heroineRigParts();
     const anatomyParts = heroParts.filter(spec => !isHeroEffectPart(spec));
@@ -945,6 +1101,7 @@
       : 36;
     const declaredFeet = Number(artRuntime.manifest?.heroine?.rig?.feetLocalY);
     const feetLocalY = Number.isFinite(declaredFeet) ? declaredFeet : measuredFeet;
+    const hierarchy = heroRigHierarchyDiagnostics(anatomyParts);
     const activeArenaId = boss?.data?.id || artRuntime.activeBossId || 'rammer';
     const visualOffsetY = getArenaVisualOffset(activeArenaId);
     const arenaVisualOffsets = Object.fromEntries(Object.keys(artRuntime.manifest?.arenas || {})
@@ -998,16 +1155,23 @@
         effectParts: heroParts.length - anatomyParts.length,
         partNames: heroParts.map(spec => spec.name),
         anatomyPartNames: anatomyParts.map(spec => spec.name),
+        parentLinks: anatomyParts.filter(spec => spec.parent).map(spec => ({ child: spec.name, parent: spec.parent })),
+        hierarchy,
+        hierarchical: hierarchy.acyclic && hierarchy.missingParents.length === 0 && hierarchy.reachesPelvis,
         zOrder: heroParts.map(spec => ({ name: spec.name, z: Number(spec.z) || 0 })),
         bodyBounds: staticRigBounds(anatomyParts, 'xywh'),
         hitbox: { width: 42, height: 72, groundLocalY: 36 },
+        hurtboxPolicy: 'forgiving-lower-core',
         feet: Math.round(feetLocalY * 10) / 10,
         feetLocalY: Math.round(feetLocalY * 10) / 10,
         renderScale: RIVA_RENDER_SCALE,
         footOffset: RIVA_FOOT_OFFSET,
-        renderedFeetLocalY: Math.round((feetLocalY * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET) * 10) / 10,
+        roadLift: RIVA_ROAD_LIFT,
+        renderedFeetLocalY: Math.round((feetLocalY * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT) * 10) / 10,
         muzzle: { ...muzzle },
         renderedMuzzle: renderedHeroMuzzle(),
+        cannonBaseRotation: RIVA_CANNON_BASE_ROTATION,
+        poseState: player ? heroPoseInputs() : null,
         loadedParts: heroParts.filter(spec => generatedImage(artRuntime.manifest?.heroine?.parts?.[spec.name])).length,
         artReady: heroArtReady(),
         visualOffsetY,
@@ -1406,7 +1570,7 @@
         ? 'Le compteur confirme 24 / 24 · aucun astérisque'
         : snapshot.checkpoint === 'upgrade'
           ? 'L’offre figée précède FORGE ' + String(snapshot.bossIndex + 2).padStart(2, '0')
-          : 'La barre de vie de ' + BOSSES[snapshot.bossIndex].name + ' revient au début';
+          : bossCatalogueNumber(snapshot.bossIndex) + ' · la barre de vie de ' + BOSSES[snapshot.bossIndex].name + ' revient au début';
     }
     const liveIndex = runMode === 'forgeRush' ? currentBossIndex : snapshot?.bossIndex;
     const entry = Number.isInteger(liveIndex) ? BOSSES[liveIndex] : null;
@@ -1420,7 +1584,8 @@
         : '24 boss · quatre anneaux · le menu promet de ne couper aucun combat';
     if (progress) {
       const wave = entry?.wave || Math.min(4, Math.floor(completed / 6) + 1);
-      progress.textContent = 'ANNEAU ' + wave + ' / 4 // PROCHAINE BARRE DE VIE ' + Math.min(24, completed + 1) + ' / 24';
+      const nextForgeIndex = Math.min(FORGE_FINAL_INDEX, FORGE_START_INDEX + completed);
+      progress.textContent = 'ANNEAU ' + wave + ' / 4 // PROCHAINE BARRE DE VIE ' + bossCatalogueNumber(nextForgeIndex);
       progress.setAttribute('aria-valuenow', String(completed));
       progress.setAttribute('aria-valuemax', '24');
     }
@@ -1512,7 +1677,8 @@
       showToast('CHECKPOINT FORGE RELU // L’ATELIER NE REROLL PAS', 'Circuit Forge restauré. Choisissez le prochain module.');
     } else {
       startFight(snapshot.bossIndex, { preserveRetries: true });
-      showToast('CHECKPOINT FORGE RELU // ' + BOSSES[snapshot.bossIndex].name + ' RECHARGE SON PATTERN', 'Circuit Forge restauré. ' + BOSSES[snapshot.bossIndex].name + '.');
+      const forgeNumber = bossCatalogueNumber(snapshot.bossIndex);
+      showToast('CHECKPOINT FORGE RELU // ' + forgeNumber + ' · ' + BOSSES[snapshot.bossIndex].name + ' RECHARGE SON PATTERN', 'Circuit Forge restauré. ' + forgeNumber + ', ' + BOSSES[snapshot.bossIndex].name + '.');
     }
     syncContinueForge();
     return true;
@@ -1612,14 +1778,14 @@
   function showIntroStory() {
     return renderStoryScene(STORY.intro, {
       art: 'intro',
-      titleSuffix: ' — le jeu ouvre enfin sa première scène',
-      metaSummary: ' Le prologue sait déjà que cette conduite mènera au premier boss.',
+      titleSuffix: ' — Cassian croit déjà tenir le cadre',
+      metaSummary: ' Pourtant, M-0 court hors champ et refuse encore sa version des faits.',
       kicker: 'INTRODUCTION // ÉMISSION PERMANENTE',
       status: 'LIGNE M-0',
       location: 'Circuit central · Minuit réseau',
       storyKey: STORY.intro.id,
-      continueLabel: 'Couper le direct · ouvrir la ligne M-0 →',
-      consequence: 'Une ligne manuelle relie encore les six relais civils. Elle ne répond qu’à Riva. Le menu appelle cela une route critique.',
+      continueLabel: 'Couper le direct · suivre M-0 →',
+      consequence: 'Six relais civils répondent encore à la ligne manuelle de Riva. Chacun rouvrira le district suivant.',
       allowBack: true,
       onContinue: () => {
         markStorySeen(STORY.intro.id);
@@ -1632,14 +1798,14 @@
   function showPrologueStory() {
     return renderStoryScene(STORY.prologue, {
       art: 'prologue',
-      titleSuffix: ' — six actes, aucune ellipse',
-      metaSummary: ' Le jeu annonce six boss et promet de ne pas cacher le septième dans une ligne de dialogue.',
+      titleSuffix: ' — la ville n’attendra pas le générique',
+      metaSummary: ' Riva connaît la route ; Cassian croit connaître la fin. Entre les deux, six boss ont déjà reçu leur entrée.',
       kicker: STORY.prologue.kicker,
       status: STORY.prologue.status,
       location: STORY.prologue.location,
       storyKey: STORY.prologue.id,
-      continueLabel: 'Valider le prologue · entrer dans le Circuit →',
-      consequence: STORY.prologue.objective + ' · ' + STORY.prologue.method + ' · La mission affiche sa méthode avant de demander de jouer.',
+      continueLabel: 'Suivre M-0 · affronter Rivet Rex →',
+      consequence: STORY.prologue.objective + ' · ' + STORY.prologue.method,
       tone: 'mission',
       allowBack: true,
       onContinue: () => {
@@ -1709,7 +1875,7 @@
       item.append(chapter, title);
       storyArchive.appendChild(item);
     }
-    if (storyArchiveProgress) storyArchiveProgress.textContent = restored + ' / ' + entries.length + ' transmissions · aucune scène inventée';
+    if (storyArchiveProgress) storyArchiveProgress.textContent = restored + ' / ' + entries.length + ' transmissions · du prologue au retour des six districts';
   }
 
   function showRadioExchange(title, lines, duration = 5.2) {
@@ -1733,7 +1899,10 @@
       return {
         toPhase: phase,
         title,
-        lines: [{ speaker: 'Riva', text: `${profile.metaLine} PHASE ${phase}/3 · ${title} entre dans le cadre.`, channel: 'maintenance' }]
+        lines: [
+          { speaker: 'Riva', text: `${profile.metaLine} PHASE ${phase}/3 · ${title} entre dans le cadre.`, channel: 'maintenance' },
+          { speaker: 'M-0', text: `RÈGLE ACTIVE · ${profile.objective}`, channel: 'tactical' }
+        ]
       };
     }
     if (runMode !== 'rush') return null;
@@ -1810,7 +1979,8 @@
       const header = document.createElement('header');
       const number = document.createElement('span');
       const status = document.createElement('strong');
-      number.textContent = 'FORGE ' + String(profile.number).padStart(2, '0') + ' · ANNEAU ' + profile.wave;
+      const catalogueIndex = BOSSES.findIndex(candidate => candidate.id === profile.id);
+      number.textContent = bossCatalogueNumber(catalogueIndex) + ' · ANNEAU ' + profile.wave;
       status.textContent = unlocked ? 'RELU' : 'CHIFFRÉ';
       header.append(number, status);
 
@@ -2090,14 +2260,14 @@
       button.dataset.bossEngine = entry.engine || (campaignEntry ? 'legacy' : 'expanded');
       button.style.setProperty('--boss-color', entry.color);
       button.disabled = !unlocked;
-      const number = (campaignEntry ? 'MACHINE ' : 'FORGE ') + String(index + 1).padStart(2, '0');
+      const number = bossCatalogueNumber(index);
       const status = forge && !campaignEntry ? ' · SIMULATION ACTIVE' : '';
       button.setAttribute('aria-label', unlocked
         ? number + ' · ' + entry.name + ' · ' + objective
         : 'Machine ' + String(visibleIndex + 1).padStart(2, '0') + ' verrouillée');
       const artPart = LEGACY_CARD_ART_PARTS[entry.id] || 'chassis';
       const artMarkup = unlocked
-        ? '<img class="boss-card-art" src="assets/generated/v2.9.0/bosses/' + entry.id + '/' + artPart + '.webp" alt="" aria-hidden="true" width="192" height="192" loading="lazy" decoding="async" draggable="false">'
+        ? '<img class="boss-card-art" src="assets/generated/v2.9.1/bosses/' + entry.id + '/' + artPart + '.webp" alt="" aria-hidden="true" width="192" height="192" loading="lazy" decoding="async" draggable="false">'
         : '';
       button.innerHTML = artMarkup + '<span><span class="boss-number">' + (unlocked ? number + status : 'VERROUILLÉE') + '</span>'
         + '<strong>' + (unlocked ? entry.name : 'SIGNATURE INCONNUE') + '</strong>'
@@ -2119,7 +2289,7 @@
     if (eyebrow) eyebrow.textContent = forge ? 'CATALOGUE INTÉGRAL // 30 BOSS QUI CONNAISSENT LE MENU' : 'LABORATOIRE // LE CANON N’AVANCE PAS';
     if (title) title.textContent = forge ? 'Catalogue intégral · aucune machine hors champ' : 'Laboratoire de campagne · rejouer sans réécrire';
     if (progress) progress.textContent = forge
-      ? BOSSES.length + ' profils jouables · 6 actes + ' + (BOSSES.length - CAMPAIGN_BOSSES.length) + ' boss Forge · chaque rig et chaque arène vient du manifeste OpenAI v2.9.'
+      ? BOSSES.length + ' profils jouables · 6 actes + ' + (BOSSES.length - CAMPAIGN_BOSSES.length) + ' boss Forge · chaque rig et chaque arène vient du manifeste OpenAI v2.9.1.'
       : Math.min(save.unlocked, CAMPAIGN_BOSSES.length) + ' / ' + CAMPAIGN_BOSSES.length + ' boss relus · le Laboratoire n’altère aucun district.';
     grid.setAttribute('aria-label', forge ? 'Catalogue complet des 30 boss' : 'Machines de campagne débloquées');
     document.querySelectorAll('#boss-select-screen [data-gearstorm-mode]').forEach(tab => {
@@ -2162,6 +2332,9 @@
       maxHp,
       invuln: 0,
       shotCooldown: 0,
+      poseAim: 0,
+      poseRecoil: 0,
+      poseLand: 0,
       dashCooldown: 0,
       dashTime: 0,
       dashHitLock: 0,
@@ -3036,7 +3209,7 @@
       boss.x = 930 + Math.sin(boss.totalTime * 1.25) * 135;
       boss.y = 315 + Math.cos(boss.totalTime * 1.75) * 70;
       if (boss.phase >= 2) bossEvent('environment-orb', 0.95, () => spawnFan(boss.x, boss.y, 4, 195, 2.25, 3.85, 'orb'));
-      if (boss.stateTime >= phase.activeSeconds * 0.84) completeExpandedMechanic('SYSTÈME STABILISÉ');
+      if (boss.stateTime >= phase.activeSeconds * 0.84) completeExpandedMechanic('ZONE STABILISÉE');
     } else if (family === 'posture-duo') {
       boss.x = lerp(boss.x, clamp(player.x + (boss.direction * 104), 170, 1110), 1 - Math.pow(0.012, dt));
       boss.y = 500;
@@ -3220,11 +3393,15 @@
     player.anim += dt * (Math.abs(player.vx) > 20 ? 12 : 4);
     player.invuln = Math.max(0, player.invuln - dt);
     player.shotCooldown = Math.max(0, player.shotCooldown - dt);
+    player.poseRecoil = Math.max(0, player.poseRecoil - dt * 12);
+    player.poseLand = Math.max(0, player.poseLand - dt * 7.5);
     player.dashCooldown = Math.max(0, player.dashCooldown - dt);
     player.dashTime = Math.max(0, player.dashTime - dt);
     player.dashHitLock = Math.max(0, player.dashHitLock - dt);
     player.overloadTime = Math.max(0, player.overloadTime - dt);
     player.slowTime = Math.max(0, player.slowTime - dt);
+    const aimResponse = 1 - Math.pow(0.00008, dt);
+    player.poseAim += ((attackHeld ? 1 : 0) - player.poseAim) * aimResponse;
     const chronoFactor = player.slowTime > 0 ? 0.58 : 1;
     if (overloadPress) activateOverload();
 
@@ -3266,6 +3443,7 @@
     if (attackHeld && player.shotCooldown <= 0) {
       noteExpandedInput('shot');
       player.shotCooldown = runBuild.fireRate;
+      player.poseRecoil = 1;
       const spread = runBuild.multishot === 1 ? [0] : [-0.11, 0, 0.11];
       const muzzle = playerMuzzlePosition();
       for (const angle of spread) {
@@ -3306,6 +3484,7 @@
     if (player.y >= floorY) {
       if (!player.onGround && player.vy > 220) {
         player.landed = true;
+        player.poseLand = 1;
         spawnDust(player.x, GROUND, 7);
       }
       player.y = floorY;
@@ -4462,7 +4641,7 @@
       const button = document.createElement('button');
       button.className = 'upgrade-card';
       const stacks = runBuild.installed.filter(id => id === upgrade.id).length;
-      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.9.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
+      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.9.1/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
       button.addEventListener('click', () => installUpgrade(upgrade));
       grid.appendChild(button);
     }
@@ -4837,19 +5016,19 @@
   function drawPlayer() {
     const airborneHeight = Math.max(0, GROUND - (player.y + player.h / 2));
     const shadowScale = clamp(1 - airborneHeight / 420, 0.48, 1);
+    const shadowLift = heroArtReady() ? RIVA_ROAD_LIFT : 0;
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.52)';
     ctx.shadowColor = 'rgba(0,0,0,0.52)';
     ctx.shadowBlur = 4;
     ctx.beginPath();
-    ctx.ellipse(player.x, GROUND - 3, 28 * shadowScale, 6 * shadowScale, 0, 0, TAU);
+    ctx.ellipse(player.x, GROUND - 3 - shadowLift, 28 * shadowScale, 6 * shadowScale, 0, 0, TAU);
     ctx.fill();
     ctx.restore();
     const blink = player.invuln > 0 && Math.floor(player.invuln * 16) % 2 === 0;
-    if (blink) return;
     ctx.save();
     ctx.translate(player.x, player.y);
-    if (player.overloadTime > 0) {
+    if (player.overloadTime > 0 && !heroArtReady()) {
       ctx.strokeStyle = 'rgba(255,243,154,0.75)';
       ctx.lineWidth = 5;
       ctx.beginPath();
@@ -4860,7 +5039,7 @@
     const bob = heroArtReady() ? 0 : player.onGround ? Math.sin(player.anim) * Math.min(1.5, Math.abs(player.vx) / 140) : 0;
     ctx.translate(0, bob);
 
-    if (player.dashTime > 0) {
+    if (player.dashTime > 0 && !heroArtReady()) {
       ctx.globalAlpha = 0.25;
       for (let i = 1; i <= 4; i++) {
         ctx.fillStyle = '#58e6ff';
@@ -4873,6 +5052,7 @@
 
     if (!drawGeneratedPlayer()) {
     // Bottes cinétiques
+    if (blink) ctx.globalAlpha = player.dashTime > 0 ? 0.72 : 0.46;
     ctx.fillStyle = '#ffad4a';
     roundedRect(-19, 24, 22, 18, 6); ctx.fill();
     roundedRect(3, 24, 22, 18, 6); ctx.fill();
@@ -5810,7 +5990,7 @@
 
   function registerGearstormServiceWorker() {
     if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
-    const marker = '__GEARSTORM_PWA_UPDATE_V2_9__';
+    const marker = '__GEARSTORM_PWA_UPDATE_V2_9_1__';
     if (globalThis[marker]) return;
     globalThis[marker] = true;
     const updateButton = document.querySelector('#update-app');

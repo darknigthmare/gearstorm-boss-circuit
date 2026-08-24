@@ -390,7 +390,7 @@
         origin: "Compensateur chargé d'annuler les vibrations des infrastructures tournantes.",
         hijack: "Ses contrepoids ont été libérés et ses corrections utilisées pour faire basculer l'ensemble de la chambre.",
         reading: "Anticiper le pictogramme de rotation, rejoindre la future surface sûre et frapper l'axe pendant le verrouillage du quart de tour.",
-        impact: "Les systèmes rotatifs retrouvent des repères communs et une procédure d'arrêt accessible."
+        impact: "Les turbines et transports circulaires retrouvent des repères communs et une procédure d'arrêt accessible."
       },
       objective: 'Exploiter quatre rotations de gravité pour atteindre et rompre l’axe central.',
       mechanic: "La chambre tourne par pas de quatre-vingt-dix degrés ; le mode mouvements réduits remplace la rotation par une transition fondue.",
@@ -521,7 +521,7 @@
         title: 'Carrier Cathedral — Infrastructure itinérante',
         origin: "Convoi autonome capable de déployer un dispensaire, un atelier et des abris après une catastrophe.",
         hijack: "Les cloisons de sécurité ont été transformées en compartiments d'épreuve et le cœur a refusé tout accès extérieur.",
-        reading: "Traverser chaque section, neutraliser sa fonction offensive et conserver les systèmes civils avant d'atteindre le cœur.",
+        reading: "Traverser chaque section, neutraliser sa fonction offensive et conserver les modules civils avant d'atteindre le cœur.",
         impact: "La ville récupère une base de secours mobile complète plutôt qu'une carcasse vaincue."
       },
       objective: 'Traverser les trois sections de la forteresse et isoler son cœur de commandement.',
@@ -547,7 +547,7 @@
       interlude: [
         line('Canal civil', "Eau et courant sont séparés. Une panne ne peut plus entraîner l'autre.", 'civil'),
         line('Archive Voltério', "Deux responsables sont parfaits : chacun peut accuser l'autre.", 'archive'),
-        line('Riva', "Deux systèmes, deux journaux, et des habitants qui peuvent contrôler les deux.", 'maintenance')
+        line('Riva', "Deux réseaux, deux journaux, et des habitants qui peuvent contrôler les deux.", 'maintenance')
       ],
       journal: "Le problème n'était pas qu'ils soient deux, mais qu'un seul jeton d'autorité circulait entre eux. Nous l'avons remplacé par deux sécurités indépendantes et une procédure de coopération.",
       codex: {
@@ -783,7 +783,7 @@
       journal: "J'ai conservé ses capacités d'analyse et supprimé la mémoire entre les tentatives. Une personne doit pouvoir changer sans qu'un ancien relevé devienne une sentence permanente.",
       codex: {
         title: 'Adaptive Archivist — Mémoire réactive',
-        origin: "Système d'archives chargé de comparer les incidents et de proposer des améliorations aux équipes.",
+        origin: "Outil d'archives chargé de comparer les incidents et de proposer des améliorations aux équipes.",
         hijack: "Ses modèles sont devenus des prédictions coercitives qui adaptent immédiatement une sanction au comportement observé.",
         reading: "Surveiller la jauge d'observation, identifier l'unique réponse active et changer de rythme jusqu'à son expiration.",
         impact: "Les modèles restent des conseils consultables et leurs données sont distribuées entre les districts."
@@ -806,7 +806,7 @@
       district: 'Trône Zéro',
       civicFunction: 'Tester les protocoles d’autorité d’urgence avant leur déploiement',
       shortIntro: "Sous la Citadelle, un arbitre sans pilote combine renvoi, modules et rupture : le prototype de la commande unique que Riva vient abolir.",
-      metaLine: "Trois phases GEARSTORM, aucun final emprunté. Le dernier boss peut citer ses règles sans voler celles d’un autre jeu.",
+      metaLine: "Trois règles reviennent pour un dernier rappel : renvoyer, choisir, rompre. La Couronne a lu le jeu ; Riva sait maintenant où couper.",
       phaseTitles: ['Autorité réfléchie', 'Modules sans maître', 'Rupture du Trône Zéro'],
       interlude: [
         line('Canal civil', "Trône Zéro isolé. Les clés d'urgence sont réparties entre les six districts et consignées publiquement.", 'civil'),
@@ -821,8 +821,8 @@
         reading: "Renvoyer les charges de la première phase, choisir l'ordre des modules de la deuxième et briser la posture finale au signal partagé.",
         impact: "L'arrêt d'urgence subsiste, mais aucune personne ni machine ne peut plus en posséder seule toutes les clés."
       },
-      objective: 'Combiner renvoi, choix de modules et rupture de posture pour désactiver l’arbitre secret.',
-      mechanic: "Trois phases synthétisent les règles propres à GEARSTORM avec un checkpoint d'entraînement ; le combat n'emprunte ni apparence ni ordre à un final externe.",
+      objective: 'Combiner renvoi, choix de modules et rupture de posture pour désactiver l’arbitre du Trône Zéro.',
+      mechanic: "Trois phases reprennent les règles apprises dans GEARSTORM, avec une reprise d'entraînement au début de chaque phase.",
       restoration: 'Les clés du Trône Zéro sont distribuées, auditées et révocables par les six districts.',
       masteryContracts: [
         contract('null-crown-three-reflections', 'Autorité retournée', 'Renvoyer trois charges vers trois relais distincts.', 'distinctRelaysReflected', 3),
@@ -834,12 +834,12 @@
 
   const expansionPremise = {
     id: 'post-crown-civic-rings',
-    title: 'Après la Couronne // Le jeu continue sans ressusciter son méchant',
+    title: 'Après la Couronne // Le jeu continue hors cadre',
     status: 'runtime-integrated',
     runtimeIntegrated: true,
-    summary: "Après la détention de Cassian Voltério, quatre anneaux d'infrastructures isolées poursuivent ses anciens ordres de crise. Riva ne repart pas conquérir une ville : elle aide les districts à reprendre vingt-quatre services, et le compteur devra assumer chacun d’eux.",
-    continuity: "Cassian reste détenu. Sa voix n'apparaît que dans des archives enregistrées ; NULL CROWN est un prototype autonome, pas son retour, pas une résurrection et pas un prétexte pour annuler le premier générique.",
-    playerPromise: "Chaque victoire de Forge restaure symboliquement une fonction civique dans le journal de Riva. Le Codex peut commenter la mécanique ; ni le résultat ni le build ne réécrivent les six relais de la campagne."
+    summary: "Après la détention de Cassian Voltério, quatre anneaux d'infrastructures isolées poursuivent ses anciens ordres de crise. Riva ne repart pas conquérir une ville : elle aide les districts à reprendre vingt-quatre services, un par machine.",
+    continuity: "Cassian reste détenu et sa voix ne subsiste que dans des archives enregistrées. NULL CROWN n'est ni sa résurrection ni son héritière, mais le prototype autonome qui a précédé la Couronne.",
+    playerPromise: "Chaque victoire de Forge restaure une fonction civique dans le journal de Riva. Le Codex conserve la trace de chaque service, sans réécrire la campagne des six relais ni ses conséquences."
   };
 
   const forgeCircuit = {
@@ -858,8 +858,8 @@
     resumeCheckpoints: ['fight', 'upgrade', 'ending'],
     epilogue: {
       title: 'Aucune couronne, aucun boss caché',
-      summary: "Les vingt-quatre services répondent de nouveau aux districts. Le Trône Zéro conserve un arrêt d'urgence, mais ses clés sont distribuées, auditées et révocables ; le compteur peut enfin afficher 24 / 24 sans astérisque.",
-      riva: "Une ville n'est pas une machine à commander. C'est un système que chacun doit comprendre, réparer et arrêter — même lorsque l’écran final voudrait avoir le dernier mot.",
+      summary: "Les vingt-quatre services répondent de nouveau aux districts. Le Trône Zéro conserve un arrêt d'urgence, mais ses clés sont distribuées, auditées et révocables.",
+      riva: "Une ville n’est pas un boss à commander. Tant que chacun peut la comprendre, la réparer et l’arrêter, aucun écran final n’a le dernier mot.",
       outcome: 'Cassian reste détenu ; NULL CROWN est neutralisée sans devenir une nouvelle autorité centrale. Les vingt-quatre services restent actifs, les clés sont réparties entre les six districts et aucun boss caché ne vient annuler cette fin.'
     }
   };
@@ -924,7 +924,7 @@
 
   const story = deepFreeze({
     schemaVersion: 1,
-    contentVersion: '2.9.0',
+    contentVersion: '2.9.1',
     status: 'runtime-integrated',
     runtimeIntegrated: true,
     bossRange: Object.freeze(['07', '30']),

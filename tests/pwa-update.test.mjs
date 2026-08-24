@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import vm from 'node:vm';
 
-const source = await readFile('pwa-update-v2.9.0.js', 'utf8');
+const source = await readFile('pwa-update-v2.9.1.js', 'utf8');
 
 function createHarness({ controlled = true } = {}) {
   const handlers = {
@@ -83,8 +83,8 @@ async function settle() {
 
 test('la migration PWA v2.8 vers v2.9 demande un consentement et recharge une fois', async () => {
   const harness = createHarness();
-  vm.runInContext(source, harness.context, { filename: 'pwa-update-v2.9.0.js' });
-  vm.runInContext(source, harness.context, { filename: 'pwa-update-v2.9.0.js' });
+  vm.runInContext(source, harness.context, { filename: 'pwa-update-v2.9.1.js' });
+  vm.runInContext(source, harness.context, { filename: 'pwa-update-v2.9.1.js' });
 
   assert.equal(harness.handlers.load.length, 1);
   assert.equal(harness.handlers.controllerchange.length, 1);
@@ -106,7 +106,7 @@ test('la migration PWA v2.8 vers v2.9 demande un consentement et recharge une fo
 
 test('un premier install reste silencieux sans controleur existant', async () => {
   const harness = createHarness({ controlled: false });
-  vm.runInContext(source, harness.context, { filename: 'pwa-update-v2.9.0.js' });
+  vm.runInContext(source, harness.context, { filename: 'pwa-update-v2.9.1.js' });
   harness.handlers.load[0]();
   await settle();
 

@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "assets" / "generated"
 RIVA_SOURCE_ROOT = SOURCE_ROOT / "riva-v2.9-sources"
 NARRATIVE_SOURCE_ROOT = SOURCE_ROOT / "narrative-v2.9-sources"
-ASSET_RELEASE = "v2.9.0"
+ASSET_RELEASE = "v2.9.1"
 OUTPUT_ROOT = SOURCE_ROOT / ASSET_RELEASE
 MANIFEST_PATH = OUTPUT_ROOT / "asset-manifest.json"
 
@@ -50,20 +50,21 @@ RIVA_ANATOMY_PARTS = (
 RIVA_EFFECT_PARTS = ("dash-trail", "overload-halo")
 HERO_PARTS = RIVA_ANATOMY_PARTS + RIVA_EFFECT_PARTS
 RIVA_PART_CONTRACTS = {
-    "thigh-far": {"extent": 145, "pivotFraction": (0.50, 0.12), "joint": (-7, 5), "parent": "pelvis", "side": "far", "z": 10, "motion": "leg-far"},
-    "shin-far": {"extent": 150, "pivotFraction": (0.50, 0.12), "joint": (-10, 20), "parent": "thigh-far", "side": "far", "z": 11, "motion": "leg-far"},
-    "boot-far": {"extent": 112, "pivotFraction": (0.50, 0.20), "joint": (-11, 32), "parent": "shin-far", "side": "far", "z": 12, "motion": "leg-far"},
-    "upper-arm-far": {"extent": 128, "pivotFraction": (0.50, 0.14), "joint": (-11, -37), "parent": "torso", "side": "far", "z": 13, "motion": "arm-far"},
-    "forearm-far": {"extent": 132, "pivotFraction": (0.50, 0.12), "joint": (-22, -18), "parent": "upper-arm-far", "side": "far", "z": 14, "motion": "arm-far"},
+    "thigh-far": {"extent": 145, "pivotFraction": (0.50, 0.12), "joint": (-9, 5), "parent": "pelvis", "side": "far", "z": 10, "motion": "leg-far"},
+    "shin-far": {"extent": 150, "pivotFraction": (0.50, 0.12), "joint": (-10, 42), "parent": "thigh-far", "side": "far", "z": 11, "motion": "leg-far"},
+    "boot-far": {"extent": 112, "pivotFraction": (0.50, 0.20), "joint": (-12, 80), "parent": "shin-far", "side": "far", "z": 12, "motion": "leg-far"},
+    "upper-arm-far": {"extent": 128, "pivotFraction": (0.50, 0.14), "joint": (-27, -48), "parent": "torso", "side": "far", "z": 13, "motion": "arm-far"},
+    "forearm-far": {"extent": 132, "pivotFraction": (0.50, 0.12), "joint": (-28, -15), "parent": "upper-arm-far", "side": "far", "z": 14, "motion": "arm-far"},
     "pelvis": {"extent": 126, "pivotFraction": (0.50, 0.50), "joint": (0, 0), "parent": None, "side": "center", "z": 30, "motion": "pelvis"},
-    "torso": {"extent": 205, "pivotFraction": (0.50, 0.86), "joint": (0, -9), "parent": "pelvis", "side": "center", "z": 40, "motion": "torso"},
-    "thigh-near": {"extent": 145, "pivotFraction": (0.50, 0.12), "joint": (7, 5), "parent": "pelvis", "side": "near", "z": 50, "motion": "leg-near"},
-    "shin-near": {"extent": 150, "pivotFraction": (0.50, 0.12), "joint": (10, 20), "parent": "thigh-near", "side": "near", "z": 51, "motion": "leg-near"},
-    "boot-near": {"extent": 112, "pivotFraction": (0.50, 0.20), "joint": (12, 32), "parent": "shin-near", "side": "near", "z": 52, "motion": "leg-near"},
-    "upper-arm-near": {"extent": 128, "pivotFraction": (0.50, 0.14), "joint": (12, -37), "parent": "torso", "side": "near", "z": 60, "motion": "arm-near"},
-    "forearm-cannon-near": {"extent": 210, "pivotFraction": (0.78, 0.18), "joint": (25, -34), "parent": "upper-arm-near", "side": "near", "z": 70, "motion": "cannon-recoil"},
-    "head": {"extent": 132, "pivotFraction": (0.68, 0.92), "joint": (0, -53), "parent": "torso", "side": "center", "z": 80, "motion": "head"},
+    "torso": {"extent": 205, "pivotFraction": (0.50, 0.86), "joint": (0, -18), "parent": "pelvis", "side": "center", "z": 40, "motion": "torso"},
+    "thigh-near": {"extent": 145, "pivotFraction": (0.50, 0.12), "joint": (9, 5), "parent": "pelvis", "side": "near", "z": 50, "motion": "leg-near"},
+    "shin-near": {"extent": 150, "pivotFraction": (0.50, 0.12), "joint": (10, 42), "parent": "thigh-near", "side": "near", "z": 51, "motion": "leg-near"},
+    "boot-near": {"extent": 112, "pivotFraction": (0.50, 0.20), "joint": (13, 80), "parent": "shin-near", "side": "near", "z": 52, "motion": "leg-near"},
+    "upper-arm-near": {"extent": 128, "pivotFraction": (0.50, 0.14), "joint": (29, -48), "parent": "torso", "side": "near", "z": 60, "motion": "arm-near"},
+    "forearm-cannon-near": {"extent": 210, "pivotFraction": (0.78, 0.18), "joint": (29, -15), "parent": "upper-arm-near", "side": "near", "z": 70, "motion": "cannon-recoil"},
+    "head": {"extent": 132, "pivotFraction": (0.68, 0.92), "joint": (0, -70), "parent": "torso", "side": "center", "z": 80, "motion": "head"},
 }
+RIVA_CANNON_MUZZLE_POINT = (156, 297)
 NARRATIVE = ("intro-broadcast", "prologue-m0", "campaign-ending", "forge-ending")
 NARRATIVE_LAYOUTS = {
     "intro-broadcast": {"focalPoint": {"x": 0.20, "y": 0.70}, "safeTextZone": {"x": 0.07, "y": 0.06, "width": 0.36, "height": 0.32}},
@@ -581,7 +582,10 @@ def main() -> None:
         "feetLocalY": 36,
         "rootOffsetY": root_offset_y,
         "ground": {"physicalY": 620, "localY": 36},
-        "muzzle": [60, -44],
+        "muzzle": {
+            "part": "forearm-cannon-near",
+            "point": list(RIVA_CANNON_MUZZLE_POINT),
+        },
         "canonicalReference": provenance_record(canonical_path, "riva-canonical-v2.9-v1"),
         "renderOrder": [part["name"] for part in hero_rig_parts],
         "parts": hero_rig_parts,

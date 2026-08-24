@@ -29,6 +29,7 @@ assets/generated/expansion-sources/
 assets/generated/forge-arena-sources/
 assets/generated/v2.5.0/
 assets/generated/v2.6.0/
+assets/generated/v2.9.0/
 assets/generated/v2.7.0/
 .env*
 qa-*.png

@@ -13,8 +13,11 @@ import {
   NARRATIVE_NAMES,
   RIVA_ANATOMY_PART_NAMES,
   RIVA_EFFECT_PART_NAMES,
+  RIVA_KINEMATIC_CHAINS,
+  RIVA_PARENT_BY_PART,
   RIVA_PART_NAMES,
   RIVA_RENDER_ORDER,
+  RIVA_ROAD_LIFT,
   validateRuntimeAssets,
 } from '../scripts/asset-contract.mjs';
 
@@ -84,7 +87,7 @@ test('les 24 boss Forge exposent des rigs multipartites complets', async () => {
   }
 });
 
-test('Riva utilise 13 masters anatomiques natifs sans doublon anatomique', async () => {
+test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion de segments', async () => {
   const runtime = await runtimePromise;
   const heroine = runtime.manifest.heroine;
   assert.deepEqual(Object.keys(heroine.parts), [...RIVA_PART_NAMES]);
@@ -92,7 +95,10 @@ test('Riva utilise 13 masters anatomiques natifs sans doublon anatomique', async
   assert.equal(heroine.rig.coordinateSpace, 'player-local-pixels');
   assert.equal(heroine.rig.feetLocalY, 36);
   assert.deepEqual(heroine.rig.ground, { physicalY: 620, localY: 36 });
-  assert.deepEqual(heroine.rig.muzzle, [60, -44]);
+  assert.deepEqual(heroine.rig.muzzle, {
+    part: 'forearm-cannon-near',
+    point: [156, 297],
+  });
   assert.ok(heroine.rig.rootOffsetY < 0);
   const measuredFeet = Math.max(...heroine.rig.parts
     .filter(part => RIVA_ANATOMY_PART_NAMES.includes(part.name))
@@ -102,6 +108,41 @@ test('Riva utilise 13 masters anatomiques natifs sans doublon anatomique', async
   assert.ok(heroine.rig.parts.every((part, index, parts) => index === 0 || part.z > parts[index - 1].z));
   assert.ok(heroine.rig.parts.every(part => part.joint.length === 2 && part.pivot.length === 2 && part.bbox.length === 4));
   assert.ok(heroine.rig.parts.every(part => part.bbox[2] > 0 && part.bbox[3] > 0 && part.coveragePixels >= 64));
+
+  const specs = new Map(heroine.rig.parts.map(part => [part.name, part]));
+  const anatomyRoots = RIVA_ANATOMY_PART_NAMES.filter(name => specs.get(name).parent === null);
+  assert.deepEqual(anatomyRoots, ['pelvis']);
+  assert.deepEqual(
+    Object.fromEntries(RIVA_ANATOMY_PART_NAMES.map(name => [name, specs.get(name).parent])),
+    { ...RIVA_PARENT_BY_PART },
+  );
+  assert.ok(RIVA_EFFECT_PART_NAMES.every(name => specs.get(name).parent === null));
+  for (const chain of RIVA_KINEMATIC_CHAINS) {
+    for (let index = 1; index < chain.length; index += 1) {
+      assert.equal(specs.get(chain[index]).parent, chain[index - 1], chain.join(' > '));
+    }
+  }
+  for (const name of RIVA_ANATOMY_PART_NAMES) {
+    const visited = new Set();
+    let current = specs.get(name);
+    while (current.parent !== null) {
+      assert.equal(visited.has(current.name), false, 'cycle via ' + current.name);
+      visited.add(current.name);
+      current = specs.get(current.parent);
+      assert.ok(current, 'parent manquant depuis ' + name);
+    }
+    assert.equal(current.name, 'pelvis', name + ' doit atteindre pelvis');
+  }
+  for (const [parentName, childName] of [
+    ['thigh-far', 'shin-far'], ['shin-far', 'boot-far'],
+    ['thigh-near', 'shin-near'], ['shin-near', 'boot-near'],
+    ['upper-arm-far', 'forearm-far'], ['upper-arm-near', 'forearm-cannon-near'],
+  ]) {
+    const parent = specs.get(parentName);
+    const child = specs.get(childName);
+    const distance = Math.hypot(child.joint[0] - parent.joint[0], child.joint[1] - parent.joint[1]);
+    assert.ok(distance >= 24 && distance <= 52, parentName + ' > ' + childName + ': ' + distance);
+  }
 
   const anatomy = RIVA_ANATOMY_PART_NAMES.map(name => heroine.parts[name]);
   assert.ok(anatomy.every(part => part.role === 'anatomy' && part.nativePart === true));
@@ -117,6 +158,19 @@ test('Riva utilise 13 masters anatomiques natifs sans doublon anatomique', async
   assert.equal(heroine.rig.canonicalReference.masterFile, 'assets/generated/riva-v2.9-sources/riva-canonical-openai-v1.png');
 });
 
+test('le runtime applique la hierarchie, le muzzle articule et la montee route de 10 px', async () => {
+  const game = await readFile('game.js', 'utf8');
+  assert.equal(RIVA_ROAD_LIFT, 10);
+  assert.match(game, /const RIVA_ROAD_LIFT = 10;/);
+  assert.match(game, /function resolveHeroRigPose\(/);
+  assert.match(game, /const parentPose = parentSpec \? resolve\(parentSpec\) : null;/);
+  assert.match(game, /rotation \+= parentPose\.rotation;/);
+  assert.match(game, /function renderedHeroMuzzle\(/);
+  assert.match(game, /const snapshot = resolveHeroRigPose\(rigParts\);/);
+  assert.match(game, /pose\.joint\[0\] \+ endpoint\.x/);
+  assert.match(game, /RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT/);
+});
+
 test('les 4 visuels narratifs OpenAI sont opaques, 16:9 et traces', async () => {
   const runtime = await runtimePromise;
   assert.deepEqual(Object.keys(runtime.manifest.narrative), [...NARRATIVE_NAMES]);
@@ -126,7 +180,7 @@ test('les 4 visuels narratifs OpenAI sont opaques, 16:9 et traces', async () => 
   assert.equal(new Set(narrative.map(asset => asset.src)).size, EXPECTED_COUNTS.narrative);
   assert.equal(new Set(narrative.map(asset => asset.source.masterFile)).size, EXPECTED_COUNTS.narrative);
   for (const name of NARRATIVE_NAMES) {
-    assert.equal(runtime.manifest.narrative[name].src, `assets/generated/v2.9.0/narrative/${name}.webp`);
+    assert.equal(runtime.manifest.narrative[name].src, `assets/generated/v2.9.1/narrative/${name}.webp`);
     assert.equal(runtime.manifest.narrative[name].source.masterFile, `assets/generated/narrative-v2.9-sources/${name}-openai-v1.png`);
   }
 });
@@ -139,7 +193,7 @@ test('les 42 masters OpenAI sont traces mais jamais publies', async () => {
   assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('riva-') && master.promptId.includes('v2.9')).length, 14);
   assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('narrative-')).length, 4);
   assert.ok(runtime.files.includes(ASSET_MANIFEST_PATH));
-  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.9.0/')));
+  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.9.1/')));
   assert.ok(runtime.entries.every(entry => entry.src.endsWith('.webp')));
   assert.ok(runtime.masterFiles.every(file => file.endsWith('.png') && !runtime.files.includes(file)));
   assert.ok(runtime.entries.every(entry => !/assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources|riva-v2\.9-sources|narrative-v2\.9-sources)\//.test(entry.src)));

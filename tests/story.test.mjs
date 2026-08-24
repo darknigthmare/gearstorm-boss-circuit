@@ -25,7 +25,7 @@ test('story.js est un script classique autonome, compatible VM sans DOM', () => 
   const story = loadStory();
   assert.ok(story, 'globalThis.GEARSTORM_STORY doit etre expose');
   assert.equal(story.schemaVersion, 1);
-  assert.equal(story.contentVersion, '2.9.0');
+  assert.equal(story.contentVersion, '2.9.1');
   assert.ok(Object.isFrozen(story));
   assert.ok(Object.isFrozen(story.acts));
   assert.ok(Object.isFrozen(story.acts[0].codex));
@@ -121,12 +121,34 @@ test('introduction, prologue, revelation, contre-plan et epilogue ferment l arc'
 
 test('le contrat meta diegetique couvre les surfaces narratives sans contaminer le Canal civil', () => {
   const story = loadStory();
-  const metaVocabulary = /\b(?:boss|phases?|HUD|menu|pattern|checkpoint|script|build|Codex|générique|retries?|interface|joueuse|compteur|progression)\b|barre de vie|écran de|meilleur temps|mise en scène|suite cachée|zone sûre/i;
+  const metaVocabulary = /\b(?:boss|phases?|HUD|menu|pattern|checkpoint|script|build|Codex|générique|prologue|retries?|interface|joueuse|compteur|progression|cadre)\b|hors champ|barre de vie|écran de|meilleur temps|mise en scène|suite cachée|zone sûre/i;
   const forbiddenCivilVocabulary = /\b(?:boss|phases?|HUD|menu|pattern|checkpoint|script|build|Codex|générique|retries?|interface|joueuse|progression)\b|barre de vie|mise en scène|suite cachée/i;
 
   assert.match(story.intro.lines.map(entry => entry.text).join(' '), metaVocabulary);
   assert.match(story.prologue.lines.map(entry => entry.text).join(' '), metaVocabulary);
   assert.match(JSON.stringify(story.epilogue), metaVocabulary);
+
+  const collectedLines = [];
+  const visited = new WeakSet();
+  const collectLines = value => {
+    if (!value || typeof value !== 'object' || visited.has(value)) return;
+    visited.add(value);
+    if (typeof value.speaker === 'string' && typeof value.text === 'string') {
+      collectedLines.push(value);
+      return;
+    }
+    for (const nested of Object.values(value)) collectLines(nested);
+  };
+  collectLines(story);
+  assert.ok(collectedLines.length > 30, 'les lignes narratives doivent être parcourues');
+  for (const entry of collectedLines) {
+    const normalizedSpeaker = entry.speaker
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase();
+    assert.notEqual(normalizedSpeaker, 'systeme', 'aucune voix générique Système ne doit parler au joueur');
+    assert.notEqual(entry.channel, 'system', 'aucun canal narratif générique system ne doit subsister');
+  }
 
   for (const act of story.acts) {
     const label = act.bossId;

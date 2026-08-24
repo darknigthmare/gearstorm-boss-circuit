@@ -167,7 +167,7 @@
     { order: 27, id: 'skyborne-battery', name: 'SKYBORNE BATTERY', wave: 4, family: 'reflect', arena: 'Batterie Aérostatique', hp: 230, parTime: 81, color: '#4599ce', accent: '#d3f0ff', arenaType: 'flight', patterns: ['mobile-fire', 'torpedo-return', 'assisted-volley'], rule: 'Les torpilles portent un verrou lisible et l’assistance vise le renvoi, jamais l’esquive.' },
     { order: 28, id: 'endurance-engine', name: 'ENDURANCE ENGINE', wave: 4, family: 'puzzle-endgame', arena: 'Circuit d’Endurance', hp: 260, parTime: 96, color: '#cf6a35', accent: '#ffe0a8', patterns: ['rounds-1-2', 'rounds-3-4', 'rounds-5-6'], rule: 'Six manches courtes et annoncées ; le Laboratoire reprend au début de la manche.', checkpoints: ['round-1', 'round-2', 'round-3', 'round-4', 'round-5', 'round-6'] },
     { order: 29, id: 'adaptive-archivist', name: 'ADAPTIVE ARCHIVIST', wave: 4, family: 'mimic', arena: 'Archives Réactives', hp: 240, parTime: 83, color: '#7d69d6', accent: '#e8ddff', patterns: ['sample-input', 'visible-adaptation', 'reset-response'], rule: 'L’adaptation est visible, locale à la tentative et limitée à une réponse.' },
-    { order: 30, id: 'null-crown', name: 'NULL CROWN', wave: 4, family: 'puzzle-endgame', phaseFamilies: ['reflect', 'modules', 'posture-duo'], arena: 'Trône Zéro', hp: 300, parTime: 105, color: '#7656c9', accent: '#fff0a8', partCount: 4, partRole: 'null-module', patterns: ['null-reflection', 'null-modules', 'null-rupture'], rule: 'Boss final du Circuit Forge : trois phases annoncées, déblocage persistant, entrée Codex, récompense et épilogue dédiés.', secret: true, checkpoints: ['phase-1', 'phase-2', 'phase-3'] }
+    { order: 30, id: 'null-crown', name: 'NULL CROWN', wave: 4, family: 'puzzle-endgame', phaseFamilies: ['reflect', 'modules', 'posture-duo'], arena: 'Trône Zéro', hp: 300, parTime: 105, color: '#7656c9', accent: '#fff0a8', partCount: 4, partRole: 'null-module', patterns: ['null-reflection', 'null-modules', 'null-rupture'], rule: 'Arbitre final déjà visible dans le Catalogue : renvoyer les charges, choisir l’ordre des modules, puis rompre sa posture.', secret: false, checkpoints: ['phase-1', 'phase-2', 'phase-3'] }
   ];
 
   // Une signature par machine : les familles restent un vocabulaire commun,
@@ -333,7 +333,7 @@
         : [
           { id: source.id + '-forge-time', title: 'Cadence Forge', objective: 'Terminer sous le temps de référence.', metric: 'timeSeconds', target: source.parTime },
           { id: source.id + '-forge-integrity', title: 'Intégrité du pilote', objective: 'Subir au plus deux impacts.', metric: 'damageTaken', target: 2 },
-          { id: source.id + '-forge-mechanic', title: 'Lecture du système', objective: 'Résoudre trois cycles mécaniques.', metric: 'mechanicCycles', target: 3 }
+          { id: source.id + '-forge-mechanic', title: 'Règle maîtrisée', objective: 'Résoudre trois cycles mécaniques.', metric: 'mechanicCycles', target: 3 }
         ],
       reward: engine === 'legacy' ? { type: 'campaign', id: source.id + '-district' } : { type: 'forge-record', id: source.id + '-verified' },
       codex: {

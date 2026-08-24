@@ -29,7 +29,7 @@ const dist = resolve(root, 'dist');
 if (dirname(dist) !== root) throw new Error('Répertoire de build non sécurisé.');
 const validateSourceMasters = process.env.VERCEL !== '1';
 
-const publicFiles = ['index.html', 'pwa-update-v2.9.0.js', 'styles.css', 'story.js', 'expansion-story.js', 'boss-roster.js', 'game.js', 'manifest.webmanifest', 'sw.js'];
+const publicFiles = ['index.html', 'pwa-update-v2.9.1.js', 'styles.css', 'story.js', 'expansion-story.js', 'boss-roster.js', 'game.js', 'manifest.webmanifest', 'sw.js'];
 const shellAssets = ['gearstorm-icon.svg', 'gearstorm-icon-192.png', 'gearstorm-icon-512.png', 'gearstorm-key-art.png'];
 const [html, story, expansionStory, bossRoster, game, manifest, packageJson, runtimeAssets] = await Promise.all([
   readFile(resolve(root, 'index.html'), 'utf8'),

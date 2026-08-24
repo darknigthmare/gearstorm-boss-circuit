@@ -1,15 +1,15 @@
 import vm from 'node:vm';
 
-export const APP_RELEASE = '2.9.0';
+export const APP_RELEASE = '2.9.1';
 export const SAVE_SCHEMA_VERSION = 5;
 export const SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
 export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
 export const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
 export const V2_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
 export const STORY_SCHEMA_VERSION = 1;
-export const STORY_CONTENT_VERSION = '2.9.0';
+export const STORY_CONTENT_VERSION = '2.9.1';
 export const EXPANSION_STORY_SCHEMA_VERSION = 1;
-export const EXPANSION_STORY_CONTENT_VERSION = '2.9.0';
+export const EXPANSION_STORY_CONTENT_VERSION = '2.9.1';
 export const CAMPAIGN_BOSS_COUNT = 6;
 export const FORGE_BOSS_COUNT = 24;
 export const PLAYABLE_BOSS_COUNT = CAMPAIGN_BOSS_COUNT + FORGE_BOSS_COUNT;
@@ -269,7 +269,7 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const domReferences = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   for (const id of domReferences) invariant(ids.has(id), `Contrat DOM : #${id} reference par game.js mais absent.`);
 
-  const pwaBootstrapTag = html.search(/<script\s+src=["']pwa-update-v2\.9\.0\.js["'][^>]*><\/script>/i);
+  const pwaBootstrapTag = html.search(/<script\s+src=["']pwa-update-v2\.9\.1\.js["'][^>]*><\/script>/i);
   const storyTag = html.search(/<script\s+src=["']story\.js["'][^>]*><\/script>/i);
   const expansionStoryTag = html.search(/<script\s+src=["']expansion-story\.js["'][^>]*><\/script>/i);
   const bossRosterTag = html.search(/<script\s+src=["']boss-roster\.js["'][^>]*><\/script>/i);
@@ -309,7 +309,7 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const shortcuts = new Set((manifest?.shortcuts || []).map(shortcut => shortcut.url));
   for (const url of ['./?mode=rush', './?mode=practice', './?mode=forge', './?mode=forgeRush']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
 
-  invariant(html.includes('GEARSTORM: Boss Circuit v2.9'), 'Metadonnees HTML v2.9 absentes.');
+  invariant(html.includes('GEARSTORM: Boss Circuit v2.9.1'), 'Metadonnees HTML v2.9.1 absentes.');
   invariant(!/GEARSTORM: Boss Circuit v2\.[2-8]\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
   invariant(/qaAllowed[\s\S]+__GEARSTORM_QA__/.test(game), 'Surface QA locale absente ou non protegee.');
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));

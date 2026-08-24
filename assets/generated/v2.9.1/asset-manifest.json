@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "release": "2.9.0",
+  "release": "2.9.1",
   "generator": "OpenAI ImageGen built-in + deterministic Pillow extraction and normalization",
   "license": "Original project artwork",
   "viewport": {
@@ -341,7 +341,7 @@
       "visualOffsetY": 80,
       "layers": {
         "far": {
-          "src": "assets/generated/v2.9.0/arenas/rammer/far.webp",
+          "src": "assets/generated/v2.9.1/arenas/rammer/far.webp",
           "width": 768,
           "height": 512,
           "alpha": false,
@@ -350,7 +350,7 @@
           "speed": 0.015
         },
         "mid": {
-          "src": "assets/generated/v2.9.0/arenas/rammer/mid.webp",
+          "src": "assets/generated/v2.9.1/arenas/rammer/mid.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -359,7 +359,7 @@
           "speed": 0.055
         },
         "ground": {
-          "src": "assets/generated/v2.9.0/arenas/rammer/ground.webp",
+          "src": "assets/generated/v2.9.1/arenas/rammer/ground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -368,7 +368,7 @@
           "speed": 0.12
         },
         "foreground": {
-          "src": "assets/generated/v2.9.0/arenas/rammer/foreground.webp",
+          "src": "assets/generated/v2.9.1/arenas/rammer/foreground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -388,7 +388,7 @@
       "visualOffsetY": 80,
       "layers": {
         "far": {
-          "src": "assets/generated/v2.9.0/arenas/kraken/far.webp",
+          "src": "assets/generated/v2.9.1/arenas/kraken/far.webp",
           "width": 768,
           "height": 512,
           "alpha": false,
@@ -397,7 +397,7 @@
           "speed": 0.015
         },
         "mid": {
-          "src": "assets/generated/v2.9.0/arenas/kraken/mid.webp",
+          "src": "assets/generated/v2.9.1/arenas/kraken/mid.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -406,7 +406,7 @@
           "speed": 0.055
         },
         "ground": {
-          "src": "assets/generated/v2.9.0/arenas/kraken/ground.webp",
+          "src": "assets/generated/v2.9.1/arenas/kraken/ground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -415,7 +415,7 @@
           "speed": 0.12
         },
         "foreground": {
-          "src": "assets/generated/v2.9.0/arenas/kraken/foreground.webp",
+          "src": "assets/generated/v2.9.1/arenas/kraken/foreground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -435,7 +435,7 @@
       "visualOffsetY": 80,
       "layers": {
         "far": {
-          "src": "assets/generated/v2.9.0/arenas/drill/far.webp",
+          "src": "assets/generated/v2.9.1/arenas/drill/far.webp",
           "width": 768,
           "height": 512,
           "alpha": false,
@@ -444,7 +444,7 @@
           "speed": 0.015
         },
         "mid": {
-          "src": "assets/generated/v2.9.0/arenas/drill/mid.webp",
+          "src": "assets/generated/v2.9.1/arenas/drill/mid.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -453,7 +453,7 @@
           "speed": 0.055
         },
         "ground": {
-          "src": "assets/generated/v2.9.0/arenas/drill/ground.webp",
+          "src": "assets/generated/v2.9.1/arenas/drill/ground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -462,7 +462,7 @@
           "speed": 0.12
         },
         "foreground": {
-          "src": "assets/generated/v2.9.0/arenas/drill/foreground.webp",
+          "src": "assets/generated/v2.9.1/arenas/drill/foreground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -482,7 +482,7 @@
       "visualOffsetY": 80,
       "layers": {
         "far": {
-          "src": "assets/generated/v2.9.0/arenas/mantis/far.webp",
+          "src": "assets/generated/v2.9.1/arenas/mantis/far.webp",
           "width": 768,
           "height": 512,
           "alpha": false,
@@ -491,7 +491,7 @@
           "speed": 0.015
         },
         "mid": {
-          "src": "assets/generated/v2.9.0/arenas/mantis/mid.webp",
+          "src": "assets/generated/v2.9.1/arenas/mantis/mid.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -500,7 +500,7 @@
           "speed": 0.055
         },
         "ground": {
-          "src": "assets/generated/v2.9.0/arenas/mantis/ground.webp",
+          "src": "assets/generated/v2.9.1/arenas/mantis/ground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -509,7 +509,7 @@
           "speed": 0.12
         },
         "foreground": {
-          "src": "assets/generated/v2.9.0/arenas/mantis/foreground.webp",
+          "src": "assets/generated/v2.9.1/arenas/mantis/foreground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -529,7 +529,7 @@
       "visualOffsetY": 80,
       "layers": {
         "far": {
-          "src": "assets/generated/v2.9.0/arenas/cyclotron/far.webp",
+          "src": "assets/generated/v2.9.1/arenas/cyclotron/far.webp",
           "width": 768,
           "height": 512,
           "alpha": false,
@@ -538,7 +538,7 @@
           "speed": 0.015
         },
         "mid": {
-          "src": "assets/generated/v2.9.0/arenas/cyclotron/mid.webp",
+          "src": "assets/generated/v2.9.1/arenas/cyclotron/mid.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -547,7 +547,7 @@
           "speed": 0.055
         },
         "ground": {
-          "src": "assets/generated/v2.9.0/arenas/cyclotron/ground.webp",
+          "src": "assets/generated/v2.9.1/arenas/cyclotron/ground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -556,7 +556,7 @@
           "speed": 0.12
         },
         "foreground": {
-          "src": "assets/generated/v2.9.0/arenas/cyclotron/foreground.webp",
+          "src": "assets/generated/v2.9.1/arenas/cyclotron/foreground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -576,7 +576,7 @@
       "visualOffsetY": 80,
       "layers": {
         "far": {
-          "src": "assets/generated/v2.9.0/arenas/omega/far.webp",
+          "src": "assets/generated/v2.9.1/arenas/omega/far.webp",
           "width": 768,
           "height": 512,
           "alpha": false,
@@ -585,7 +585,7 @@
           "speed": 0.015
         },
         "mid": {
-          "src": "assets/generated/v2.9.0/arenas/omega/mid.webp",
+          "src": "assets/generated/v2.9.1/arenas/omega/mid.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -594,7 +594,7 @@
           "speed": 0.055
         },
         "ground": {
-          "src": "assets/generated/v2.9.0/arenas/omega/ground.webp",
+          "src": "assets/generated/v2.9.1/arenas/omega/ground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -603,7 +603,7 @@
           "speed": 0.12
         },
         "foreground": {
-          "src": "assets/generated/v2.9.0/arenas/omega/foreground.webp",
+          "src": "assets/generated/v2.9.1/arenas/omega/foreground.webp",
           "width": 768,
           "height": 512,
           "alpha": true,
@@ -623,7 +623,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/bastion-ricochet/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/bastion-ricochet/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -657,7 +657,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/hydraulic-warden/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/hydraulic-warden/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -691,7 +691,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/hive-foreman/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/hive-foreman/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -725,7 +725,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/echo-fencer/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/echo-fencer/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -759,7 +759,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/breaker-array/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/breaker-array/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -793,7 +793,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/vertical-verdict/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/vertical-verdict/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -827,7 +827,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/rail-tyrant/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/rail-tyrant/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -861,7 +861,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/triplex-hunter/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/triplex-hunter/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -895,7 +895,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/ground-eater/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/ground-eater/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -929,7 +929,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/floodline-leviathan/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/floodline-leviathan/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -963,7 +963,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/centrifuge-zero/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/centrifuge-zero/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -997,7 +997,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/tempest-regulator/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/tempest-regulator/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1031,7 +1031,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/ascension-frame/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/ascension-frame/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1065,7 +1065,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/counterforge/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/counterforge/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1099,7 +1099,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/carrier-cathedral/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/carrier-cathedral/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1133,7 +1133,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/twin-governors/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/twin-governors/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1167,7 +1167,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/loadout-reactor/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/loadout-reactor/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1201,7 +1201,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/orbital-famine/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/orbital-famine/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1235,7 +1235,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/logic-crucible/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/logic-crucible/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1269,7 +1269,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/vector-vault/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/vector-vault/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1303,7 +1303,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/skyborne-battery/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/skyborne-battery/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1337,7 +1337,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/endurance-engine/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/endurance-engine/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1371,7 +1371,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/adaptive-archivist/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/adaptive-archivist/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1405,7 +1405,7 @@
       "visualOffsetY": 28,
       "telegraphSafe": true,
       "backdrop": {
-        "src": "assets/generated/v2.9.0/arenas/null-crown/backdrop.webp",
+        "src": "assets/generated/v2.9.1/arenas/null-crown/backdrop.webp",
         "width": 768,
         "height": 432,
         "alpha": false,
@@ -1434,7 +1434,7 @@
     "rammer": {
       "parts": {
         "wheel": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/wheel.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/wheel.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1442,7 +1442,7 @@
           "sha256": "5520b1ecd49eb0c7cfee173ef6f3640e56e8303ef28a85a9e8f227dc93e8c60d"
         },
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1450,7 +1450,7 @@
           "sha256": "25beaf452190811a2fc65bdce66327be2e974670447a0c082d46485e4a33fbe6"
         },
         "ram": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/ram.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/ram.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1458,7 +1458,7 @@
           "sha256": "4da3df34ee4e46a43deae1585bcc045791089a666427f61f374f08e0ceea2ff3"
         },
         "hammer-left": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/hammer-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/hammer-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1466,7 +1466,7 @@
           "sha256": "87fa6d4a672680aad2c83c7e49058f6edac05d599f22f26c39d8cc63cc0f0652"
         },
         "hammer-right": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/hammer-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/hammer-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1474,7 +1474,7 @@
           "sha256": "54fc13a088e01afb6a898d903b03751bb1e0031ecc676c512722bf1f94fd79af"
         },
         "rivet-pod": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/rivet-pod.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/rivet-pod.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1482,7 +1482,7 @@
           "sha256": "88d7ca98d8a7cf95c02106232c921ec72b6734b24fa808a89bf7d31a1865d3f4"
         },
         "mine-seismic": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/mine-seismic.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/mine-seismic.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1490,7 +1490,7 @@
           "sha256": "761c782ecd9727ddaa8dca083214c0a330dc87b6716928af08e6e5860797cc44"
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1498,7 +1498,7 @@
           "sha256": "46736cf0e2c48ef1bf116e4f15cf29091e82b93a3f7146a55f483803a6c0d6a8"
         },
         "overdrive": {
-          "src": "assets/generated/v2.9.0/bosses/rammer/overdrive.webp",
+          "src": "assets/generated/v2.9.1/bosses/rammer/overdrive.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1510,7 +1510,7 @@
     "kraken": {
       "parts": {
         "fuselage": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/fuselage.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/fuselage.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1518,7 +1518,7 @@
           "sha256": "5281c16246d9df206c92d9bb751bb26cfae09ee42b7f5a3d83fb1f4d1a9bf76f"
         },
         "cockpit": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/cockpit.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/cockpit.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1526,7 +1526,7 @@
           "sha256": "4cb072a75cb1e23ebe1d13c022b7313ee5c95fd4ce5e666a9c4c96ecba49fbd3"
         },
         "wing-left": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/wing-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/wing-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1534,7 +1534,7 @@
           "sha256": "94a9e27cbc5ca5677cbd8b4840047bb317eeec853ba4d739e4e9db8891aeaa23"
         },
         "wing-right": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/wing-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/wing-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1542,7 +1542,7 @@
           "sha256": "c36c8eba637e637281b29085254589ebd937c33dd19b9042dc9ff14bdff12971"
         },
         "tail-thruster": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/tail-thruster.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/tail-thruster.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1550,7 +1550,7 @@
           "sha256": "037d6ce1771ee34eb4c751537860e71beeb690926efa644c06d9b37257016612"
         },
         "ion-emitter": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/ion-emitter.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/ion-emitter.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1558,7 +1558,7 @@
           "sha256": "afb22486201e0d3187fa5abb79241399ccbf60a8384059f2d272116255e92033"
         },
         "bomb-pod": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/bomb-pod.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/bomb-pod.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1566,7 +1566,7 @@
           "sha256": "50f93172dcddc4349adb2f919edd4b09a87bc9b78ce52a22b6732da34155b772"
         },
         "laser-blades": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/laser-blades.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/laser-blades.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1574,7 +1574,7 @@
           "sha256": "f98495f49f60858e770ad8eb97fe740f646dd8413fdc0858d5703d4e441306c8"
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/kraken/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/kraken/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1586,7 +1586,7 @@
     "drill": {
       "parts": {
         "carapace": {
-          "src": "assets/generated/v2.9.0/bosses/drill/carapace.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/carapace.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1594,7 +1594,7 @@
           "sha256": "5fc7a2d21911986bc0da4340fcda9f14a19feee5224fed143c13b81066669f91"
         },
         "cockpit": {
-          "src": "assets/generated/v2.9.0/bosses/drill/cockpit.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/cockpit.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1602,7 +1602,7 @@
           "sha256": "485b83751032a1d0ed64b32a2d1b001edc231b9668fe2232b05c49eb76c55b08"
         },
         "legs-front-left": {
-          "src": "assets/generated/v2.9.0/bosses/drill/legs-front-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/legs-front-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1610,7 +1610,7 @@
           "sha256": "586fe09842598db78d061cbba65c3b7dd8942031f10d98d2d24a1bf557128f89"
         },
         "legs-front-right": {
-          "src": "assets/generated/v2.9.0/bosses/drill/legs-front-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/legs-front-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1618,7 +1618,7 @@
           "sha256": "0d80c698e152359e6d5115cab46e3f154d5b39164f885d69ddc9f0a2b1e70063"
         },
         "legs-rear": {
-          "src": "assets/generated/v2.9.0/bosses/drill/legs-rear.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/legs-rear.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1626,7 +1626,7 @@
           "sha256": "8288012b3b258b633dda82d834d85609babd8229863a0e12cc9054a555896402"
         },
         "magnetic-coil": {
-          "src": "assets/generated/v2.9.0/bosses/drill/magnetic-coil.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/magnetic-coil.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1634,7 +1634,7 @@
           "sha256": "1cac11d41961b181fe2bb457e0c35586b28c897cbfa1caaa02ad278c01d67c75"
         },
         "polarity-claws": {
-          "src": "assets/generated/v2.9.0/bosses/drill/polarity-claws.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/polarity-claws.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1642,7 +1642,7 @@
           "sha256": "78337e62724386ac3670764cc56074a9d683467a1447750b8775e53d66d9f5e4"
         },
         "scrap-ring": {
-          "src": "assets/generated/v2.9.0/bosses/drill/scrap-ring.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/scrap-ring.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1650,7 +1650,7 @@
           "sha256": "39228c0e64b125bcaf6962af2a493b474519d5f5bfdc9e361f531785edc1005e"
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/drill/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/drill/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1662,7 +1662,7 @@
     "mantis": {
       "parts": {
         "torso": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/torso.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/torso.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1670,7 +1670,7 @@
           "sha256": "9819b9c3dc0109a34b632fef81fde491a3971a426989311858ccf0ff2f790b35"
         },
         "cockpit": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/cockpit.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/cockpit.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1678,7 +1678,7 @@
           "sha256": "f0be63078edd9609590db38e78694c196e2b8353981cb03b5273016087390dcf"
         },
         "scythe-left": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/scythe-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/scythe-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1686,7 +1686,7 @@
           "sha256": "233aa77107c6a647740476b72a15821dc9b87fb37ea75ee47ee10d2106cdb076"
         },
         "scythe-right": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/scythe-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/scythe-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1694,7 +1694,7 @@
           "sha256": "70ce1016fe0ceb9d745706898029a459c1799b9dea984e2a2ac6cfaf61fbfe87"
         },
         "legs-left": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/legs-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/legs-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1702,7 +1702,7 @@
           "sha256": "910b1f3f95154603aacecc23d25ee1d7b6af59893b5ef30c6cec9c669c9354bf"
         },
         "legs-right": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/legs-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/legs-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1710,7 +1710,7 @@
           "sha256": "b0be9e0ce6f4fff42179b6a94fc4080b6a2276f2b0fee4dde6b95850f19d1490"
         },
         "chrono-halo": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/chrono-halo.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/chrono-halo.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1718,7 +1718,7 @@
           "sha256": "3757aab54139a8e60ec3a1099d65a394aba886c29d9a39ad99da9da8d111731c"
         },
         "time-emitter": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/time-emitter.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/time-emitter.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1726,7 +1726,7 @@
           "sha256": "d8e9c9aa1c63f3e1395b75709c4e02176ca4b9e5589e1fbbc08b5b7a186a238d"
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/mantis/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/mantis/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1738,7 +1738,7 @@
     "cyclotron": {
       "parts": {
         "furnace-torso": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/furnace-torso.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/furnace-torso.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1746,7 +1746,7 @@
           "sha256": "35b93020b53769942ec8b20a014c2065f14fbaf495b0220076751b0aa9e12a38"
         },
         "cockpit": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/cockpit.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/cockpit.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1754,7 +1754,7 @@
           "sha256": "873ee43d736a114e44b7bb2037c57991e66b4f3ad058f38b0065aabfcfe5a27a"
         },
         "piston-left": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/piston-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/piston-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1762,7 +1762,7 @@
           "sha256": "cb8a8057f85256eaff5783c852fa9d159288ce0286f3277402a517ac273fcf14"
         },
         "piston-right": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/piston-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/piston-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1770,7 +1770,7 @@
           "sha256": "2b48f3be17732bafd7022630e736c510f9ca2edde93f11fa915be714feafad7e"
         },
         "leg-left": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/leg-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/leg-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1778,7 +1778,7 @@
           "sha256": "0ad7316b4d803bd87c1eb10c8d228db7633619d74478c8d0628db92c37dc5bac"
         },
         "leg-right": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/leg-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/leg-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1786,7 +1786,7 @@
           "sha256": "db34e3322fb9b4a5b3effa9f17ee56e4093a35764f7e6ee536f5d6c6d853ad87"
         },
         "stacks-hopper": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/stacks-hopper.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/stacks-hopper.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1794,7 +1794,7 @@
           "sha256": "2b6457891df3dd0f053de6aa1cba93182ef9e4a20432d5502fc744d7a7745c6a"
         },
         "molten-core": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/molten-core.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/molten-core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1802,7 +1802,7 @@
           "sha256": "73b28ac342bc4f24c6437094c1bed370beecdc61be87f4eee4f583c815702c80"
         },
         "overarmor": {
-          "src": "assets/generated/v2.9.0/bosses/cyclotron/overarmor.webp",
+          "src": "assets/generated/v2.9.1/bosses/cyclotron/overarmor.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1814,7 +1814,7 @@
     "omega": {
       "parts": {
         "crown-hull": {
-          "src": "assets/generated/v2.9.0/bosses/omega/crown-hull.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/crown-hull.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1822,7 +1822,7 @@
           "sha256": "769546ae9db8a8618f502fb1b4730411c5ba10143a93b45e0072653e6e9fa657"
         },
         "throne-cockpit": {
-          "src": "assets/generated/v2.9.0/bosses/omega/throne-cockpit.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/throne-cockpit.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1830,7 +1830,7 @@
           "sha256": "61929dc4528594d40fbd5b786e7882f50faffd82ec08b86ea6aeb5c53eae8680"
         },
         "battery-left": {
-          "src": "assets/generated/v2.9.0/bosses/omega/battery-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/battery-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1838,7 +1838,7 @@
           "sha256": "28dd425af48fe2e1a2fa21a1be91422913409b3fb9d5262f366f18d7eca332a3"
         },
         "battery-right": {
-          "src": "assets/generated/v2.9.0/bosses/omega/battery-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/battery-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1846,7 +1846,7 @@
           "sha256": "a2067b04e02b2c58076bc4692224e5b29a35844153abe4897473b5c400e3c906"
         },
         "stabilizers": {
-          "src": "assets/generated/v2.9.0/bosses/omega/stabilizers.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/stabilizers.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1854,7 +1854,7 @@
           "sha256": "248e4e7a30db9e27ff0974af785388fbe5b0a5ad1985ee08c047283fb5eac42a"
         },
         "blade-ring": {
-          "src": "assets/generated/v2.9.0/bosses/omega/blade-ring.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/blade-ring.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1862,7 +1862,7 @@
           "sha256": "060c4dcf7373fc0da3a0d3ad88096805a12e5456961dd8e385ecda73067545ee"
         },
         "combined-arsenal": {
-          "src": "assets/generated/v2.9.0/bosses/omega/combined-arsenal.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/combined-arsenal.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1870,7 +1870,7 @@
           "sha256": "2872e9b7389d4a152f45132111cc1a846c7619eb38eb61beeb2b4018623e7f10"
         },
         "omega-core": {
-          "src": "assets/generated/v2.9.0/bosses/omega/omega-core.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/omega-core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1878,7 +1878,7 @@
           "sha256": "5b3e423300fc180e7673827b44ae44327cf8ba029c81c0282ef4a291a2d06cd6"
         },
         "ruptured-armor": {
-          "src": "assets/generated/v2.9.0/bosses/omega/ruptured-armor.webp",
+          "src": "assets/generated/v2.9.1/bosses/omega/ruptured-armor.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1919,7 +1919,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/bastion-ricochet/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1941,7 +1941,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/bastion-ricochet/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1964,7 +1964,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/bastion-ricochet/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -1987,7 +1987,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/bastion-ricochet/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/bastion-ricochet/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2043,7 +2043,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/hydraulic-warden/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2065,7 +2065,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/hydraulic-warden/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2088,7 +2088,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/hydraulic-warden/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2111,7 +2111,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/hydraulic-warden/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/hydraulic-warden/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2167,7 +2167,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/hive-foreman/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/hive-foreman/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2189,7 +2189,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/hive-foreman/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/hive-foreman/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2212,7 +2212,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/hive-foreman/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/hive-foreman/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2235,7 +2235,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/hive-foreman/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/hive-foreman/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2291,7 +2291,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/echo-fencer/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/echo-fencer/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2313,7 +2313,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/echo-fencer/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/echo-fencer/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2336,7 +2336,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/echo-fencer/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/echo-fencer/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2359,7 +2359,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/echo-fencer/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/echo-fencer/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2415,7 +2415,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/breaker-array/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/breaker-array/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2437,7 +2437,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/breaker-array/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/breaker-array/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2460,7 +2460,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/breaker-array/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/breaker-array/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2483,7 +2483,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/breaker-array/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/breaker-array/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2539,7 +2539,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/vertical-verdict/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2561,7 +2561,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/vertical-verdict/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2584,7 +2584,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/vertical-verdict/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2607,7 +2607,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/vertical-verdict/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/vertical-verdict/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2663,7 +2663,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/rail-tyrant/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2685,7 +2685,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/rail-tyrant/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2708,7 +2708,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/rail-tyrant/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2731,7 +2731,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/rail-tyrant/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/rail-tyrant/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2787,7 +2787,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/triplex-hunter/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2809,7 +2809,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/triplex-hunter/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2832,7 +2832,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/triplex-hunter/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2855,7 +2855,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/triplex-hunter/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/triplex-hunter/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2911,7 +2911,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/ground-eater/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/ground-eater/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2933,7 +2933,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/ground-eater/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/ground-eater/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2956,7 +2956,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/ground-eater/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/ground-eater/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -2979,7 +2979,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/ground-eater/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/ground-eater/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3035,7 +3035,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/floodline-leviathan/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3057,7 +3057,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/floodline-leviathan/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3080,7 +3080,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/floodline-leviathan/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3103,7 +3103,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/floodline-leviathan/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/floodline-leviathan/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3159,7 +3159,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/centrifuge-zero/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3181,7 +3181,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/centrifuge-zero/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3204,7 +3204,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/centrifuge-zero/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3227,7 +3227,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/centrifuge-zero/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/centrifuge-zero/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3283,7 +3283,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/tempest-regulator/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3305,7 +3305,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/tempest-regulator/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3328,7 +3328,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/tempest-regulator/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3351,7 +3351,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/tempest-regulator/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/tempest-regulator/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3407,7 +3407,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/ascension-frame/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/ascension-frame/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3429,7 +3429,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/ascension-frame/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/ascension-frame/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3452,7 +3452,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/ascension-frame/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/ascension-frame/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3475,7 +3475,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/ascension-frame/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/ascension-frame/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3531,7 +3531,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/counterforge/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/counterforge/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3553,7 +3553,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/counterforge/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/counterforge/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3576,7 +3576,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/counterforge/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/counterforge/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3599,7 +3599,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/counterforge/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/counterforge/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3655,7 +3655,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/carrier-cathedral/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3677,7 +3677,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/carrier-cathedral/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3700,7 +3700,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/carrier-cathedral/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3723,7 +3723,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/carrier-cathedral/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/carrier-cathedral/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3779,7 +3779,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/twin-governors/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/twin-governors/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3801,7 +3801,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/twin-governors/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/twin-governors/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3824,7 +3824,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/twin-governors/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/twin-governors/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3847,7 +3847,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/twin-governors/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/twin-governors/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3903,7 +3903,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/loadout-reactor/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3925,7 +3925,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/loadout-reactor/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3948,7 +3948,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/loadout-reactor/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -3971,7 +3971,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/loadout-reactor/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/loadout-reactor/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4027,7 +4027,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/orbital-famine/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/orbital-famine/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4049,7 +4049,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/orbital-famine/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/orbital-famine/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4072,7 +4072,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/orbital-famine/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/orbital-famine/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4095,7 +4095,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/orbital-famine/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/orbital-famine/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4151,7 +4151,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/logic-crucible/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/logic-crucible/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4173,7 +4173,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/logic-crucible/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/logic-crucible/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4196,7 +4196,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/logic-crucible/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/logic-crucible/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4219,7 +4219,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/logic-crucible/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/logic-crucible/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4275,7 +4275,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/vector-vault/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/vector-vault/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4297,7 +4297,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/vector-vault/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/vector-vault/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4320,7 +4320,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/vector-vault/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/vector-vault/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4343,7 +4343,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/vector-vault/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/vector-vault/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4399,7 +4399,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/skyborne-battery/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4421,7 +4421,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/skyborne-battery/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4444,7 +4444,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/skyborne-battery/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4467,7 +4467,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/skyborne-battery/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/skyborne-battery/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4523,7 +4523,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/endurance-engine/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/endurance-engine/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4545,7 +4545,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/endurance-engine/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/endurance-engine/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4568,7 +4568,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/endurance-engine/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/endurance-engine/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4591,7 +4591,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/endurance-engine/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/endurance-engine/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4647,7 +4647,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/adaptive-archivist/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4669,7 +4669,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/adaptive-archivist/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4692,7 +4692,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/adaptive-archivist/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4715,7 +4715,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/adaptive-archivist/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/adaptive-archivist/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4771,7 +4771,7 @@
       },
       "parts": {
         "chassis": {
-          "src": "assets/generated/v2.9.0/bosses/null-crown/chassis.webp",
+          "src": "assets/generated/v2.9.1/bosses/null-crown/chassis.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4793,7 +4793,7 @@
           }
         },
         "core": {
-          "src": "assets/generated/v2.9.0/bosses/null-crown/core.webp",
+          "src": "assets/generated/v2.9.1/bosses/null-crown/core.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4816,7 +4816,7 @@
           "weakCore": true
         },
         "appendage-left": {
-          "src": "assets/generated/v2.9.0/bosses/null-crown/appendage-left.webp",
+          "src": "assets/generated/v2.9.1/bosses/null-crown/appendage-left.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4839,7 +4839,7 @@
           "side": "left"
         },
         "appendage-right": {
-          "src": "assets/generated/v2.9.0/bosses/null-crown/appendage-right.webp",
+          "src": "assets/generated/v2.9.1/bosses/null-crown/appendage-right.webp",
           "width": 418,
           "height": 418,
           "alpha": true,
@@ -4868,7 +4868,7 @@
     "id": "riva-spark",
     "parts": {
       "thigh-far": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/thigh-far.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/thigh-far.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4883,7 +4883,7 @@
         }
       },
       "shin-far": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/shin-far.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/shin-far.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4898,7 +4898,7 @@
         }
       },
       "boot-far": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/boot-far.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/boot-far.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4913,7 +4913,7 @@
         }
       },
       "upper-arm-far": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/upper-arm-far.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/upper-arm-far.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4928,7 +4928,7 @@
         }
       },
       "forearm-far": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/forearm-far.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/forearm-far.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4943,7 +4943,7 @@
         }
       },
       "pelvis": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/pelvis.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/pelvis.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4958,7 +4958,7 @@
         }
       },
       "torso": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/torso.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/torso.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4973,7 +4973,7 @@
         }
       },
       "thigh-near": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/thigh-near.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/thigh-near.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -4988,7 +4988,7 @@
         }
       },
       "shin-near": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/shin-near.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/shin-near.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -5003,7 +5003,7 @@
         }
       },
       "boot-near": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/boot-near.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/boot-near.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -5018,7 +5018,7 @@
         }
       },
       "upper-arm-near": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/upper-arm-near.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/upper-arm-near.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -5033,7 +5033,7 @@
         }
       },
       "forearm-cannon-near": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/forearm-cannon-near.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/forearm-cannon-near.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -5048,7 +5048,7 @@
         }
       },
       "head": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/head.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/head.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -5063,7 +5063,7 @@
         }
       },
       "dash-trail": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/dash-trail.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/dash-trail.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -5078,7 +5078,7 @@
         }
       },
       "overload-halo": {
-        "src": "assets/generated/v2.9.0/heroine/riva-spark/overload-halo.webp",
+        "src": "assets/generated/v2.9.1/heroine/riva-spark/overload-halo.webp",
         "width": 418,
         "height": 418,
         "alpha": true,
@@ -5101,15 +5101,18 @@
       },
       "coordinateSpace": "player-local-pixels",
       "feetLocalY": 36,
-      "rootOffsetY": -23.6,
+      "rootOffsetY": -71.0,
       "ground": {
         "physicalY": 620,
         "localY": 36
       },
-      "muzzle": [
-        60,
-        -44
-      ],
+      "muzzle": {
+        "part": "forearm-cannon-near",
+        "point": [
+          156,
+          297
+        ]
+      },
       "canonicalReference": {
         "masterFile": "assets/generated/riva-v2.9-sources/riva-canonical-openai-v1.png",
         "masterSha256": "4ecfd8861884d909c5fa6e5be1dad7a1fd4f1c189f5acdd577abbf6536443e84",
@@ -5139,7 +5142,7 @@
           "side": "center",
           "joint": [
             -25,
-            -28.6
+            -76.0
           ],
           "pivot": [
             209,
@@ -5161,8 +5164,8 @@
           "parent": "pelvis",
           "side": "far",
           "joint": [
-            -7,
-            -18.6
+            -9,
+            -66.0
           ],
           "pivot": [
             208,
@@ -5185,7 +5188,7 @@
           "side": "far",
           "joint": [
             -10,
-            -3.6
+            -29.0
           ],
           "pivot": [
             208,
@@ -5207,8 +5210,8 @@
           "parent": "shin-far",
           "side": "far",
           "joint": [
-            -11,
-            8.4
+            -12,
+            9.0
           ],
           "pivot": [
             208,
@@ -5230,8 +5233,8 @@
           "parent": "torso",
           "side": "far",
           "joint": [
-            -11,
-            -60.6
+            -27,
+            -119.0
           ],
           "pivot": [
             208,
@@ -5253,8 +5256,8 @@
           "parent": "upper-arm-far",
           "side": "far",
           "joint": [
-            -22,
-            -41.6
+            -28,
+            -86.0
           ],
           "pivot": [
             208,
@@ -5277,7 +5280,7 @@
           "side": "center",
           "joint": [
             0,
-            -23.6
+            -71.0
           ],
           "pivot": [
             208,
@@ -5300,7 +5303,7 @@
           "side": "center",
           "joint": [
             0,
-            -32.6
+            -89.0
           ],
           "pivot": [
             208,
@@ -5322,8 +5325,8 @@
           "parent": "pelvis",
           "side": "near",
           "joint": [
-            7,
-            -18.6
+            9,
+            -66.0
           ],
           "pivot": [
             209,
@@ -5346,7 +5349,7 @@
           "side": "near",
           "joint": [
             10,
-            -3.6
+            -29.0
           ],
           "pivot": [
             208,
@@ -5368,8 +5371,8 @@
           "parent": "shin-near",
           "side": "near",
           "joint": [
-            12,
-            8.4
+            13,
+            9.0
           ],
           "pivot": [
             209,
@@ -5391,8 +5394,8 @@
           "parent": "torso",
           "side": "near",
           "joint": [
-            12,
-            -60.6
+            29,
+            -119.0
           ],
           "pivot": [
             208,
@@ -5414,8 +5417,8 @@
           "parent": "upper-arm-near",
           "side": "near",
           "joint": [
-            25,
-            -57.6
+            29,
+            -86.0
           ],
           "pivot": [
             252,
@@ -5438,7 +5441,7 @@
           "side": "center",
           "joint": [
             0,
-            -76.6
+            -141.0
           ],
           "pivot": [
             232,
@@ -5461,7 +5464,7 @@
           "side": "center",
           "joint": [
             0,
-            -43.6
+            -91.0
           ],
           "pivot": [
             209,
@@ -5483,7 +5486,7 @@
   },
   "vfx": {
     "muzzle-cyan": {
-      "src": "assets/generated/v2.9.0/vfx/muzzle-cyan.webp",
+      "src": "assets/generated/v2.9.1/vfx/muzzle-cyan.webp",
       "width": 314,
       "height": 314,
       "alpha": true,
@@ -5491,7 +5494,7 @@
       "sha256": "f0aaf757696f4c7bc38d69213b226e0fa0d80c77483794214592f4b79d2519f2"
     },
     "impact-metal": {
-      "src": "assets/generated/v2.9.0/vfx/impact-metal.webp",
+      "src": "assets/generated/v2.9.1/vfx/impact-metal.webp",
       "width": 313,
       "height": 314,
       "alpha": true,
@@ -5499,7 +5502,7 @@
       "sha256": "87485fa470580b030928981c59a77aa4d250ee842db0919d4c294685527ff1e8"
     },
     "shield-hit": {
-      "src": "assets/generated/v2.9.0/vfx/shield-hit.webp",
+      "src": "assets/generated/v2.9.1/vfx/shield-hit.webp",
       "width": 313,
       "height": 314,
       "alpha": true,
@@ -5507,7 +5510,7 @@
       "sha256": "bd77131a53822606b1455dc72f595d59a68c1e27e8d85cfaa51013af939c01d9"
     },
     "magnetic-spark": {
-      "src": "assets/generated/v2.9.0/vfx/magnetic-spark.webp",
+      "src": "assets/generated/v2.9.1/vfx/magnetic-spark.webp",
       "width": 314,
       "height": 314,
       "alpha": true,
@@ -5515,7 +5518,7 @@
       "sha256": "e27bf35d1262255417cd6186055a8e3b39359ae0e70f3095240fe8b5143c726c"
     },
     "smoke": {
-      "src": "assets/generated/v2.9.0/vfx/smoke.webp",
+      "src": "assets/generated/v2.9.1/vfx/smoke.webp",
       "width": 314,
       "height": 313,
       "alpha": true,
@@ -5523,7 +5526,7 @@
       "sha256": "d8bc30895183c41eb33bd48259af0f0832157557d3078be46d75b7a7b5dfcb8a"
     },
     "rivet-sparks": {
-      "src": "assets/generated/v2.9.0/vfx/rivet-sparks.webp",
+      "src": "assets/generated/v2.9.1/vfx/rivet-sparks.webp",
       "width": 313,
       "height": 313,
       "alpha": true,
@@ -5531,7 +5534,7 @@
       "sha256": "58139420eb6cba224eeb2b0bb07879ab2b9e1e021bb8ad6c80252137c917a62e"
     },
     "electric-arcs": {
-      "src": "assets/generated/v2.9.0/vfx/electric-arcs.webp",
+      "src": "assets/generated/v2.9.1/vfx/electric-arcs.webp",
       "width": 313,
       "height": 313,
       "alpha": true,
@@ -5539,7 +5542,7 @@
       "sha256": "e1921bc1401997968426a0a829296233f983cab677c2ef6e7cf0f996c40c3a1f"
     },
     "molten-splash": {
-      "src": "assets/generated/v2.9.0/vfx/molten-splash.webp",
+      "src": "assets/generated/v2.9.1/vfx/molten-splash.webp",
       "width": 314,
       "height": 313,
       "alpha": true,
@@ -5547,7 +5550,7 @@
       "sha256": "a9ed794de0f82b079b2164116f704b3929160ce98680b7eda34eefd88fd0f26e"
     },
     "warning-pulse": {
-      "src": "assets/generated/v2.9.0/vfx/warning-pulse.webp",
+      "src": "assets/generated/v2.9.1/vfx/warning-pulse.webp",
       "width": 314,
       "height": 313,
       "alpha": true,
@@ -5555,7 +5558,7 @@
       "sha256": "4c46ed81877ed201654a3591d7f446a1391d33cf53c8acd4038badff54aa8471"
     },
     "dash-shockwave": {
-      "src": "assets/generated/v2.9.0/vfx/dash-shockwave.webp",
+      "src": "assets/generated/v2.9.1/vfx/dash-shockwave.webp",
       "width": 313,
       "height": 313,
       "alpha": true,
@@ -5563,7 +5566,7 @@
       "sha256": "65a1484d7a67a0200a6d9de62e4c04a9cc4c9c00352efdc18db4da23379dbcd3"
     },
     "overload-bloom": {
-      "src": "assets/generated/v2.9.0/vfx/overload-bloom.webp",
+      "src": "assets/generated/v2.9.1/vfx/overload-bloom.webp",
       "width": 313,
       "height": 313,
       "alpha": true,
@@ -5571,7 +5574,7 @@
       "sha256": "333b758843dbd77573f5017913770b8ea588e2d124e6fd3736b43bd837871d7e"
     },
     "chrono-fracture": {
-      "src": "assets/generated/v2.9.0/vfx/chrono-fracture.webp",
+      "src": "assets/generated/v2.9.1/vfx/chrono-fracture.webp",
       "width": 314,
       "height": 313,
       "alpha": true,
@@ -5579,7 +5582,7 @@
       "sha256": "c70ddd5ed20830894f9fc86abc755f31b7fee8fe297339251474d428695c3365"
     },
     "explosion-small": {
-      "src": "assets/generated/v2.9.0/vfx/explosion-small.webp",
+      "src": "assets/generated/v2.9.1/vfx/explosion-small.webp",
       "width": 314,
       "height": 314,
       "alpha": true,
@@ -5587,7 +5590,7 @@
       "sha256": "e682f3b2f3f1848664f7c42f1b8cf0fa622b2a65a8e2b745652783633ae42606"
     },
     "explosion-core": {
-      "src": "assets/generated/v2.9.0/vfx/explosion-core.webp",
+      "src": "assets/generated/v2.9.1/vfx/explosion-core.webp",
       "width": 313,
       "height": 314,
       "alpha": true,
@@ -5595,7 +5598,7 @@
       "sha256": "a712674fe4a362d1f70b6e79205a2d04fb639a67221c8e255862e36dc6c4aa64"
     },
     "explosion-final": {
-      "src": "assets/generated/v2.9.0/vfx/explosion-final.webp",
+      "src": "assets/generated/v2.9.1/vfx/explosion-final.webp",
       "width": 313,
       "height": 314,
       "alpha": true,
@@ -5603,7 +5606,7 @@
       "sha256": "97eb0d43c633618394ccb0c8cad1f613ac76b071b90a3101f8d14b1c41ebcfd3"
     },
     "scrap-glow": {
-      "src": "assets/generated/v2.9.0/vfx/scrap-glow.webp",
+      "src": "assets/generated/v2.9.1/vfx/scrap-glow.webp",
       "width": 314,
       "height": 314,
       "alpha": true,
@@ -5613,7 +5616,7 @@
   },
   "narrative": {
     "intro-broadcast": {
-      "src": "assets/generated/v2.9.0/narrative/intro-broadcast.webp",
+      "src": "assets/generated/v2.9.1/narrative/intro-broadcast.webp",
       "width": 1280,
       "height": 720,
       "alpha": false,
@@ -5636,7 +5639,7 @@
       }
     },
     "prologue-m0": {
-      "src": "assets/generated/v2.9.0/narrative/prologue-m0.webp",
+      "src": "assets/generated/v2.9.1/narrative/prologue-m0.webp",
       "width": 1280,
       "height": 720,
       "alpha": false,
@@ -5659,7 +5662,7 @@
       }
     },
     "campaign-ending": {
-      "src": "assets/generated/v2.9.0/narrative/campaign-ending.webp",
+      "src": "assets/generated/v2.9.1/narrative/campaign-ending.webp",
       "width": 1280,
       "height": 720,
       "alpha": false,
@@ -5682,7 +5685,7 @@
       }
     },
     "forge-ending": {
-      "src": "assets/generated/v2.9.0/narrative/forge-ending.webp",
+      "src": "assets/generated/v2.9.1/narrative/forge-ending.webp",
       "width": 1280,
       "height": 720,
       "alpha": false,

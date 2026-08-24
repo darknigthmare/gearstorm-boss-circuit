@@ -5,6 +5,7 @@ async function waitForQa(page) {
 }
 
 test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/?qa=1');
   await waitForQa(page);
 
@@ -32,7 +33,34 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
   expect(diagnostics.heroine.feetLocalY).toBeCloseTo(36, 5);
   expect(diagnostics.heroine.renderScale).toBeCloseTo(1.10, 5);
   expect(diagnostics.heroine.footOffset).toBeCloseTo(3.6, 5);
-  expect(diagnostics.heroine.renderedFeetLocalY).toBeCloseTo(diagnostics.heroine.hitbox.groundLocalY, 1);
+  expect(diagnostics.heroine.roadLift).toBe(10);
+  expect(diagnostics.heroine.renderedFeetLocalY).toBeCloseTo(
+    diagnostics.heroine.feetLocalY * diagnostics.heroine.renderScale
+      - diagnostics.heroine.footOffset
+      - diagnostics.heroine.roadLift,
+    5,
+  );
+  expect(diagnostics.heroine.hitbox.groundLocalY - diagnostics.heroine.renderedFeetLocalY).toBeCloseTo(10, 5);
+  expect(diagnostics.heroine.hierarchical).toBe(true);
+  expect(diagnostics.heroine.hierarchy.acyclic).toBe(true);
+  expect(diagnostics.heroine.hierarchy.cycles).toEqual([]);
+  expect(diagnostics.heroine.hierarchy.missingParents).toEqual([]);
+  expect(diagnostics.heroine.hierarchy.roots).toEqual(['pelvis']);
+  expect(diagnostics.heroine.hierarchy.reachesPelvis).toBe(true);
+  expect(diagnostics.heroine.hierarchy.chains).toEqual([
+    ['pelvis', 'torso', 'head'],
+    ['pelvis', 'thigh-far', 'shin-far', 'boot-far'],
+    ['pelvis', 'thigh-near', 'shin-near', 'boot-near'],
+    ['torso', 'upper-arm-far', 'forearm-far'],
+    ['torso', 'upper-arm-near', 'forearm-cannon-near'],
+  ]);
+  expect(diagnostics.heroine.muzzle).toEqual({
+    part: 'forearm-cannon-near',
+    point: [156, 297],
+  });
+  expect(Number.isFinite(diagnostics.heroine.renderedMuzzle.x)).toBe(true);
+  expect(Number.isFinite(diagnostics.heroine.renderedMuzzle.y)).toBe(true);
+  expect(diagnostics.heroine.cannonBaseRotation).toBeCloseTo(-2.16, 5);
   const zValues = diagnostics.heroine.zOrder.map(entry => entry.z);
   expect(zValues).toEqual([...zValues].sort((left, right) => left - right));
   expect(diagnostics.activeArenaId).toBe('rammer');
@@ -46,6 +74,25 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
     scrollWidth: document.documentElement.scrollWidth
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.width + 1);
+
+  const idleMuzzle = await page.evaluate(() => {
+    window.__GEARSTORM_QA__.launchBoss('rammer', { phase: 1 });
+    window.__GEARSTORM_QA__.skipIntro();
+    return window.__GEARSTORM_QA__.getRigDiagnostics().heroine.renderedMuzzle;
+  });
+  await page.keyboard.down('KeyJ');
+  await page.waitForFunction(() => {
+    const pose = window.__GEARSTORM_QA__.getRigDiagnostics().heroine.poseState;
+    return pose && pose.aim > 0 && pose.recoil > 0;
+  });
+  const firingRig = await page.evaluate(() => window.__GEARSTORM_QA__.getRigDiagnostics().heroine);
+  await page.keyboard.up('KeyJ');
+  expect(firingRig.poseState.aim).toBeGreaterThan(0);
+  expect(firingRig.poseState.recoil).toBeGreaterThan(0);
+  expect(Math.hypot(
+    firingRig.renderedMuzzle.x - idleMuzzle.x,
+    firingRig.renderedMuzzle.y - idleMuzzle.y,
+  )).toBeGreaterThan(0.1);
 
   const forgeOffset = await page.evaluate(() => {
     window.__GEARSTORM_QA__.launchBoss('bastion-ricochet', { phase: 1 });

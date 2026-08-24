@@ -42,7 +42,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     invariant(headerValue(vercel, source, 'Cache-Control') === 'public, max-age=0, must-revalidate', `Revalidation requise : ${source}.`);
   }
   invariant(headerValue(vercel, '/sw.js', 'Service-Worker-Allowed') === '/', 'Scope du service worker absent.');
-  invariant(headerValue(vercel, '/pwa-update-v2.9.0.js', 'Cache-Control') === 'public, max-age=31536000, immutable', 'Bootstrap PWA versionne non immutable.');
+  invariant(headerValue(vercel, '/pwa-update-v2.9.1.js', 'Cache-Control') === 'public, max-age=31536000, immutable', 'Bootstrap PWA versionne non immutable.');
   invariant(headerValue(vercel, `/assets/generated/v${ASSET_RELEASE}/(.*)`, 'Cache-Control') === 'public, max-age=31536000, immutable', 'Cache immutable assets absent.');
 
   invariant(serviceWorker.includes(`const APP_VERSION = '${APP_RELEASE}'`), 'Version application du service worker incoherente.');
@@ -58,7 +58,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(coreBlock.includes("'./story.js'"), 'Le registre narratif doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./expansion-story.js'"), 'Le registre narratif Forge doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./boss-roster.js'"), 'Le roster des 30 boss doit faire partie du shell PWA.');
-  invariant(coreBlock.includes("'./pwa-update-v2.9.0.js'"), 'Le bootstrap de migration PWA doit faire partie du shell.');
+  invariant(coreBlock.includes("'./pwa-update-v2.9.1.js'"), 'Le bootstrap de migration PWA doit faire partie du shell.');
   invariant(coreBlock.includes(`assets/generated/v\${ASSET_VERSION}/asset-manifest.json`), 'Catalogue assets absent du shell PWA.');
   invariant(!/\.webp[\x60'"]/.test(coreBlock), 'Les WebP runtime ne doivent pas etre precaches.');
   const installBlock = serviceWorker.slice(serviceWorker.indexOf("self.addEventListener('install'"), serviceWorker.indexOf("self.addEventListener('activate'"));

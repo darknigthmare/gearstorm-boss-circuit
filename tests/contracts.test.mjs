@@ -24,7 +24,7 @@ const [html, css, story, expansionStorySource, game, bossRosterSource, readme, d
   readFile('DESIGN.md', 'utf8'),
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
-  readFile('assets/generated/v2.9.0/asset-manifest.json', 'utf8').then(JSON.parse),
+  readFile('assets/generated/v2.9.1/asset-manifest.json', 'utf8').then(JSON.parse),
 ]);
 
 const rosterContext = {};
@@ -133,7 +133,7 @@ test('la passe meta v2.9 reste visible dans la Forge et les quatre tableaux narr
     assert.match(html, new RegExp(`id=["']${id}["']`));
   }
   for (const filename of ['intro-broadcast', 'prologue-m0', 'campaign-ending', 'forge-ending']) {
-    assert.match(css, new RegExp(`assets/generated/v2\\.9\\.0/narrative/${filename}\\.webp`));
+    assert.match(css, new RegExp(`assets/generated/v2\\.9\\.1/narrative/${filename}\\.webp`));
   }
   const expansion = rosterContext.GEARSTORM_EXPANSION_STORY;
   assert.equal(expansion.bosses.length, 24);
@@ -170,14 +170,18 @@ test('le rig anatomique OpenAI v2.9 de Riva garde treize pieces et un contact vi
   assert.match(game, /rigParts\.length === 15/);
   assert.match(game, /anatomyParts\.length === 13/);
   assert.match(game, /const RIVA_RENDER_SCALE = 1\.10/);
+  assert.match(game, /const RIVA_ROAD_LIFT = 10/);
   assert.match(game, /const RIVA_FOOT_OFFSET = 3\.6/);
-  assert.match(game, /assets\/generated\/v2\.9\.0\/asset-manifest\.json/);
+  assert.match(game, /assets\/generated\/v2\.9\.1\/asset-manifest\.json/);
   assert.doesNotMatch(game, /body-core|firing-arm/);
   assert.match(game, /visualOffsetY/);
   const shadow = game.slice(game.indexOf('function drawPlayer()'), game.indexOf('const blink', game.indexOf('function drawPlayer()')));
-  assert.match(shadow, /ellipse\(player\.x, GROUND - 3, 28 \* shadowScale, 6 \* shadowScale/);
+  assert.match(shadow, /const shadowLift = heroArtReady\(\) \? RIVA_ROAD_LIFT : 0/);
+  assert.match(shadow, /ellipse\(player\.x, GROUND - 3 - shadowLift, 28 \* shadowScale, 6 \* shadowScale/);
   assert.match(shadow, /shadowBlur = 4/);
   assert.doesNotMatch(shadow, /ctx\.stroke\(\)/);
+  assert.doesNotMatch(game, /if \(blink[^\n]+return/);
+  assert.match(game, /if \(blink\) ctx\.globalAlpha = player\.dashTime > 0 \? 0\.72 : 0\.46/);
 });
 
 test('le registre data-driven livre les 30 boss et les 24 contrats Forge', () => {
@@ -228,7 +232,7 @@ test('le registre data-driven livre les 30 boss et les 24 contrats Forge', () =>
   }
   assert.equal(mechanicIds.size, 24);
   assert.equal(signatureStates.size, 72);
-  assert.equal(artManifest.release, '2.9.0');
+  assert.equal(artManifest.release, '2.9.1');
 });
 
 test('les huit familles ont des boucles, telegraphes et handlers distincts', () => {
@@ -466,9 +470,11 @@ test('le récit de campagne reste distinct du Laboratoire', () => {
 
   assert.match(game, /snapshot\.bossIndex \+ 2/);
   assert.doesNotMatch(game, /snapshot\.bossIndex - FORGE_START_INDEX \+ 2/);
-  assert.match(html, /Campagne · machines débloquées/);
-  assert.match(html, /Catalogue intégral donne accès aux 30 boss/);
-  assert.match(bossRosterSource, /Boss final du Circuit Forge : trois phases annoncées/);
+  assert.match(html, /Campagne · boss déjà débloqués/);
+  assert.match(html, /Le Catalogue intégral permet de choisir librement parmi les 30 boss/);
+  assert.match(bossRosterSource, /Arbitre final déjà visible dans le Catalogue/);
+  assert.match(bossRosterSource, /renvoyer les charges, choisir l’ordre des modules, puis rompre sa posture/);
+  assert.doesNotMatch(html, /<strong>\s*Syst[eè]me\s*<\/strong>/iu);
 
   const introBlock = game.slice(game.indexOf('function configureIntro'), game.indexOf('function startMasteryCycle'));
   assert.match(introBlock, /runMode === 'rush'/);
