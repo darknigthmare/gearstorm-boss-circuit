@@ -10,7 +10,7 @@
 - Archivage permanent des 24 interludes et `metaLine` Forge dans le Codex, structurés autour des quatre anneaux et repris dans les résultats de combat.
 - Extension du ton méta aux surfaces de jeu et de narration ; les tutoriels, aides, objectifs critiques et libellés d’accessibilité restent explicites et non méta.
 - La sauvegarde reste en schéma v5 et les 30 boss, 90 phases et 90 contrats restent stables.
-- Cette entrée décrit l’état source du candidat ; elle ne certifie ni QA finale, ni commit, ni push, ni déploiement public.
+- Release validée par 75/75 tests Node, 13 parcours Chromium réussis, audit npm sans vulnérabilité, GitHub Actions vert et déploiement Vercel Ready.
 
 ## 2.8.0 — Circuit fiable
 

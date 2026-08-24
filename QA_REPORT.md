@@ -1,10 +1,10 @@
 # Rapport QA — GEARSTORM: Boss Circuit 2.9.0
 
-Préparation du candidat : 24 août 2026.
+Validation finale : 24 août 2026.
 
-## Statut du candidat v2.9.0 — validation en attente
+## Statut v2.9.0 — validée, poussée et publiée
 
-Aucune réussite de gate, CI, commit, push ou publication Vercel n’est revendiquée ici pour la v2.9.0. Le manifeste et les sources ont seulement été relus statiquement pendant la préparation documentaire.
+La release v2.9.0 a été vérifiée localement, poussée sur `main`, validée par GitHub Actions sous Node 22 et publiée sur Vercel. Les résultats ci-dessous sont ceux réellement observés sur l’état final.
 
 | Surface v2.9 | État au moment de cette mise à jour |
 | --- | --- |
@@ -13,11 +13,13 @@ Aucune réussite de gate, CI, commit, push ou publication Vercel n’est revendi
 | Rig Riva | Manifeste : 13 pièces anatomiques + 2 effets, `rootOffsetY = -23.6`, `feetLocalY = 36` |
 | Perspective | Sol physique 620 ; offsets visuels campagne `+80`, Forge `+28` |
 | Contenu | 24 interludes, 24 `metaLine` et quatre anneaux présents dans les registres/surfaces |
-| Tests Node / build / audit npm | À exécuter sur l’état final assemblé |
-| QA navigateur et captures finales | À exécuter |
-| GitHub / CI / Vercel / HTTP public | Non vérifiés pour v2.9.0 |
+| Tests Node / build / audit npm | `npm run qa` réussi ; 75/75 tests Node ; build 30 boss / 90 phases / 233 WebP / 90 contrats ; `npm audit` : 0 vulnérabilité |
+| QA navigateur et captures finales | CI Chromium desktop/mobile : 13 réussis, 1 ignoré ; audit Chrome direct : 19 états finaux en 1440 × 900 et 390 × 844, plus captures de rig en 1280 × 720 |
+| GitHub / CI | Correctif runtime `1e31ebb` sur `main` ; workflow `32779812750` réussi en 2 min 22 s |
+| Vercel | Déploiement `dpl_37u6NAS5dYnb8Jy8zhGTmBCzR5oy` Ready ; alias `https://gearstorm-boss-circuit.vercel.app` |
+| HTTP public | Racine, manifeste, pièce de Riva, illustration narrative, bootstrap PWA et service worker : HTTP 200 avec types, caches et en-têtes attendus |
 
-Cette lecture statique ne prouve ni le contact visuel final de Riva, ni l’absence de régression, ni le comportement PWA. Les résultats v2.9 devront être ajoutés après exécution réelle des gates.
+Le contact de Riva est couvert par le manifeste, les tests alpha/rig et les captures finales ; la PWA est couverte par les contrats Node et le parcours Chromium hors ligne de la CI. Restent hors preuve : appareils physiques, lecteur d’écran réel, Firefox/WebKit sur cette release et playtests humains prolongés.
 
 ---
 

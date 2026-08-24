@@ -15,12 +15,12 @@ Ouvrir ensuite `http://127.0.0.1:8080`. Sous Windows, `LANCER_LE_JEU.bat` lance 
 
 Le mode `file://` reste un repli jouable, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
 
-## Cibles de publication
+## Publication vérifiée
 
-- Dépôt GitHub prévu : https://github.com/darknigthmare/gearstorm-boss-circuit
-- URL Vercel prévue : https://gearstorm-boss-circuit.vercel.app
+- Dépôt GitHub : https://github.com/darknigthmare/gearstorm-boss-circuit
+- Jeu public Vercel : https://gearstorm-boss-circuit.vercel.app
 
-Ces identifiants décrivent les cibles du projet. Ce document ne confirme ni l’état Git distant, ni un déploiement Vercel, ni la disponibilité publique du candidat v2.9.0.
+La v2.9.0 est publiée depuis `main`. La CI GitHub Actions et le déploiement Vercel Ready ont été vérifiés le 24 août 2026 ; les preuves détaillées sont consignées dans `QA_REPORT.md`.
 
 ## Passe v2.9.0 — perspective, art séparé et contenu méta
 
@@ -126,7 +126,7 @@ Sur mobile portrait, le jeu affiche un conseil d’orientation : le paysage rest
 
 Le CSS contient les variantes `prefers-reduced-motion` et `prefers-contrast`, des cibles tactiles et une recommandation paysage en portrait. Le runtime garde aussi des réglages manuels prioritaires.
 
-Le dépôt contient un workflow CI Node 22.x. Playwright exécute par défaut Chromium desktop et un profil mobile tactile ; Firefox et WebKit sont configurés en opt-in, sans exécution revendiquée dans cette revue.
+Le workflow CI Node 22.x a réussi sur la v2.9.0. Playwright a exécuté Chromium desktop et un profil mobile tactile ; Firefox et WebKit restent configurés en opt-in et n’ont pas été exécutés pour cette release.
 
 Le fichier `tests/e2e/forge.spec.mjs` couvre :
 
@@ -143,17 +143,17 @@ Le fichier `tests/e2e/accessibility.spec.mjs` couvre en Chromium :
 - la navigation de menu par Gamepad API simulée ;
 - le rechargement hors ligne d’un shell déjà installé.
 
-Ces fichiers décrivent une couverture automatisée, pas une QA finale. Ils ne remplacent pas les tests matériels de manette, tactile, lecteur d’écran ou mobile bas de gamme. Le consentement face à un worker réellement `waiting` reste couvert par les contrats Node, pas par un E2E navigateur ; les six manches complètes d’ENDURANCE ENGINE ne sont pas encore parcourues en E2E. Firefox et WebKit restent configurés mais non exécutés dans cette revue.
+La CI v2.9 a exécuté 13 parcours Chromium avec succès et en a ignoré un conformément à sa garde. Ils ne remplacent pas les tests matériels de manette, tactile, lecteur d’écran ou mobile bas de gamme. Le consentement face à un worker réellement `waiting` reste couvert par les contrats Node, pas par un E2E navigateur ; les six manches complètes d’ENDURANCE ENGINE ne sont pas encore parcourues en E2E. Firefox et WebKit restent configurés mais non exécutés pour cette release.
 
 ## Qualité et build
 
-La porte de qualité prévue est :
+La porte de qualité exécutée localement et en CI est :
 
 ```text
 npm run qa
 ```
 
-La matrice Chromium prévue est :
+La matrice Chromium exécutée en CI est :
 
 ```text
 npm run test:e2e
@@ -165,7 +165,7 @@ La matrice Firefox/WebKit reste opt-in :
 npm run test:e2e:cross-browser
 ```
 
-Les contrôles ciblés restent `npm test`, `npm run build` et `npm run check:release`. `QA_REPORT.md` est réservé aux validations réellement exécutées ; ce README ne certifie ni QA finale ni déploiement.
+Les contrôles ciblés restent `npm test`, `npm run build` et `npm run check:release`. `QA_REPORT.md` consigne les validations réellement exécutées, la CI verte, le déploiement Ready et les limites de preuve matérielle.
 
 ## Structure
 

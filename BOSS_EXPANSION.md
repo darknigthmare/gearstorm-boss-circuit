@@ -1,6 +1,6 @@
 # GEARSTORM — Contrat d’expansion des boss
 
-Statut du document : implémentation Forge v2.9 assemblée et feuille de raffinement ; QA finale en attente
+Statut du document : implémentation Forge v2.9 publiée ; QA locale, CI Chromium et Vercel vérifiés le 24 août 2026
 
 Portée : 30 boss originaux jouables, dont 6 en campagne et 24 dans la Forge libre ou le Circuit Forge
 

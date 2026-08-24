@@ -1,7 +1,7 @@
 # Audit professionnel du jeu — v2.9.0
 
 Date : 24 août 2026
-Portée : revue statique du code, des données, des documents, du manifeste artistique et des surfaces de tests présentes dans le dépôt. Cet audit ne constitue ni une exécution finale de QA, ni un test matériel, ni une vérification de déploiement.
+Portée : revue du code, des données et du manifeste, exécution locale des gates, audit Chrome desktop/mobile, CI Chromium sous Node 22 et vérification du déploiement Vercel. Aucun test matériel n’est revendiqué.
 
 ## Verdict
 
@@ -26,7 +26,7 @@ Le jeu ne doit toutefois pas encore être qualifié de release commerciale maté
 | Art | Manifeste v2.9.0, 42 masters, 233 WebP runtime, 18 175 510 octets |
 | Audio | Web Audio synthétique, sans banque sonore distante |
 | E2E présents | Chromium desktop/mobile : rig, grille 30, matrice 24 × 3, checkpoint Forge, accessibilité, sauvegarde portable, Gamepad simulé et offline |
-| Publication | Non vérifiée dans cette revue |
+| Publication | Correctif runtime `1e31ebb` sur `main`, CI `32779812750` verte, Vercel Ready et alias public HTTP 200 |
 
 ## Corrigé dans la v2.9.0
 
@@ -37,7 +37,7 @@ Le jeu ne doit toutefois pas encore être qualifié de release commerciale maté
 - Contenu : 24 interludes et 24 `metaLine` persistants dans le Codex, panorama des quatre anneaux et transmission Forge au résultat.
 - Ton : surfaces de jeu et narration méta ; tutoriels, aide, accessibilité et objectifs critiques maintenus factuels.
 
-Ces points sont observés statiquement dans le candidat. Leur validation navigateur et leur publication restent à établir dans `QA_REPORT.md`.
+Ces points sont confirmés par les contrats automatisés, les diagnostics du rig, les captures Chrome finales, la CI et les contrôles HTTP consignés dans `QA_REPORT.md`.
 
 ## Fiabilité héritée de la v2.8.0
 
@@ -93,15 +93,15 @@ Ces points sont observés statiquement dans le candidat. Leur validation navigat
 - E2E Forge présents pour la grille de 30 boss, le rig de Riva, le débordement horizontal, les 72 lancements de phases et le premier checkpoint.
 - E2E accessibilité présent pour le focus clavier, les cibles de 44 CSS px, l’export téléchargé, l’import normalisé, les préférences système first-run, le Gamepad simulé et le rechargement offline.
 - Contrats Node présents pour le consentement PWA face à un worker `waiting`.
-- Workflow GitHub Actions prévu pour Node 22.x, QA, navigateur et audit de dépendances.
+- Workflow GitHub Actions exécuté sous Node 22.x pour QA, navigateur et audit de dépendances.
 
-L’existence de ces fichiers ne prouve pas qu’ils ont tous réussi sur le candidat v2.9.0.
+Sur l’état final v2.9.0, la CI a exécuté 75/75 tests Node et 13 parcours Chromium réussis avec un test ignoré ; l’audit npm n’a trouvé aucune vulnérabilité.
 
 ## Risques restant — P0
 
-Aucun bloqueur gameplay P0 supplémentaire n’a été démontré par cette revue statique dans le périmètre corrigé.
+Aucun bloqueur gameplay P0 supplémentaire n’a été démontré après les gates locales, la CI Chromium et les vérifications publiques du périmètre corrigé.
 
-La release reste cependant non certifiable tant que les portes réelles n’ont pas été exécutées sur l’état final assemblé : vérification syntaxique, tests Node, build, contrôle de release, E2E navigateur, audit de dépendances, inspection responsive, puis état Git et déploiement public. Ce sont des preuves de sortie manquantes, pas une affirmation de bug.
+La release logicielle est validée et publiée. Une qualification matérielle complète reste distincte : manettes réelles, appareils tactiles, lecteurs d’écran, Safari/iOS, Android bas de gamme et sessions de jeu prolongées ne sont pas couverts par cette sortie.
 
 ## Risques restant — P1
 
@@ -161,11 +161,11 @@ Action recommandée : ajouter des scénarios déterministes ciblés plutôt qu�
 1. Ajouter les E2E d’erreur d’import et du consentement face à un worker réellement en attente.
 2. Ajouter un test déterministe des manches 1 à 6 d’ENDURANCE ENGINE et des reprises `fight`/`upgrade`.
 3. Segmenter les records par mode, difficulté et version d’équilibrage.
-4. Exécuter la matrice automatisée sur l’état final et consigner uniquement les résultats observés.
+4. Conserver la matrice automatisée verte sur chaque changement de `main` et consigner uniquement les résultats observés.
 5. Tester tactile, manette, lecteur d’écran, paysage/portrait et performances sur matériel réel.
 6. Réaliser une passe audio et une passe de différenciation des boss guidées par les retours de jeu.
-7. Ne déclarer la publication terminée qu’après commit, push, déploiement prêt et requête HTTP publique vérifiée.
+7. Surveiller la publication Vercel et les en-têtes publics après chaque nouvelle version.
 
 ## Limites de preuve
 
-Cette révision de `GAME_AUDIT.md` remplace l’audit v2.5 devenu obsolète. Elle s’appuie sur les fichiers présents le 21 août 2026 et distingue explicitement code disponible, interface exposée et preuve exécutée. Aucun résultat de commande, statut GitHub, statut Vercel, test matériel ou disponibilité publique n’est revendiqué ici.
+Cette révision s’appuie sur l’état publié le 24 août 2026. Les commandes locales, la CI GitHub, Vercel Ready et les réponses HTTP publiques sont vérifiées ; les tests matériels, Firefox/WebKit et les playtests humains prolongés restent hors preuve.
