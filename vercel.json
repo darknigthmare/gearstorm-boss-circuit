@@ -140,7 +140,7 @@
       ]
     },
     {
-      "source": "/pwa-update-v2.9.1.js",
+      "source": "/pwa-update-v2.10.0.js",
       "headers": [
         {
           "key": "Cache-Control",
@@ -158,7 +158,7 @@
       ]
     },
     {
-      "source": "/assets/generated/v2.9.1/(.*)",
+      "source": "/assets/generated/v2.10.0/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

@@ -25,7 +25,7 @@ test('story.js est un script classique autonome, compatible VM sans DOM', () => 
   const story = loadStory();
   assert.ok(story, 'globalThis.GEARSTORM_STORY doit etre expose');
   assert.equal(story.schemaVersion, 1);
-  assert.equal(story.contentVersion, '2.9.1');
+  assert.equal(story.contentVersion, '2.10.0');
   assert.ok(Object.isFrozen(story));
   assert.ok(Object.isFrozen(story.acts));
   assert.ok(Object.isFrozen(story.acts[0].codex));
@@ -51,7 +51,7 @@ test('chaque acte fournit le contrat narratif complet', () => {
   const story = loadStory();
   for (const act of story.acts) {
     const label = `${act.bossId}/${act.id}`;
-    for (const field of ['bossName', 'district', 'civicFunction', 'narrativeBeat', 'rivaJournal', 'districtConsequence', 'restoration']) {
+    for (const field of ['bossName', 'district', 'civicFunction', 'narrativeBeat', 'rivaJournal', 'memoryFragment', 'districtConsequence', 'restoration']) {
       assert.equal(typeof act[field], 'string', `${label}: ${field} manquant`);
       const minimum = ['bossName', 'narrativeBeat'].includes(field) ? 3 : 12;
       assert.ok(act[field].trim().length > minimum, `${label}: ${field} incomplet`);
@@ -78,7 +78,7 @@ test('chaque acte fournit le contrat narratif complet', () => {
     assert.equal(act.interlude.length, 3, `${label}: interlude tripartite requis`);
     act.interlude.forEach((entry, index) => assertLine(entry, `${label}/interlude/${index}`));
     const interludeSpeakers = new Set(act.interlude.map(entry => entry.speaker));
-    for (const speaker of ['Riva', 'Cassian', 'Canal civil']) {
+    for (const speaker of ['Riva', 'Cassian', 'Nara Vey']) {
       assert.ok(interludeSpeakers.has(speaker), `${label}: voix ${speaker} absente de l'interlude`);
     }
 
@@ -116,13 +116,33 @@ test('introduction, prologue, revelation, contre-plan et epilogue ferment l arc'
   assert.deepEqual(Array.from(story.epilogue.districtRestorations, entry => entry.bossId), [...story.bossOrder]);
   assert.match(story.epilogue.cassianFate, /détention/i);
   assert.match(story.epilogue.rivaChoice, /refuse la Couronne/i);
-  assert.match(story.epilogue.lines.at(-1).text, /Pour ceux qui y vivent/);
+  assert.match(story.epilogue.lines.at(-1).text, /pour ceux qui y vivent/i);
 });
 
-test('le contrat meta diegetique couvre les surfaces narratives sans contaminer le Canal civil', () => {
+test('la bible relie Gearstorm, la Couronne provisoire, M-0 et les six voix', () => {
   const story = loadStory();
-  const metaVocabulary = /\b(?:boss|phases?|HUD|menu|pattern|checkpoint|script|build|Codex|générique|prologue|retries?|interface|joueuse|compteur|progression|cadre)\b|hors champ|barre de vie|écran de|meilleur temps|mise en scène|suite cachée|zone sûre/i;
-  const forbiddenCivilVocabulary = /\b(?:boss|phases?|HUD|menu|pattern|checkpoint|script|build|Codex|générique|retries?|interface|joueuse|progression)\b|barre de vie|mise en scène|suite cachée/i;
+  assert.match(story.intro.summary, /Gearstorm/);
+  assert.match(story.prologue.summary, /Nuit des Six Extinctions/);
+  assert.match(story.glossary.crown, /provisoire/);
+  assert.match(story.glossary.sixExtinctions, /Gearstorm/);
+  assert.match(story.characters.riva.arc, /Cofondatrice involontaire|culpabilité/);
+  assert.match(story.characters.cassian.arc, /refuse la fin de son mandat/);
+  assert.match(story.characters.nara.role, /réseau civil|Régulatrice/);
+  assert.equal(new Set(Object.values(story.characters).map(character => character.credo)).size, 3);
+  assert.deepEqual(Array.from(story.intro.lines, entry => entry.speaker), ['Cassian', 'Nara Vey', 'Riva']);
+
+  for (const act of story.acts) {
+    assert.match(act.memoryFragment, /M-0|COURONNE|ARCHIVE|PROCÈS-VERBAL/);
+  }
+  assert.match(story.getActByOrder(4).rivaJournal, /modèle capable d’anticiper une panne/);
+  assert.match(story.getActByOrder(5).rivaJournal, /contre-phase M-0/);
+  assert.match(story.getActByOrder(6).rivaJournal, /six équipes/);
+});
+
+test('le contrat meta diegetique reste dans le monde et donne une voix propre à Nara', () => {
+  const story = loadStory();
+  const metaVocabulary = /\b(?:actes?|cadre|coulisses?|rôles?|scènes?|rappels?|rideau|répliques?|projecteurs?|public|auteur|final|fin|décor|montage|répétition|signature|diffuses?|texte|entrée|gradins?|spectacle)\b|hors champ|mise en scène/i;
+  const forbiddenNarrativeVocabulary = /\b(?:boss|HUD|hitbox|checkpoint|retry|retries|build|spam|frame|interface|menu|pattern|joueuse|compteur|progression|système)\b|barre de vie|level design|phase (?:deux|trois|\d)/i;
 
   assert.match(story.intro.lines.map(entry => entry.text).join(' '), metaVocabulary);
   assert.match(story.prologue.lines.map(entry => entry.text).join(' '), metaVocabulary);
@@ -148,12 +168,14 @@ test('le contrat meta diegetique couvre les surfaces narratives sans contaminer 
       .toLowerCase();
     assert.notEqual(normalizedSpeaker, 'systeme', 'aucune voix générique Système ne doit parler au joueur');
     assert.notEqual(entry.channel, 'system', 'aucun canal narratif générique system ne doit subsister');
+    assert.doesNotMatch(entry.text, forbiddenNarrativeVocabulary, `${entry.speaker}: jargon technique dans le dialogue`);
   }
 
   for (const act of story.acts) {
     const label = act.bossId;
     assert.match(act.preFight.map(entry => entry.text).join(' '), metaVocabulary, `${label}: pre-combat non meta`);
-    assert.match(act.rivaJournal, metaVocabulary, `${label}: journal non meta`);
+    assert.ok(act.rivaJournal.length > 100, `${label}: journal trop faible`);
+    assert.doesNotMatch(act.rivaJournal, forbiddenNarrativeVocabulary, `${label}: journal trop technique`);
     assert.match(
       act.interlude.find(entry => entry.speaker === 'Riva')?.text || '',
       metaVocabulary,
@@ -166,15 +188,19 @@ test('le contrat meta diegetique couvre les surfaces narratives sans contaminer 
         `${label}: transition ${transition.toPhase} non meta`
       );
     }
-    const civilLine = act.interlude.find(entry => entry.speaker === 'Canal civil');
-    assert.ok(civilLine, `${label}: Canal civil absent`);
-    assert.doesNotMatch(civilLine.text, forbiddenCivilVocabulary, `${label}: Canal civil doit rester premier degre`);
+    const civilLine = act.interlude.find(entry => entry.speaker === 'Nara Vey');
+    assert.ok(civilLine, `${label}: Nara Vey absente`);
+    assert.equal(civilLine.channel, 'civil');
+    assert.doesNotMatch(civilLine.text, forbiddenNarrativeVocabulary, `${label}: Nara doit rester diégétique`);
   }
 });
 
 test('les objectifs et methodes restent litteraux malgre la couche meta', () => {
   const story = loadStory();
-  assert.equal(story.prologue.objective, 'Réactiver les six relais de sécurité et reprendre la Couronne.');
+  assert.equal(story.prologue.objective, 'Réactiver les six relais de sécurité et révoquer le mandat de la Couronne.');
+  assert.match(story.epilogue.summary, /mandat de la Couronne est aboli/);
+  assert.match(story.glossary.crown, /est abolie/);
+  assert.doesNotMatch(story.epilogue.summary, /rend la Couronne à son rôle provisoire/);
   assert.equal(story.prologue.method, 'Lire · Esquiver · Exposer · Surcharger');
   for (const act of story.acts) {
     for (const contract of act.masteryContracts) {
@@ -186,6 +212,11 @@ test('les objectifs et methodes restent litteraux malgre la couche meta', () => 
 test('les textes corrigent les incoherences de lore et correspondent aux mecaniques annoncees', () => {
   const story = loadStory();
   const serialized = JSON.stringify(story).toLocaleLowerCase('fr-FR');
+  assert.match(serialized, /gearstorm/);
+  assert.match(serialized, /nuit des six extinctions/);
+  assert.match(serialized, /couronne provisoire/);
+  assert.match(serialized, /modèle adaptatif/);
+  assert.match(serialized, /nara vey/);
   for (const forbidden of [
     /six réacteurs/,
     /quatre marteaux/,

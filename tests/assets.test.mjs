@@ -13,6 +13,7 @@ import {
   NARRATIVE_NAMES,
   RIVA_ANATOMY_PART_NAMES,
   RIVA_EFFECT_PART_NAMES,
+  RIVA_HEAD_DROP_Y,
   RIVA_KINEMATIC_CHAINS,
   RIVA_PARENT_BY_PART,
   RIVA_PART_NAMES,
@@ -23,7 +24,7 @@ import {
 
 const runtimePromise = validateRuntimeAssets();
 
-test('le catalogue v2.9 contient exactement les 233 assets attendus', async () => {
+test('le catalogue v2.10 contient exactement les 233 assets attendus', async () => {
   const runtime = await runtimePromise;
   assert.equal(runtime.manifest.release, ASSET_RELEASE);
   assert.equal(runtime.entries.length, EXPECTED_COUNTS.runtimeFiles);
@@ -97,9 +98,11 @@ test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion 
   assert.deepEqual(heroine.rig.ground, { physicalY: 620, localY: 36 });
   assert.deepEqual(heroine.rig.muzzle, {
     part: 'forearm-cannon-near',
-    point: [156, 297],
+    point: [149, 297],
   });
   assert.ok(heroine.rig.rootOffsetY < 0);
+  assert.equal(RIVA_HEAD_DROP_Y, 4);
+  assert.equal(heroine.rig.headDropY, RIVA_HEAD_DROP_Y);
   const measuredFeet = Math.max(...heroine.rig.parts
     .filter(part => RIVA_ANATOMY_PART_NAMES.includes(part.name))
     .map(part => part.joint[1] + (part.bbox[1] + part.bbox[3] - part.pivot[1]) * part.scale));
@@ -110,6 +113,8 @@ test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion 
   assert.ok(heroine.rig.parts.every(part => part.bbox[2] > 0 && part.bbox[3] > 0 && part.coveragePixels >= 64));
 
   const specs = new Map(heroine.rig.parts.map(part => [part.name, part]));
+  assert.equal(specs.get('head').joint[1] - heroine.rig.rootOffsetY, -70 + RIVA_HEAD_DROP_Y);
+  assert.equal(specs.get('head').joint[1] - specs.get('torso').joint[1], -48);
   const anatomyRoots = RIVA_ANATOMY_PART_NAMES.filter(name => specs.get(name).parent === null);
   assert.deepEqual(anatomyRoots, ['pelvis']);
   assert.deepEqual(
@@ -160,8 +165,10 @@ test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion 
 
 test('le runtime applique la hierarchie, le muzzle articule et la montee route de 10 px', async () => {
   const game = await readFile('game.js', 'utf8');
+  const generator = await readFile('scripts/process-openai-art.py', 'utf8');
   assert.equal(RIVA_ROAD_LIFT, 10);
   assert.match(game, /const RIVA_ROAD_LIFT = 10;/);
+  assert.match(game, /const RIVA_CANNON_RECOIL = 12;/);
   assert.match(game, /function resolveHeroRigPose\(/);
   assert.match(game, /const parentPose = parentSpec \? resolve\(parentSpec\) : null;/);
   assert.match(game, /rotation \+= parentPose\.rotation;/);
@@ -169,6 +176,10 @@ test('le runtime applique la hierarchie, le muzzle articule et la montee route d
   assert.match(game, /const snapshot = resolveHeroRigPose\(rigParts\);/);
   assert.match(game, /pose\.joint\[0\] \+ endpoint\.x/);
   assert.match(game, /RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT/);
+  assert.match(game, /pose\.x = -animation\.recoil \* RIVA_CANNON_RECOIL;/);
+  assert.match(game, /spawnDust\(player\.x, GROUND - \(heroArtReady\(\) \? RIVA_ROAD_LIFT : 0\), 7\);/);
+  assert.match(generator, /RIVA_HEAD_DROP_Y = 4/);
+  assert.match(generator, /contract\["joint"\]\[1\] \+ \(RIVA_HEAD_DROP_Y if part == "head" else 0\)/);
 });
 
 test('les 4 visuels narratifs OpenAI sont opaques, 16:9 et traces', async () => {
@@ -180,7 +191,7 @@ test('les 4 visuels narratifs OpenAI sont opaques, 16:9 et traces', async () => 
   assert.equal(new Set(narrative.map(asset => asset.src)).size, EXPECTED_COUNTS.narrative);
   assert.equal(new Set(narrative.map(asset => asset.source.masterFile)).size, EXPECTED_COUNTS.narrative);
   for (const name of NARRATIVE_NAMES) {
-    assert.equal(runtime.manifest.narrative[name].src, `assets/generated/v2.9.1/narrative/${name}.webp`);
+    assert.equal(runtime.manifest.narrative[name].src, `assets/generated/v2.10.0/narrative/${name}.webp`);
     assert.equal(runtime.manifest.narrative[name].source.masterFile, `assets/generated/narrative-v2.9-sources/${name}-openai-v1.png`);
   }
 });
@@ -193,7 +204,7 @@ test('les 42 masters OpenAI sont traces mais jamais publies', async () => {
   assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('riva-') && master.promptId.includes('v2.9')).length, 14);
   assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('narrative-')).length, 4);
   assert.ok(runtime.files.includes(ASSET_MANIFEST_PATH));
-  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.9.1/')));
+  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.10.0/')));
   assert.ok(runtime.entries.every(entry => entry.src.endsWith('.webp')));
   assert.ok(runtime.masterFiles.every(file => file.endsWith('.png') && !runtime.files.includes(file)));
   assert.ok(runtime.entries.every(entry => !/assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources|riva-v2\.9-sources|narrative-v2\.9-sources)\//.test(entry.src)));

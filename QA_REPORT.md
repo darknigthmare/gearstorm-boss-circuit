@@ -1,3 +1,56 @@
+# Rapport QA — GEARSTORM: Boss Circuit 2.10.0
+
+Validation locale réalisée le 25 août 2026.
+
+## Statut v2.10.0 — gates locales réussies, publication distante en attente
+
+Le candidat v2.10.0 a franchi les gates locales et l’audit Chrome décrits ci-dessous. Aucun commit, push, résultat GitHub Actions, identifiant Vercel ni contrôle HTTP public v2.10 n’est encore revendiqué : la publication distante attend la gate finale.
+
+| Surface v2.10 | Résultat observé |
+| --- | --- |
+| Vérification complète | `npm run qa` réussi |
+| Tests Node | **84/84 réussis** |
+| Build | 30 boss, 90 phases, 233 WebP et 90 contrats |
+| Inventaire artistique | **18 175 510 octets** |
+| Taille de `dist/` | **21 735 065 octets** |
+| Audit npm | **0 vulnérabilité** |
+| Hygiène du diff | `git diff --check` propre hors avertissements de conversion CRLF |
+| Audit Chrome | agent-browser, desktop 1440 × 900 et mobile 412 × 915 |
+| Captures | 12 états avant correction et 12 états après correction |
+| Accessibilité automatisée | axe : 0 violation sur le Codex desktop et le combat mobile ; contraste du gradient Canvas seulement indéterminé |
+| Runtime navigateur | console, erreurs de page et erreurs réseau observées : aucune |
+| Publication GitHub / CI / Vercel | **En attente de la gate finale** |
+
+## Vérifications fonctionnelles v2.10
+
+- Le parcours de focus combat → pause → titre → Options → retour rend le focus à `#settings`, hors de tout ancêtre `inert`.
+- Le diagnostic du canon donne une erreur angulaire maximale d’environ `1,32 × 10⁻16`, un museau `[149, 297]` et un recul de `12 px` local, soit `13,2 px` Canvas.
+- Le placement de Riva conserve `roadLift = 10`, `headDrop = 4` et une poussière de contact à `y = 610`.
+- L’asset proche `forearm-cannon-near` est une pièce combinée avant-bras–canon ; la documentation ne le compte pas comme deux segments séparés.
+- Les sauvegardes contradictoires sont normalisées, une v5 corrompue peut retomber sur une v4 valide, les checkpoints finaux impossibles sont assainis et une migration chargée reste utilisable si la persistance dépasse le quota.
+- Un échec de `cache.put` ne masque plus une réponse réseau valide. Le cache raster garde au plus trois bundles de boss et n’expulse pas le rig permanent de Riva.
+- Les voies sûres, les formes ordonnées de LOGIC CRUCIBLE, la réserve d’ORBITAL FAMINE et les environnements directionnels ajoutent texte, formes, numéros, hachures ou flèches à la couleur.
+- Cinq maîtrises contextuelles utilisent leur cause exacte : HIVE FOREMAN, ECHO FENCER, BREAKER ARRAY, FLOODLINE LEVIATHAN et VECTOR VAULT.
+
+## Cohérence narrative vérifiée
+
+La Couronne est abolie, Cassian reste détenu et M-0 devient publique, distribuée entre six équipes sans clé maîtresse. Le Circuit Forge est la suite canonique post-campagne ; le Catalogue des 30 machines est une simulation hors chronologie. Les archives proposent neuf transmissions relisibles, quatre révélations d’anneau, vingt-quatre journaux et soixante-douze voix de phase Forge.
+
+## Limites honnêtes
+
+- Aucun appareil tactile ou contrôleur physique, lecteur d’écran réel, Firefox ou WebKit n’a été testé pour cette release.
+- Le mobile portrait reste pris en charge mais le paysage demeure recommandé pour la largeur tactique.
+- Les records locaux ne sont pas segmentés par mode, difficulté et version d’équilibrage.
+- Les 24 arènes Forge restent monocouches.
+- Les 24 boss Forge conservent des rigs de quatre pièces spécialisés au-dessus de huit familles moteur partagées.
+- Le contraste exact du gradient de combat Canvas n’a pas pu être déterminé automatiquement par axe ; aucune violation déterministe n’a été remontée.
+
+Les preuves visuelles sont indexées dans [`docs/audits/v2.10.0/`](docs/audits/v2.10.0/README.md).
+
+---
+
+# Annexe historique — rapport QA v2.9.1 conservé intégralement
+
 # Rapport QA — GEARSTORM: Boss Circuit 2.9.1
 
 Validation finale : 25 août 2026.

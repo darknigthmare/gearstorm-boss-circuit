@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "assets" / "generated"
 RIVA_SOURCE_ROOT = SOURCE_ROOT / "riva-v2.9-sources"
 NARRATIVE_SOURCE_ROOT = SOURCE_ROOT / "narrative-v2.9-sources"
-ASSET_RELEASE = "v2.9.1"
+ASSET_RELEASE = "v2.10.0"
 OUTPUT_ROOT = SOURCE_ROOT / ASSET_RELEASE
 MANIFEST_PATH = OUTPUT_ROOT / "asset-manifest.json"
 
@@ -64,7 +64,8 @@ RIVA_PART_CONTRACTS = {
     "forearm-cannon-near": {"extent": 210, "pivotFraction": (0.78, 0.18), "joint": (29, -15), "parent": "upper-arm-near", "side": "near", "z": 70, "motion": "cannon-recoil"},
     "head": {"extent": 132, "pivotFraction": (0.68, 0.92), "joint": (0, -70), "parent": "torso", "side": "center", "z": 80, "motion": "head"},
 }
-RIVA_CANNON_MUZZLE_POINT = (156, 297)
+RIVA_CANNON_MUZZLE_POINT = (149, 297)
+RIVA_HEAD_DROP_Y = 4
 NARRATIVE = ("intro-broadcast", "prologue-m0", "campaign-ending", "forge-ending")
 NARRATIVE_LAYOUTS = {
     "intro-broadcast": {"focalPoint": {"x": 0.20, "y": 0.70}, "safeTextZone": {"x": 0.07, "y": 0.06, "width": 0.36, "height": 0.32}},
@@ -531,7 +532,10 @@ def main() -> None:
             "name": part,
             "parent": contract["parent"],
             "side": contract["side"],
-            "joint": list(contract["joint"]),
+            "joint": [
+                contract["joint"][0],
+                contract["joint"][1] + (RIVA_HEAD_DROP_Y if part == "head" else 0),
+            ],
             "pivot": geometry["pivot"],
             "bbox": geometry["bbox"],
             "scale": 0.30,
@@ -581,6 +585,7 @@ def main() -> None:
         "coordinateSpace": "player-local-pixels",
         "feetLocalY": 36,
         "rootOffsetY": root_offset_y,
+        "headDropY": RIVA_HEAD_DROP_Y,
         "ground": {"physicalY": 620, "localY": 36},
         "muzzle": {
             "part": "forearm-cannon-near",

@@ -56,11 +56,14 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
   ]);
   expect(diagnostics.heroine.muzzle).toEqual({
     part: 'forearm-cannon-near',
-    point: [156, 297],
+    point: [149, 297],
   });
   expect(Number.isFinite(diagnostics.heroine.renderedMuzzle.x)).toBe(true);
   expect(Number.isFinite(diagnostics.heroine.renderedMuzzle.y)).toBe(true);
-  expect(diagnostics.heroine.cannonBaseRotation).toBeCloseTo(-2.16, 5);
+  expect(diagnostics.heroine.cannonBaseRotation).toBeCloseTo(-2.1573086184800845, 10);
+  expect(diagnostics.heroine.cannonRecoil).toBe(12);
+  expect(Math.abs(diagnostics.heroine.renderedCannonAngle)).toBeLessThan(0.001);
+  expect(Math.abs(diagnostics.heroine.cannonAimError)).toBeLessThan(0.001);
   const zValues = diagnostics.heroine.zOrder.map(entry => entry.z);
   expect(zValues).toEqual([...zValues].sort((left, right) => left - right));
   expect(diagnostics.activeArenaId).toBe('rammer');
@@ -75,24 +78,39 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.width + 1);
 
-  const idleMuzzle = await page.evaluate(() => {
+  const cannonPoseAudit = await page.evaluate(() => {
     window.__GEARSTORM_QA__.launchBoss('rammer', { phase: 1 });
     window.__GEARSTORM_QA__.skipIntro();
-    return window.__GEARSTORM_QA__.getRigDiagnostics().heroine.renderedMuzzle;
+    const poses = [
+      { name: 'idle', pose: { vx: 0, vy: 0, onGround: true, anim: 0, poseAim: 0, poseRecoil: 0, poseLand: 0, dashTime: 0 } },
+      { name: 'recoil-only', pose: { vx: 0, vy: 0, onGround: true, anim: 0, poseAim: 0, poseRecoil: 1, poseLand: 0, dashTime: 0 } },
+      { name: 'run-forward', pose: { vx: 390, vy: 0, onGround: true, anim: Math.PI / 2, poseAim: 0, poseRecoil: 0, poseLand: 0, dashTime: 0 } },
+      { name: 'run-back', pose: { vx: 390, vy: 0, onGround: true, anim: Math.PI * 1.5, poseAim: 0, poseRecoil: 0, poseLand: 0, dashTime: 0 } },
+      { name: 'jump-rise', pose: { vx: 180, vy: -720, onGround: false, anim: 0, poseAim: 0, poseRecoil: 0, poseLand: 0, dashTime: 0 } },
+      { name: 'jump-fall', pose: { vx: 180, vy: 585, onGround: false, anim: 0, poseAim: 0, poseRecoil: 0, poseLand: 0, dashTime: 0 } },
+      { name: 'fire', pose: { vx: 0, vy: 0, onGround: true, anim: 0, poseAim: 1, poseRecoil: 1, poseLand: 0, dashTime: 0 } },
+      { name: 'dash', pose: { vx: 940, vy: 0, onGround: true, anim: Math.PI / 2, poseAim: 0, poseRecoil: 0, poseLand: 0, dashTime: 0.19 } },
+      { name: 'fire-dash-rise', pose: { vx: 940, vy: -720, onGround: false, anim: 0, poseAim: 1, poseRecoil: 1, poseLand: 0, dashTime: 0.19 } },
+    ];
+    return poses.map(entry => ({ name: entry.name, rig: window.__GEARSTORM_QA__.setHeroPoseState(entry.pose) }));
   });
-  await page.keyboard.down('KeyJ');
-  await page.waitForFunction(() => {
-    const pose = window.__GEARSTORM_QA__.getRigDiagnostics().heroine.poseState;
-    return pose && pose.aim > 0 && pose.recoil > 0;
-  });
-  const firingRig = await page.evaluate(() => window.__GEARSTORM_QA__.getRigDiagnostics().heroine);
-  await page.keyboard.up('KeyJ');
-  expect(firingRig.poseState.aim).toBeGreaterThan(0);
-  expect(firingRig.poseState.recoil).toBeGreaterThan(0);
-  expect(Math.hypot(
-    firingRig.renderedMuzzle.x - idleMuzzle.x,
-    firingRig.renderedMuzzle.y - idleMuzzle.y,
-  )).toBeGreaterThan(0.1);
+  for (const entry of cannonPoseAudit) {
+    expect(entry.rig, entry.name).toBeTruthy();
+    expect(Math.abs(entry.rig.renderedCannonAngle), entry.name).toBeLessThan(0.001);
+    expect(Math.abs(entry.rig.cannonAimError), entry.name).toBeLessThan(0.001);
+  }
+  const idleRig = cannonPoseAudit.find(entry => entry.name === 'idle').rig;
+  const firingRig = cannonPoseAudit.find(entry => entry.name === 'fire').rig;
+  const recoilRig = cannonPoseAudit.find(entry => entry.name === 'recoil-only').rig;
+  const runRig = cannonPoseAudit.find(entry => entry.name === 'run-forward').rig;
+  const jumpRig = cannonPoseAudit.find(entry => entry.name === 'jump-rise').rig;
+  expect(firingRig.poseState.aim).toBe(1);
+  expect(firingRig.poseState.recoil).toBe(1);
+  expect(recoilRig.poseState.recoil).toBe(1);
+  expect(idleRig.renderedMuzzle.x - recoilRig.renderedMuzzle.x).toBeCloseTo(13.2, 3);
+  expect(Math.abs(recoilRig.renderedMuzzle.y - idleRig.renderedMuzzle.y)).toBeLessThan(0.1);
+  expect(Math.hypot(runRig.renderedMuzzle.x - idleRig.renderedMuzzle.x, runRig.renderedMuzzle.y - idleRig.renderedMuzzle.y)).toBeGreaterThan(0.1);
+  expect(Math.hypot(jumpRig.renderedMuzzle.x - idleRig.renderedMuzzle.x, jumpRig.renderedMuzzle.y - idleRig.renderedMuzzle.y)).toBeGreaterThan(0.1);
 
   const forgeOffset = await page.evaluate(() => {
     window.__GEARSTORM_QA__.launchBoss('bastion-ricochet', { phase: 1 });

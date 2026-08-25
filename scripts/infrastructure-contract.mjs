@@ -42,7 +42,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     invariant(headerValue(vercel, source, 'Cache-Control') === 'public, max-age=0, must-revalidate', `Revalidation requise : ${source}.`);
   }
   invariant(headerValue(vercel, '/sw.js', 'Service-Worker-Allowed') === '/', 'Scope du service worker absent.');
-  invariant(headerValue(vercel, '/pwa-update-v2.9.1.js', 'Cache-Control') === 'public, max-age=31536000, immutable', 'Bootstrap PWA versionne non immutable.');
+  invariant(headerValue(vercel, `/pwa-update-v${APP_RELEASE}.js`, 'Cache-Control') === 'public, max-age=31536000, immutable', 'Bootstrap PWA versionne non immutable.');
   invariant(headerValue(vercel, `/assets/generated/v${ASSET_RELEASE}/(.*)`, 'Cache-Control') === 'public, max-age=31536000, immutable', 'Cache immutable assets absent.');
 
   invariant(serviceWorker.includes(`const APP_VERSION = '${APP_RELEASE}'`), 'Version application du service worker incoherente.');
@@ -58,7 +58,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(coreBlock.includes("'./story.js'"), 'Le registre narratif doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./expansion-story.js'"), 'Le registre narratif Forge doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./boss-roster.js'"), 'Le roster des 30 boss doit faire partie du shell PWA.');
-  invariant(coreBlock.includes("'./pwa-update-v2.9.1.js'"), 'Le bootstrap de migration PWA doit faire partie du shell.');
+  invariant(coreBlock.includes(`'./pwa-update-v${APP_RELEASE}.js'`), 'Le bootstrap de migration PWA doit faire partie du shell.');
   invariant(coreBlock.includes(`assets/generated/v\${ASSET_VERSION}/asset-manifest.json`), 'Catalogue assets absent du shell PWA.');
   invariant(!/\.webp[\x60'"]/.test(coreBlock), 'Les WebP runtime ne doivent pas etre precaches.');
   const installBlock = serviceWorker.slice(serviceWorker.indexOf("self.addEventListener('install'"), serviceWorker.indexOf("self.addEventListener('activate'"));
@@ -82,6 +82,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     'assets/generated/riva/',
     'assets/generated/vfx/',
     'assets/generated/PROVENANCE.md',
+    'assets/generated/v2.9.1/',
     'assets/generated/**/*.png',
   ]) {
     invariant(ignored.has(pattern), `.vercelignore incomplet : ${pattern}.`);
@@ -106,6 +107,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
     invariant(ci.includes(marker), `Contrat CI Linux absent : ${marker}.`);
   }
   invariant(ci.includes('name: gearstorm-web-v' + APP_RELEASE), 'Artefact CI non versionne sur la release application.');
+  invariant(ci.includes('name: gearstorm-playwright-v' + APP_RELEASE), 'Artefact Playwright CI non versionne sur la release application.');
   invariant(!ci.includes('pull_request_target'), 'pull_request_target est interdit pour cette CI.');
   invariant(!ci.includes('VERCEL_TOKEN'), 'La CI de validation ne doit pas exiger de secret de deploiement.');
 

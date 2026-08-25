@@ -42,14 +42,14 @@
     modules: {
       id: 'modules',
       label: 'RÉSEAU MODULAIRE',
-      loop: 'Détruire des pièces possédant chacune une hitbox et un état de dégâts.',
+      loop: 'Détruire des pièces possédant chacune un point d’impact et un état de dégâts.',
       telegraph: 'Anneau numéroté sur chaque pièce active et état intact/endommagé/détruit.',
       verbs: ['prioriser', 'démonter', 'exposer']
     },
     mimic: {
       id: 'mimic',
       label: 'DUEL MIMÉTIQUE',
-      loop: 'Varier tir, saut et ruée pour éviter une réponse spécialisée du boss.',
+      loop: 'Varier tir, saut et ruée pour éviter une réponse spécialisée de la machine.',
       telegraph: 'Action observée nommée avant que la réponse correspondante ne soit armée.',
       verbs: ['varier', 'observer', 'adapter']
     },
@@ -64,7 +64,7 @@
       id: 'gravity-weather',
       label: 'ENVIRONNEMENT PILOTÉ',
       loop: 'Composer avec un seul état de gravité, fluide, énergie ou météo à la fois.',
-      telegraph: 'Pictogramme, texte et impulsion sonore indépendants de la couleur.',
+      telegraph: 'Nom de l’état, zone annoncée et impulsion sonore indépendants de la couleur.',
       verbs: ['compenser', 'stabiliser', 'neutraliser']
     },
     'posture-duo': {
@@ -76,7 +76,7 @@
     },
     'puzzle-endgame': {
       id: 'puzzle-endgame',
-      label: 'LOGIQUE ET ENDGAME',
+      label: 'LOGIQUE ET ARBITRAGE',
       loop: 'Résoudre une courte séquence de formes pendant que la machine reste active.',
       telegraph: 'Formes, chiffres et trajectoires ; aucune information ne dépend de la couleur.',
       verbs: ['déduire', 'ordonner', 'survivre']
@@ -87,54 +87,54 @@
     {
       id: 'rammer', name: 'RIVET REX', epithet: 'Le bélier mono-roue à marteaux variables',
       color: '#ff8b42', accent: '#fff0a6', hp: 120, parTime: 44, arena: 'Rocade des Rivets',
-      quote: '« Riva Spark ! Trois phases, deux marteaux et absolument aucun frein. Admire le génie de Voltério ! »',
+      quote: '« Riva Spark ! J’ai donné deux marteaux à la Rocade et retiré tous ses freins. Appelle cela une entrée en scène. »',
       description: 'Charges, marteaux, mines et impacts sismiques.',
-      transmission: 'Le premier verrou du Circuit vient de céder. Voltério comprend enfin que tu n’es pas une variable de laboratoire.',
+      transmission: 'Nara Vey confirme le retour des convois : le premier verrou du Circuit vient de céder.',
       weakPoint: { x: 20, y: -42, r: 30, part: 'core' }, hitbox: { w: 190, h: 160 },
       patterns: [['patrol', 'slam'], ['patrol', 'slam', 'mines'], ['patrol', 'slam', 'seismic-mines']]
     },
     {
       id: 'kraken', name: 'SKY SLICER', epithet: 'Le rapace bombardier à géométrie variable',
       color: '#2bc9e8', accent: '#b7fbff', hp: 145, parTime: 52, arena: 'Couloir des Hautes-Tensions',
-      quote: '« Le ciel est mon laboratoire, Spark. Essaie donc d’esquiver une équation qui vole ! »',
+      quote: '« Le ciel n’est plus une route, Spark. C’est mon plafond, et chaque éclair y signe mon nom. »',
       description: 'Salves ioniques, lignes de foudre et condensateur exposé.',
-      transmission: 'Le brouillage aérien est tombé. Les districts du nord reçoivent de nouveau le signal de Riva.',
+      transmission: 'Le brouillage aérien est tombé. Nara relie de nouveau les voix des districts du nord.',
       weakPoint: { x: 0, y: 5, r: 34, part: 'core' }, hitbox: { w: 190, h: 160 },
       patterns: [['orbit', 'beam'], ['orbit', 'beam-grid'], ['orbit', 'beam-grid-cross']]
     },
     {
       id: 'drill', name: 'MAGNETRON', epithet: 'L’araignée magnétique qui replie l’arène',
       color: '#b777ff', accent: '#f2dcff', hp: 160, parTime: 58, arena: 'Fosse Ferromagnétique',
-      quote: '« Attraction, répulsion… et humiliation. La physique a déjà choisi son camp ! »',
+      quote: '« La Fosse ramène chacun à la place que je lui ai écrite. Même le métal connaît son rôle. »',
       description: 'Inversions de polarité, éruptions et débris magnétiques.',
-      transmission: 'Les rails d’évacuation sont libérés. Les habitants commencent à quitter les gradins forcés.',
+      transmission: 'Les rails d’évacuation sont libérés. Les habitants quittent les gradins forcés et reprennent les trains.',
       weakPoint: { x: 0, y: -56, r: 31, part: 'core' }, hitbox: { w: 190, h: 160 },
       patterns: [['burrow', 'erupt'], ['polarity', 'erupt'], ['polarity', 'erupt', 'debris']]
     },
     {
       id: 'mantis', name: 'CHRONO MANTIS', epithet: 'La mante temporelle aux lames déphasées',
       color: '#ff4f7b', accent: '#ffd0dc', hp: 175, parTime: 54, arena: 'Horloge de la Faille',
-      quote: '« J’ai ralenti le temps autour de toi. Techniquement, ta défaite dure déjà depuis plusieurs minutes. »',
+      quote: '« Je corrige l’heure, l’archive et le moment où tu croyais gagner. Qui contestera un instant que j’ai effacé ? »',
       description: 'Ruées, téléportations, engrenages et ralentissements.',
-      transmission: 'Les horloges du Circuit redémarrent. Voltério ne peut plus effacer les secondes où tu le dépasses.',
+      transmission: 'Les horloges redémarrent et six copies de l’archive circulent. Voltério ne peut plus retirer une seconde du récit.',
       weakPoint: { x: 0, y: -5, r: 31, part: 'core' }, hitbox: { w: 190, h: 160 },
       patterns: [['dash', 'blades'], ['dash', 'chrono-field'], ['dash', 'chrono-grid']]
     },
     {
       id: 'cyclotron', name: 'FOUNDRY TITAN', epithet: 'Le colosse-fonderie qui remodèle le sol',
       color: '#ffb12e', accent: '#fff0b7', hp: 205, parTime: 66, arena: 'Fournaise des Pistons',
-      quote: '« Mon Titan recycle une ville entière avant le petit-déjeuner. Toi, tu seras l’échantillon de démonstration. »',
+      quote: '« Tout ce que la ville fabrique finit dans ma Fournaise. Ta révolte en sortira frappée à mon nom. »',
       description: 'Pistons, lave, flammes et pluie de métal en fusion.',
-      transmission: 'La fonderie est froide. Pour la première fois, le Circuit n’est plus alimenté par la peur.',
+      transmission: 'La Fournaise refroidit. Cinq districts détiennent désormais chacun un fragment de la contre-phase M-0.',
       weakPoint: { x: 0, y: -12, r: 34, part: 'molten-core' }, hitbox: { w: 230, h: 160 },
       patterns: [['roll', 'bomb-rain'], ['roll', 'bomb-rain', 'piston'], ['roll', 'lava-line', 'crash']]
     },
     {
       id: 'omega', name: 'CROWN ENGINE Ω', epithet: 'La forteresse finale aux trois formes',
       color: '#8f78ff', accent: '#fff4ad', hp: 280, parTime: 82, arena: 'Citadelle Voltério',
-      quote: '« Toutes mes inventions, un seul trône, et moi au centre. La conclusion était inévitable ! »',
+      quote: '« Tes réponses, mes machines, un seul trône : tu as répété exactement la conclusion que j’avais écrite. »',
       description: 'Trois formes mêlant roquettes, grilles laser, débris magnétiques, chrono-pièges et mines.',
-      transmission: 'La Couronne est brisée. Le Circuit Voltério appartient de nouveau à ceux qui y vivent.',
+      transmission: 'Les six équipes révoquent ensemble la Couronne provisoire. Le Circuit appartient de nouveau à ceux qui y vivent.',
       weakPoint: { x: 0, y: 8, r: 39, part: 'omega-core' }, hitbox: { w: 190, h: 220 },
       patterns: [['arsenal', 'laser-grid'], ['arsenal', 'magnetic-grid'], ['arsenal', 'chrono-grid', 'core-open']]
     }
@@ -145,7 +145,7 @@
     { order: 8, id: 'hydraulic-warden', name: 'HYDRAULIC WARDEN', wave: 1, family: 'lure', arena: 'Chambre des Mors', hp: 165, parTime: 60, color: '#df5d49', accent: '#ffd0a3', partCount: 2, partRole: 'press-arm', patterns: ['single-ram', 'cross-press', 'fast-safe-press'], rule: 'Une zone de refuge reste visible et le télégraphe ne raccourcit jamais.' },
     { order: 9, id: 'hive-foreman', name: 'HIVE FOREMAN', wave: 1, family: 'modules', arena: 'Dépôt des Micro-Forges', hp: 170, parTime: 64, color: '#d9b83e', accent: '#fff4a8', partCount: 3, partRole: 'drone', patterns: ['guard-drone', 'repair-drone', 'ammo-drone'], rule: 'Une seule famille de drones est active par vague et sa fonction est nommée.' },
     { order: 10, id: 'echo-fencer', name: 'ECHO FENCER', wave: 1, family: 'mimic', arena: 'Salle de Répétition', hp: 160, parTime: 57, color: '#bd6cff', accent: '#f0ceff', patterns: ['echo-shot', 'echo-jump', 'echo-dash'], rule: 'La copie est annoncée ; aucune commande de Riva n’est désactivée.' },
-    { order: 11, id: 'breaker-array', name: 'BREAKER ARRAY', wave: 1, family: 'modules', arena: 'Station de Délestage', hp: 190, parTime: 68, color: '#5cc8e8', accent: '#c6f7ff', partCount: 4, partRole: 'module', patterns: ['free-order-modules', 'order-remix', 'mobile-modules'], rule: 'Les quatre modules ont des hitboxes et aucun ordre ne crée de choix perdant.' },
+    { order: 11, id: 'breaker-array', name: 'BREAKER ARRAY', wave: 1, family: 'modules', arena: 'Station de Délestage', hp: 190, parTime: 68, color: '#5cc8e8', accent: '#c6f7ff', partCount: 4, partRole: 'module', patterns: ['free-order-modules', 'order-remix', 'mobile-modules'], rule: 'Les quatre modules possèdent chacun une zone de contact et aucun ordre ne crée de choix perdant.' },
     { order: 12, id: 'vertical-verdict', name: 'VERTICAL VERDICT', wave: 1, family: 'vertical-lane', arena: 'Puits des Contrepoids', hp: 180, parTime: 66, color: '#4fa6ff', accent: '#d3edff', arenaType: 'vertical', patterns: ['counterweight-rise', 'double-warning-floor', 'moving-safe-platform'], rule: 'Le bas n’est dangereux qu’après deux avertissements et une voie sûre existe.' },
 
     { order: 13, id: 'rail-tyrant', name: 'RAIL TYRANT', wave: 2, family: 'vertical-lane', arena: 'Rocade Cargo 7', hp: 195, parTime: 69, color: '#e45b3d', accent: '#ffd0a8', arenaType: 'scroll', partCount: 4, partRole: 'coupling', patterns: ['pursuit', 'couplings', 'engine-pass'], rule: 'Aucun obstacle impossible ne partage une voie ; une voie reste ouverte.' },
@@ -153,21 +153,22 @@
     { order: 15, id: 'ground-eater', name: 'GROUND EATER', wave: 2, family: 'lure', arena: 'Chantier de Démolition', hp: 205, parTime: 72, color: '#a87b4a', accent: '#f5d59f', arenaType: 'destructible', patterns: ['break-support', 'rolling-rebuild', 'support-feint'], rule: 'La reconstruction tourne et conserve toujours au moins 35 % de sol praticable.' },
     { order: 16, id: 'floodline-leviathan', name: 'FLOODLINE LEVIATHAN', wave: 2, family: 'gravity-weather', arena: 'Réservoir des Écluses', hp: 210, parTime: 75, color: '#287fc7', accent: '#b9e9ff', arenaType: 'fluid', partCount: 3, partRole: 'valve', patterns: ['low-water', 'pressure-current', 'high-water-valves'], rule: 'La pression remplace l’oxygène et aucune variation non signalée ne tue instantanément.' },
     { order: 17, id: 'centrifuge-zero', name: 'CENTRIFUGE ZERO', wave: 2, family: 'gravity-weather', arena: 'Anneau Centrifuge', hp: 205, parTime: 73, color: '#7c68e8', accent: '#ded7ff', arenaType: 'gravity', patterns: ['quarter-turn', 'half-cycle', 'rotor-window'], rule: 'La gravité tourne par quarts ; en mouvement réduit la caméra reste stable.' },
-    { order: 18, id: 'tempest-regulator', name: 'TEMPEST REGULATOR', wave: 2, family: 'gravity-weather', arena: 'Observatoire Météore', hp: 215, parTime: 76, color: '#44b7d7', accent: '#e2fbff', arenaType: 'weather', partCount: 3, partRole: 'module', patterns: ['wind', 'conductive-rain', 'heat'], rule: 'Un seul danger météo est actif et chaque état a texte, pictogramme et son.' },
+    { order: 18, id: 'tempest-regulator', name: 'TEMPEST REGULATOR', wave: 2, family: 'gravity-weather', arena: 'Observatoire Météore', hp: 215, parTime: 76, color: '#44b7d7', accent: '#e2fbff', arenaType: 'weather', partCount: 3, partRole: 'module', patterns: ['wind', 'conductive-rain', 'heat'], rule: 'Un seul danger météo est actif et chaque état est nommé, délimité et annoncé avant son activation.' },
 
     { order: 19, id: 'ascension-frame', name: 'ASCENSION FRAME', wave: 3, family: 'vertical-lane', arena: 'Pilier des Ascensions', hp: 230, parTime: 80, color: '#dd8246', accent: '#ffe1b7', arenaType: 'vertical', partCount: 3, partRole: 'anchor', patterns: ['left-arm-route', 'right-arm-route', 'central-anchor'], rule: 'Trois routes courtes ; une chute ramène toujours vers une plateforme de reprise.' },
-    { order: 20, id: 'counterforge', name: 'COUNTERFORGE', wave: 3, family: 'posture-duo', arena: 'Cour du Contrecoup', hp: 205, parTime: 67, color: '#ef4f67', accent: '#ffd0d8', patterns: ['dash-counter', 'delayed-counter', 'posture-burst'], rule: 'La fenêtre de contre possède signal visuel, sonore et haptique ; Pilote l’élargit.' },
+    { order: 20, id: 'counterforge', name: 'COUNTERFORGE', wave: 3, family: 'posture-duo', arena: 'Cour du Contrecoup', hp: 205, parTime: 67, color: '#ef4f67', accent: '#ffd0d8', patterns: ['dash-counter', 'delayed-counter', 'posture-burst'], rule: 'La fenêtre de contre est annoncée avant la frappe ; Pilote l’élargit.' },
     { order: 21, id: 'carrier-cathedral', name: 'CARRIER CATHEDRAL', wave: 3, family: 'vertical-lane', arena: 'Cathédrale Mobile', hp: 250, parTime: 88, color: '#536ca8', accent: '#dbe5ff', arenaType: 'colossus', partCount: 3, partRole: 'section', patterns: ['outer-deck', 'engine-nave', 'heart-vault'], rule: 'Chaque section est courte et constitue un checkpoint interne du Laboratoire.', checkpoints: ['outer-deck', 'engine-nave', 'heart-vault'] },
     { order: 22, id: 'twin-governors', name: 'TWIN GOVERNORS', wave: 3, family: 'posture-duo', arena: 'Chambre des Deux Régulateurs', hp: 225, parTime: 78, color: '#4fa8a0', accent: '#d5fff8', partCount: 2, partRole: 'governor', patterns: ['shield-pass', 'power-pass', 'mutual-collision'], rule: 'Une seule cible principale est vulnérable et l’alimentation active est nommée.' },
-    { order: 23, id: 'loadout-reactor', name: 'LOADOUT REACTOR', wave: 3, family: 'mimic', arena: 'Atelier des Modules', hp: 220, parTime: 74, color: '#e38b3d', accent: '#ffe5b8', patterns: ['observe-build', 'single-adaptation', 'counter-window'], rule: 'Une seule mécanique du build influence la réponse ; aucun hard counter.' },
+    { order: 23, id: 'loadout-reactor', name: 'LOADOUT REACTOR', wave: 3, family: 'mimic', arena: 'Atelier des Modules', hp: 220, parTime: 74, color: '#e38b3d', accent: '#ffe5b8', patterns: ['observe-build', 'single-adaptation', 'counter-window'], rule: 'Une seule propriété de l’équipement influence la réponse ; aucune configuration n’est condamnée.' },
     { order: 24, id: 'orbital-famine', name: 'ORBITAL FAMINE', wave: 3, family: 'gravity-weather', arena: 'Orbital Terminus', hp: 235, parTime: 82, color: '#556fe8', accent: '#dbe0ff', arenaType: 'energy', partCount: 3, partRole: 'condensator', patterns: ['energy-drain', 'risky-recharge', 'guaranteed-condensator'], rule: 'Une recharge apparaît à cadence garantie et sa réserve reste distincte de la vie.' },
 
     { order: 25, id: 'logic-crucible', name: 'LOGIC CRUCIBLE', wave: 4, family: 'puzzle-endgame', arena: 'Chambre Booléenne', hp: 215, parTime: 76, color: '#ba5ce8', accent: '#f1d6ff', patterns: ['shape-sequence', 'logic-pairs', 'moving-sequence'], rule: 'La séquence dure moins de 45 secondes, utilise formes et chiffres, et ne régresse pas sur dégâts.' },
     { order: 26, id: 'vector-vault', name: 'VECTOR VAULT', wave: 4, family: 'reflect', arena: 'Chambre des Vecteurs', hp: 225, parTime: 79, color: '#42a9df', accent: '#cef2ff', partCount: 3, partRole: 'deflector', patterns: ['single-vector', 'preview-ricochet', 'moving-deflectors'], rule: 'Pilote prévisualise la trajectoire et la machine reste active pendant la résolution.' },
-    { order: 27, id: 'skyborne-battery', name: 'SKYBORNE BATTERY', wave: 4, family: 'reflect', arena: 'Batterie Aérostatique', hp: 230, parTime: 81, color: '#4599ce', accent: '#d3f0ff', arenaType: 'flight', patterns: ['mobile-fire', 'torpedo-return', 'assisted-volley'], rule: 'Les torpilles portent un verrou lisible et l’assistance vise le renvoi, jamais l’esquive.' },
+    { order: 27, id: 'skyborne-battery', name: 'SKYBORNE BATTERY', wave: 4, family: 'reflect', arena: 'Batterie Aérostatique', hp: 230, parTime: 81, color: '#4599ce', accent: '#d3f0ff', arenaType: 'flight', patterns: ['mobile-fire', 'torpedo-return', 'assisted-volley'], rule: 'Les torpilles portent un verrou lisible et conservent une trajectoire stable avant le renvoi.' },
     { order: 28, id: 'endurance-engine', name: 'ENDURANCE ENGINE', wave: 4, family: 'puzzle-endgame', arena: 'Circuit d’Endurance', hp: 260, parTime: 96, color: '#cf6a35', accent: '#ffe0a8', patterns: ['rounds-1-2', 'rounds-3-4', 'rounds-5-6'], rule: 'Six manches courtes et annoncées ; le Laboratoire reprend au début de la manche.', checkpoints: ['round-1', 'round-2', 'round-3', 'round-4', 'round-5', 'round-6'] },
     { order: 29, id: 'adaptive-archivist', name: 'ADAPTIVE ARCHIVIST', wave: 4, family: 'mimic', arena: 'Archives Réactives', hp: 240, parTime: 83, color: '#7d69d6', accent: '#e8ddff', patterns: ['sample-input', 'visible-adaptation', 'reset-response'], rule: 'L’adaptation est visible, locale à la tentative et limitée à une réponse.' },
-    { order: 30, id: 'null-crown', name: 'NULL CROWN', wave: 4, family: 'puzzle-endgame', phaseFamilies: ['reflect', 'modules', 'posture-duo'], arena: 'Trône Zéro', hp: 300, parTime: 105, color: '#7656c9', accent: '#fff0a8', partCount: 4, partRole: 'null-module', patterns: ['null-reflection', 'null-modules', 'null-rupture'], rule: 'Arbitre final déjà visible dans le Catalogue : renvoyer les charges, choisir l’ordre des modules, puis rompre sa posture.', secret: false, checkpoints: ['phase-1', 'phase-2', 'phase-3'] }
+    // Arbitre final déjà visible dans le Catalogue : NULL CROWN n’est pas une surprise cachée.
+    { order: 30, id: 'null-crown', name: 'NULL CROWN', wave: 4, family: 'puzzle-endgame', phaseFamilies: ['reflect', 'modules', 'posture-duo'], arena: 'Trône Zéro', hp: 300, parTime: 105, color: '#7656c9', accent: '#fff0a8', partCount: 4, partRole: 'null-module', patterns: ['null-reflection', 'null-modules', 'null-rupture'], rule: 'Arbitre inscrit dès l’ouverture des Archives : renvoyer les charges, choisir l’ordre des modules, puis rompre sa posture.', secret: false, checkpoints: ['phase-1', 'phase-2', 'phase-3'] }
   ];
 
   // Une signature par machine : les familles restent un vocabulaire commun,
@@ -295,9 +296,9 @@
         safeFloorRatio: source.id === 'ground-eater' ? 0.35 : 1,
         resetOnRetry: true
       },
-      quote: source.quote || ('« Profil Forge ' + String(source.order).padStart(2, '0') + ' chargé. Résous sa boucle, Spark. »'),
+      quote: source.quote || ('« Registre ' + String(source.order).padStart(2, '0') + ' : service placé sous l’autorité du Trône. Toute déviation sera corrigée. »'),
       description: source.description || mechanics?.loop || 'Machine expérimentale de la Forge.',
-      transmission: source.transmission || ('Simulation Forge terminée : ' + source.name + ' a validé sa boucle de combat.'),
+      transmission: source.transmission || ('Nara Vey confirme : ' + source.name + ' répond de nouveau à son équipe locale.'),
       fairnessRule: source.rule || 'Les ouvertures et dangers restent télégraphiés.',
       hitbox: source.hitbox || { w: 196, h: 168 },
       weakPoint,

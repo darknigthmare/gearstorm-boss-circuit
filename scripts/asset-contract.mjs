@@ -2,9 +2,9 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 
-export const ASSET_RELEASE = '2.9.1';
+export const ASSET_RELEASE = '2.10.0';
 export const ASSET_DIRECTORY = 'v' + ASSET_RELEASE;
-export const ASSET_MANIFEST_PATH = 'assets/generated/v2.9.1/asset-manifest.json';
+export const ASSET_MANIFEST_PATH = 'assets/generated/v2.10.0/asset-manifest.json';
 export const ASSET_BUDGET_BYTES = 22 * 1024 * 1024;
 export const EXPECTED_COUNTS = Object.freeze({
   runtimeFiles: 233,
@@ -49,6 +49,7 @@ export const RIVA_RENDER_ORDER = Object.freeze([
   'overload-halo',
 ]);
 export const RIVA_ROAD_LIFT = 10;
+export const RIVA_HEAD_DROP_Y = 4;
 export const RIVA_PARENT_BY_PART = Object.freeze({
   pelvis: null,
   torso: 'pelvis',
@@ -180,11 +181,14 @@ function validateHeroineRig(heroine) {
   invariant(rig?.coordinateSpace === 'player-local-pixels', 'Riva: espace de coordonnees invalide');
   invariant(rig?.feetLocalY === 36, 'Riva: pieds locaux a 36 attendus');
   invariant(Number.isFinite(rig?.rootOffsetY) && rig.rootOffsetY < 0 && rig.rootOffsetY > -100, 'Riva: calibration verticale absente');
+  invariant(rig?.headDropY === RIVA_HEAD_DROP_Y, 'Riva: abaissement tete de 4 px attendu');
   invariant(rig?.ground?.physicalY === 620 && rig?.ground?.localY === 36, 'Riva: contrat sol 620/36 invalide');
   invariant(rig?.muzzle && typeof rig.muzzle === 'object' && !Array.isArray(rig.muzzle),
     'Riva: muzzle articule objet attendu');
   invariant(rig.muzzle.part === 'forearm-cannon-near', 'Riva: muzzle doit suivre le canon proche');
   pixelPair(rig.muzzle.point, 'Riva: point muzzle', true);
+  invariant(rig.muzzle.point[0] === 149 && rig.muzzle.point[1] === 297,
+    'Riva: muzzle optique [149,297] attendu');
   invariant(Array.isArray(rig.parts) && rig.parts.length === EXPECTED_COUNTS.heroineParts, 'Riva: 15 specs rig attendues');
   invariant(JSON.stringify(rig.renderOrder) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: renderOrder incoherent');
   invariant(JSON.stringify(rig.parts.map(part => part.name)) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: specs non triees par z');
@@ -207,6 +211,11 @@ function validateHeroineRig(heroine) {
     invariant(Number.isInteger(spec.coveragePixels) && spec.coveragePixels >= 64, 'Riva ' + spec.name + ': couverture insuffisante');
   }
   validateHeroineHierarchy(rig.parts);
+  const head = rig.parts.find(spec => spec.name === 'head');
+  const torso = rig.parts.find(spec => spec.name === 'torso');
+  invariant(head?.joint?.[1] - rig.rootOffsetY === -70 + RIVA_HEAD_DROP_Y,
+    'Riva: abaissement reproductible de la tete invalide');
+  invariant(head.joint[1] - torso?.joint?.[1] === -48, 'Riva: raccord cou tete/torse a -48 attendu');
   invariant(rig.parts.filter(spec => RIVA_EFFECT_PART_NAMES.includes(spec.name)).every(spec => spec.parent === null),
     'Riva: les effets doivent rester des racines visuelles independantes');
   invariant(rig.parts.some(spec => spec.name === rig.muzzle.part), 'Riva: piece du muzzle absente du rig');
@@ -468,7 +477,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   for (const entry of entries) {
     invariant(!ids.has(entry.id), 'Identifiant duplique: ' + entry.id);
     ids.add(entry.id);
-    invariant(typeof entry.src === 'string' && /^assets\/generated\/v2\.9\.1\/.+\.webp$/.test(entry.src), entry.id + ': chemin runtime invalide');
+    invariant(typeof entry.src === 'string' && entry.src.startsWith('assets/generated/' + ASSET_DIRECTORY + '/') && entry.src.endsWith('.webp'), entry.id + ': chemin runtime invalide');
     invariant(!entry.src.includes('..') && !entry.src.includes('\\'), entry.id + ': chemin non securise');
     invariant(!sources.has(entry.src), 'Source dupliquee: ' + entry.src);
     sources.add(entry.src);

@@ -80,7 +80,7 @@ test('expansion-story.js est autonome, immuable et intégré au runtime', () => 
   const story = loadExpansionStory();
   assert.ok(story, 'globalThis.GEARSTORM_EXPANSION_STORY doit etre expose');
   assert.equal(story.schemaVersion, 1);
-  assert.equal(story.contentVersion, '2.9.1');
+  assert.equal(story.contentVersion, '2.10.0');
   assert.equal(story.status, 'runtime-integrated');
   assert.equal(story.runtimeIntegrated, true);
   assert.equal(story.expansionPremise.runtimeIntegrated, true);
@@ -89,6 +89,7 @@ test('expansion-story.js est autonome, immuable et intégré au runtime', () => 
   assert.ok(Object.isFrozen(story.bosses[0]));
   assert.ok(Object.isFrozen(story.bosses[0].codex));
   assert.ok(Object.isFrozen(story.bosses[0].interlude));
+  assert.ok(Object.isFrozen(story.bosses[0].phaseLines));
   assert.ok(Object.isFrozen(story.masteryContracts));
   assert.ok(Object.isFrozen(story.forgeCircuit));
   assert.ok(Object.isFrozen(story.forgeCircuit.epilogue));
@@ -110,6 +111,7 @@ test('les entrees 07 a 30 suivent exactement le contrat BOSS_EXPANSION', () => {
 
 test('chaque boss jouable fournit un contrat narratif et mécanique complet', () => {
   const story = loadExpansionStory();
+  const observedInterludeOrders = new Set();
   for (const boss of story.bosses) {
     const label = `${boss.code}/${boss.id}`;
     for (const field of ['name', 'district', 'civicFunction', 'shortIntro', 'metaLine', 'journal', 'objective', 'mechanic', 'restoration']) {
@@ -121,14 +123,15 @@ test('chaque boss jouable fournit un contrat narratif et mécanique complet', ()
     assert.equal(boss.phaseTitles.length, 3, `${label}: trois phases requises`);
     assert.equal(new Set(boss.phaseTitles).size, 3, `${label}: phases dupliquees`);
     assert.ok(boss.phaseTitles.every(title => typeof title === 'string' && title.length > 5));
+    assert.equal(boss.phaseLines.length, 3, `${label}: trois voix de phase requises`);
+    assert.equal(new Set(boss.phaseLines).size, 3, `${label}: voix de phase dupliquees`);
+    assert.ok(boss.phaseLines.every(text => typeof text === 'string' && text.length > 35));
 
     assert.equal(boss.interlude.length, 3, `${label}: interlude tripartite requis`);
     boss.interlude.forEach((entry, index) => assertLine(entry, `${label}/interlude/${index}`));
-    assert.deepEqual(
-      Array.from(boss.interlude, entry => entry.speaker),
-      ['Canal civil', 'Archive Voltério', 'Riva'],
-      `${label}: ordre des voix incoherent`
-    );
+    const speakers = Array.from(boss.interlude, entry => entry.speaker);
+    assert.deepEqual([...speakers].sort(), ['Archive Voltério', 'Nara Vey', 'Riva']);
+    observedInterludeOrders.add(speakers.join(' > '));
 
     assert.deepEqual(Object.keys(boss.codex).sort(), ['hijack', 'impact', 'origin', 'reading', 'title']);
     for (const [field, value] of Object.entries(boss.codex)) {
@@ -136,6 +139,7 @@ test('chaque boss jouable fournit un contrat narratif et mécanique complet', ()
       assert.ok(value.trim().length > 15, `${label}/codex/${field} incomplet`);
     }
   }
+  assert.ok(observedInterludeOrders.size >= 3, 'les 24 interludes ne doivent pas suivre un ordre de voix unique');
 });
 
 test('quatre vagues de six boss restent ordonnees et immuables', () => {
@@ -146,6 +150,8 @@ test('quatre vagues de six boss restent ordonnees et immuables', () => {
     assert.equal(wave.bossCodes.length, 6);
     assert.ok(Object.isFrozen(wave));
     assert.ok(Object.isFrozen(wave.bossCodes));
+    assert.equal(typeof wave.revelation, 'string');
+    assert.ok(wave.revelation.length > 60, `${wave.id}: révélation trop faible`);
     const bosses = story.getBossesByWave(wave.id);
     assert.equal(bosses.length, 6);
     assert.ok(Object.isFrozen(bosses));
@@ -162,28 +168,46 @@ test('quatre vagues de six boss restent ordonnees et immuables', () => {
   ]);
 });
 
-test('le contrat meta diegetique v2.9 couvre chaque boss et chaque anneau', () => {
+test('le contrat meta diegetique v2.10 couvre chaque boss et chaque anneau', () => {
   const story = loadExpansionStory();
-  const metaVocabulary = /\b(?:boss|hitbox|jeu|scénario|spam|directeur|niveau|budget|combat|jauge|option|phase|checkpoint|frame|interface|build|barre|puzzle|retry|final|GEARSTORM)\b|level design|caméra|écran|télégraphe|prévisualisée|illisible/i;
-  const forbiddenCivilVocabulary = /\b(?:boss|hitbox|jeu|spam|level design|checkpoint|frame|HUD|interface|build|retry|GEARSTORM)\b|barre de vie|quatrième mur|menu titre|suite cachée/i;
+  const metaVocabulary = /\b(?:actes?|cadre|coulisses?|rôles?|scènes?|rappels?|rideau|répliques?|projecteurs?|public|auteur|final|décor|texte|accessoire|règles?|secret|histoire|page|archive|effet|entrées?|écrire|appelle)\b|hors champ|mise en scène|dernier mot/i;
+  const forbiddenNarrativeVocabulary = /\b(?:boss|hitbox|jeu|spam|checkpoint|frame|HUD|interface|build|retry|joueuse|compteur|pattern)\b|barre de vie|level design|phase (?:deux|trois|\d)|menu titre|suite cachée/i;
   const metaLines = [];
+  const phaseLines = [];
 
   for (const boss of story.bosses) {
     assert.match(boss.metaLine, metaVocabulary, `${boss.code}: metaLine sans marqueur meta`);
     assert.doesNotMatch(boss.metaLine, /\b(?:Sonic|SEGA|Mario|Eggman|OpenAI)\b/i, `${boss.code}: référence externe interdite`);
-    const civilLine = boss.interlude.find(entry => entry.speaker === 'Canal civil');
-    assert.ok(civilLine, `${boss.code}: Canal civil absent`);
-    assert.doesNotMatch(civilLine.text, forbiddenCivilVocabulary, `${boss.code}: Canal civil doit rester premier degre`);
+    assert.doesNotMatch(boss.metaLine, forbiddenNarrativeVocabulary, `${boss.code}: commentaire meta trop technique`);
+    assert.doesNotMatch(boss.journal, forbiddenNarrativeVocabulary, `${boss.code}: journal trop technique`);
+    for (const phaseLine of boss.phaseLines) {
+      assert.doesNotMatch(phaseLine, forbiddenNarrativeVocabulary, `${boss.code}: voix de phase trop technique`);
+      phaseLines.push(phaseLine);
+    }
+    for (const entry of boss.interlude) {
+      assert.doesNotMatch(entry.text, forbiddenNarrativeVocabulary, `${boss.code}/${entry.speaker}: jargon technique dans le dialogue`);
+    }
+    const civilLine = boss.interlude.find(entry => entry.speaker === 'Nara Vey');
+    assert.ok(civilLine, `${boss.code}: Nara Vey absente`);
+    assert.equal(civilLine.channel, 'civil');
+    assert.doesNotMatch(civilLine.text, forbiddenNarrativeVocabulary, `${boss.code}: Nara doit rester diégétique`);
     metaLines.push(boss.metaLine);
   }
 
   assert.equal(new Set(metaLines).size, 24, 'chaque boss Forge doit posseder une ligne meta propre');
+  assert.equal(new Set(phaseLines).size, 72, 'chaque transformation Forge doit posseder une voix propre');
   for (const wave of story.waves) {
     assert.match(wave.title, / · /, `${wave.id}: titre d'anneau non meta`);
     assert.match(wave.premise, metaVocabulary, `${wave.id}: premise d'anneau non meta`);
+    assert.doesNotMatch(wave.premise, forbiddenNarrativeVocabulary, `${wave.id}: premise trop technique`);
+    assert.match(wave.revelation, /Cassian|Couronne|Trône Zéro/);
   }
-  assert.match(story.expansionPremise.title, /jeu continue/i);
+  assert.match(story.expansionPremise.title, /ville continue|hors cadre/i);
   assert.match(story.expansionPremise.playerPromise, /Codex/i);
+  assert.match(story.expansionPremise.summary, /Nuit des Six Extinctions/);
+  assert.match(story.expansionPremise.summary, /abolition du mandat de la Couronne/);
+  assert.match(story.expansionPremise.continuity, /Couronne provisoire/);
+  assert.match(story.expansionPremise.playerPromise, /faute de Riva/);
 });
 
 test('trois contrats de maitrise uniques existent pour chacun des 24 boss', () => {
@@ -212,13 +236,33 @@ test('trois contrats de maitrise uniques existent pour chacun des 24 boss', () =
   assert.equal(Object.keys(story.masteryContracts).length, 24);
 });
 
+test('les contrats de renvoi ouvrent une fenêtre réalisable avant le tir final', () => {
+  const story = loadExpansionStory();
+  const ids = [
+    'bastion-ricochet-reflect-finish',
+    'echo-fencer-disc-finish',
+    'vector-vault-vector-finish',
+    'skyborne-battery-charged-finish'
+  ];
+
+  for (const id of ids) {
+    const contract = story.bosses
+      .flatMap(boss => boss.masteryContracts)
+      .find(entry => entry.id === id);
+    assert.ok(contract, `${id}: contrat absent`);
+    assert.match(contract.objective, /^Ouvrir la dernière fenêtre/);
+    assert.match(contract.objective, /puis (?:l’)?achever/i);
+    assert.doesNotMatch(contract.objective, /^Porter le coup final.*(?:renvoy|disque|trajectoire)/i);
+  }
+});
+
 test('les objectifs restent alignes aux mecaniques annoncees dans le plan', () => {
   const story = loadExpansionStory();
   const termsByCode = {
     '07': ['renvoy', 'relais'],
     '08': ['bélier', 'presse'],
     '09': ['drone', 'famille'],
-    '10': ['action', 'copi'],
+    '10': ['action', 'mémorisée'],
     '11': ['quatre module', 'ordre'],
     '12': ['contrepoids', 'plateforme'],
     '13': ['convoi', 'voie'],
@@ -228,16 +272,16 @@ test('les objectifs restent alignes aux mecaniques annoncees dans le plan', () =
     '17': ['gravité', 'quatre-vingt-dix'],
     '18': ['vent', 'pluie', 'chaleur'],
     '19': ['bras', 'ancrage'],
-    '20': ['contre', 'signal'],
-    '21': ['section', 'boss est l'],
+    '20': ['contre', 'annoncée'],
+    '21': ['section', 'cathédrale'],
     '22': ['bouclier', 'une seule cible'],
-    '23': ['adaptation', 'build'],
+    '23': ['adaptation', 'équipement'],
     '24': ['réserve', 'condensateur'],
     '25': ['séquence', 'quarante-cinq'],
     '26': ['déflecteur', 'trajectoire'],
-    '27': ['torpille', 'visée assistée'],
+    '27': ['torpille', 'verrou'],
     '28': ['six manche', 'reprise'],
-    '29': ['adaptation', 'réinitialisée'],
+    '29': ['adaptation', 's’efface'],
     '30': ['renvoi', 'modules', 'rupture']
   };
 
@@ -254,7 +298,7 @@ test('la continuite maintient Cassian detenu et fait de NULL CROWN un prototype 
   const nullCrown = JSON.stringify(story.getBossById('null-crown')).toLocaleLowerCase('fr-FR');
 
   assert.match(premise, /détention|détenu/);
-  assert.match(premise, /archives enregistrées/);
+  assert.match(premise, /archives/);
   assert.match(premise, /pas son retour|pas.*résurrection/);
   assert.match(nullCrown, /prototype/);
   assert.match(nullCrown, /(?:pas|ni) son retour/);
@@ -277,11 +321,12 @@ test('le Circuit Forge ordonne les 24 boss et ses quatre checkpoints de vague', 
     assert.ok(checkpoint.title.length > 8);
   }
   assert.match(circuit.epilogue.summary, /vingt-quatre services/i);
+  assert.match(circuit.epilogue.summary, /Trône Zéro se tait/i);
   assert.match(circuit.epilogue.outcome, /Cassian reste détenu/);
-  assert.match(circuit.epilogue.outcome, /NULL CROWN est neutralisée/i);
-  assert.match(circuit.epilogue.outcome, /vingt-quatre services restent actifs/i);
-  assert.match(circuit.epilogue.outcome, /six districts/i);
-  assert.match(circuit.epilogue.outcome, /aucun boss caché/i);
+  assert.match(circuit.epilogue.outcome, /NULL CROWN rejoint les preuves publiques/i);
+  assert.match(circuit.epilogue.outcome, /accord des six districts/i);
+  assert.match(circuit.epilogue.outcome, /sans clause secrète/i);
+  assert.doesNotMatch(circuit.epilogue.outcome, /vingt-quatre services/i, 'l’épilogue ne doit pas répéter son résumé');
 });
 
 test('les helpers sont deterministes et ne renvoient aucun conteneur mutable', () => {

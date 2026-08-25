@@ -22,9 +22,9 @@
       accent: '#fff0a6',
       hp: 120,
       arena: 'Rocade des Rivets',
-      quote: '« Riva Spark ! Trois phases, deux marteaux et absolument aucun frein. Admire le génie de Voltério ! »',
+      quote: '« Riva Spark ! J’ai donné deux marteaux à la Rocade et retiré tous ses freins. Appelle cela une entrée en scène. »',
       description: 'Charges, marteaux, mines et impacts sismiques.',
-      transmission: 'Le premier verrou du Circuit vient de céder. Voltério comprend enfin que tu n’es pas une variable de laboratoire.'
+      transmission: 'Nara Vey confirme le retour des convois : le premier verrou du Circuit vient de céder.'
     },
     {
       id: 'kraken',
@@ -34,9 +34,9 @@
       accent: '#b7fbff',
       hp: 145,
       arena: 'Couloir des Hautes-Tensions',
-      quote: '« Le ciel est mon laboratoire, Spark. Essaie donc d’esquiver une équation qui vole ! »',
+      quote: '« Le ciel n’est plus une route, Spark. C’est mon plafond, et chaque éclair y signe mon nom. »',
       description: 'Salves ioniques, lignes de foudre et condensateur exposé.',
-      transmission: 'Le brouillage aérien est tombé. Les districts du nord reçoivent de nouveau le signal de Riva.'
+      transmission: 'Le brouillage aérien est tombé. Nara relie de nouveau les voix des districts du nord.'
     },
     {
       id: 'drill',
@@ -46,9 +46,9 @@
       accent: '#f2dcff',
       hp: 160,
       arena: 'Fosse Ferromagnétique',
-      quote: '« Attraction, répulsion… et humiliation. La physique a déjà choisi son camp ! »',
+      quote: '« La Fosse ramène chacun à la place que je lui ai écrite. Même le métal connaît son rôle. »',
       description: 'Inversions de polarité, éruptions et débris magnétiques.',
-      transmission: 'Les rails d’évacuation sont libérés. Les habitants commencent à quitter les gradins forcés.'
+      transmission: 'Les rails d’évacuation sont libérés. Les habitants quittent les gradins forcés et reprennent les trains.'
     },
     {
       id: 'mantis',
@@ -58,9 +58,9 @@
       accent: '#ffd0dc',
       hp: 175,
       arena: 'Horloge de la Faille',
-      quote: '« J’ai ralenti le temps autour de toi. Techniquement, ta défaite dure déjà depuis plusieurs minutes. »',
+      quote: '« Je corrige l’heure, l’archive et le moment où tu croyais gagner. Qui contestera un instant que j’ai effacé ? »',
       description: 'Ruées, téléportations, engrenages et ralentissements.',
-      transmission: 'Les horloges du Circuit redémarrent. Voltério ne peut plus effacer les secondes où tu le dépasses.'
+      transmission: 'Les horloges redémarrent et six copies de l’archive circulent. Voltério ne peut plus retirer une seconde du récit.'
     },
     {
       id: 'cyclotron',
@@ -70,9 +70,9 @@
       accent: '#fff0b7',
       hp: 205,
       arena: 'Fournaise des Pistons',
-      quote: '« Mon Titan recycle une ville entière avant le petit-déjeuner. Toi, tu seras l’échantillon de démonstration. »',
+      quote: '« Tout ce que la ville fabrique finit dans ma Fournaise. Ta révolte en sortira frappée à mon nom. »',
       description: 'Pistons, lave, flammes et pluie de métal en fusion.',
-      transmission: 'La fonderie est froide. Pour la première fois, le Circuit n’est plus alimenté par la peur.'
+      transmission: 'La Fournaise refroidit. Cinq districts détiennent désormais chacun un fragment de la contre-phase M-0.'
     },
     {
       id: 'omega',
@@ -82,9 +82,9 @@
       accent: '#fff4ad',
       hp: 280,
       arena: 'Citadelle Voltério',
-      quote: '« Toutes mes inventions, un seul trône, et moi au centre. La conclusion était inévitable ! »',
+      quote: '« Tes réponses, mes machines, un seul trône : tu as répété exactement la conclusion que j’avais écrite. »',
       description: 'Trois formes mêlant roquettes, grilles laser, débris magnétiques, chrono-pièges et mines.',
-      transmission: 'La Couronne est brisée. Le Circuit Voltério appartient de nouveau à ceux qui y vivent.'
+      transmission: 'Les six équipes révoquent ensemble la Couronne provisoire. Le Circuit appartient de nouveau à ceux qui y vivent.'
     }
   ];
   const BOSS_REGISTRY = globalThis.GEARSTORM_BOSS_ROSTER || null;
@@ -121,6 +121,7 @@
   const V2_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
   const LEGACY_SAVE_KEY = 'geargrin_overdrive_save';
   const RANK_VALUES = Object.freeze({ C: 1, B: 2, A: 3, S: 4 });
+  const QA_ALLOWED = new URLSearchParams(location.search).get('qa') === '1' && ['127.0.0.1', 'localhost'].includes(location.hostname);
   const requestedModeValue = new URLSearchParams(location.search).get('mode');
   const requestedLaunchMode = BOSS_REGISTRY?.resolveLaunchMode?.(requestedModeValue)
     || (['rush', 'practice'].includes(requestedModeValue) ? requestedModeValue : null);
@@ -260,6 +261,7 @@
   let ambient = [];
 
   const screens = [...document.querySelectorAll('.screen')];
+  const screenOpeners = new Map();
   const touchControls = document.getElementById('touch-controls');
   const bossIntro = document.getElementById('boss-intro');
   const toast = document.getElementById('toast');
@@ -271,6 +273,7 @@
   const mobileOverload = document.querySelector('#mobile-overload');
   const combatObjective = document.querySelector('#combat-objective');
   const combatHint = document.querySelector('#combat-hint');
+  const combatMechanic = document.querySelector('#combat-mechanic');
   const pauseBuild = document.querySelector('#pause-build');
   const resultLore = document.querySelector('#result-lore');
   const resultLoreLabel = document.querySelector('#result-lore-label');
@@ -284,7 +287,7 @@
   const storyArchiveProgress = document.querySelector('#story-archive-progress');
 
 
-  const ART_MANIFEST_URL = 'assets/generated/v2.9.1/asset-manifest.json';
+  const ART_MANIFEST_URL = 'assets/generated/v2.10.0/asset-manifest.json';
   const artLoader = document.querySelector('#art-loader');
   const artLoaderLabel = document.querySelector('#art-loader-label');
   const artLoaderProgress = document.querySelector('#art-loader-progress');
@@ -299,15 +302,20 @@
     requested: new Set(),
     currentAssets: new Set(),
     bundlePromises: new Map(),
+    bossBundleOrder: [],
     effects: [],
     parallaxTime: 0,
     initialPromise: null
   };
+  const MAX_CACHED_BOSS_BUNDLES = 3;
 
   const RIVA_RENDER_SCALE = 1.10;
   const RIVA_FOOT_OFFSET = 3.6;
   const RIVA_ROAD_LIFT = 10;
-  const RIVA_CANNON_BASE_ROTATION = -2.16;
+  const RIVA_CANNON_RECOIL = 12;
+  // Fallback mesure sur l'axe coude -> emetteur de l'asset OpenAI. Le runtime
+  // recalcule cette valeur depuis le manifest pour rester juste si l'art evolue.
+  const RIVA_CANNON_BASE_ROTATION = -2.1573086184800845;
   const RIVA_CANNON_PART = 'forearm-cannon-near';
   const RIVA_MUZZLE = Object.freeze({ x: 45, y: -8 });
   const HERO_EFFECT_PARTS = Object.freeze(new Set(['dash-trail', 'overload-halo']));
@@ -490,10 +498,39 @@
     return Promise.all([...unique.values()].map(loadGeneratedImage));
   }
 
+  function touchGeneratedBossBundle(id) {
+    const previous = artRuntime.bossBundleOrder.indexOf(id);
+    if (previous >= 0) artRuntime.bossBundleOrder.splice(previous, 1);
+    artRuntime.bossBundleOrder.push(id);
+  }
+
+  function evictGeneratedBossBundles(protectedIds = new Set()) {
+    while (artRuntime.bossBundleOrder.length > MAX_CACHED_BOSS_BUNDLES) {
+      const index = artRuntime.bossBundleOrder.findIndex(id => !protectedIds.has(id));
+      if (index < 0) break;
+      const [evictedId] = artRuntime.bossBundleOrder.splice(index, 1);
+      for (const entry of generatedArtBossEntries(evictedId)) {
+        if (!entry?.src || artRuntime.currentAssets.has(entry.src) || artRuntime.pending.has(entry.src)) continue;
+        artRuntime.images.delete(entry.src);
+        artRuntime.requested.delete(entry.src);
+        artRuntime.failed.delete(entry.src);
+      }
+      artRuntime.bundlePromises.delete(evictedId);
+    }
+    updateArtLoader();
+  }
+
   function preloadGeneratedBossBundle(id) {
     if (!artRuntime.manifest || !id) return Promise.resolve([]);
-    if (artRuntime.bundlePromises.has(id)) return artRuntime.bundlePromises.get(id);
-    const pending = preloadGeneratedEntries(generatedArtBossEntries(id));
+    if (artRuntime.bundlePromises.has(id)) {
+      touchGeneratedBossBundle(id);
+      return artRuntime.bundlePromises.get(id);
+    }
+    const pending = preloadGeneratedEntries(generatedArtBossEntries(id)).then(images => {
+      touchGeneratedBossBundle(id);
+      evictGeneratedBossBundles(new Set([artRuntime.activeBossId, id]));
+      return images;
+    });
     artRuntime.bundlePromises.set(id, pending);
     return pending;
   }
@@ -502,6 +539,7 @@
     if (id) artRuntime.activeBossId = id;
     if (!artRuntime.manifest) return Promise.resolve([]);
     const activeId = id || artRuntime.activeBossId || 'rammer';
+    touchGeneratedBossBundle(activeId);
     const coreEntries = generatedArtCoreEntries();
     const bossEntries = generatedArtBossEntries(activeId);
     if (markCurrent) {
@@ -555,7 +593,8 @@
       loaded: [...artRuntime.images.keys()],
       loadedCount: artRuntime.images.size,
       failed: [...artRuntime.failed],
-      currentAssets: [...artRuntime.currentAssets]
+      currentAssets: [...artRuntime.currentAssets],
+      cachedBossIds: [...artRuntime.bossBundleOrder]
     };
   }
 
@@ -641,6 +680,19 @@
     };
   }
 
+  function heroCannonRestRotation(spec, declared = heroineRigMuzzle()) {
+    if (spec && declared?.part === spec.name && Array.isArray(declared.point)) {
+      const axisX = declared.point[0] - spec.pivot[0];
+      const axisY = declared.point[1] - spec.pivot[1];
+      if (Math.hypot(axisX, axisY) > 0.001) return -Math.atan2(axisY, axisX);
+    }
+    return RIVA_CANNON_BASE_ROTATION;
+  }
+
+  function normalizeRigAngle(rotation) {
+    return Math.atan2(Math.sin(rotation), Math.cos(rotation));
+  }
+
   function heroPoseInputs(subject = player) {
     const reduceMotion = save.settings.reduceMotion;
     const velocityY = Number(subject?.vy) || 0;
@@ -680,8 +732,10 @@
     } else if (name === 'forearm-far') {
       pose.rotation = 0.10 - side * stride * 0.14 + animation.jumpBlend * 0.055;
     } else if (name === RIVA_CANNON_PART) {
-      pose.rotation = RIVA_CANNON_BASE_ROTATION - animation.recoil * 0.075 + animation.airborne * 0.035;
-      pose.x = -animation.recoil * 1.8;
+      // Le tir central n'a pas de visee verticale : le canon garde donc son axe
+      // balistique et exprime le recul par translation, sans faux coup de nez.
+      pose.rotation = RIVA_CANNON_BASE_ROTATION;
+      pose.x = -animation.recoil * RIVA_CANNON_RECOIL;
     } else if (name.startsWith('thigh')) {
       pose.rotation = side * stride * 0.30 - side * animation.rising * 0.17 + side * animation.falling * 0.08 + side * animation.landing * 0.11;
     } else if (name.startsWith('shin')) {
@@ -697,6 +751,8 @@
     const byName = new Map(rigParts.map(spec => [spec.name, spec]));
     const resolved = new Map();
     const resolving = new Set();
+    const rootRotation = heroRootRotation(animation);
+    const cannonMuzzle = heroineRigMuzzle();
 
     function resolve(spec) {
       if (resolved.has(spec.name)) return resolved.get(spec.name);
@@ -725,6 +781,12 @@
         joint = [parentPose.joint[0] + offset.x, parentPose.joint[1] + offset.y];
         rotation += parentPose.rotation;
       }
+      if (spec.name === RIVA_CANNON_PART) {
+        // Le coude et le recul suivent toujours la hierarchie. Seule la rotation
+        // finale compense bras, torse et inclinaison racine afin que l'emetteur
+        // reste colineaire au vecteur reel du projectile.
+        rotation = heroCannonRestRotation(spec, cannonMuzzle) - rootRotation;
+      }
       const worldPose = { ...localPose, x: 0, y: 0, joint, rotation };
       resolving.delete(spec.name);
       resolved.set(spec.name, worldPose);
@@ -732,8 +794,24 @@
     }
 
     for (const spec of rigParts) resolve(spec);
-    return { animation, rootRotation: heroRootRotation(animation), parts: resolved };
+    return { animation, rootRotation, parts: resolved };
   }
+  function renderedHeroCannonAngle() {
+    const declared = heroineRigMuzzle();
+    if (!declared?.part || !declared.point) return 0;
+    const rigParts = heroineRigParts();
+    const spec = rigParts.find(candidate => candidate.name === declared.part);
+    if (!spec) return 0;
+    const snapshot = resolveHeroRigPose(rigParts);
+    const pose = snapshot.parts.get(spec.name);
+    if (!pose) return 0;
+    const sourceAxis = Math.atan2(
+      declared.point[1] - spec.pivot[1],
+      declared.point[0] - spec.pivot[0]
+    );
+    return normalizeRigAngle(sourceAxis + pose.rotation + snapshot.rootRotation);
+  }
+
 
   function renderedHeroMuzzle() {
     const declared = heroineRigMuzzle();
@@ -1102,6 +1180,8 @@
     const declaredFeet = Number(artRuntime.manifest?.heroine?.rig?.feetLocalY);
     const feetLocalY = Number.isFinite(declaredFeet) ? declaredFeet : measuredFeet;
     const hierarchy = heroRigHierarchyDiagnostics(anatomyParts);
+    const renderedCannonAngle = renderedHeroCannonAngle();
+    const cannonProjectileAngle = 0;
     const activeArenaId = boss?.data?.id || artRuntime.activeBossId || 'rammer';
     const visualOffsetY = getArenaVisualOffset(activeArenaId);
     const arenaVisualOffsets = Object.fromEntries(Object.keys(artRuntime.manifest?.arenas || {})
@@ -1170,7 +1250,11 @@
         renderedFeetLocalY: Math.round((feetLocalY * RIVA_RENDER_SCALE - RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT) * 10) / 10,
         muzzle: { ...muzzle },
         renderedMuzzle: renderedHeroMuzzle(),
+        renderedCannonAngle,
+        cannonProjectileAngle,
+        cannonAimError: normalizeRigAngle(renderedCannonAngle - cannonProjectileAngle),
         cannonBaseRotation: RIVA_CANNON_BASE_ROTATION,
+        cannonRecoil: RIVA_CANNON_RECOIL,
         poseState: player ? heroPoseInputs() : null,
         loadedParts: heroParts.filter(spec => generatedImage(artRuntime.manifest?.heroine?.parts?.[spec.name])).length,
         artReady: heroArtReady(),
@@ -1278,15 +1362,16 @@
       counts.set(rawId, count + 1);
       installed.push(rawId);
     }
-    const checkpoint = ['fight', 'interlude', 'upgrade'].includes(value.checkpoint)
+    let checkpoint = ['fight', 'interlude', 'upgrade'].includes(value.checkpoint)
       ? value.checkpoint
       : value.pendingUpgrade === true ? 'upgrade' : 'fight';
+    if (bossIndex === CAMPAIGN_BOSSES.length - 1 && checkpoint === 'upgrade') checkpoint = 'interlude';
     const upgradeOffer = checkpoint === 'upgrade' ? sanitizeUpgradeOffer(value.upgradeOffer, installed) : [];
     return {
       version: 2,
       bossIndex,
       checkpoint,
-      pendingUpgrade: checkpoint !== 'fight' && bossIndex < CAMPAIGN_BOSSES.length - 1,
+      pendingUpgrade: checkpoint === 'upgrade' && bossIndex < CAMPAIGN_BOSSES.length - 1,
       score: Math.max(0, Math.floor(Number(value.score) || 0)),
       rushElapsedBeforeBoss: Math.max(0, Number(value.rushElapsedBeforeBoss) || 0),
       rushRetryPenalty: Math.max(0, Number(value.rushRetryPenalty) || 0),
@@ -1312,12 +1397,20 @@
       counts.set(rawId, count + 1);
       installed.push(rawId);
     }
-    const checkpoint = ['fight', 'upgrade', 'ending'].includes(value.checkpoint) ? value.checkpoint : 'fight';
-    const completedBosses = clamp(
+    let checkpoint = ['fight', 'upgrade', 'ending'].includes(value.checkpoint) ? value.checkpoint : 'fight';
+    let completedBosses = clamp(
       Math.floor(Number(value.completedBosses) || (bossIndex - FORGE_START_INDEX + (checkpoint === 'upgrade' ? 1 : 0))),
       0,
       EXPANDED_BOSSES.length
     );
+    const finalBoss = bossIndex === FORGE_FINAL_INDEX;
+    if (checkpoint === 'ending' && (!finalBoss || completedBosses < EXPANDED_BOSSES.length)) {
+      checkpoint = 'fight';
+      completedBosses = Math.max(0, bossIndex - FORGE_START_INDEX);
+    } else if (finalBoss && checkpoint === 'upgrade' && completedBosses >= EXPANDED_BOSSES.length) {
+      checkpoint = 'ending';
+      completedBosses = EXPANDED_BOSSES.length;
+    }
     const upgradeOffer = checkpoint === 'upgrade' ? sanitizeUpgradeOffer(value.upgradeOffer, installed) : [];
     return {
       version: 1,
@@ -1352,6 +1445,7 @@
     safe.unlocked = Math.floor(clamp(Number(parsed.unlocked) || 1, 1, CAMPAIGN_BOSSES.length));
     safe.bestRush = Number.isFinite(parsed.bestRush) && parsed.bestRush > 0 ? parsed.bestRush : null;
     safe.completed = parsed.completed === true;
+    if (safe.completed) safe.unlocked = CAMPAIGN_BOSSES.length;
     safe.bestForgeRush = Number.isFinite(parsed.bestForgeRush) && parsed.bestForgeRush > 0 ? parsed.bestForgeRush : null;
     safe.forgeCompleted = parsed.forgeCompleted === true;
     safe.forgeRushSnapshot = sanitizeForgeRushSnapshot(parsed.forgeRushSnapshot);
@@ -1412,20 +1506,32 @@
   }
 
   function loadSave() {
-    try {
-      const currentRaw = localStorage.getItem(SAVE_KEY);
-      const previousRaw = localStorage.getItem(PREVIOUS_SAVE_KEY);
-      const olderRaw = localStorage.getItem(OLDER_SAVE_KEY);
-      const v2Raw = localStorage.getItem(V2_SAVE_KEY);
-      const legacyRaw = localStorage.getItem(LEGACY_SAVE_KEY);
-      const raw = currentRaw ?? previousRaw ?? olderRaw ?? v2Raw ?? legacyRaw;
-      if (!raw) return createDefaultSave(true);
-      const safe = normalizeSaveData(JSON.parse(raw));
-      if (!currentRaw) localStorage.setItem(SAVE_KEY, JSON.stringify(safe));
+    const candidates = [SAVE_KEY, PREVIOUS_SAVE_KEY, OLDER_SAVE_KEY, V2_SAVE_KEY, LEGACY_SAVE_KEY];
+    for (const key of candidates) {
+      let raw = null;
+      try {
+        raw = localStorage.getItem(key);
+      } catch {
+        return createDefaultSave(true);
+      }
+      if (!raw) continue;
+      let safe = null;
+      try {
+        safe = normalizeSaveData(JSON.parse(raw));
+      } catch {
+        // Un slot corrompu ne doit pas masquer une sauvegarde antérieure encore valide.
+        continue;
+      }
+      if (key !== SAVE_KEY) {
+        try {
+          localStorage.setItem(SAVE_KEY, JSON.stringify(safe));
+        } catch {
+          // La migration reste jouable en mémoire si le stockage v5 est plein ou interdit.
+        }
+      }
       return safe;
-    } catch {
-      return createDefaultSave(true);
     }
+    return createDefaultSave(true);
   }
 
   function persistSave() {
@@ -1553,40 +1659,64 @@
     persistSave();
   }
 
+  function forgeNarrativeUnlocked() {
+    return save.completed || QA_ALLOWED;
+  }
+
   function syncContinueForge() {
     const button = document.querySelector('#continue-forge');
+    const startButton = document.querySelector('#forge-rush-start');
     const summary = document.querySelector('#forge-run-summary');
     const progress = document.querySelector('#forge-wave-progress');
     const snapshot = sanitizeForgeRushSnapshot(save.forgeRushSnapshot);
+    const narrativeUnlocked = forgeNarrativeUnlocked();
     if (button) {
       button.hidden = !snapshot;
-      button.disabled = !snapshot;
+      button.disabled = !snapshot || !narrativeUnlocked;
       const title = button.querySelector('.button-copy strong');
       const detail = button.querySelector('.button-copy small, [data-forge-continue-detail]');
-      if (title) title.textContent = snapshot?.checkpoint === 'ending'
-        ? 'Lire la fin Forge déjà acquise'
-        : snapshot?.checkpoint === 'upgrade' ? 'Reprendre l’Atelier · offre intacte' : 'Reprendre la Forge · le checkpoint attend';
-      if (detail && snapshot) detail.textContent = snapshot.checkpoint === 'ending'
-        ? 'Le compteur confirme 24 / 24 · aucun astérisque'
-        : snapshot.checkpoint === 'upgrade'
-          ? 'L’offre figée précède FORGE ' + String(snapshot.bossIndex + 2).padStart(2, '0')
-          : bossCatalogueNumber(snapshot.bossIndex) + ' · la barre de vie de ' + BOSSES[snapshot.bossIndex].name + ' revient au début';
+      if (title) title.textContent = !narrativeUnlocked
+        ? 'Forge en attente de la campagne'
+        : snapshot?.checkpoint === 'ending'
+          ? 'Relire la fin Forge'
+          : snapshot?.checkpoint === 'upgrade' ? 'Reprendre l’Atelier' : 'Reprendre la Forge';
+      if (detail && snapshot) detail.textContent = !narrativeUnlocked
+        ? 'Libère les six districts ; ce point de reprise sera conservé.'
+        : snapshot.checkpoint === 'ending'
+          ? 'Les vingt-quatre services ont été restitués.'
+          : snapshot.checkpoint === 'upgrade'
+            ? 'L’offre conservée précède FORGE ' + String(snapshot.bossIndex + 2).padStart(2, '0')
+            : bossCatalogueNumber(snapshot.bossIndex) + ' · ' + BOSSES[snapshot.bossIndex].name + ' attend sa reprise.';
+    }
+    if (startButton) {
+      startButton.disabled = !narrativeUnlocked;
+      startButton.setAttribute('aria-disabled', String(!narrativeUnlocked));
+      if (startButton.firstChild) startButton.firstChild.textContent = narrativeUnlocked
+        ? (save.forgeCompleted ? 'Retraverser le Circuit Forge ' : 'Lancer le Circuit Forge ')
+        : 'Terminer la campagne pour ouvrir la Forge ';
     }
     const liveIndex = runMode === 'forgeRush' ? currentBossIndex : snapshot?.bossIndex;
     const entry = Number.isInteger(liveIndex) ? BOSSES[liveIndex] : null;
     const completed = runMode === 'forgeRush'
       ? Math.max(0, liveIndex - FORGE_START_INDEX + (['result', 'upgrade', 'ending'].includes(state) ? 1 : 0))
       : snapshot?.completedBosses || save.forgeCleared.length;
-    if (summary) summary.textContent = save.forgeCompleted
-      ? 'Circuit Forge terminé · la fin retient ' + formatTime(save.bestForgeRush)
-      : snapshot
-        ? completed + ' / 24 boss archivés · le checkpoint retient ' + snapshot.installed.length + ' modules'
-        : '24 boss · quatre anneaux · le menu promet de ne couper aucun combat';
+    if (summary) summary.textContent = !narrativeUnlocked
+      ? 'Suite canonique verrouillée : libère les six districts. Les 30 simulations du Catalogue restent jouables.'
+      : save.forgeCompleted
+        ? 'Circuit Forge terminé · meilleure traversée ' + formatTime(save.bestForgeRush)
+        : snapshot
+          ? completed + ' / 24 machines stabilisées · ' + snapshot.installed.length + ' modules conservés'
+          : 'Après l’abolition de la Couronne : 24 machines, quatre anneaux et autant de services à restituer.';
     if (progress) {
-      const wave = entry?.wave || Math.min(4, Math.floor(completed / 6) + 1);
-      const nextForgeIndex = Math.min(FORGE_FINAL_INDEX, FORGE_START_INDEX + completed);
-      progress.textContent = 'ANNEAU ' + wave + ' / 4 // PROCHAINE BARRE DE VIE ' + bossCatalogueNumber(nextForgeIndex);
-      progress.setAttribute('aria-valuenow', String(completed));
+      if (!narrativeUnlocked) {
+        progress.textContent = 'SUITE CANONIQUE VERROUILLÉE // SIX DISTRICTS À LIBÉRER';
+        progress.setAttribute('aria-valuenow', '0');
+      } else {
+        const wave = entry?.wave || Math.min(4, Math.floor(completed / 6) + 1);
+        const nextForgeIndex = Math.min(FORGE_FINAL_INDEX, FORGE_START_INDEX + completed);
+        progress.textContent = 'ANNEAU ' + wave + ' / 4 // PROCHAINE MACHINE ' + bossCatalogueNumber(nextForgeIndex);
+        progress.setAttribute('aria-valuenow', String(completed));
+      }
       progress.setAttribute('aria-valuemax', '24');
     }
   }
@@ -1647,6 +1777,13 @@
   }
 
   function resumeForgeRushSnapshot() {
+    if (!forgeNarrativeUnlocked()) {
+      selectionMode = 'forge';
+      buildBossGrid('forge');
+      showScreen('boss-select-screen');
+      showToast('CHRONOLOGIE VERROUILLÉE // SIX DISTRICTS D’ABORD', 'Le point de reprise Forge est conservé ; le Catalogue reste libre en simulation.');
+      return false;
+    }
     const snapshot = sanitizeForgeRushSnapshot(save.forgeRushSnapshot);
     if (!snapshot) {
       syncContinueForge();
@@ -1739,6 +1876,7 @@
     const block = document.createElement('blockquote');
     block.className = 'story-line';
     block.dataset.channel = line.channel || 'radio';
+    block.dataset.speaker = line.speaker;
     const speaker = document.createElement('strong');
     speaker.textContent = line.speaker;
     const copy = document.createElement('span');
@@ -1796,24 +1934,23 @@
   }
 
   function showPrologueStory() {
-    return renderStoryScene(STORY.prologue, {
-      art: 'prologue',
-      titleSuffix: ' — la ville n’attendra pas le générique',
-      metaSummary: ' Riva connaît la route ; Cassian croit connaître la fin. Entre les deux, six boss ont déjà reçu leur entrée.',
-      kicker: STORY.prologue.kicker,
-      status: STORY.prologue.status,
-      location: STORY.prologue.location,
-      storyKey: STORY.prologue.id,
-      continueLabel: 'Suivre M-0 · affronter Rivet Rex →',
-      consequence: STORY.prologue.objective + ' · ' + STORY.prologue.method,
-      tone: 'mission',
-      allowBack: true,
-      onContinue: () => {
-        markStorySeen(STORY.prologue.id);
-        pendingStoryAction = null;
-        startRun('rush', 0);
-      }
-    });
+    const scene = STORY.prologue;
+    const dialogue = document.querySelector('#prologue-dialogue');
+    if (!scene || !dialogue) return false;
+    document.querySelector('#prologue-kicker').textContent = scene.kicker;
+    document.querySelector('#prologue-chapter').textContent = scene.chapter;
+    document.querySelector('#prologue-title').textContent = scene.title;
+    document.querySelector('#prologue-summary').textContent = scene.summary;
+    document.querySelector('#prologue-objective').textContent = scene.objective;
+    document.querySelector('#prologue-method').textContent = scene.method;
+    dialogue.replaceChildren(...(scene.lines || []).map(createStoryLine));
+    const startButton = document.querySelector('#prologue-start');
+    if (startButton) startButton.firstChild.textContent = 'Suivre M-0 · Affronter Rivet Rex ';
+    currentStoryKey = scene.id;
+    pendingStoryAction = null;
+    showScreen('prologue-screen');
+    announce(scene.chapter + '. ' + scene.title + '. ' + scene.objective);
+    return true;
   }
 
   function showInterlude(index) {
@@ -1827,14 +1964,14 @@
       lines: act.interlude
     };
     return renderStoryScene(scene, {
-      titleSuffix: ' — le résultat rend la scène à la ville',
-      metaSummary: ' L’interlude existe à l’écran : aucun district n’est libéré hors champ.',
+      titleSuffix: ' — le district reprend sa voix',
+      metaSummary: '',
       kicker: 'DISTRICT RESTAURÉ // LIGNE M-0',
       status: act.civicFunction,
       location: act.district,
       storyKey: act.id,
-      continueLabel: index === CAMPAIGN_BOSSES.length - 1 ? 'Lire la fin sans boss caché →' : 'Ouvrir l’Atelier · offre figée →',
-      consequence: act.restoration + ' · Le jeu archive cette restauration avant la prochaine barre de vie.',
+      continueLabel: index === CAMPAIGN_BOSSES.length - 1 ? 'Rejoindre les six équipes →' : 'Rejoindre l’Atelier mobile →',
+      consequence: act.restoration + ' · M-0 scelle cette restitution dans les archives partagées.',
       tone: index === CAMPAIGN_BOSSES.length - 1 ? 'resolution' : 'district',
       allowBack: false,
       onContinue: () => {
@@ -1852,30 +1989,76 @@
   function buildStoryArchive() {
     if (!storyArchive) return;
     const entries = [
-      { id: STORY.intro.id, chapter: STORY.intro.chapter, title: STORY.intro.title },
-      { id: STORY.prologue.id, chapter: STORY.prologue.chapter, title: STORY.prologue.title },
+      { ...STORY.intro },
+      { ...STORY.prologue, consequence: STORY.prologue.objective },
       ...STORY.acts.map((act, index) => ({
         id: act.id,
         chapter: 'INTERLUDE ' + String(index + 1).padStart(2, '0'),
-        title: act.restoration
+        title: act.district + ' · commande rendue',
+        summary: act.districtConsequence,
+        lines: act.interlude,
+        consequence: act.restoration
       })),
-      { id: STORY.epilogue.id, chapter: STORY.epilogue.chapter, title: STORY.epilogue.title }
+      { ...STORY.epilogue, consequence: STORY.epilogue.rivaChoice }
     ];
     storyArchive.textContent = '';
     let restored = 0;
+
     for (const entry of entries) {
       const unlocked = save.storySeen.includes(entry.id);
       if (unlocked) restored += 1;
       const item = document.createElement('li');
       item.dataset.state = unlocked ? 'available' : 'locked';
+
+      if (!unlocked) {
+        const chapter = document.createElement('span');
+        chapter.textContent = 'SIGNAL CHIFFRÉ';
+        const title = document.createElement('strong');
+        title.textContent = 'Transmission encore hors de portée';
+        item.append(chapter, title);
+        storyArchive.appendChild(item);
+        continue;
+      }
+
+      const details = document.createElement('details');
+      const heading = document.createElement('summary');
       const chapter = document.createElement('span');
-      chapter.textContent = unlocked ? entry.chapter : 'SIGNAL CHIFFRÉ';
+      chapter.textContent = entry.chapter;
       const title = document.createElement('strong');
-      title.textContent = unlocked ? entry.title : 'Transmission encore hors champ';
-      item.append(chapter, title);
+      title.textContent = entry.title;
+      heading.append(chapter, title);
+      heading.setAttribute('aria-label', 'Relire ' + entry.chapter + ' · ' + entry.title);
+      details.appendChild(heading);
+
+      if (entry.summary) {
+        const summary = document.createElement('p');
+        summary.className = 'story-archive-summary';
+        summary.textContent = entry.summary;
+        details.appendChild(summary);
+      }
+
+      if (entry.lines?.length) {
+        const dialogue = document.createElement('div');
+        dialogue.className = 'story-archive-dialogue';
+        dialogue.replaceChildren(...entry.lines.map(createStoryLine));
+        details.appendChild(dialogue);
+      }
+
+      if (entry.consequence) {
+        const consequence = document.createElement('p');
+        consequence.className = 'story-archive-consequence';
+        consequence.textContent = entry.consequence;
+        details.appendChild(consequence);
+      }
+
+      item.appendChild(details);
       storyArchive.appendChild(item);
     }
-    if (storyArchiveProgress) storyArchiveProgress.textContent = restored + ' / ' + entries.length + ' transmissions · du prologue au retour des six districts';
+
+    if (storyArchiveProgress) {
+      storyArchiveProgress.textContent = restored + ' / ' + entries.length
+        + ' transmissions · de l’introduction à l’épilogue';
+    }
   }
 
   function showRadioExchange(title, lines, duration = 5.2) {
@@ -1895,12 +2078,13 @@
     if (isExpandedBoss()) {
       const profile = EXPANSION_STORY?.getBossById?.(boss.data.id);
       const title = profile?.phaseTitles?.[phase - 1];
-      if (!title) return null;
+      const voice = profile?.phaseLines?.[phase - 1];
+      if (!title || !voice) return null;
       return {
         toPhase: phase,
         title,
         lines: [
-          { speaker: 'Riva', text: `${profile.metaLine} PHASE ${phase}/3 · ${title} entre dans le cadre.`, channel: 'maintenance' },
+          { speaker: 'Riva', text: voice, channel: 'maintenance' },
           { speaker: 'M-0', text: `RÈGLE ACTIVE · ${profile.objective}`, channel: 'tactical' }
         ]
       };
@@ -1954,9 +2138,20 @@
         const ring = document.createElement('article');
         const title = document.createElement('h4');
         const premise = document.createElement('p');
+        const revelation = document.createElement('p');
+        const waveBossIds = wave.bossCodes
+          .map(code => EXPANSION_STORY?.getBossById?.(code)?.id)
+          .filter(Boolean);
+        const waveCompleted = waveBossIds.length === wave.bossCodes.length
+          && waveBossIds.every(id => save.forgeCleared.includes(id));
         title.textContent = wave.title;
         premise.textContent = wave.premise;
-        ring.append(title, premise);
+        revelation.className = 'ring-revelation';
+        revelation.textContent = waveCompleted
+          ? 'RÉVÉLATION RESTAURÉE · ' + wave.revelation
+          : 'RÉVÉLATION CHIFFRÉE · stabilise les six services de cet anneau.';
+        ring.dataset.state = waveCompleted ? 'revealed' : 'encrypted';
+        ring.append(title, premise, revelation);
         ringFragment.appendChild(ring);
       }
       ringOverview.replaceChildren(ringFragment);
@@ -1999,7 +2194,8 @@
           ['Origine', profile.codex?.origin],
           ['Détournement', profile.codex?.hijack],
           ['Lecture', profile.codex?.reading],
-          ['Impact', profile.codex?.impact]
+          ['Impact', profile.codex?.impact],
+          ['Journal de Riva', profile.journal]
         ]) {
           const term = document.createElement('dt');
           const copy = document.createElement('dd');
@@ -2064,7 +2260,8 @@
             + '<dt>Détournement</dt><dd>' + act.codex.hijack + '</dd>'
             + '<dt>Lecture</dt><dd>' + act.codex.reading + '</dd>'
             + '<dt>Impact</dt><dd>' + act.codex.impact + '</dd>'
-            + '<dt>Hors cadre</dt><dd>' + act.rivaJournal + '</dd>';
+            + '<dt>Mémoire M-0</dt><dd>' + act.memoryFragment + '</dd>'
+            + '<dt>Journal de Riva</dt><dd>' + act.rivaJournal + '</dd>';
         }
         let record = card.querySelector('.codex-record');
         if (!record) {
@@ -2123,6 +2320,18 @@
   }
 
   function showScreen(id) {
+    const source = document.querySelector('.screen.active');
+    const target = document.getElementById(id);
+    const activeElement = document.activeElement instanceof HTMLElement && source?.contains(document.activeElement)
+      ? document.activeElement
+      : null;
+    const returnTarget = source?.id ? screenOpeners.get(source.id) : null;
+    const isReturning = returnTarget instanceof HTMLElement && target?.contains(returnTarget);
+    if (!isReturning && target && activeElement instanceof HTMLElement) {
+      // Une navigation avant appartient au contrôle réellement activé dans l'écran courant.
+      // Ne propage jamais l'ouvreur historique d'un écran intermédiaire (pause -> titre).
+      screenOpeners.set(id, activeElement);
+    }
     screens.forEach(screen => {
       const active = screen.id === id;
       screen.classList.toggle('active', active);
@@ -2131,6 +2340,11 @@
     });
     requestAnimationFrame(() => {
       const active = document.getElementById(id);
+      if (isReturning && returnTarget instanceof HTMLElement && !returnTarget.hidden && !returnTarget.hasAttribute('disabled')) {
+        screenOpeners.delete(source.id);
+        returnTarget.focus({ preventScroll: true });
+        return;
+      }
       const focused = active?.querySelector('button:not(:disabled):not([hidden]), select:not(:disabled), input:not(:disabled)');
       focused?.focus({ preventScroll: true });
     });
@@ -2165,6 +2379,8 @@
   function syncCombatGuidance() {
     if (!player || !boss || state !== 'fight') return;
     const expansionStory = EXPANSION_STORY?.getBossById?.(boss.data.id);
+    const runtime = boss.runtime;
+    const family = runtime?.family;
     let objective = expansionStory?.objective || 'Survis au cycle et attends l’ouverture du noyau.';
     if (boss.state === 'intro') objective = expansionStory
       ? expansionStory.shortIntro + ' · OBJECTIF · ' + expansionStory.objective
@@ -2176,6 +2392,31 @@
     else if (['slamTelegraph', 'crashTelegraph', 'dashTelegraph'].includes(boss.state)) objective = 'DANGER IMMINENT · quitte la zone marquée.';
     else if (boss.hidden) objective = 'Machine enfouie · repère le cercle d’éruption.';
 
+    let mechanic = '';
+    if (runtime && ['telegraph', 'active'].includes(boss.state)) {
+      if (family === 'vertical-lane') {
+        const laneNames = ['gauche', 'centre', 'droite'];
+        mechanic = 'VOIE ' + (runtime.safeLane + 1) + ' SÛRE · ' + laneNames[runtime.safeLane] + ' · les zones hachurées vont frapper.';
+        objective = mechanic;
+      } else if (family === 'puzzle-endgame' && runtime.puzzleSequence?.length) {
+        const shapeName = id => ['carré', 'cercle', 'triangle'][id % 3];
+        const sequence = runtime.puzzleSequence.map(id => shapeName(id) + ' ' + (id + 1)).join(' → ');
+        const expected = runtime.puzzleSequence[runtime.puzzleIndex];
+        mechanic = expected === undefined
+          ? 'SÉQUENCE RÉSOLUE · le noyau peut s’ouvrir.'
+          : 'PROCHAINE FORME · ' + shapeName(expected) + ' ' + (expected + 1) + ' · ordre ' + sequence + '.';
+        objective = mechanic;
+      } else if (family === 'gravity-weather') {
+        const environment = String(runtime.environment || 'stable').replaceAll('-', ' ').toUpperCase();
+        mechanic = 'ENVIRONNEMENT · ' + environment + ' · les flèches indiquent la poussée.';
+      }
+    }
+    if (boss.data.id === 'orbital-famine' && runtime) {
+      const reserve = Math.round(clamp(Number.isFinite(runtime.resource) ? runtime.resource : 100, 0, 100));
+      mechanic = 'RÉSERVE ORBITALE · ' + reserve + ' % · ' + (reserve <= 25 ? 'SEUIL CRITIQUE, vise un condensateur.' : 'marge disponible.');
+      objective = mechanic;
+    }
+
     const bossHints = {
       rammer: 'Écarte-toi de sa verticale, saute l’onde puis contre-attaque.',
       kraken: 'Lis les bandes laser avant de choisir saut ou ruée.',
@@ -2184,12 +2425,15 @@
       cyclotron: 'Reste mobile : les mines ferment progressivement l’arène.',
       omega: 'Traite chaque grille comme un rythme : observe, puis traverse.'
     };
-    const family = boss.runtime?.family;
     let hint = bossHints[boss.data.id] || BOSS_REGISTRY?.families?.[family]?.loop || boss.data.fairnessRule;
     if (player.overload >= 100 && player.overloadTime <= 0) hint = 'SURCHARGE PRÊTE · L / X pour amplifier les dégâts et dissiper les menaces.';
     else if (player.barrier > 0) hint = 'Égide active : ' + player.barrier + ' impact' + (player.barrier > 1 ? 's' : '') + ' absorbé' + (player.barrier > 1 ? 's' : '') + '.';
 
     setTextIfChanged(combatObjective, objective);
+    if (combatMechanic) {
+      combatMechanic.hidden = !mechanic;
+      if (mechanic) setTextIfChanged(combatMechanic, mechanic);
+    }
     if (combatHint) {
       combatHint.hidden = !save.settings.combatHints;
       if (save.settings.combatHints) setTextIfChanged(combatHint, hint);
@@ -2252,8 +2496,8 @@
       const expansionStory = campaignEntry ? null : EXPANSION_STORY?.getBossById?.(entry.id);
       const intro = expansionStory?.shortIntro || entry.description;
       const objective = expansionStory?.objective || entry.description;
-      const metaCopy = expansionStory?.metaLine || 'Le Laboratoire rejoue cette barre de vie sans réécrire le district.';
-      const cardCopy = intro + (objective && objective !== intro ? ' OBJECTIF · ' + objective : '') + ' HORS CADRE · ' + metaCopy;
+      const cardCopy = intro + (objective && objective !== intro ? ' OBJECTIF · ' + objective : '')
+        + (forge ? ' · SIMULATION HORS CHRONOLOGIE · aucune restitution canonique.' : '');
       const button = document.createElement('button');
       button.className = 'boss-card';
       button.dataset.bossId = entry.id;
@@ -2261,13 +2505,13 @@
       button.style.setProperty('--boss-color', entry.color);
       button.disabled = !unlocked;
       const number = bossCatalogueNumber(index);
-      const status = forge && !campaignEntry ? ' · SIMULATION ACTIVE' : '';
+      const status = forge ? ' · SIMULATION HORS CHRONOLOGIE' : '';
       button.setAttribute('aria-label', unlocked
         ? number + ' · ' + entry.name + ' · ' + objective
         : 'Machine ' + String(visibleIndex + 1).padStart(2, '0') + ' verrouillée');
       const artPart = LEGACY_CARD_ART_PARTS[entry.id] || 'chassis';
       const artMarkup = unlocked
-        ? '<img class="boss-card-art" src="assets/generated/v2.9.1/bosses/' + entry.id + '/' + artPart + '.webp" alt="" aria-hidden="true" width="192" height="192" loading="lazy" decoding="async" draggable="false">'
+        ? '<img class="boss-card-art" src="assets/generated/v2.10.0/bosses/' + entry.id + '/' + artPart + '.webp" alt="" aria-hidden="true" width="192" height="192" loading="lazy" decoding="async" draggable="false">'
         : '';
       button.innerHTML = artMarkup + '<span><span class="boss-number">' + (unlocked ? number + status : 'VERROUILLÉE') + '</span>'
         + '<strong>' + (unlocked ? entry.name : 'SIGNATURE INCONNUE') + '</strong>'
@@ -2286,10 +2530,10 @@
     const eyebrow = document.querySelector('#boss-select-eyebrow');
     const title = document.querySelector('#boss-select-title');
     const progress = document.querySelector('#boss-select-progress, #lab-progress');
-    if (eyebrow) eyebrow.textContent = forge ? 'CATALOGUE INTÉGRAL // 30 BOSS QUI CONNAISSENT LE MENU' : 'LABORATOIRE // LE CANON N’AVANCE PAS';
-    if (title) title.textContent = forge ? 'Catalogue intégral · aucune machine hors champ' : 'Laboratoire de campagne · rejouer sans réécrire';
+    if (eyebrow) eyebrow.textContent = forge ? 'CATALOGUE INTÉGRAL // 30 SIMULATIONS HORS CHRONOLOGIE' : 'LABORATOIRE // LE CANON N’AVANCE PAS';
+    if (title) title.textContent = forge ? 'Catalogue intégral · choisir librement sans modifier l’histoire' : 'Laboratoire de campagne · rejouer sans réécrire';
     if (progress) progress.textContent = forge
-      ? BOSSES.length + ' profils jouables · 6 actes + ' + (BOSSES.length - CAMPAIGN_BOSSES.length) + ' boss Forge · chaque rig et chaque arène vient du manifeste OpenAI v2.9.1.'
+      ? BOSSES.length + ' profils jouables en simulation · ces combats n’altèrent ni les six districts ni la suite canonique de la Forge.'
       : Math.min(save.unlocked, CAMPAIGN_BOSSES.length) + ' / ' + CAMPAIGN_BOSSES.length + ' boss relus · le Laboratoire n’altère aucun district.';
     grid.setAttribute('aria-label', forge ? 'Catalogue complet des 30 boss' : 'Machines de campagne débloquées');
     document.querySelectorAll('#boss-select-screen [data-gearstorm-mode]').forEach(tab => {
@@ -2398,6 +2642,13 @@
   }
 
   function startRun(mode, index = 0, options = {}) {
+    if (mode === 'forgeRush' && !forgeNarrativeUnlocked()) {
+      selectionMode = 'forge';
+      buildBossGrid('forge');
+      showScreen('boss-select-screen');
+      showToast('CHRONOLOGIE VERROUILLÉE // SIX DISTRICTS D’ABORD', 'Le Catalogue reste libre en simulation ; le Circuit Forge commence après l’abolition de la Couronne.');
+      return false;
+    }
     const campaignResume = mode === 'rush' && sanitizeRushSnapshot(save.rushSnapshot);
     const forgeResume = mode === 'forgeRush' && sanitizeForgeRushSnapshot(save.forgeRushSnapshot);
     if (!options.force && (campaignResume || forgeResume)) {
@@ -2507,7 +2758,7 @@
       : act?.preFight?.map(line => line.speaker + ' — ' + line.text).join('  ·  ')
         || data.quote + ' · HORS CADRE — Le Laboratoire garde la barre de vie et retire les conséquences.';
     document.getElementById('intro-index').textContent = expansionStory
-      ? 'FORGE ' + String(expansionStory.number).padStart(2, '0') + ' · ANNEAU ' + expansionStory.wave
+      ? (runMode === 'forge' ? 'SIMULATION ' : '') + 'FORGE ' + String(expansionStory.number).padStart(2, '0') + ' · ANNEAU ' + expansionStory.wave
       : data.arena + ' · MACHINE ' + String(currentBossIndex + 1).padStart(2, '0');
     document.getElementById('intro-name').textContent = data.name;
     document.getElementById('intro-epithet').textContent = wave ? wave.title + ' · ' + functionLabel : functionLabel;
@@ -2670,6 +2921,7 @@
     spawnGeneratedVfx('electric-arcs', player.x, player.y, { size: 128, duration: 0.48, growth: 0.3 });
     addFloatingText(player.x, player.y - 72, 'SURCHARGE', '#fff39a');
     shake(12);
+    haptic([35, 25, 55]);
     sfx('overload');
   }
 
@@ -2686,6 +2938,15 @@
       uniquePartIds: new Set(),
       destroyedByRole: Object.create(null),
       firstWindowByRole: Object.create(null),
+      priorityDroneFamilies: new Set(),
+      priorityDroneFailures: new Set(),
+      mimicPhaseTwoSamples: 0,
+      mimicPhaseTwoCompleteSamples: 0,
+      cleanBreakerModules: new Set(),
+      offlineBreakerModuleHits: 0,
+      valvesByPressureCycle: new Map(),
+      maximumValvesInPressureCycle: 0,
+      maximumProjectileBounceChain: 0,
       reflectionHits: 0,
       reflectionStreak: 0,
       maximumReflectionStreak: 0,
@@ -2733,6 +2994,15 @@
       signatureStates: [...telemetry.signatureStates],
       partsDestroyed: [...telemetry.partsDestroyed],
       destroyedByRole: { ...telemetry.destroyedByRole },
+      priorityDroneFamilies: [...telemetry.priorityDroneFamilies],
+      priorityDroneFailures: [...telemetry.priorityDroneFailures],
+      mimicPhaseTwoSamples: telemetry.mimicPhaseTwoSamples,
+      mimicPhaseTwoCompleteSamples: telemetry.mimicPhaseTwoCompleteSamples,
+      cleanBreakerModules: [...telemetry.cleanBreakerModules],
+      offlineBreakerModuleHits: telemetry.offlineBreakerModuleHits,
+      valvesByPressureCycle: Object.fromEntries([...telemetry.valvesByPressureCycle].map(([key, parts]) => [key, [...parts]])),
+      maximumValvesInPressureCycle: telemetry.maximumValvesInPressureCycle,
+      maximumProjectileBounceChain: telemetry.maximumProjectileBounceChain,
       reflectionHits: telemetry.reflectionHits,
       maximumReflectionStreak: telemetry.maximumReflectionStreak,
       reflectionTargets: [...telemetry.reflectionTargets],
@@ -2816,6 +3086,7 @@
       part.hp = part.maxHp;
       part.state = 'intact';
       part.destroyed = false;
+      delete part.destroyedAt;
     }
   }
 
@@ -2857,7 +3128,17 @@
       const attackable = runtime.parts.filter(part => EXPANDED_ATTACKABLE_ROLES.has(part.role));
       if (attackable.every(part => part.destroyed)) resetExpandedParts();
       runtime.mechanicTarget = Math.max(1, attackable.filter(part => !part.destroyed).length);
+      if (boss.data.id === 'hive-foreman') {
+        runtime.priorityPartId = attackable[Math.min(attackable.length - 1, Math.max(0, boss.phase - 1))]?.id || null;
+        runtime.priorityFamily = runtime.selectedPattern;
+        runtime.firstPartDestroyedInCycle = false;
+      }
     } else if (family === 'mimic') {
+      const sampledActions = Object.values(runtime.inputTelemetry).filter(value => value > 0).length;
+      if (boss.data.id === 'echo-fencer' && boss.phase === 2) {
+        currentForgeTelemetry.mimicPhaseTwoSamples += 1;
+        if (sampledActions === 3) currentForgeTelemetry.mimicPhaseTwoCompleteSamples += 1;
+      }
       runtime.adaptation = Object.entries(runtime.inputTelemetry).sort((a, b) => b[1] - a[1])[0]?.[0] || 'shot';
       runtime.inputTelemetry = { shot: 0, jump: 0, dash: 0 };
     } else if (family === 'vertical-lane') {
@@ -3130,7 +3411,15 @@
         event('logic-pressure', 1.0, () => spawnSignatureBeamH(GROUND - 132, 0.48, 0.42, 'logicPressure'));
         break;
       case 'vector-vault':
-        event('wall-vector', 0.5, () => { const charge = spawnReflectableCharge(p + 4); charge.wallRicochet = true; charge.source = 'selfRicochet'; });
+        event('wall-vector', 0.5, () => {
+          const charge = spawnReflectableCharge(p + 4);
+          charge.wallRicochet = true;
+          charge.maxWallBounces = 4;
+          charge.life = Math.max(charge.life, 9);
+          charge.vx = (player.x < charge.x ? -1 : 1) * 760;
+          charge.vy = 0;
+          charge.source = 'selfRicochet';
+        });
         break;
       case 'skyborne-battery':
         boss.y = 270 + Math.sin(boss.totalTime * 2.4) * 105;
@@ -3242,7 +3531,8 @@
       }
     } else if (boss.state === 'telegraph') {
       boss.vulnerable = false;
-      boss.attackLabel = 'PHASE ' + boss.phase + ' · TÉLÉGRAPHE ' + boss.runtime.selectedPattern.toUpperCase().replaceAll('-', ' ');
+      const priorityLabel = boss.runtime.priorityPartId ? ' · PRIORITÉ ' + boss.runtime.priorityPartId.toUpperCase().replaceAll('-', ' ') : '';
+      boss.attackLabel = 'PHASE ' + boss.phase + ' · TÉLÉGRAPHE ' + boss.runtime.selectedPattern.toUpperCase().replaceAll('-', ' ') + priorityLabel;
       if (boss.stateTime >= phase.telegraphSeconds * (save.settings.difficulty === 'casual' ? 1.25 : 1)) {
         setBossState('active');
         startExpandedActive();
@@ -3311,11 +3601,28 @@
     spawnBurst(hitbox.x, hitbox.y, part.destroyed ? boss.data.accent : '#dce5f6', part.destroyed ? 16 : 6, part.destroyed ? 260 : 120);
     addFloatingText(hitbox.x, hitbox.y - 20, part.destroyed ? 'PIÈCE DÉTRUITE' : 'MODULE', boss.data.accent);
     if (part.destroyed) {
+      part.destroyedAt = boss.totalTime;
       boss.runtime.mechanicProgress += 1;
       currentForgeTelemetry.partsDestroyed.add(boss.phase + ':' + part.id);
       currentForgeTelemetry.uniquePartIds.add(part.id);
       incrementForgeMetric(currentForgeTelemetry.destroyedByRole, part.role);
       if (boss.cycle === 0) incrementForgeMetric(currentForgeTelemetry.firstWindowByRole, part.role);
+      if (boss.data.id === 'hive-foreman' && part.role === 'drone' && !boss.runtime.firstPartDestroyedInCycle) {
+        boss.runtime.firstPartDestroyedInCycle = true;
+        const family = boss.runtime.priorityFamily || boss.runtime.selectedPattern;
+        if (!currentForgeTelemetry.priorityDroneFamilies.has(family) && !currentForgeTelemetry.priorityDroneFailures.has(family)) {
+          if (part.id === boss.runtime.priorityPartId) currentForgeTelemetry.priorityDroneFamilies.add(family);
+          else currentForgeTelemetry.priorityDroneFailures.add(family);
+        }
+      }
+      if (boss.data.id === 'breaker-array' && part.role === 'module') currentForgeTelemetry.cleanBreakerModules.add(part.id);
+      if (boss.data.id === 'floodline-leviathan' && part.role === 'valve') {
+        const pressureCycle = boss.phase + ':' + boss.cycle;
+        if (!currentForgeTelemetry.valvesByPressureCycle.has(pressureCycle)) currentForgeTelemetry.valvesByPressureCycle.set(pressureCycle, new Set());
+        const valves = currentForgeTelemetry.valvesByPressureCycle.get(pressureCycle);
+        valves.add(part.id);
+        currentForgeTelemetry.maximumValvesInPressureCycle = Math.max(currentForgeTelemetry.maximumValvesInPressureCycle, valves.size);
+      }
       if (part.role === 'condensator') {
         boss.runtime.resource = Math.min(100, boss.runtime.resource + 38);
         boss.runtime.resourceEmpty = false;
@@ -3374,9 +3681,19 @@
     }
     if (!['intro', 'phaseEnter', 'phaseTransition', 'defeat'].includes(boss.state)) {
       for (const part of boss.runtime.parts) {
-        if (!EXPANDED_ATTACKABLE_ROLES.has(part.role) || part.destroyed) continue;
+        if (!EXPANDED_ATTACKABLE_ROLES.has(part.role)) continue;
         const hitbox = expandedPartWorldHitbox(part);
-        if (circleHit(shot.x, shot.y, shot.r, hitbox.x, hitbox.y, hitbox.r)) return hitExpandedPart(part, shot.damage || runBuild.shotDamage);
+        if (!circleHit(shot.x, shot.y, shot.r, hitbox.x, hitbox.y, hitbox.r)) continue;
+        if (part.destroyed) {
+          const firedAfterShutdown = Number.isFinite(shot.forgeCreatedAt) && Number.isFinite(part.destroyedAt) && shot.forgeCreatedAt > part.destroyedAt;
+          if (boss.data.id === 'breaker-array' && part.role === 'module' && firedAfterShutdown) {
+            currentForgeTelemetry.offlineBreakerModuleHits += 1;
+            addFloatingText(hitbox.x, hitbox.y - 20, 'MODULE HORS LIGNE', '#f5d59f');
+            return true;
+          }
+          continue;
+        }
+        return hitExpandedPart(part, shot.damage || runBuild.shotDamage);
       }
     }
     return false;
@@ -3437,6 +3754,7 @@
         growth: 0.7
       });
       shake(5);
+      haptic(18);
       sfx('dash');
     }
 
@@ -3454,6 +3772,7 @@
           vy: angle * runBuild.projectileSpeed,
           r: 7,
           damage: runBuild.shotDamage,
+          forgeCreatedAt: boss?.totalTime ?? null,
           life: 1.25,
           trail: 0
         });
@@ -3485,7 +3804,7 @@
       if (!player.onGround && player.vy > 220) {
         player.landed = true;
         player.poseLand = 1;
-        spawnDust(player.x, GROUND, 7);
+        spawnDust(player.x, GROUND - (heroArtReady() ? RIVA_ROAD_LIFT : 0), 7);
       }
       player.y = floorY;
       player.vy = 0;
@@ -4063,6 +4382,7 @@
       spawnGeneratedVfx('shield-hit', player.x, player.y, { size: 108, duration: 0.48, growth: 0.52 });
       addFloatingText(player.x, player.y - 50, 'ÉGIDE', '#bffaff');
       shake(4);
+      haptic(20);
       sfx('deflect');
       announce('Égide capacitive : impact absorbé. Charges restantes ' + player.barrier + '.');
       return;
@@ -4077,6 +4397,7 @@
     damageTaken += amount;
     flash = 0.08;
     shake(10);
+    haptic([45, 30, 70]);
     spawnBurst(player.x, player.y, '#ff6682', 16, 280);
     spawnGeneratedVfx('shield-hit', player.x, player.y, { size: 88, duration: 0.4, growth: 0.5 });
     addFloatingText(player.x, player.y - 50, '-1 CORE', '#ff8398');
@@ -4104,7 +4425,7 @@
       if (s.type === 'reflectOrb') {
         s.x += s.vx * dt * speedFactor;
         s.y += s.vy * dt * speedFactor;
-        if (s.wallRicochet && !s.friendly && (s.x <= 30 || s.x >= W - 30) && (s.wallBounces || 0) < 2) {
+        if (s.wallRicochet && !s.friendly && (s.x <= 30 || s.x >= W - 30) && (s.wallBounces || 0) < (s.maxWallBounces || 2)) {
           s.x = clamp(s.x, 30, W - 30);
           s.vx *= -1;
           s.wallBounces = (s.wallBounces || 0) + 1;
@@ -4117,6 +4438,9 @@
           currentForgeTelemetry.reflectionHits += 1;
           currentForgeTelemetry.reflectionStreak += 1;
           currentForgeTelemetry.maximumReflectionStreak = Math.max(currentForgeTelemetry.maximumReflectionStreak, currentForgeTelemetry.reflectionStreak);
+          if (boss.data.id === 'vector-vault') {
+            currentForgeTelemetry.maximumProjectileBounceChain = Math.max(currentForgeTelemetry.maximumProjectileBounceChain, s.wallBounces || 0);
+          }
           currentForgeTelemetry.reflectionTargets.add(boss.phase + ':' + (s.shape || 0));
           spawnBurst(s.x, s.y, boss.data.accent, 18, 320);
           addFloatingText(s.x, s.y - 24, 'RENVOI ' + boss.runtime.mechanicProgress + '/' + boss.runtime.mechanicTarget, boss.data.accent);
@@ -4286,11 +4610,11 @@
       relaysDisabledByReflection: telemetry.reflectionHits,
       distinctRamsPressed: telemetry.lurePresses,
       perfectFinalCycle: telemetry.perfectFamilyCycles.phase3 || 0,
-      correctPriorityTargets: telemetry.uniquePartIds.size,
+      correctPriorityTargets: telemetry.priorityDroneFamilies.size,
       finalOpeningsUsed: telemetry.finalPhaseOpenings,
-      actionDiversity: telemetry.actions.size,
+      actionDiversity: telemetry.mimicPhaseTwoSamples > 0 && telemetry.mimicPhaseTwoCompleteSamples === telemetry.mimicPhaseTwoSamples ? 3 : 0,
       mimicCounterHits: familyHits.mimic || 0,
-      cleanModuleShutdowns: telemetry.destroyedByRole.module || 0,
+      cleanModuleShutdowns: telemetry.offlineBreakerModuleHits === 0 ? telemetry.cleanBreakerModules.size : 0,
       coreOpeningsUsed: telemetry.finalPhaseOpenings,
       weightsReturned: telemetry.familyCompletions['vertical-lane'] || 0,
       couplersDestroyed: telemetry.destroyedByRole.coupling || 0,
@@ -4299,7 +4623,7 @@
       perfectPermutationCycle: telemetry.perfectFamilyCycles['vertical-lane'] || 0,
       selfDestroyedSupports: telemetry.lurePresses,
       collapsingSectionHits: familyHits.lure || 0,
-      valvesClosedInCycle: telemetry.destroyedByRole.valve || 0,
+      valvesClosedInCycle: telemetry.maximumValvesInPressureCycle,
       pressureHits: boss?.data?.id === 'floodline-leviathan' ? familyHits['gravity-weather'] || 0 : 0,
       distinctGravityQuadrants: telemetry.gravityQuadrants.size,
       firstWindowModules: telemetry.firstWindowByRole.module || 0,
@@ -4312,7 +4636,7 @@
       condensatorsCollected: telemetry.destroyedByRole.condensator || 0,
       minimumReservePercent: telemetry.minimumReservePercent,
       perfectSequences: telemetry.puzzlePerfectSequences,
-      maximumBounceChain: telemetry.maximumReflectionStreak,
+      maximumBounceChain: telemetry.maximumProjectileBounceChain,
       distinctBatteriesHit: telemetry.reflectionTargets.size,
       checkpointRetries: currentBossRetries,
       healsUsed: telemetry.healsUsed,
@@ -4468,13 +4792,16 @@
       return;
     }
     const wave = EXPANSION_STORY?.waves?.find(entry => entry.number === profile.wave);
+    const closesWave = wave?.bossCodes?.at(-1) === profile.code;
     if (label) label.textContent = (wave?.title || 'Transmission Forge')
-      + ' // le résultat rend la règle publique';
+      + (closesWave ? ' // révélation de l’anneau restaurée' : ' // service rendu à son équipe');
     if (copy) {
       const restoredLines = (profile.interlude || [])
         .map(line => line.speaker + ' — ' + line.text)
         .join('  ·  ');
-      copy.textContent = restoredLines + '  ·  HORS CADRE — ' + profile.metaLine;
+      copy.textContent = restoredLines + (closesWave && wave?.revelation
+        ? '  ·  RÉVÉLATION DE L’ANNEAU — ' + wave.revelation
+        : '');
     }
   }
   function showResult() {
@@ -4493,31 +4820,30 @@
     recordBestRank(BOSSES[currentBossIndex].id, medal);
     const masteryResults = evaluateMasteryContracts(rankedTime);
     document.getElementById('result-eyebrow').textContent = practiceResult
-      ? 'SIMULATION TERMINÉE // LE LABO N’ÉCRIT PAS LE CANON'
+      ? 'SIMULATION TERMINÉE // HORS CHRONOLOGIE'
       : forgeComplete
-        ? 'TRÔNE ZÉRO NEUTRALISÉ // 24 / 24 SANS ASTÉRISQUE'
-        : rushComplete ? 'COURONNE NEUTRALISÉE // LE GÉNÉRIQUE PEUT COMMENCER' : 'MACHINE NEUTRALISÉE // LE DISTRICT QUITTE L’ARÈNE';
+        ? 'TRÔNE ZÉRO NEUTRALISÉ // SIX CLÉS DISTRIBUÉES'
+        : rushComplete ? 'MANDAT RÉVOQUÉ // SIX DISTRICTS AUTONOMES' : 'SERVICE STABILISÉ // TRANSMISSION M-0';
     document.getElementById('result-title').textContent = forgeComplete
-      ? 'NULL CROWN rend ses clés · la fin reste acquise'
-      : rushComplete ? 'Crown Engine Ω est tombé · aucun second final' : BOSSES[currentBossIndex].name + ' · barre de vie archivée';
-    const resultSummary = expansionStory?.restoration
-      || (practiceResult
-        ? 'Données de combat archivées. La progression de campagne reste inchangée.'
-        : act?.districtConsequence || BOSSES[currentBossIndex].transmission);
-    document.getElementById('result-summary').textContent = resultSummary
-      + (practiceResult ? ' · Le Laboratoire referme cette parenthèse.' : ' · L’écran de résultat accepte enfin de rendre la suite.');
+      ? 'NULL CROWN rend ses clés'
+      : rushComplete ? 'Crown Engine Ω est tombé' : BOSSES[currentBossIndex].name + ' · service stabilisé';
+    const resultSummary = practiceResult
+      ? 'Données de combat archivées. La progression de campagne reste inchangée.'
+      : expansionStory?.restoration || act?.districtConsequence || BOSSES[currentBossIndex].transmission;
+    document.getElementById('result-summary').textContent = practiceResult
+      ? resultSummary + ' · Simulation hors chronologie : aucune restitution n’est modifiée.'
+      : resultSummary;
     const briefing = document.querySelector('#combat-briefing');
     if (briefing) briefing.hidden = true;
     const resultBuild = document.querySelector('#result-build');
     if (resultBuild) resultBuild.textContent = describeBuild();
-    if (resultLoreLabel) resultLoreLabel.textContent = expansionStory
-      ? 'Journal de Riva // Forge et commentaire de design'
-      : practiceResult ? 'Rapport du Laboratoire // canon intact' : 'Journal de Riva // après-combat';
-    if (resultLore) resultLore.textContent = expansionStory?.journal
-      || (practiceResult
-        ? 'Profil mécanique : ' + BOSSES[currentBossIndex].description
-        : act?.rivaJournal || BOSSES[currentBossIndex].transmission);
-    syncForgeResultTransmission(expansionStory);
+    if (resultLoreLabel) resultLoreLabel.textContent = practiceResult
+      ? 'Rapport de simulation // hors chronologie'
+      : expansionStory ? 'Journal de Riva // restitution Forge' : 'Journal de Riva // après l’arrêt';
+    if (resultLore) resultLore.textContent = practiceResult
+      ? 'Profil mécanique : ' + BOSSES[currentBossIndex].description
+      : expansionStory?.journal || act?.rivaJournal || BOSSES[currentBossIndex].transmission;
+    syncForgeResultTransmission(practiceResult ? null : expansionStory);
     renderMasteryResults(masteryResults);
 
     if (runMode === 'rush') {
@@ -4641,7 +4967,7 @@
       const button = document.createElement('button');
       button.className = 'upgrade-card';
       const stacks = runBuild.installed.filter(id => id === upgrade.id).length;
-      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.9.1/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
+      button.innerHTML = '<span><img class="upgrade-icon" src="assets/generated/v2.10.0/vfx/' + upgrade.icon + '.webp" alt="" width="64" height="64" decoding="async"><strong>' + upgrade.name + '</strong><small>' + upgrade.description + '</small></span><em>' + (stacks ? 'NIVEAU ' + (stacks + 1) : 'INSTALLER') + '</em>';
       button.addEventListener('click', () => installUpgrade(upgrade));
       grid.appendChild(button);
     }
@@ -4685,7 +5011,7 @@
       const cards = [
         ['Boss archivés', '24 / 24'],
         ['Temps que la fin retient', formatTime(total)],
-        ['Score que le HUD assume', score.toLocaleString('fr-FR')],
+        ['Score final', score.toLocaleString('fr-FR')],
         ['Contrats réellement lus', Math.min(90, masteryTotal) + ' / 90'],
         ['Reprises conservées', runRetryCount.toLocaleString('fr-FR')]
       ];
@@ -4700,7 +5026,7 @@
         fragment.appendChild(card);
       }
       stats.replaceChildren(fragment);
-      stats.setAttribute('aria-label', 'Bilan du Circuit Forge. Build final : ' + describeBuild());
+      stats.setAttribute('aria-label', 'Bilan du Circuit Forge. Configuration finale : ' + describeBuild());
     }
     player = null;
     boss = null;
@@ -4725,7 +5051,7 @@
     persistSave();
     buildCodex();
 
-    document.getElementById('ending-title').textContent = STORY.epilogue.title + ' · le générique rend la ville';
+    document.getElementById('ending-title').textContent = STORY.epilogue.title;
     const transmission = document.querySelector('.ending-transmission');
     if (transmission) transmission.textContent = STORY.epilogue.lines.map(line => line.speaker + ' — ' + line.text).join('  ·  ');
     const resolution = document.querySelector('.ending-resolution');
@@ -4742,9 +5068,28 @@
         districts.appendChild(item);
       });
     }
-    document.getElementById('ending-summary').textContent = STORY.epilogue.summary
-      + ' · Temps que le générique retient : ' + formatTime(total)
-      + ' · Score final : ' + score.toLocaleString('fr-FR') + ' · Reprises conservées : ' + runRetryCount + ' · Build final : ' + describeBuild() + '.';
+    document.getElementById('ending-summary').textContent = STORY.epilogue.summary;
+    const endingStats = document.querySelector('#ending-stats');
+    if (endingStats) {
+      const cards = [
+        ['Temps total', formatTime(total)],
+        ['Score final', score.toLocaleString('fr-FR')],
+        ['Reprises', runRetryCount.toLocaleString('fr-FR')],
+        ['Configuration finale', describeBuild()]
+      ];
+      const fragment = document.createDocumentFragment();
+      for (const [label, value] of cards) {
+        const card = document.createElement('article');
+        const caption = document.createElement('span');
+        const result = document.createElement('strong');
+        caption.textContent = label;
+        result.textContent = value;
+        card.append(caption, result);
+        fragment.appendChild(card);
+      }
+      endingStats.replaceChildren(fragment);
+      endingStats.setAttribute('aria-label', 'Bilan de campagne. Configuration finale : ' + describeBuild());
+    }
     announce('Circuit libéré en ' + formatTime(total) + '. Score final ' + score + '.');
     player = null;
     boss = null;
@@ -5196,10 +5541,28 @@
 
   function drawExpandedArenaWarnings() {
     const runtime = boss.runtime;
-    if (!runtime || !['telegraph', 'active'].includes(boss.state)) return;
+    if (!runtime) return;
     const family = expandedFamily();
     const pulse = save.settings.reduceMotion ? 0.7 : 0.55 + Math.sin(boss.totalTime * 8) * 0.15;
     ctx.save();
+    if (boss.data.id === 'orbital-famine') {
+      const reserve = clamp(Number.isFinite(runtime.resource) ? runtime.resource : 100, 0, 100);
+      ctx.fillStyle = 'rgba(7,12,28,0.88)';
+      ctx.fillRect(W - 330, 104, 270, 54);
+      ctx.strokeStyle = reserve <= 25 ? '#ff8398' : boss.data.accent;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(W - 330, 104, 270, 54);
+      ctx.fillStyle = reserve <= 25 ? '#ff6682' : boss.data.accent;
+      ctx.fillRect(W - 318, 136, 246 * reserve / 100, 10);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '950 14px system-ui';
+      ctx.textAlign = 'left';
+      ctx.fillText('RÉSERVE ORBITALE ' + Math.round(reserve) + ' %', W - 318, 126);
+    }
+    if (!['telegraph', 'active'].includes(boss.state)) {
+      ctx.restore();
+      return;
+    }
     ctx.lineWidth = save.settings.highContrast ? 7 : 5;
     ctx.strokeStyle = hexToRgba(boss.data.accent, 0.82);
     ctx.fillStyle = hexToRgba(boss.data.color, 0.13 + pulse * 0.08);
@@ -5214,9 +5577,26 @@
     } else if (family === 'vertical-lane') {
       for (let lane = 0; lane < 3; lane++) {
         const x = lane * (W / 3);
-        ctx.fillStyle = lane === runtime.safeLane ? 'rgba(120,255,190,0.12)' : hexToRgba(boss.data.color, 0.2);
+        const safe = lane === runtime.safeLane;
+        ctx.fillStyle = safe ? 'rgba(120,255,190,0.16)' : hexToRgba(boss.data.color, 0.23);
         ctx.fillRect(x, 52, W / 3, GROUND - 52);
         ctx.strokeRect(x + 6, 58, W / 3 - 12, GROUND - 64);
+        if (!safe) {
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'rgba(255,255,255,0.42)';
+          for (let y = 72; y < GROUND - 40; y += 54) {
+            for (let stripe = x + 16; stripe < x + W / 3 - 20; stripe += 54) {
+              ctx.beginPath();
+              ctx.moveTo(stripe, y);
+              ctx.lineTo(Math.min(stripe + 34, x + W / 3 - 12), y + 34);
+              ctx.stroke();
+            }
+          }
+        }
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '950 17px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('VOIE ' + (lane + 1) + (safe ? ' · SÛRE' : ' · DANGER'), x + W / 6, 88);
       }
     } else if (family === 'posture-duo') {
       ctx.beginPath(); ctx.arc(boss.x, boss.y, 118 + pulse * 14, 0, TAU); ctx.stroke();
@@ -5230,11 +5610,19 @@
         ctx.fill(); ctx.stroke();
         ctx.fillStyle = '#fff'; ctx.font = '900 16px system-ui'; ctx.textAlign = 'center'; ctx.fillText(String(node.id + 1), node.x, node.y + 6);
       }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '950 15px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('ORDRE · ' + runtime.puzzleSequence.map(id => String(id + 1)).join(' → ') + ' · ÉTAPE ' + Math.min(runtime.puzzleIndex + 1, runtime.puzzleSequence.length) + '/' + runtime.puzzleSequence.length, W / 2, 164);
     } else if (family === 'gravity-weather') {
       const direction = runtime.environment.endsWith('left') ? -1 : runtime.environment.endsWith('right') ? 1 : 0;
       if (direction) {
         for (let y = 180; y < GROUND; y += 90) { ctx.beginPath(); ctx.moveTo(W / 2, y); ctx.lineTo(W / 2 + direction * 180, y); ctx.stroke(); }
       }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '950 15px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('ENVIRONNEMENT · ' + String(runtime.environment || 'stable').replaceAll('-', ' ').toUpperCase(), W / 2, 164);
     }
     ctx.setLineDash([]);
     ctx.fillStyle = '#fff';
@@ -5654,6 +6042,10 @@
   }
   function addFloatingText(x,y,text,color){floatingTexts.push({x,y,text,color,life:0.75});}
   function shake(amount){screenShake=Math.max(screenShake,amount);}
+  function haptic(pattern){
+    if (!save.settings.shake || typeof navigator.vibrate !== 'function') return false;
+    try { return navigator.vibrate(pattern); } catch { return false; }
+  }
 
   function overlapsPlayerBoss(){
     if (!boss?.collisionEnabled) return false;
@@ -5729,8 +6121,12 @@
   }
 
   window.addEventListener('keydown',event=>{
-    if(['ArrowLeft','ArrowRight','ArrowUp','Space'].includes(event.code))event.preventDefault();
-    if(!keys[event.code])pressed.add(event.code);keys[event.code]=true;
+    const inFight = state === 'fight';
+    if (inFight && ['ArrowLeft','ArrowRight','ArrowUp','Space'].includes(event.code)) event.preventDefault();
+    if (inFight) {
+      if(!keys[event.code])pressed.add(event.code);
+      keys[event.code]=true;
+    }
     if(event.code==='Escape'||event.code==='KeyP'){
       if(state==='fight')pauseGame();else if(state==='paused')resumeGame();
     }
@@ -5764,7 +6160,7 @@
   });
 
   document.getElementById('start-rush').addEventListener('click', showIntroStory);
-  document.getElementById('prologue-start')?.addEventListener('click',()=>{markStorySeen(STORY.prologue.id);startRun('rush',0);});
+  document.getElementById('prologue-start')?.addEventListener('click',()=>{markStorySeen(STORY.prologue.id);pendingStoryAction=null;startRun('rush',0);});
   storyContinue?.addEventListener('click',()=>{const action=pendingStoryAction; if(action) action();});
   storyBack?.addEventListener('click',()=>{pendingStoryAction=null;currentStoryKey=null;showScreen('title-screen');});
   document.getElementById('practice').addEventListener('click',()=>{selectionMode='practice';buildBossGrid('practice');showScreen('boss-select-screen');});
@@ -5814,7 +6210,7 @@
     await importSaveFile(file);
   });
   document.getElementById('reset-save').addEventListener('click',()=>{
-    if(!confirm('Réinitialiser les boss débloqués et tous les meilleurs temps ?'))return;
+    if(!confirm('Effacer toute la progression locale : campagne, Circuit Forge, checkpoints, records, maîtrises, Codex et scènes vues ? Exportez d’abord la sauvegarde si vous souhaitez la conserver.'))return;
     const settings={...save.settings};save=structuredClone(DEFAULT_SAVE);save.settings=settings;persistSave();applySettings();buildBossGrid();buildCodex();syncContinueRun();syncContinueForge();showToast('PROGRESSION RÉINITIALISÉE // LE MENU OUBLIE SES CHECKPOINTS', 'Progression réinitialisée.');
   });
 
@@ -5838,7 +6234,7 @@
     return startRun(LEGACY_BOSS_IDS.has(id) && options.mode === 'practice' ? 'practice' : 'forge', index, options);
   }
 
-  const qaAllowed = new URLSearchParams(location.search).get('qa') === '1' && ['127.0.0.1', 'localhost'].includes(location.hostname);
+  const qaAllowed = QA_ALLOWED;
   if (qaAllowed) Object.defineProperty(window, '__GEARSTORM_QA__', {
     value: Object.freeze({
       getState: () => ({ state, runMode, launchMode: requestedLaunchMode, bossIndex: currentBossIndex, bossId: boss?.data.id ?? null, boss: boss?.data.name ?? null, bossState: boss?.state ?? null, currentBossRetries, enduranceRound: boss?.runtime?.round ?? null, signatureCycle: boss?.runtime?.signatureCycle ?? null, bossFamily: boss?.runtime?.family ?? null, mechanicId: boss?.runtime?.mechanicId ?? null, signatureState: boss?.runtime?.signatureState ?? null, mechanicProgress: boss?.runtime?.mechanicProgress ?? null, mechanicTarget: boss?.runtime?.mechanicTarget ?? null, phase: boss?.phase ?? null, hp: boss?.hp ?? null, maxHp: boss?.maxHp ?? null, overload: player?.overload ?? null, barrier: player?.barrier ?? null, installed: [...runBuild.installed], rushSnapshot: sanitizeRushSnapshot(save.rushSnapshot), forgeRushSnapshot: sanitizeForgeRushSnapshot(save.forgeRushSnapshot), activeScreen: document.querySelector('.screen.active')?.id ?? null, art: getGeneratedArtState() }),
@@ -5868,6 +6264,18 @@
       get currentAssets() { return [...artRuntime.currentAssets]; },
       getArtState: () => getGeneratedArtState(),
       getRigDiagnostics: () => getRigDiagnostics(),
+      setHeroPoseState: pose => {
+        if (!player || state !== 'fight' || !pose || typeof pose !== 'object') return false;
+        if (Number.isFinite(Number(pose.vx))) player.vx = Number(pose.vx);
+        if (Number.isFinite(Number(pose.vy))) player.vy = Number(pose.vy);
+        if (Number.isFinite(Number(pose.anim))) player.anim = Number(pose.anim);
+        if (Number.isFinite(Number(pose.poseAim))) player.poseAim = clamp(Number(pose.poseAim), 0, 1);
+        if (Number.isFinite(Number(pose.poseRecoil))) player.poseRecoil = clamp(Number(pose.poseRecoil), 0, 1);
+        if (Number.isFinite(Number(pose.poseLand))) player.poseLand = clamp(Number(pose.poseLand), 0, 1);
+        if (Number.isFinite(Number(pose.dashTime))) player.dashTime = Math.max(0, Number(pose.dashTime));
+        if (typeof pose.onGround === 'boolean') player.onGround = pose.onGround;
+        return getRigDiagnostics().heroine;
+      },
       getRushSnapshot: () => sanitizeRushSnapshot(save.rushSnapshot),
       resumeRush: () => resumeRushSnapshot(),
       protectPlayer: () => {
@@ -5953,7 +6361,7 @@
         await promptEvent.prompt();
         const choice = await promptEvent.userChoice;
         promptEvent = null;
-        button.hidden = choice?.outcome === 'accepted';
+        button.hidden = true;
         if (choice?.outcome !== 'accepted') showToast('INSTALLATION REPORTÉE // LE CIRCUIT RESTE DANS CET ONGLET', 'Installation annulée.');
       } finally {
         button.disabled = false;
@@ -5990,7 +6398,7 @@
 
   function registerGearstormServiceWorker() {
     if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
-    const marker = '__GEARSTORM_PWA_UPDATE_V2_9_1__';
+    const marker = '__GEARSTORM_PWA_UPDATE_V2_10_0__';
     if (globalThis[marker]) return;
     globalThis[marker] = true;
     const updateButton = document.querySelector('#update-app');

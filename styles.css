@@ -1401,6 +1401,19 @@ body.reduce-motion #art-loader-progress::-moz-progress-bar {
 
 .combat-briefing[hidden] { display: none !important; }
 #combat-objective { color: white; font-size: 0.86rem; line-height: 1.35; }
+#combat-mechanic {
+  margin: 0.12rem 0;
+  padding: 0.32rem 0.45rem;
+  border: 1px solid rgba(255, 178, 76, 0.38);
+  border-radius: 7px;
+  background: rgba(255, 178, 76, 0.1);
+  color: #fff0c9;
+  font-size: 0.69rem;
+  font-weight: 900;
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+}
+#combat-mechanic[hidden] { display: none !important; }
 #combat-hint { margin: 0; color: #d8e2f5; font-size: 0.72rem; line-height: 1.4; }
 
 .boss-intro {
@@ -1598,6 +1611,7 @@ body.high-contrast .boss-intro {
   line-height: 1.5;
 }
 
+.story-line[data-speaker="Cassian"],
 .story-line[data-speaker="Cassian Voltério"] {
   border-color: rgba(255, 101, 126, 0.22);
   border-left-color: var(--danger);
@@ -1613,6 +1627,7 @@ body.high-contrast .boss-intro {
   text-transform: uppercase;
 }
 
+.story-line[data-speaker="Cassian"] strong,
 .story-line[data-speaker="Cassian Voltério"] strong { color: #ff9cac; }
 
 .story-consequence {
@@ -1698,6 +1713,14 @@ body.high-contrast .boss-intro {
 .story-archive li[data-state="locked"] { opacity: 0.5; }
 .story-archive span { color: var(--cyan); font-size: 0.62rem; font-weight: 950; letter-spacing: 0.1em; }
 .story-archive strong { display: block; margin-top: 0.25rem; font-size: 0.72rem; line-height: 1.35; }
+.story-archive details { min-width: 0; }
+.story-archive summary { cursor: pointer; list-style-position: inside; }
+.story-archive li:has(details[open]) { grid-column: 1 / -1; }
+.story-archive-summary,
+.story-archive-consequence { margin: 0.65rem 0 0; color: #cbd8ec; font-size: 0.74rem; line-height: 1.5; }
+.story-archive-consequence { color: var(--orange); }
+.story-archive-dialogue { display: grid; gap: 0.45rem; margin-top: 0.65rem; }
+.story-archive-dialogue .story-line { margin: 0; padding: 0.5rem 0.6rem; font-size: 0.72rem; }
 
 #result-screen .result-panel { width: min(760px, 94vw); }
 
@@ -2237,7 +2260,7 @@ body.high-contrast .boss-card-art {
   background:
     linear-gradient(100deg, rgba(3, 5, 13, 0.96) 0%, rgba(3, 5, 13, 0.58) 48%, rgba(3, 5, 13, 0.9) 100%),
     radial-gradient(circle at 72% 22%, rgba(126, 233, 255, 0.18), transparent 28%),
-    url("assets/generated/v2.9.1/arenas/null-crown/backdrop.webp") center / cover no-repeat,
+    url("assets/generated/v2.10.0/arenas/null-crown/backdrop.webp") center / cover no-repeat,
     #070816;
 }
 
@@ -2332,7 +2355,7 @@ body.high-contrast .boss-card-art {
   }
 }
 
-/* Passe UI méta-diégétique v2.9.1 : quatre transmissions illustrées, résultat Forge et Codex étendu. */
+/* Passe UI méta-diégétique v2.10.0 : quatre transmissions illustrées, résultat Forge et Codex étendu. */
 .story-screen,
 .prologue-screen,
 #ending-screen,
@@ -2348,33 +2371,33 @@ body.high-contrast .boss-card-art {
 }
 
 .story-screen {
-  --narrative-art: url("assets/generated/v2.9.1/narrative/intro-broadcast.webp");
+  --narrative-art: url("assets/generated/v2.10.0/narrative/intro-broadcast.webp");
   --narrative-focus: 50% 46%;
   --narrative-banner-focus: 50% 42%;
 }
 
 .story-screen[data-narrative-scene="prologue"] {
-  --narrative-art: url("assets/generated/v2.9.1/narrative/prologue-m0.webp");
+  --narrative-art: url("assets/generated/v2.10.0/narrative/prologue-m0.webp");
   --narrative-focus: 42% 50%;
   --narrative-banner-focus: 40% 48%;
 }
 
 .prologue-screen {
-  --narrative-art: url("assets/generated/v2.9.1/narrative/prologue-m0.webp");
+  --narrative-art: url("assets/generated/v2.10.0/narrative/prologue-m0.webp");
   --narrative-focus: 42% 50%;
   --narrative-banner-focus: 40% 48%;
   justify-content: flex-end;
 }
 
 #ending-screen {
-  --narrative-art: url("assets/generated/v2.9.1/narrative/campaign-ending.webp");
+  --narrative-art: url("assets/generated/v2.10.0/narrative/campaign-ending.webp");
   --narrative-focus: 58% 46%;
   --narrative-banner-focus: 58% 42%;
   justify-content: flex-start;
 }
 
 .forge-ending-screen {
-  --narrative-art: url("assets/generated/v2.9.1/narrative/forge-ending.webp");
+  --narrative-art: url("assets/generated/v2.10.0/narrative/forge-ending.webp");
   --narrative-focus: 42% 50%;
   --narrative-banner-focus: 40% 48%;
   justify-content: flex-end;
@@ -2640,6 +2663,88 @@ body.high-contrast :is(.story-panel, .prologue-panel, .ending-panel)::before {
   }
 }
 
+/* Prologue desktop : l’illustration et le briefing partagent le cadre sans action flottante. */
+@media (min-width: 900px) and (min-height: 640px) {
+  .prologue-screen { justify-content: center; }
+
+  .prologue-panel {
+    width: min(1160px, 96vw);
+    display: grid;
+    grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.28fr);
+    column-gap: 1.25rem;
+    align-items: start;
+    max-height: calc(100dvh - 2rem);
+  }
+
+  .prologue-panel::before {
+    grid-column: 1;
+    grid-row: 1 / span 8;
+    min-height: 100%;
+    height: 100%;
+    margin: 0;
+    background-position: center, 44% 50%;
+  }
+
+  .prologue-panel > * { grid-column: 2; }
+  .prologue-panel .chapter-mark { margin: 0.62rem 0 0.2rem; }
+  .prologue-panel h2 { margin: 0; font-size: clamp(2rem, 3.3vw, 3.35rem); }
+
+  .prologue-copy {
+    margin: 0.5rem 0 0.6rem;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  #prologue-dialogue {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.48rem;
+  }
+
+  .prologue-panel blockquote {
+    min-width: 0;
+    margin: 0;
+    padding: 0.62rem 0.68rem;
+    font-size: 0.71rem;
+    line-height: 1.38;
+  }
+
+  .prologue-panel .story-line strong {
+    margin-bottom: 0.22rem;
+    font-size: 0.58rem;
+  }
+
+  .prologue-panel .mission-brief {
+    gap: 0.25rem 0.7rem;
+    margin: 0.62rem 0;
+    padding: 0.58rem 0.68rem;
+  }
+
+  .prologue-panel .mission-brief strong { font-size: 0.7rem; line-height: 1.35; }
+
+  .prologue-panel .district-route {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.3rem;
+    margin: 0 0 0.62rem;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .prologue-panel .district-route li {
+    padding: 0.42rem;
+    border-radius: 8px;
+  }
+
+  .prologue-panel .district-route strong { font-size: 0.58rem; line-height: 1.25; }
+  .prologue-panel .district-route small { font-size: 0.56rem; line-height: 1.25; }
+
+  .prologue-actions {
+    position: static;
+    padding-top: 0;
+    background: none;
+  }
+}
+
 .forge-ring-overview {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2661,6 +2766,14 @@ body.high-contrast :is(.story-panel, .prologue-panel, .ending-panel)::before {
   font-size: 0.72rem;
   line-height: 1.34;
 }
+
+.forge-ring-overview .ring-revelation {
+  padding-top: 0.48rem;
+  border-top: 1px solid rgba(126, 233, 255, 0.18);
+}
+
+.forge-ring-overview article[data-state="revealed"] .ring-revelation { color: var(--orange); }
+.forge-ring-overview article[data-state="encrypted"] .ring-revelation { opacity: 0.58; }
 
 .forge-ring-overview p,
 .forge-codex-card .codex-transmission {

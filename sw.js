@@ -1,11 +1,11 @@
-const APP_VERSION = '2.9.1';
-const ASSET_VERSION = '2.9.1';
+const APP_VERSION = '2.10.0';
+const ASSET_VERSION = '2.10.0';
 const SHELL_CACHE = `gearstorm-shell-v${APP_VERSION}`;
 const RUNTIME_CACHE = `gearstorm-runtime-v${ASSET_VERSION}`;
 const GENERATED_RUNTIME_PREFIX = new URL(`./assets/generated/v${ASSET_VERSION}/`, self.registration.scope).pathname;
 const CORE_ASSETS = [
   './index.html',
-  './pwa-update-v2.9.1.js',
+  './pwa-update-v2.10.0.js',
   './styles.css',
   './story.js',
   './expansion-story.js',
@@ -42,6 +42,14 @@ function canonicalRequest(url) {
   return new Request(url.origin + url.pathname, { method: 'GET' });
 }
 
+async function putCacheBestEffort(cache, key, response) {
+  try {
+    await cache.put(key, response.clone());
+  } catch {
+    // Une réponse réseau valide reste utilisable si le quota/cache navigateur refuse l'écriture.
+  }
+}
+
 async function cacheFirstRuntime(request, url) {
   const cache = await caches.open(RUNTIME_CACHE);
   const cacheKey = canonicalRequest(url);
@@ -51,7 +59,7 @@ async function cacheFirstRuntime(request, url) {
   const response = await fetch(request);
   const contentType = response.headers.get('content-type') || '';
   if (response.ok && response.type === 'basic' && /^image\/webp(?:;|$)/i.test(contentType)) {
-    await cache.put(cacheKey, response.clone());
+    await putCacheBestEffort(cache, cacheKey, response);
   }
   return response;
 }
@@ -61,7 +69,7 @@ async function networkFirstNavigation(request) {
     const response = await fetch(request);
     if (response.ok && response.type === 'basic') {
       const cache = await caches.open(SHELL_CACHE);
-      await cache.put('./index.html', response.clone());
+      await putCacheBestEffort(cache, './index.html', response);
     }
     return response;
   } catch {
@@ -74,7 +82,7 @@ async function staleWhileRevalidateShell(request, url, event) {
   const cacheKey = canonicalRequest(url);
   const cached = await cache.match(cacheKey);
   const network = fetch(request).then(async response => {
-    if (response.ok && response.type === 'basic') await cache.put(cacheKey, response.clone());
+    if (response.ok && response.type === 'basic') await putCacheBestEffort(cache, cacheKey, response);
     return response;
   });
   if (!cached) return network;

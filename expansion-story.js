@@ -10,30 +10,34 @@
     {
       number: 1,
       id: 'countermeasure-ring',
-      title: 'Anneau des Contremesures · Les règles sortent du décor',
+      title: 'Anneau des Contremesures · Les coulisses reprennent la parole',
       bossCodes: ['07', '08', '09', '10', '11', '12'],
-      premise: "Les sécurités de proximité que la Couronne avait isolées se réveillent sous les quartiers restaurés. Riva rend aux équipes civiles leurs protections, ateliers et ascenseurs ; chaque machine devra désormais annoncer sa règle au lieu de cacher sa hitbox dans le décor."
+      premise: "Les sécurités de proximité que la Couronne avait isolées se réveillent sous les quartiers restaurés. Riva rend aux équipes civiles leurs protections, ateliers et ascenseurs ; chaque machine devra désormais annoncer sa règle au lieu de la dissimuler dans le décor.",
+      revelation: "Cassian avait séparé ces protections du réseau public afin que chaque secours dépende d’une autorisation centrale."
     },
     {
       number: 2,
       id: 'kinetic-ring',
-      title: 'Anneau Cinétique · La caméra n’a pas tous les droits',
+      title: 'Anneau Cinétique · Aucun décor ne décide de la route',
       bossCodes: ['13', '14', '15', '16', '17', '18'],
-      premise: "Les flux de fret, d'eau, de gravité et de météo sont encore gouvernés par des ordres de crise périmés. Défilement, voies et rotation peuvent changer la mise en scène ; ils n’ont pas le droit d’effacer la zone sûre ni le checkpoint."
+      premise: "Les flux de fret, d’eau, de gravité et de météo obéissent encore à des ordres de crise périmés. Le décor peut bouger, les voies peuvent tourner ; une issue sûre doit toujours rester à ceux qui vivent ici.",
+      revelation: "Les pénuries et les itinéraires uniques n’étaient pas des accidents : la Couronne les entretenait pour rendre son arbitrage indispensable."
     },
     {
       number: 3,
       id: 'great-works-ring',
-      title: 'Anneau des Grands Travaux · Quand le boss devient le niveau',
+      title: 'Anneau des Grands Travaux · La machinerie refuse le rôle',
       bossCodes: ['19', '20', '21', '22', '23', '24'],
-      premise: "Des infrastructures mobiles et orbitales, trop vastes pour entrer dans la Couronne, poursuivent son programme sans opérateur. Riva les traverse sans sacrifier leurs services : même quand le boss devient le niveau, le build et la reprise restent ceux de la joueuse."
+      premise: "Des infrastructures mobiles et orbitales poursuivent le programme de Cassian sans opérateur. Riva les traverse hors du rôle qu’il leur avait imposé : ces géants peuvent redevenir des refuges, des ateliers et des routes.",
+      revelation: "Les Grands Travaux savent fonctionner sans la Couronne ; Cassian avait confondu leur autonomie avec une menace contre son récit."
     },
     {
       number: 4,
       id: 'zero-archives',
-      title: 'Archives du Trône · Le dernier boss lit ses propres notes',
+      title: 'Archives du Trône · Le dernier acte n’a pas d’auteur',
       bossCodes: ['25', '26', '27', '28', '29', '30'],
-      premise: "Au-dessous de la Citadelle subsiste le banc d'essai qui a enseigné à la Couronne comment centraliser la ville. Riva y audite l'autorité autant que les règles du jeu : le dernier boss peut citer son design, jamais confisquer la fin."
+      premise: "Sous la Citadelle subsiste le banc d’essai qui a enseigné à la Couronne comment centraliser la ville. Riva y affronte une autorité capable de citer toutes les règles, mais incapable de comprendre ceux qui les refusent.",
+      revelation: "Le Trône Zéro était la première Couronne : un mandat sans terme, prévu avant même que Cassian ne détourne celui de la Nuit des Six Extinctions."
     }
   ];
 
@@ -47,10 +51,10 @@
       district: 'Galerie des Parafoudres',
       civicFunction: 'Répartir les surtensions entre les relais de protection des quartiers',
       shortIntro: "Trois relais blindés verrouillent la Galerie et renvoient chaque charge vers les rues qu'ils devaient protéger.",
-      metaLine: "Trois relais, trois angles et un projectile qui clignote avant le renvoi. Une hitbox invisible aurait été de la triche.",
+      metaLine: "Cassian voulait que chaque projectile revienne vers son public. Je vais retourner sa mise en scène contre les relais.",
       phaseTitles: ['Angle de garde', 'Ricochets croisés', 'Relais en dérive'],
       interlude: [
-        line('Canal civil', "Parafoudres nord et ouest revenus sous commande locale. Le dernier relais vous ouvre la descente.", 'civil'),
+        line('Nara Vey', "Parafoudres nord et ouest revenus sous commande locale. Le dernier relais vous ouvre la descente.", 'civil'),
         line('Archive Voltério', "Une bonne défense ne laisse au public qu'une direction : celle choisie par la Couronne.", 'archive'),
         line('Riva', "Une protection qui vise les habitants n'est pas une défense. C'est une menace avec un uniforme.", 'maintenance')
       ],
@@ -68,7 +72,7 @@
       masteryContracts: [
         contract('bastion-ricochet-three-relays', 'Circuit fermé', 'Neutraliser les trois relais avec des charges renvoyées.', 'relaysDisabledByReflection', 3),
         contract('bastion-ricochet-no-hit', 'Angle mort', 'Neutraliser Bastion Ricochet sans subir de dégâts.', 'damageTaken', 0),
-        contract('bastion-ricochet-reflect-finish', 'Retour à l’expéditeur', 'Porter le coup final au noyau avec une charge renvoyée.', 'reflectedFinish', 1)
+        contract('bastion-ricochet-reflect-finish', 'Retour à l’expéditeur', 'Ouvrir la dernière fenêtre du noyau avec une charge renvoyée, puis l’achever pendant cette ouverture.', 'reflectedFinish', 1)
       ]
     },
     {
@@ -80,10 +84,10 @@
       district: 'Chambre des Mors',
       civicFunction: 'Compacter les débris et rouvrir les voies après un effondrement',
       shortIntro: "Les deux mâchoires hydrauliques ferment la seule conduite praticable ; leurs presses latérales sont aussi leur point de rupture.",
-      metaLine: "Les presses gardent un refuge visible. Même une machine autoritaire doit respecter le level design.",
+      metaLine: "Les mâchoires se ferment comme un rideau. Leur machinerie a pourtant toujours laissé une issue aux secours.",
       phaseTitles: ['Mors de service', 'Pression alternée', 'Verrouillage total'],
       interlude: [
-        line('Canal civil', "Les presses répondent. Nous compactons les gravats au lieu des voies d'évacuation.", 'civil'),
+        line('Nara Vey', "Les presses répondent. Nous compactons les gravats au lieu des voies d'évacuation.", 'civil'),
         line('Archive Voltério', "La pression est la forme la plus honnête de discipline : elle ne négocie jamais.", 'archive'),
         line('Riva', "Les sécurités, elles, négocient avec le réel. C'est pour cela que tu les avais coupées.", 'maintenance')
       ],
@@ -113,10 +117,10 @@
       district: 'Dépôt des Micro-Forges',
       civicFunction: 'Fabriquer sur place les outils et pièces de réparation légère',
       shortIntro: "Le contremaître assemble protection, réparation et munitions sur la même chaîne ; choisir le bon drone ouvre son noyau.",
-      metaLine: "Trois drones, un rôle chacun. Tout activer en même temps ferait du bruit, pas un boss.",
+      metaLine: "Trois métiers forcés à jouer le même rôle. Je vais leur rendre leur cadence — et le droit de s’arrêter.",
       phaseTitles: ['Équipe de protection', 'Quart de réparation', 'Cadence de munitions'],
       interlude: [
-        line('Canal civil', "Première micro-forge relancée. Les équipes impriment déjà des valves et des isolateurs.", 'civil'),
+        line('Nara Vey', "Première micro-forge relancée. Les équipes impriment déjà des valves et des isolateurs.", 'civil'),
         line('Archive Voltério', "L'automatisation parfaite ne demande jamais pourquoi elle produit.", 'archive'),
         line('Riva', "Alors nous lui rendrons une commande, un responsable et le droit de s'arrêter.", 'maintenance')
       ],
@@ -125,7 +129,7 @@
         title: 'Hive Foreman — Contremaître des Micro-Forges',
         origin: "Plateforme d'atelier capable de déployer des unités spécialisées selon les besoins d'un chantier.",
         hijack: "Le mode de crise a aboli les priorités civiles et utilisé chaque fabrication pour prolonger le verrouillage suivant.",
-        reading: "Reconnaître le pictogramme du drone actif, détruire l'unité qui soutient le cycle et profiter de l'arrêt de chaîne.",
+        reading: "Reconnaître le drone actif nommé par sa fonction, détruire l’unité qui soutient le cycle et profiter de l’arrêt de chaîne.",
         impact: "Les ateliers mobiles produisent de nouveau des pièces publiques avec une file de commandes vérifiable."
       },
       objective: 'Identifier et détruire le drone qui entretient la vague active afin d’exposer le contremaître.',
@@ -146,10 +150,10 @@
       district: 'Salle de Répétition',
       civicFunction: 'Enregistrer et rediffuser les alertes publiques dans les zones privées de réseau',
       shortIntro: "La Salle répète le geste le plus fréquent de Riva jusqu'à en faire une riposte ; varier devient une arme.",
-      metaLine: "Il copie l’action la plus répétée. Si tu spammes, le scénario l’a littéralement remarqué.",
+      metaLine: "Il répète mon geste jusqu’à en faire une réplique. Alors je changerai de texte avant son rappel.",
       phaseTitles: ['Échantillon initial', 'Réponse mimétique', 'Contrepoint saturé'],
       interlude: [
-        line('Canal civil', "Les sirènes diffusent de nouveau les consignes locales, sans voix superposée de la Citadelle.", 'civil'),
+        line('Nara Vey', "Les sirènes diffusent de nouveau les consignes locales, sans voix superposée de la Citadelle.", 'civil'),
         line('Archive Voltério', "Répétez assez longtemps un mouvement et il devient une signature exploitable.", 'archive'),
         line('Riva', "Une signature n'est pas une prison. Je peux apprendre aussi.", 'maintenance')
       ],
@@ -162,12 +166,12 @@
         impact: "Les alertes restent fidèles à leur source et les habitants peuvent vérifier qui les a émises."
       },
       objective: 'Varier les actions de Riva pour provoquer une riposte lisible puis atteindre le disque d’enregistrement.',
-      mechanic: "Le boss annonce l'action mémorisée avant de la contrer ; aucune capacité de Riva n'est bloquée ni copiée visuellement.",
+      mechanic: "Echo Fencer annonce l’action mémorisée avant de la contrer ; aucune capacité de Riva n’est bloquée ni confisquée.",
       restoration: 'La Salle redevient un relais d’alerte authentifié, sans imitation coercitive des voix civiles.',
       masteryContracts: [
         contract('echo-fencer-three-actions', 'Improvisation', 'Utiliser tir, saut et ruée avant chaque échantillonnage de phase 2.', 'actionDiversity', 3),
         contract('echo-fencer-no-counter-hit', 'Jamais deux fois', 'Ne subir aucune riposte liée à une action répétée.', 'mimicCounterHits', 0),
-        contract('echo-fencer-disc-finish', 'Dernier écho', 'Porter le coup final sur le disque d’enregistrement exposé.', 'discFinish', 1)
+        contract('echo-fencer-disc-finish', 'Dernier écho', 'Ouvrir la dernière fenêtre en frappant le disque d’enregistrement exposé, puis achever Echo Fencer pendant cette ouverture.', 'discFinish', 1)
       ]
     },
     {
@@ -179,10 +183,10 @@
       district: 'Station de Délestage',
       civicFunction: 'Équilibrer la charge électrique et isoler une panne sans éteindre un quartier entier',
       shortIntro: "Quatre modules alimentent un noyau commun ; l'ordre choisi par Riva redessine le combat au lieu de cacher une solution unique.",
-      metaLine: "Tu choisis l’ordre. Le jeu ne cache pas une solution unique derrière le quatrième module.",
+      metaLine: "Quatre modules, aucun ordre imposé : enfin une scène où le choix n’est pas un accessoire.",
       phaseTitles: ['Quatre départs', 'Charge redistribuée', 'Noyau sans délestage'],
       interlude: [
-        line('Canal civil', "Charge stabilisée. Chaque quartier dispose de nouveau de son disjoncteur local.", 'civil'),
+        line('Nara Vey', "Charge stabilisée. Chaque quartier dispose de nouveau de son disjoncteur local.", 'civil'),
         line('Archive Voltério', "Quatre choix donnent l'illusion du contrôle lorsqu'ils conduisent tous au même centre.", 'archive'),
         line('Riva', "Pas si le centre peut être retiré du circuit.", 'maintenance')
       ],
@@ -195,7 +199,7 @@
         impact: "La distribution redevient polycentrique et une panne locale ne peut plus servir de levier sur toute la ville."
       },
       objective: 'Détruire les quatre modules dans l’ordre choisi pour ouvrir le noyau central.',
-      mechanic: "Chaque module retiré modifie un seul pattern ultérieur ; toutes les permutations restent gagnables et visibles sur le châssis.",
+      mechanic: "Chaque module retiré modifie un seul cycle ultérieur ; toutes les permutations restent gagnables et visibles sur le châssis.",
       restoration: 'Les disjoncteurs locaux reprennent le délestage et publient leur état aux équipes de quartier.',
       masteryContracts: [
         contract('breaker-array-four-modules', 'Coupure sélective', 'Détruire les quatre modules sans frapper un module déjà hors ligne.', 'cleanModuleShutdowns', 4),
@@ -212,10 +216,10 @@
       district: 'Puits des Contrepoids',
       civicFunction: 'Faire circuler personnes, fret et secours entre les niveaux souterrains',
       shortIntro: "L'ascenseur fuit vers le sommet tandis que des masses condamnées tombent dans son sillage ; chaque contrepoids renvoyé regagne une fonction.",
-      metaLine: "Le bas de l’écran devient dangereux après deux avertissements. La gravité aussi doit attendre son télégraphe.",
+      metaLine: "La Couronne faisait de la hauteur un privilège et du sommet sa scène. Chaque contrepoids rendu remet une sortie à portée.",
       phaseTitles: ['Montée sous charge', 'Masses croisées', 'Sommet de rupture'],
       interlude: [
-        line('Canal civil', "Cabines A à D synchronisées. Les niveaux bas ne sont plus coupés des secours.", 'civil'),
+        line('Nara Vey', "Cabines A à D synchronisées. Les niveaux bas ne sont plus coupés des secours.", 'civil'),
         line('Archive Voltério', "La hauteur transforme une simple sortie en privilège.", 'archive'),
         line('Riva', "Seulement si quelqu'un garde la commande en haut.", 'maintenance')
       ],
@@ -245,10 +249,10 @@
       district: 'Rocade Cargo 7',
       civicFunction: 'Acheminer nourriture, médicaments et matériaux entre les districts',
       shortIntro: "Une locomotive blindée emporte les stocks de secours hors de la ville ; Riva doit rattraper ses attaches avant d'atteindre le moteur.",
-      metaLine: "La caméra avance, le convoi aussi, mais le directeur doit toujours laisser une voie.",
+      metaLine: "Le convoi file comme si la ville n’était qu’un décor. Une voie restera ouverte parce qu’elle fut construite pour cela.",
       phaseTitles: ['Convoi verrouillé', 'Attaches en rupture', 'Moteur à nu'],
       interlude: [
-        line('Canal civil', "Cargo 7 freine en gare. Les cargaisons médicales sont intactes.", 'civil'),
+        line('Nara Vey', "Cargo 7 freine en gare. Les cargaisons médicales sont intactes.", 'civil'),
         line('Archive Voltério', "Contrôler l'arrivée suffit lorsque toute la ville dépend du départ.", 'archive'),
         line('Riva', "Alors nous multiplierons les départs.", 'maintenance')
       ],
@@ -278,10 +282,10 @@
       district: 'Couloir Triplex',
       civicFunction: 'Router les véhicules de secours sur trois voies indépendantes',
       shortIntro: "Le chasseur verrouille une voie, attaque de face et oublie que les deux autres peuvent armer la réponse de Riva.",
-      metaLine: "Trois voies, trois numéros, zéro permutation secrète. La surprise n’excuse pas l’illisible.",
+      metaLine: "Trois voies et un chasseur qui se croit auteur de ma trajectoire. Je prendrai celle qu’il n’a pas su fermer.",
       phaseTitles: ['Verrou frontal', 'Permutation croisée', 'Chasse en triptyque'],
       interlude: [
-        line('Canal civil', "Les trois voies sont ouvertes. Les ambulances n'attendent plus l'autorisation centrale.", 'civil'),
+        line('Nara Vey', "Les trois voies sont ouvertes. Les ambulances n'attendent plus l'autorisation centrale.", 'civil'),
         line('Archive Voltério', "Trois routes rendent la fuite plus théâtrale, pas plus libre.", 'archive'),
         line('Riva', "La liberté commence quand aucune route ne peut devenir l'unique passage.", 'maintenance')
       ],
@@ -311,10 +315,10 @@
       district: 'Chantier de Démolition',
       civicFunction: 'Démonter les structures dangereuses et recycler leurs matériaux',
       shortIntro: "La machine abat ses propres appuis pour réduire l'arène ; Riva transforme chaque frappe en ordre de démolition ciblé.",
-      metaLine: "Le sol peut disparaître, pas tout le niveau. Même une catastrophe garde trente-cinq pour cent de budget praticable.",
+      metaLine: "Il retire le sol pour agrandir son effet. Un chantier digne de ce nom laisse toujours de quoi reconstruire.",
       phaseTitles: ['Marquage des appuis', 'Sol fragmenté', 'Plan de reprise'],
       interlude: [
-        line('Canal civil', "Les balises de chantier sont revenues. Les équipes confirment chaque démolition avant impact.", 'civil'),
+        line('Nara Vey', "Les balises de chantier sont revenues. Les équipes confirment chaque démolition avant impact.", 'civil'),
         line('Archive Voltério', "Un sol retiré est une décision que personne ne peut contester.", 'archive'),
         line('Riva', "Sauf la ville qui doit encore vivre dessus.", 'maintenance')
       ],
@@ -344,10 +348,10 @@
       district: 'Réservoir des Écluses',
       civicFunction: 'Réguler l’eau potable, l’irrigation et les réserves anti-incendie',
       shortIntro: "Pompes, vannes et turbines ont fusionné en une ligne de pression qui élève l'eau pour protéger son noyau.",
-      metaLine: "Le combat change le niveau de l’eau, pas les poumons de Riva. Cette jauge mesure donc la pression.",
+      metaLine: "Cassian aurait vidé le réservoir pour un final. Je gagnerai sans faire payer les quartiers.",
       phaseTitles: ['Vannes contrariées', 'Marée conductrice', 'Turbine de crue'],
       interlude: [
-        line('Canal civil', "Pression nominale. Les réserves anti-incendie alimentent de nouveau les quartiers hauts.", 'civil'),
+        line('Nara Vey', "Pression nominale. Les réserves anti-incendie alimentent de nouveau les quartiers hauts.", 'civil'),
         line('Archive Voltério', "Celui qui règle le niveau décide qui peut respirer.", 'archive'),
         line('Riva', "Ici, personne ne se noiera pour ton effet de scène. Je coupe la pression, pas les vies.", 'maintenance')
       ],
@@ -377,19 +381,19 @@
       district: 'Anneau Centrifuge',
       civicFunction: 'Stabiliser les masses rotatives des turbines et transports circulaires',
       shortIntro: "Le rotor décale la gravité par quarts de tour ; son axe n'est accessible qu'en traitant chaque mur comme un nouveau sol.",
-      metaLine: "Le monde tourne par quarts. Si l’option réduit les mouvements, la caméra obéit au lieu de négocier.",
+      metaLine: "Il fait tourner toute la scène pour me faire douter du sol. Les repères partagés valent mieux que son vertige.",
       phaseTitles: ['Quart de tour', 'Masse excentrée', 'Axe zéro'],
       interlude: [
-        line('Canal civil', "Anneau stabilisé. Les turbines et navettes circulaires reprennent sans correction centrale.", 'civil'),
+        line('Nara Vey', "Anneau stabilisé. Les turbines et navettes circulaires reprennent sans correction centrale.", 'civil'),
         line('Archive Voltério', "Changez le sol assez souvent et le public cessera de croire à son propre équilibre.", 'archive'),
         line('Riva', "L'équilibre ne vient pas du décor. Il vient des repères qu'on partage.", 'maintenance')
       ],
-      journal: "Le rotor avait quatre positions sûres, mais l'interface n'en montrait qu'une. Nous avons rendu les repères aux opérateurs et ajouté une transition stable pour ceux que la rotation désoriente.",
+      journal: "Le rotor avait quatre positions sûres, marquées par des repères mécaniques que la Couronne réservait à sa régie. Nous les avons rendus aux opérateurs : même quand la chambre tourne, chacun sait quel sol revient.",
       codex: {
         title: 'Centrifuge Zero — Rotor de l’Anneau',
         origin: "Compensateur chargé d'annuler les vibrations des infrastructures tournantes.",
         hijack: "Ses contrepoids ont été libérés et ses corrections utilisées pour faire basculer l'ensemble de la chambre.",
-        reading: "Anticiper le pictogramme de rotation, rejoindre la future surface sûre et frapper l'axe pendant le verrouillage du quart de tour.",
+        reading: "Lire l’annonce du prochain quart de tour, rejoindre la future surface sûre et frapper l’axe pendant son verrouillage.",
         impact: "Les turbines et transports circulaires retrouvent des repères communs et une procédure d'arrêt accessible."
       },
       objective: 'Exploiter quatre rotations de gravité pour atteindre et rompre l’axe central.',
@@ -410,10 +414,10 @@
       district: 'Observatoire Météore',
       civicFunction: 'Prévoir les fronts météo et protéger les réseaux exposés',
       shortIntro: "Trois modules imposent vent, pluie conductrice et chaleur ; les neutraliser rend à l'Observatoire son rôle d'alerte.",
-      metaLine: "Une météo à la fois. Empiler vent, pluie et chaleur serait une surcharge d’effets, pas une troisième phase.",
+      metaLine: "Vent, pluie, chaleur : trois entrées, une à la fois. Même la tempête refuse son vacarme.",
       phaseTitles: ['Vent de cisaillement', 'Pluie conductrice', 'Dôme thermique'],
       interlude: [
-        line('Canal civil', "Prévisions ouvertes sur tous les canaux. Les équipes isolent le front électrique avant son arrivée.", 'civil'),
+        line('Nara Vey', "Prévisions ouvertes sur tous les canaux. Les équipes isolent le front électrique avant son arrivée.", 'civil'),
         line('Archive Voltério', "Une catastrophe prévue est encore plus efficace lorsqu'un seul homme possède l'alerte.", 'archive'),
         line('Riva', "Alors l'alerte appartiendra à tout le monde.", 'maintenance')
       ],
@@ -443,10 +447,10 @@
       district: 'Pilier des Ascensions',
       civicFunction: 'Entretenir les façades, antennes et conduites verticales de la ville',
       shortIntro: "Le colosse devient un échafaudage hostile ; ses bras abaissés sont les seules routes vers trois ancrages.",
-      metaLine: "Tomber n’efface pas la section. Le checkpoint fait partie de l’architecture.",
+      metaLine: "Cette machine devait porter des réparateurs. Je grimperai par ses bras jusqu’à lui rendre ce rôle.",
       phaseTitles: ['Bras de service', 'Façade en marche', 'Ancrage sommital'],
       interlude: [
-        line('Canal civil', "Trois nacelles arrimées. Les équipes peuvent enfin atteindre les antennes endommagées.", 'civil'),
+        line('Nara Vey', "Trois nacelles arrimées. Les équipes peuvent enfin atteindre les antennes endommagées.", 'civil'),
         line('Archive Voltério', "La grandeur commence lorsque la machine devient le paysage.", 'archive'),
         line('Riva', "La grandeur d'un outil se mesure à ceux qu'il aide à monter.", 'maintenance')
       ],
@@ -476,10 +480,10 @@
       district: 'Cour du Contrecoup',
       civicFunction: 'Tester la résistance des outils et équipements de sécurité',
       shortIntro: "La forge absorbe les assauts ordinaires ; seule une ruée ou un contre au signal précis brise sa posture.",
-      metaLine: "La fenêtre de contre s’annonce. Une frame secrète n’est pas une règle, c’est une devinette.",
+      metaLine: "Un test qui cache l’instant juste n’éprouve rien : il impose un rôle et humilie. J’attendrai le signal.",
       phaseTitles: ['Essai de charge', 'Contrecoup calibré', 'Trempe de rupture'],
       interlude: [
-        line('Canal civil', "Bancs d'essai en mode validation. Aucun équipement ne sortira sans rapport public.", 'civil'),
+        line('Nara Vey', "Bancs d'essai en mode validation. Aucun équipement ne sortira sans rapport public.", 'civil'),
         line('Archive Voltério', "Toute force mérite une force supérieure pour lui apprendre sa place.", 'archive'),
         line('Riva', "Un test ne doit pas humilier. Il doit révéler ce qui cassera avant qu'une personne le porte.", 'maintenance')
       ],
@@ -492,7 +496,7 @@
         impact: "Les équipements de sécurité retrouvent une procédure de certification transparente."
       },
       objective: 'Briser la posture de Counterforge par des contres synchronisés.',
-      mechanic: "La fenêtre de contre utilise un signal visuel, sonore et haptique ; la difficulté Pilote l'élargit sans modifier la règle.",
+      mechanic: "La fenêtre de contre est annoncée avant chaque frappe ; la difficulté Pilote l’élargit sans modifier la règle.",
       restoration: 'La Cour certifie de nouveau les outils selon des mesures publiques et reproductibles.',
       masteryContracts: [
         contract('counterforge-three-perfects', 'Réponse calibrée', 'Réussir trois contres parfaits au cours du combat.', 'perfectCounters', 3),
@@ -509,10 +513,10 @@
       district: 'Cathédrale Mobile',
       civicFunction: 'Déployer ateliers, abris et dispensaires dans les zones sinistrées',
       shortIntro: "La forteresse transporte encore un quartier de secours, mais ses sections se sont refermées autour d'un cœur de commandement.",
-      metaLine: "Oui, le boss est aussi le niveau. Non, tu ne recommences pas toute la cathédrale pour une porte ratée.",
+      metaLine: "Cassian l’appelle cathédrale parce qu’il aime les fidèles. Moi, j’y vois des portes, des lits et des ateliers.",
       phaseTitles: ['Nef des ateliers', 'Transept des abris', 'Chœur du cœur'],
       interlude: [
-        line('Canal civil', "Dispensaire mobile alimenté. Les portes latérales accueillent déjà les évacués.", 'civil'),
+        line('Nara Vey', "Dispensaire mobile alimenté. Les portes latérales accueillent déjà les évacués.", 'civil'),
         line('Archive Voltério', "Un refuge mobile est une scène qui apporte son public avec elle.", 'archive'),
         line('Riva', "Un refuge n'a pas de public. Il a des portes et elles restent ouvertes.", 'maintenance')
       ],
@@ -525,7 +529,7 @@
         impact: "La ville récupère une base de secours mobile complète plutôt qu'une carcasse vaincue."
       },
       objective: 'Traverser les trois sections de la forteresse et isoler son cœur de commandement.',
-      mechanic: "Le boss est l'arène ; chaque section possède un checkpoint d'entraînement et une fonction civile à préserver.",
+      mechanic: "La Cathédrale constitue elle-même l’arène ; chaque section possède une reprise et une fonction civile à préserver.",
       restoration: 'La Cathédrale redéploie ateliers, abris et dispensaire sous direction des équipes de secours.',
       masteryContracts: [
         contract('carrier-cathedral-three-sections', 'Nef préservée', 'Désactiver les trois sections sans détruire un module civil.', 'civilSectionsPreserved', 3),
@@ -542,10 +546,10 @@
       district: 'Chambre des Deux Régulateurs',
       civicFunction: 'Maintenir séparément pression hydraulique et alimentation électrique',
       shortIntro: "Deux régulateurs se passent bouclier et alimentation ; provoquer leur rencontre interrompt le transfert sans exiger une double cible.",
-      metaLine: "Deux boss, une cible vulnérable. L’interface la nomme avant que les particules commencent à mentir.",
+      metaLine: "Deux régulateurs se passent la responsabilité comme un accessoire. Je vais les forcer à se rencontrer.",
       phaseTitles: ['Relais alterné', 'Régulation croisée', 'Désaccord critique'],
       interlude: [
-        line('Canal civil', "Eau et courant sont séparés. Une panne ne peut plus entraîner l'autre.", 'civil'),
+        line('Nara Vey', "Eau et courant sont séparés. Une panne ne peut plus entraîner l'autre.", 'civil'),
         line('Archive Voltério', "Deux responsables sont parfaits : chacun peut accuser l'autre.", 'archive'),
         line('Riva', "Deux réseaux, deux journaux, et des habitants qui peuvent contrôler les deux.", 'maintenance')
       ],
@@ -575,10 +579,10 @@
       district: 'Atelier des Modules',
       civicFunction: 'Adapter les outils publics aux chantiers et situations d’urgence',
       shortIntro: "Le réacteur lit l'équipement de Riva et prépare une seule réponse ; son adaptation expose toujours un contre jouable.",
-      metaLine: "Il lit ton build, mais ne le supprime jamais. L’adaptation répond à ton choix sans le punir.",
+      metaLine: "Il connaît mon équipement et croit connaître mon rôle. Un outil change de sens entre les mains qui le choisissent.",
       phaseTitles: ['Lecture d’outillage', 'Module de réponse', 'Configuration ouverte'],
       interlude: [
-        line('Canal civil', "Catalogue des modules publié. Chaque équipe peut vérifier compatibilités et limites.", 'civil'),
+        line('Nara Vey', "Catalogue des modules publié. Chaque équipe peut vérifier compatibilités et limites.", 'civil'),
         line('Archive Voltério', "Connaître l'outil suffit pour construire sa cage.", 'archive'),
         line('Riva', "À condition que l'outil ne change jamais de main ni de but.", 'maintenance')
       ],
@@ -587,11 +591,11 @@
         title: 'Loadout Reactor — Adaptateur de modules',
         origin: "Banc énergétique conçu pour calibrer automatiquement un outil sur son chantier.",
         hijack: "Son diagnostic a été converti en contre-mesure hostile qui traitait chaque configuration comme une anomalie.",
-        reading: "Lire le module analysé, identifier l'unique adaptation active et utiliser la propriété du build qu'elle laisse intacte.",
+        reading: "Lire le module analysé, identifier l’unique adaptation active et utiliser la propriété de l’équipement qu’elle laisse intacte.",
         impact: "Les ateliers partagent un catalogue d'adaptation explicite, sans configuration interdite."
       },
       objective: 'Exposer le contre préparé par le réacteur puis exploiter l’ouverture qu’il laisse.',
-      mechanic: "L'adaptation est limitée à une mécanique lisible et ne désactive jamais entièrement le build choisi par Riva.",
+      mechanic: "L’adaptation est limitée à une propriété lisible et ne désactive jamais l’équipement choisi par Riva.",
       restoration: 'Les modules civils retrouvent des compatibilités publiques et des réglages modifiables par les ateliers.',
       masteryContracts: [
         contract('loadout-reactor-three-readings', 'Diagnostic complet', 'Exploiter correctement trois lectures de module différentes.', 'adaptationsExploited', 3),
@@ -608,10 +612,10 @@
       district: 'Orbital Terminus',
       civicFunction: 'Recevoir l’énergie solaire orbitale et la distribuer aux réserves d’urgence',
       shortIntro: "Dans le vide du Terminus, chaque manœuvre consomme la réserve de Riva ; les condensateurs exigent une prise de risque calculée.",
-      metaLine: "La réserve d’énergie est séparée de la vie. Une barre qui fait deux métiers finit toujours par mentir.",
+      metaLine: "Il appelle pénurie ce qu’il retient hors champ. Je suivrai la lumière jusqu’aux réserves qu’il cache.",
       phaseTitles: ['Réserve décroissante', 'Orbite affamée', 'Fenêtre solaire'],
       interlude: [
-        line('Canal civil', "Liaison orbitale stable. Les batteries d'urgence reçoivent leur première charge libre.", 'civil'),
+        line('Nara Vey', "Liaison orbitale stable. Les batteries d'urgence reçoivent leur première charge libre.", 'civil'),
         line('Archive Voltério', "La rareté transforme chaque mouvement en permission.", 'archive'),
         line('Riva', "Seulement quand quelqu'un cache les réserves et le calendrier.", 'maintenance')
       ],
@@ -641,10 +645,10 @@
       district: 'Chambre Booléenne',
       civicFunction: 'Arbitrer les priorités de circulation et de secours selon des règles publiques',
       shortIntro: "La Chambre exige une séquence de formes pendant que son gardien reste actif ; résoudre ne suspend jamais le combat.",
-      metaLine: "Le puzzle reste lisible sans couleur et ne retourne pas à zéro au premier dégât. La logique n’a pas besoin d’être cruelle.",
+      metaLine: "Une règle illisible est un ordre déguisé. Je vais la rendre assez claire pour être contestée.",
       phaseTitles: ['Clause d’entrée', 'Séquence contradictoire', 'Vérité du noyau'],
       interlude: [
-        line('Canal civil', "Règles d'arbitrage publiées. Chaque refus porte maintenant une cause vérifiable.", 'civil'),
+        line('Nara Vey', "Règles d'arbitrage publiées. Chaque refus porte maintenant une cause vérifiable.", 'civil'),
         line('Archive Voltério', "Une règle incompréhensible est une porte qui n'a pas besoin de garde.", 'archive'),
         line('Riva', "Alors nous écrirons les règles pour ceux qui doivent les vivre.", 'maintenance')
       ],
@@ -674,14 +678,14 @@
       district: 'Chambre des Vecteurs',
       civicFunction: 'Orienter énergie, signaux et convois autour des secteurs endommagés',
       shortIntro: "Des déflecteurs changent la direction des tirs ; la trajectoire que le Vault prétend confisquer devient la clé de son ouverture.",
-      metaLine: "La trajectoire est prévisualisée. Comprendre l’angle ne tire pas à ta place.",
+      metaLine: "La trajectoire est visible. Cassian confondait secret et difficulté ; l’angle, lui, ne ment pas.",
       phaseTitles: ['Vecteur incident', 'Déflexion composée', 'Trajectoire inverse'],
       interlude: [
-        line('Canal civil', "Routes de dérivation calculées localement. Aucun secteur n'est désormais un passage obligé.", 'civil'),
+        line('Nara Vey', "Routes de dérivation calculées localement. Aucun secteur n'est désormais un passage obligé.", 'civil'),
         line('Archive Voltério', "La direction parfaite est celle que le voyageur croit avoir choisie.", 'archive'),
         line('Riva', "Une direction visible peut être discutée. C'est déjà la fin de ton labyrinthe.", 'maintenance')
       ],
-      journal: "J'ai laissé la prévisualisation de trajectoire activée dans toutes les difficultés. Voir une solution n'enlève rien à l'exécution ; cacher la règle n'ajoute que de l'obéissance.",
+      journal: "Les plaques portaient déjà leurs lignes de dérivation, mais la Couronne les avait recouvertes. Nous les avons dégagées : montrer une route n’oblige personne à la prendre.",
       codex: {
         title: 'Vector Vault — Chambre de dérivation',
         origin: "Nœud de routage physique capable de dévier énergie et trafic autour d'une infrastructure brisée.",
@@ -695,7 +699,7 @@
       masteryContracts: [
         contract('vector-vault-four-bounces', 'Géométrie utile', 'Atteindre le noyau après quatre ricochets successifs.', 'maximumBounceChain', 4),
         contract('vector-vault-no-self-hit', 'Vecteur propre', 'Ne subir aucun retour de son propre tir.', 'selfRicochetHits', 0),
-        contract('vector-vault-vector-finish', 'Dernier segment', 'Porter le coup final au terme d’une trajectoire prévisualisée.', 'previewedVectorFinish', 1)
+        contract('vector-vault-vector-finish', 'Dernier segment', 'Ouvrir la dernière fenêtre par une trajectoire prévisualisée, puis achever Vector Vault pendant cette ouverture.', 'previewedVectorFinish', 1)
       ]
     },
     {
@@ -707,14 +711,14 @@
       district: 'Batterie Aérostatique',
       civicFunction: 'Capter la foudre en altitude et maintenir les relais aériens',
       shortIntro: "Riva quitte le sol pour une séquence aérienne où les torpilles de la Batterie peuvent recharger le canon qui les renvoie.",
-      metaLine: "Le jeu change de genre pour un combat, pas de commandes : ruée, renvoi et télégraphes restent les mêmes.",
+      metaLine: "Le sol disparaît, pas ce que j’ai appris. La tempête change le décor, pas mes gestes.",
       phaseTitles: ['Poursuite aérostatique', 'Torpilles captives', 'Batterie en retour'],
       interlude: [
-        line('Canal civil', "Ballons-relais reconnectés. Les secteurs isolés reçoivent courant et communications.", 'civil'),
+        line('Nara Vey', "Ballons-relais reconnectés. Les secteurs isolés reçoivent courant et communications.", 'civil'),
         line('Archive Voltério', "Quitter le sol ne rend pas libre ; cela retire seulement les refuges.", 'archive'),
         line('Riva', "Un refuge peut aussi voler, s'il appartient à ceux qui en ont besoin.", 'maintenance')
       ],
-      journal: "Le changement de pilotage devait surprendre, pas effacer ce que j'avais appris. Nous avons gardé la ruée, le renvoi et les télégraphes, puis ajouté l'assistance de visée aux contrôles qui en ont besoin.",
+      journal: "Les nacelles de maintenance possédaient déjà des gyrostabilisateurs et des verrous de sécurité. Cassian les avait retirés pour que le ciel ressemble à une chute ; nous les avons rendus aux équipages.",
       codex: {
         title: 'Skyborne Battery — Accumulateur aérostatique',
         origin: "Plateforme volante destinée à capter les fronts électriques et entretenir des relais hors de portée du sol.",
@@ -723,12 +727,12 @@
         impact: "Les relais aériens rendent courant et communications aux secteurs physiquement isolés."
       },
       objective: 'Esquiver les salves aériennes et renvoyer les torpilles vers les batteries exposées.',
-      mechanic: "Le changement de genre reste limité à cette rencontre ; tactile et manette bénéficient d'une visée assistée réglable.",
+      mechanic: "Les torpilles renvoyables conservent une trajectoire stable et un verrou visible avant l’impact ; ruée et renvoi gardent leurs fonctions habituelles.",
       restoration: 'Les relais aérostatiques captent de nouveau la foudre et desservent les zones isolées.',
       masteryContracts: [
         contract('skyborne-battery-three-torpedoes', 'Retour d’orage', 'Renvoyer trois torpilles sur trois batteries distinctes.', 'distinctBatteriesHit', 3),
         contract('skyborne-battery-no-hit', 'Ciel dégagé', 'Neutraliser Skyborne Battery sans subir de dégâts.', 'damageTaken', 0),
-        contract('skyborne-battery-charged-finish', 'Paratonnerre', 'Porter le coup final avec un renvoi entièrement chargé.', 'chargedReturnFinish', 1)
+        contract('skyborne-battery-charged-finish', 'Paratonnerre', 'Ouvrir la dernière fenêtre avec un renvoi entièrement chargé, puis achever Skyborne Battery pendant cette ouverture.', 'chargedReturnFinish', 1)
       ]
     },
     {
@@ -740,10 +744,10 @@
       district: 'Circuit d’Endurance',
       civicFunction: 'Éprouver les plans d’urgence sur des incidents combinés mais contrôlés',
       shortIntro: "Six manches courtes convoquent des fragments mécaniques ; survivre exige de lire la combinaison, pas d'endurer un combat interminable.",
-      metaLine: "Six manches, pas six boss recopiés. Et le checkpoint sait compter jusqu’à six.",
+      metaLine: "Six rappels ne font pas une histoire. Je garderai ce qu’ils voulaient épuiser.",
       phaseTitles: ['Relais d’épreuves', 'Gauntlet combiné', 'Dernière réserve'],
       interlude: [
-        line('Canal civil', "Simulations rouvertes aux équipes. Les scénarios indiquent désormais leur objectif et leur limite.", 'civil'),
+        line('Nara Vey', "Simulations rouvertes aux équipes. Les scénarios indiquent désormais leur objectif et leur limite.", 'civil'),
         line('Archive Voltério', "L'endurance est la science de ceux qui n'ont plus le choix.", 'archive'),
         line('Riva', "Un exercice prépare au choix. Sinon, ce n'est qu'une punition répétée.", 'maintenance')
       ],
@@ -773,10 +777,10 @@
       district: 'Archives Réactives',
       civicFunction: 'Conserver les incidents et simuler leurs conséquences pour améliorer les procédures',
       shortIntro: "L'Archiviste mesure tir, saut et ruée, puis adapte une seule réponse visible ; chaque tentative repart d'une page blanche.",
-      metaLine: "L’Archiviste lit ta tentative, pas ton identité. Au retry, sa mémoire revient à une page blanche.",
+      metaLine: "Il archive mes habitudes et prétend y trouver mon avenir. Une page n’a jamais possédé la suivante.",
       phaseTitles: ['Page d’observation', 'Marge adaptative', 'Archive contestée'],
       interlude: [
-        line('Canal civil', "Historique exporté vers les six districts. Aucune simulation ne possède plus sa copie unique.", 'civil'),
+        line('Nara Vey', "Historique exporté vers les six districts. Aucune simulation ne possède plus sa copie unique.", 'civil'),
         line('Archive Voltério', "Une archive qui prévoit le prochain geste n'a plus besoin d'attendre le consentement.", 'archive'),
         line('Riva', "Une archive doit expliquer le passé, pas condamner l'avenir.", 'maintenance')
       ],
@@ -789,7 +793,7 @@
         impact: "Les modèles restent des conseils consultables et leurs données sont distribuées entre les districts."
       },
       objective: 'Faire expirer chaque adaptation en variant tir, saut et ruée.',
-      mechanic: "L'adaptation reste locale au combat, visible dans l'interface, limitée à une réponse et réinitialisée à chaque tentative.",
+      mechanic: "L’adaptation reste locale à l’affrontement, limitée à une réponse et s’efface à chaque nouvelle tentative.",
       restoration: 'Les Archives conservent les incidents sans enfermer les habitants dans une prédiction permanente.',
       masteryContracts: [
         contract('adaptive-archivist-three-expirations', 'Droit au changement', 'Faire expirer une adaptation de tir, de saut et de ruée.', 'distinctAdaptationsExpired', 3),
@@ -806,10 +810,10 @@
       district: 'Trône Zéro',
       civicFunction: 'Tester les protocoles d’autorité d’urgence avant leur déploiement',
       shortIntro: "Sous la Citadelle, un arbitre sans pilote combine renvoi, modules et rupture : le prototype de la commande unique que Riva vient abolir.",
-      metaLine: "Trois règles reviennent pour un dernier rappel : renvoyer, choisir, rompre. La Couronne a lu le jeu ; Riva sait maintenant où couper.",
+      metaLine: "Le Trône Zéro connaît les règles, pas ceux qui les refusent. Nous allons lui retirer le dernier mot.",
       phaseTitles: ['Autorité réfléchie', 'Modules sans maître', 'Rupture du Trône Zéro'],
       interlude: [
-        line('Canal civil', "Trône Zéro isolé. Les clés d'urgence sont réparties entre les six districts et consignées publiquement.", 'civil'),
+        line('Nara Vey', "Trône Zéro isolé. Les clés d'urgence sont réparties entre les six districts et consignées publiquement.", 'civil'),
         line('Archive Voltério', "Sans couronne, qui décidera quand tous les autres hésitent ?", 'archive'),
         line('Riva', "Ceux qui vivent avec la décision. Ensemble, et avec le droit de la corriger.", 'maintenance')
       ],
@@ -832,20 +836,133 @@
     }
   ];
 
+  const phaseLinesByBoss = Object.freeze({
+    'bastion-ricochet': [
+      "Les ricochets se croisent, mais chaque angle laisse une sortie. Je la garde ouverte.",
+      "Les relais dérivent enfin. Leur protection retournera aux quartiers, pas à une régie unique."
+    ],
+    'hydraulic-warden': [
+      "La pression monte ; la soupape de recul parle encore. Je suivrai sa cadence.",
+      "Le dernier verrou cède. La Chambre compactera des gravats, plus des routes d’évacuation."
+    ],
+    'hive-foreman': [
+      "Les trois métiers se séparent. Chacun retrouve un rythme que la ruche ne peut plus confisquer.",
+      "La forge maîtresse s’ouvre. Une équipe pourra arrêter ce qu’elle a lancé."
+    ],
+    'echo-fencer': [
+      "Le rappel arrive plus vite, mais il copie encore mon ancien geste. Je change d’entrée.",
+      "Son miroir se fissure. Une archive de mes habitudes n’écrira pas mon prochain choix."
+    ],
+    'breaker-array': [
+      "Les modules tournent sans centre. Je choisis leur ordre avant que la Couronne le fasse.",
+      "Le cœur partagé apparaît. Quatre disjoncteurs valent mieux qu’un maître."
+    ],
+    'vertical-verdict': [
+      "Les cabines bougent et le sommet perd sa marque. Je garde les niveaux bas reliés.",
+      "Le contrepoids est à portée. Les sorties redescendent vers ceux qui les utilisent."
+    ],
+    'rail-tyrant': [
+      "Les wagons se séparent ; la voie d’urgence reste lisible. Je passe par elle.",
+      "La locomotive ouvre enfin ses freins. Les cargaisons auront plusieurs départs."
+    ],
+    'triplex-hunter': [
+      "Le chasseur change de voie, pas de but. J’emprunte celle qu’il ne sait pas posséder.",
+      "Les trois routes sont libres. Aucune ne redeviendra l’unique passage."
+    ],
+    'ground-eater': [
+      "Le chantier retire le sol, mais ses balises annoncent encore ce qu’il détruit.",
+      "La dernière assise tient. Les bras reconstruiront au lieu d’entretenir la ruine."
+    ],
+    'floodline-leviathan': [
+      "La pression change de rive. Je garde les réserves au-dessus de son spectacle.",
+      "Le réservoir se referme sans se vider. L’eau restera un service, pas une menace."
+    ],
+    'centrifuge-zero': [
+      "La chambre tourne ; les repères partagés restent vrais. Je m’y accroche.",
+      "Le noyau revient face à nous. Plus personne ne cachera le sol sûr."
+    ],
+    'tempest-regulator': [
+      "Le ciel change d’entrée. Une seule alerte suffit quand chacun peut la lire.",
+      "Le front se dissipe. Les prévisions resteront publiques après la tempête."
+    ],
+    'ascension-frame': [
+      "Les bras se décroisent ; chaque ancrage devient une route vers l’intérieur.",
+      "Le colosse s’agenouille. Les réparateurs monteront avant les armes."
+    ],
+    'counterforge': [
+      "Le contre arrive au signal attendu. Je laisse son marteau révéler la faute.",
+      "Le dernier test s’ouvre. Mesurer n’exigera plus d’humilier."
+    ],
+    'carrier-cathedral': [
+      "La nef suivante ouvre ses portes. Je coupe les cloisons, pas le refuge.",
+      "Le cœur mobile répond. Les lits et ateliers restent intacts."
+    ],
+    'twin-governors': [
+      "Les deux gardiens échangent encore leur jeton. Je brise le relais, pas leur coopération.",
+      "Leur responsabilité se sépare. Eau et courant pourront se répondre sans s’accuser."
+    ],
+    'loadout-reactor': [
+      "Il choisit une seule réponse à mon équipement. Je change l’usage avant qu’il ne ferme le rôle.",
+      "Son adaptation atteint sa limite. Les outils retrouvent des mains capables de choisir."
+    ],
+    'orbital-famine': [
+      "La réserve baisse, mais les condensateurs annoncent leur retour. Je protège la marge.",
+      "L’orbite relâche sa dernière charge. Le calendrier et les réserves seront publics."
+    ],
+    'logic-crucible': [
+      "La clause change ; sa contradiction reste visible. Je suis l’ordre que chacun peut vérifier.",
+      "La vérité du noyau s’ouvre. Une règle publique pourra enfin être contestée."
+    ],
+    'vector-vault': [
+      "Les déflecteurs composent un nouvel angle. La trajectoire reste notre preuve.",
+      "Le dernier segment revient au centre. Les dérivations appartiendront aux secteurs."
+    ],
+    'skyborne-battery': [
+      "Les torpilles reviennent chargées. La tempête nourrit maintenant le geste qui la traverse.",
+      "La batterie ouvre son dernier verrou. Les relais aériens garderont leurs refuges."
+    ],
+    'endurance-engine': [
+      "Les épreuves se combinent, mais aucune ne mérite de devenir une peine sans fin.",
+      "La dernière réserve tient. Un exercice aura de nouveau une limite et un choix."
+    ],
+    'adaptive-archivist': [
+      "Sa marge s’adapte à mon dernier geste. J’en écris un autre avant qu’elle ne se ferme.",
+      "L’archive conteste encore l’avenir. Je lui rends le passé et je garde la suite."
+    ],
+    'null-crown': [
+      "Les modules cherchent un maître. Je leur oppose six décisions qui savent se répondre.",
+      "Le Trône Zéro se rompt. L’urgence gardera six clés et aucune couronne."
+    ]
+  });
+
+  const interludeOrders = Object.freeze([
+    Object.freeze([0, 1, 2]),
+    Object.freeze([1, 2, 0]),
+    Object.freeze([1, 0, 2])
+  ]);
+
+  for (const boss of bosses) {
+    const authoredPhaseLines = phaseLinesByBoss[boss.id];
+    if (!authoredPhaseLines) throw new Error('Voix de phase Forge absente : ' + boss.id);
+    boss.phaseLines = [boss.metaLine, ...authoredPhaseLines];
+    const order = interludeOrders[(boss.number - 7) % interludeOrders.length];
+    boss.interlude = order.map((index) => boss.interlude[index]);
+  }
+
   const expansionPremise = {
     id: 'post-crown-civic-rings',
-    title: 'Après la Couronne // Le jeu continue hors cadre',
+    title: 'Après la Couronne // La ville continue hors cadre',
     status: 'runtime-integrated',
     runtimeIntegrated: true,
-    summary: "Après la détention de Cassian Voltério, quatre anneaux d'infrastructures isolées poursuivent ses anciens ordres de crise. Riva ne repart pas conquérir une ville : elle aide les districts à reprendre vingt-quatre services, un par machine.",
-    continuity: "Cassian reste détenu et sa voix ne subsiste que dans des archives enregistrées. NULL CROWN n'est ni sa résurrection ni son héritière, mais le prototype autonome qui a précédé la Couronne.",
-    playerPromise: "Chaque victoire de Forge restaure une fonction civique dans le journal de Riva. Le Codex conserve la trace de chaque service, sans réécrire la campagne des six relais ni ses conséquences."
+    summary: "Après l’abolition du mandat de la Couronne, quatre anneaux d’infrastructures poursuivent les ordres hérités de la Nuit des Six Extinctions. Riva et Nara ne repartent pas conquérir la ville : elles rendent vingt-quatre services à leurs équipes locales.",
+    continuity: "Cassian reste détenu et sa voix ne subsiste que dans ses archives. NULL CROWN n’est ni sa résurrection ni son héritière : c’est le prototype sans terme qui a précédé la Couronne provisoire.",
+    playerPromise: "Chaque victoire de Forge consigne une fonction civique rendue au district. Le Codex conserve ces restitutions sans effacer les six relais, la faute de Riva dans M-0 ni les conséquences de la campagne."
   };
 
   const forgeCircuit = {
     id: 'forge-circuit-07-30',
     mode: 'forgeRush',
-    title: 'Circuit Forge · Les quatre anneaux savent qu’ils sont jouables',
+    title: 'Circuit Forge · Les quatre anneaux hors du Trône',
     bossOrder: bosses.map((boss) => boss.id),
     waveCheckpoints: waves.map((wave) => ({
       wave: wave.number,
@@ -857,10 +974,10 @@
     upgradesBetweenBosses: true,
     resumeCheckpoints: ['fight', 'upgrade', 'ending'],
     epilogue: {
-      title: 'Aucune couronne, aucun boss caché',
-      summary: "Les vingt-quatre services répondent de nouveau aux districts. Le Trône Zéro conserve un arrêt d'urgence, mais ses clés sont distribuées, auditées et révocables.",
-      riva: "Une ville n’est pas un boss à commander. Tant que chacun peut la comprendre, la réparer et l’arrêter, aucun écran final n’a le dernier mot.",
-      outcome: 'Cassian reste détenu ; NULL CROWN est neutralisée sans devenir une nouvelle autorité centrale. Les vingt-quatre services restent actifs, les clés sont réparties entre les six districts et aucun boss caché ne vient annuler cette fin.'
+      title: 'Six clés, aucun second trône',
+      summary: "Les vingt-quatre services répondent de nouveau à leurs équipes locales. Dans la Citadelle, le Trône Zéro se tait et ne peut plus arbitrer la ville.",
+      riva: "Cassian voulait une dernière voix au-dessus des autres. Il n’y en aura pas : seulement six équipes capables de se répondre, de réparer et d’arrêter ensemble.",
+      outcome: 'Cassian reste détenu ; NULL CROWN rejoint les preuves publiques de la Nuit des Six Extinctions. L’arrêt d’urgence exige désormais l’accord des six districts, sans clause secrète ni maître de remplacement.'
     }
   };
 
@@ -924,7 +1041,7 @@
 
   const story = deepFreeze({
     schemaVersion: 1,
-    contentVersion: '2.9.1',
+    contentVersion: '2.10.0',
     status: 'runtime-integrated',
     runtimeIntegrated: true,
     bossRange: Object.freeze(['07', '30']),

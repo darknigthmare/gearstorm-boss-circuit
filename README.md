@@ -1,6 +1,9 @@
-# GEARSTORM: Boss Circuit v2.9.1
+# GEARSTORM: Boss Circuit v2.10.0
 
 GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables de la campagne de Cassian Voltério, puis affronte vingt-quatre profils supplémentaires dans la Forge : 30 boss jouables, 90 phases et 90 contrats de maîtrise.
+
+État courant : le candidat local v2.10.0 conserve les 30 boss, 90 phases et 90 contrats, ferme l’arc de la Couronne et renforce sauvegarde, cache, accessibilité et cohérence du canon. Sa publication distante est encore en attente.
+
 
 ## Jouer en local
 
@@ -13,9 +16,22 @@ npm start
 
 Ouvrir ensuite `http://127.0.0.1:8080`. Sous Windows, `LANCER_LE_JEU.bat` lance également la version locale dans le navigateur.
 
+
+La production vérifiée ci-dessous reste la v2.9.1. Pour v2.10.0, aucun commit, push, run CI ni déploiement Vercel n’est encore revendiqué.
+
 Le mode `file://` reste un repli jouable, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
 
 ## Publication vérifiée
+
+## Passe v2.10.0 — canon, robustesse et lecture causale
+
+La Couronne est abolie, Cassian reste détenu et M-0 devient une infrastructure publique distribuée entre six équipes. Le Circuit Forge 07–30 se déroule après la campagne ; le Catalogue des 30 machines demeure une simulation hors chronologie.
+
+Les archives comptent neuf transmissions relisibles, quatre révélations d’anneau, vingt-quatre journaux et soixante-douze voix de phase Forge. Cinq maîtrises contextuelles mesurent désormais leur cause exacte.
+
+Riva conserve treize pièces anatomiques : l’asset proche `forearm-cannon-near` combine l’avant-bras et le canon. Le diagnostic relève une erreur de visée maximale d’environ `1,32 × 10⁻16`, un museau `[149, 297]`, un recul de `12 px` local (`13,2 px` Canvas), `roadLift = 10`, `headDrop = 4` et une poussière à `y = 610`.
+
+Les sauvegardes contradictoires et checkpoints finaux sont normalisés, une sauvegarde v4 valide peut secourir une v5 corrompue, les erreurs de quota restent non destructives, le cache raster est borné à trois bundles de boss et les refus `cache.put` ne masquent plus les réponses réseau. Les preuves locales et les 24 captures avant/après sont regroupées dans [`docs/audits/v2.10.0/`](docs/audits/v2.10.0/README.md).
 
 - Dépôt GitHub : https://github.com/darknigthmare/gearstorm-boss-circuit
 - Jeu public Vercel : https://gearstorm-boss-circuit.vercel.app
@@ -92,7 +108,7 @@ Le Codex sépare la connaissance de la progression : une victoire de Laboratoire
 
 ## Direction artistique
 
-Le pack artistique v2.9.1 est dérivé de **42 masters originaux OpenAI** vers **233 WebP runtime**, soit **18 175 510 octets** déclarés par le manifeste :
+Le pack artistique v2.10.0 est dérivé de **42 masters originaux OpenAI** vers **233 WebP runtime**, soit **18 175 510 octets** déclarés par le manifeste :
 
 | Famille | Masters | Assets runtime |
 | --- | ---: | ---: |
@@ -105,7 +121,7 @@ Le pack artistique v2.9.1 est dérivé de **42 masters originaux OpenAI** vers *
 | Intro, prologue, fin campagne et fin Forge | 4 | 4 |
 | **Total** | **42** | **233** |
 
-Le rig de Riva n’utilise plus un corps complet fusionné : tête, torse, bassin, bras, avant-bras, canon, cuisses, tibias et bottes sont treize pièces anatomiques natives. Deux couches d’effet — traînée de ruée et halo de Surcharge — portent le total héroïne à quinze. Les douze liens parent–enfant forment une hiérarchie sans cycle ; la remontée de route vaut `10 px` et la hurtbox reste volontairement tolérante sur le bas du corps.
+Le rig de Riva n’utilise plus un corps complet fusionné : tête, torse, bassin, deux bras supérieurs, avant-bras éloigné, asset combiné avant-bras–canon proche, deux cuisses, deux tibias et deux bottes forment treize pièces anatomiques natives. Deux couches d’effet — traînée de ruée et halo de Surcharge — portent le total héroïne à quinze. Les douze liens parent–enfant forment une hiérarchie sans cycle ; la remontée de route vaut `10 px` et la hurtbox reste volontairement tolérante sur le bas du corps.
 
 Les offsets visuels `+80` (campagne) et `+28` (Forge) rapprochent les routes peintes du sol physique `620` sans altérer la simulation. Chaque machine Forge garde quatre pièces et un backdrop ; les transformations secondaires restent pilotées par les huit familles communes et les arènes Forge ne sont pas revendiquées comme des décors parallaxe multicouches.
 
@@ -129,6 +145,9 @@ Sur mobile portrait, le jeu affiche un conseil d’orientation : le paysage rest
 Le CSS contient les variantes `prefers-reduced-motion` et `prefers-contrast`, des cibles tactiles et une recommandation paysage en portrait. Le runtime garde aussi des réglages manuels prioritaires.
 
 Le workflow CI Node 22.x a réussi sur la v2.9.1. Playwright a exécuté Chromium desktop et un profil mobile tactile ; Firefox et WebKit restent configurés en opt-in et n’ont pas été exécutés pour cette release.
+
+Pour v2.10.0, la validation locale compte 84/84 tests Node, `npm run qa` vert, un audit npm sans vulnérabilité et un audit agent-browser Chrome desktop/mobile sans erreur console. La publication CI/Vercel reste en attente.
+
 
 Le fichier `tests/e2e/forge.spec.mjs` couvre :
 
@@ -175,7 +194,7 @@ Les contrôles ciblés restent `npm test`, `npm run build` et `npm run check:rel
 - `story.js` : campagne narrative des six districts.
 - `expansion-story.js` : quatre vagues Forge, journaux, objectifs et 72 contrats instrumentés.
 - `boss-roster.js` : registre des 30 machines, 24 `mechanicId`, 72 états Forge et huit familles partagées.
-- `assets/generated/v2.9.1/` : pack runtime de 233 WebP et manifeste de provenance/assemblage.
+- `assets/generated/v2.10.0/` : pack runtime de 233 WebP et manifeste de provenance/assemblage.
 - `manifest.webmanifest`, `sw.js` : installation et fonctionnement hors ligne.
 - `server.js` : serveur local à surface publique restreinte.
 - `scripts/` : build, contrats et garde-fous de release.

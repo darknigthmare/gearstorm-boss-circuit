@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit — conception v2.9.1
+# GEARSTORM: Boss Circuit — conception v2.10.0
 
 ## Pitch
 
@@ -30,13 +30,15 @@ Chaque boss franchit trois seuils de points de vie. Les phases augmentent la den
 
 Depuis le titre, la Forge propose deux parcours distincts. La Forge libre expose les 30 machines pour des tentatives indépendantes ; le Circuit Forge enchaîne les boss 07 à 30 en quatre vagues de six. Aucun de ces parcours ne modifie `campaignCleared`, les six relais ou l’ordre narratif de la campagne.
 
+Le Catalogue intégral est explicitement une simulation hors chronologie. Le Circuit Forge est une suite canonique qui ne s’ouvre qu’après l’abolition de la Couronne et prolonge la restitution des services sans modifier le destin de Cassian.
+
 Chaque extension possède trois phases. Le registre attribue 24 `mechanicId` et 72 signatures d’état uniques, mais les rencontres reposent volontairement sur huit familles socles enrichies : renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et puzzle/endgame. La singularité vient des objectifs, paramètres, hazards, télégraphes et états propres, pas d’une duplication de 24 moteurs.
 
 ENDURANCE ENGINE ajoute six manches internes. La progression de ses points de vie ne suffit pas : la phase 1 doit avoir atteint la manche 2, la phase 2 la manche 4 et la fin la manche 6. Cette barrière fait de la survie aux cycles la règle centrale du boss, même avec un build offensif puissant.
 
 Le Circuit Forge sauvegarde en v5 le combat, le choix de module ou la fin à reprendre. Un module est proposé entre les boss ; la dernière victoire ouvre la restauration des quatre anneaux et enregistre le meilleur temps. `boss-roster.js` porte les règles de combat et `expansion-story.js` les objectifs, journaux, restaurations, 24 interludes, 24 `metaLine` et 72 contrats instrumentés. Le Codex conserve ces transmissions par anneau après déverrouillage.
 
-## Progression et reprise v2.9
+## Progression et reprise v2.10
 
 Onze modules couvrent cadence, noyau, ruée, tir multiple, dégâts, Surcharge, bouclier, mobilité, précision, combo et auto-réparation de phase. Ils ne persistent que pendant le Circuit en cours ; leurs limites de cumul empêchent de dépasser le niveau prévu.
 
@@ -47,6 +49,14 @@ La sauvegarde locale reste en schéma v5. Elle conserve déblocages, meilleurs t
 
 L’export produit uniquement une copie JSON v5 normalisée de l’état courant. L’import est borné à 1 Mio et repasse exclusivement par la migration/normalisation avant toute persistance. Les options rendent les deux actions et un input fichier JSON masqué ; le pipeline runtime reste tolérant si un hook manque.
 
+
+## Robustesse et causalité v2.10
+
+La normalisation de sauvegarde réconcilie campagne terminée, boss débloqués et checkpoints finaux. Une v5 illisible peut retomber sur une v4 valide ; une migration déjà chargée reste jouable même si l’écriture v5 échoue par quota.
+
+Le cache PWA écrit en best-effort : une réponse réseau valide est rendue même si `cache.put` échoue. Le cache raster conserve au plus trois bundles de boss selon un LRU et garde les assets permanents de Riva.
+
+La lecture ne repose plus sur la couleur seule : voies numérotées et hachurées, formes et ordre textuel de LOGIC CRUCIBLE, réserve chiffrée d’ORBITAL FAMINE et flèches d’environnement. Cinq maîtrises Forge contextuelles utilisent leur événement causal exact.
 Le Laboratoire et la Forge libre permettent de rejouer sans faire avancer les six relais ni les Circuits séquentiels.
 
 ## Accessibilité et lisibilité
@@ -57,9 +67,9 @@ Sur une sauvegarde neuve seulement, le runtime initialise mouvement réduit et c
 
 Les cartes déverrouillées montrent une miniature WebP décorative du boss sans remplacer le texte ni l’état accessible. Les cartes verrouillées n’exposent pas cette illustration. Sur mobile portrait, le paysage est recommandé pour conserver la largeur tactique de l’arène.
 
-## Direction artistique v2.9.1
+## Direction artistique v2.10.0
 
-Le manifeste v2.9.1, de schéma 3, référence 42 masters OpenAI et 233 WebP runtime pour 18 175 510 octets : 48 assets d’arène, 150 pièces de boss, 15 assets héroïne, 16 VFX et 4 images narratives. Il conserve dimensions, alpha, poids et SHA-256 ; les masters restent réservés à la provenance.
+Le manifeste v2.10.0, de schéma 3, référence 42 masters OpenAI et 233 WebP runtime pour 18 175 510 octets : 48 assets d’arène, 150 pièces de boss, 15 assets héroïne, 16 VFX et 4 images narratives. Il conserve dimensions, alpha, poids et SHA-256 ; les masters restent réservés à la provenance.
 
 | Famille | Masters | Runtime |
 | --- | ---: | ---: |
@@ -70,7 +80,7 @@ Le manifeste v2.9.1, de schéma 3, référence 42 masters OpenAI et 233 WebP run
 | Narration | 4 | 4 |
 | **Total** | **42** | **233** |
 
-Riva utilise treize pièces anatomiques indépendantes et deux couches d’effet. `rootOffsetY = -23.6` place les pixels utiles des bottes sur `feetLocalY = 36` ; cette limite alpha est mesurée dans le contrat d’assets. La tête, le torse et le bassin ne sont plus fusionnés, et l’avant-bras-canon possède son pivot propre.
+Riva utilise treize pièces anatomiques indépendantes et deux couches d’effet. L’asset proche `forearm-cannon-near` combine l’avant-bras et le canon ; aucun canon distinct n’est compté en plus. `rootOffsetY = -23.6` place les pixels utiles des bottes sur `feetLocalY = 36` ; `roadLift = 10`, `headDrop = 4` et la poussière à `y = 610` règlent la lecture de contact. Le recul vaut `12 px` local, soit `13,2 px` Canvas.
 
 Le sol physique reste `y = 620`. Le rendu applique `+80 px` aux six décors de campagne et `+28 px` aux backdrops Forge pour aligner les routes peintes sans déplacer la simulation. Chaque boss Forge conserve quatre pièces transparentes et un backdrop ; ses animations secondaires restent pilotées par les huit familles moteur. Le fallback Canvas demeure disponible.
 
@@ -103,7 +113,7 @@ Le Codex sépare connaissance et progression : une analyse de Laboratoire peut e
 - **Pause** : objectif, build, commandes et sorties explicites.
 - **Résultat et interlude** : performance, journal de Riva, conséquence locale et décision suivante.
 - **Atelier** : offre déterministe de trois modules parmi les onze disponibles.
-- **Codex** : dossiers Riva/Voltério, six fiches civiles, archives M-0, panorama des quatre anneaux et 24 transmissions Forge permanentes.
+- **Codex** : dossiers Riva/Voltério, six fiches civiles, neuf transmissions M-0 relisibles, panorama des quatre anneaux, quatre révélations, 24 journaux et 72 voix Forge.
 - **Épilogues** : restauration des six relais pour la campagne et des quatre anneaux pour la Forge.
 
 Les cartes de Forge conservent leur nom, leur état verrouillé/déverrouillé et leur libellé accessible même lorsque la miniature ne charge pas. Les options rendent les contrôles d’export/import ; le bouton de mise à jour PWA reste masqué jusqu’à la détection d’un worker en attente.
@@ -118,6 +128,6 @@ Une première installation reste silencieuse. Pour une application déjà contr�
 
 ## Fin
 
-Après Crown Engine Ω, l’interlude de la Citadelle confirme la détention de Cassian, puis l’épilogue rend les six commandes locales aux équipes civiles. Riva refuse la Couronne au profit de six interrupteurs, six équipes et d’une ligne M-0 indépendante.
+Après Crown Engine Ω, l’interlude de la Citadelle confirme la détention de Cassian, puis l’épilogue abolit le mandat de la Couronne et rend les six commandes locales aux équipes civiles. Riva publie M-0, détruit la clé maîtresse et la distribue entre six équipes qui ne peuvent agir qu’ensemble.
 
 Le Circuit Forge possède sa propre fin : après NULL CROWN, les 24 services des quatre anneaux rendent leurs clés aux districts, sans ressusciter Cassian ni réécrire la campagne. Chaque écran final résume le temps et le build du parcours correspondant.

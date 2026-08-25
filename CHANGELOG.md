@@ -1,5 +1,20 @@
 # Historique des versions
 
+## 2.10.0 — La Couronne rend les clés
+
+- Fermeture de l’arc canonique : le mandat de la Couronne est aboli, Cassian Voltério reste détenu, M-0 devient un protocole public distribué entre six équipes et aucune clé maîtresse ne subsiste.
+- Clarification des modes : le Circuit Forge 07–30 est une suite canonique post-campagne, tandis que le Catalogue des 30 machines reste une simulation libre hors chronologie et n’altère aucune restitution civile.
+- Extension des archives à neuf transmissions relisibles, quatre révélations d’anneau, vingt-quatre journaux de Riva et soixante-douze voix de phase Forge.
+- Correction définitive du tir articulé de Riva : erreur angulaire maximale observée d’environ `1,32 × 10⁻16`, museau `[149, 297]`, recul de `12 px` local soit `13,2 px` Canvas. L’asset proche `forearm-cannon-near` combine l’avant-bras et le canon ; il ne s’agit pas de deux pièces séparées.
+- Recalage de la silhouette sur la route avec `roadLift = 10`, abaissement de tête `headDrop = 4` et poussière de contact à `y = 610`, sans déplacer le sol physique.
+- Normalisation des sauvegardes contradictoires, récupération d’une v4 valide si une v5 est corrompue, assainissement des checkpoints finaux et conservation d’une migration chargée même si la persistance échoue par dépassement de quota.
+- Durcissement PWA et mémoire : les refus d’écriture `cache.put` ne masquent plus une réponse réseau valide et le cache raster applique un LRU limité à trois bundles de boss sans expulser le rig de Riva.
+- Ajout de signaux non chromatiques pour les voies sûres, la séquence de LOGIC CRUCIBLE, la réserve d’ORBITAL FAMINE et les environnements directionnels.
+- Cinq maîtrises Forge utilisent désormais leur cause exacte : cibles prioritaires de HIVE FOREMAN, diversité complète de phase 2 d’ECHO FENCER, modules propres de BREAKER ARRAY, trois vannes dans un même cycle de FLOODLINE LEVIATHAN et quatre ricochets successifs de VECTOR VAULT.
+- Correction du parcours clavier et du retour de focus : combat → pause → titre → Options → retour restitue `#settings` hors arbre `inert`.
+- Validation locale : `84/84` tests Node, `npm run qa` vert, build de `21 735 065` octets, 233 WebP pour `18 175 510` octets artistiques, audit npm sans vulnérabilité, 12 captures Chrome avant et 12 après, audit axe sans violation sur Codex desktop et combat mobile.
+- Publication distante v2.10 en attente de la gate finale : aucun commit, push, statut CI ou déploiement Vercel v2.10 n’est revendiqué par cette entrée.
+
 ## 2.9.1 — Riva reprend la route
 
 - Activation d'une vraie hiérarchie de rig : `pelvis` est l'unique racine, les douze liens parent–enfant sont propagés et les cycles sont refusés par contrat.

@@ -32,7 +32,7 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'], ...chromiumLaunch } },
-    { name: 'chromium-mobile', use: { ...devices['Pixel 7'], isMobile: false, hasTouch: true, ...chromiumLaunch } },
+    { name: 'chromium-mobile', use: { ...devices['Pixel 7'], ...chromiumLaunch } },
     // Opt-in via npm run test:e2e:cross-browser; the default script selects Chromium only.
     { name: 'firefox-desktop', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit-desktop', use: { ...devices['Desktop Safari'] } }
