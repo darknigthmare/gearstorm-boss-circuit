@@ -2,9 +2,9 @@
 
 Validation locale réalisée le 25 août 2026.
 
-## Statut v2.11.0 — source validée localement, publication distante à confirmer
+## Statut v2.11.0 — validée, poussée et publiée
 
-La source v2.11.0 a franchi le gate local `npm run qa:ci`. Le push, le run GitHub Actions associé et le déploiement Vercel de cette version ne sont pas encore consignés ici : aucun identifiant distant n’est anticipé.
+Le commit applicatif `505f973` a été poussé sur `main`. Le run GitHub Actions `32897624756` et son job Linux `97963805683` sont réussis ; l’artifact `gearstorm-web-v2.11.0` porte l’ID `9581941579`. Vercel a construit ce même commit sous Node 22 et l’a publié avec le déploiement `dpl_7eV3wtN3nMz23xKnnKk5Cuqxmstt`, état `READY`.
 
 | Surface v2.11 | Résultat observé |
 | --- | --- |
@@ -18,8 +18,8 @@ La source v2.11.0 a franchi le gate local `npm run qa:ci`. Le push, le run GitHu
 | E2E Chromium | **26 réussis, 2 ignorés, 0 échec** |
 | Audit visuel local | Desktop et mobile : menu, Options, Riva et Forge contrôlés ; aucune erreur console, requête échouée ou barre de défilement horizontale observée |
 | Firefox et WebKit | **25 réussis, 3 ignorés, 0 échec** ; la course de focus WebKit est corrigée et couverte par régression |
-| GitHub Actions v2.11 | À confirmer après push |
-| Vercel v2.11 | À confirmer après push sur `https://gearstorm-boss-circuit.vercel.app` |
+| GitHub Actions v2.11 | Run `32897624756` : **success** ; job `97963805683` ; artifact `9581941579` de 42 283 854 octets |
+| Vercel v2.11 | `dpl_7eV3wtN3nMz23xKnnKk5Cuqxmstt` : **READY** ; commit `505f973` ; alias canonique HTTP 200 |
 
 ## Vérifications fonctionnelles v2.11
 
@@ -39,7 +39,7 @@ La source v2.11.0 a franchi le gate local `npm run qa:ci`. Le push, le run GitHu
 - Le mobile portrait reste pris en charge, mais le paysage demeure recommandé pour conserver la largeur tactique du combat.
 - Le contraste exact des gradients peints dans le Canvas ne peut pas être déterminé automatiquement par axe ; aucune violation déterministe n’a été remontée sur les éléments DOM contrôlés.
 - Les captures de l’audit visuel v2.11 sont des preuves de travail locales et ne sont pas encore archivées dans `docs/audits/v2.11.0/`.
-- La publication v2.11 ne sera considérée comme vérifiée qu’après correspondance explicite entre le commit poussé, le run GitHub Actions, le déploiement Vercel `READY` et l’alias canonique.
+- Le commit applicatif de référence est `505f973`. Un éventuel commit documentaire ultérieur ne modifie pas le runtime, les assets ou les résultats consignés ci-dessus.
 
 ---
 

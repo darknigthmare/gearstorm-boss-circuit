@@ -17,7 +17,7 @@ npm start
 Ouvrir ensuite `http://127.0.0.1:8080`. Sous Windows, `LANCER_LE_JEU.bat` lance également la version locale dans le navigateur.
 
 
-La production v2.10.0 est vérifiée sur GitHub Actions et Vercel ; les identifiants observés sont consignés ci-dessous et dans `QA_REPORT.md`.
+La production v2.11.0 est vérifiée sur GitHub Actions et Vercel ; les identifiants observés sont consignés ci-dessous et dans `QA_REPORT.md`.
 
 Le mode `file://` reste un repli jouable, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
 
@@ -33,7 +33,7 @@ Le mixage synthétique suit désormais la famille et l’intensité du boss, tra
 
 ## Publication vérifiée
 
-La source v2.11.0 a franchi le gate local `npm run qa:ci` : 92 tests Node réussis, puis 26 parcours Chromium réussis, 2 ignorés et aucun échec. L’URL canonique reste [https://gearstorm-boss-circuit.vercel.app](https://gearstorm-boss-circuit.vercel.app). La correspondance de cet alias avec le commit v2.11.0 poussé, le run GitHub Actions et le déploiement Vercel `READY` sera renseignée après publication ; tant que ces preuves ne figurent pas ici, ce document ne présente pas la v2.11.0 comme la production active.
+La v2.11.0 a franchi `npm run qa:ci` avec 92 tests Node, 26 parcours Chromium réussis et 2 ignorés. Le gate complémentaire compte 25 réussites Firefox/WebKit et 3 scénarios ignorés, sans échec. Le commit applicatif `505f973` est validé par le run GitHub Actions `32897624756` et publié par Vercel sous `dpl_7eV3wtN3nMz23xKnnKk5Cuqxmstt`, état `READY`. L’alias [https://gearstorm-boss-circuit.vercel.app](https://gearstorm-boss-circuit.vercel.app) répond en HTTP 200 ; les smokes desktop et mobile chargent le manifeste v2.11 et le module de records sans erreur console ni requête échouée.
 
 ## Passe v2.10.0 — canon, robustesse et lecture causale
 
