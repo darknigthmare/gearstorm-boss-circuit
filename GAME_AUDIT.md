@@ -4,7 +4,7 @@ Date : 25 août 2026
 
 ## Verdict courant
 
-GEARSTORM v2.10.0 est localement validé comme boss rush complet de 30 machines et 90 phases. La passe ferme les incohérences de canon, de sauvegarde, de cache, de signaux non chromatiques, de maîtrises causales et de focus relevées dans l’audit avant/après. La publication distante reste en attente de la gate finale.
+GEARSTORM v2.10.0 est validé et publié comme boss rush complet de 30 machines et 90 phases. La passe ferme les incohérences de canon, de sauvegarde, de cache, de signaux non chromatiques, de maîtrises causales et de focus relevées dans l’audit avant/après. GitHub Actions est vert et la production Vercel est `READY`.
 
 Le canon articulé de Riva suit désormais sa transformation complète avec une erreur maximale observée d’environ `1,32 × 10⁻16`. Son point d’émission est `[149, 297]`, le recul vaut `12 px` dans l’espace local et `13,2 px` sur le Canvas. `forearm-cannon-near` est un asset combiné avant-bras–canon, pas un canon indépendant ajouté à un avant-bras distinct.
 
@@ -20,7 +20,7 @@ Le canon articulé de Riva suit désormais sa transformation complète avec une 
 | Tests | 84/84 Node ; `npm run qa` vert ; audit npm 0 vulnérabilité |
 | Audit Chrome | 1440 × 900 et 412 × 915 ; 12 captures avant + 12 après |
 | Accessibilité | axe : 0 violation Codex desktop et combat mobile ; gradient Canvas indéterminé |
-| Publication distante | Commit, push, CI et Vercel v2.10 en attente |
+| Publication distante | `b65b027` + `bc0129a`, CI `32871248113` verte, Vercel `dpl_AgHpmCoLwomtZ6Xj51LcThcZdha9` `READY`, HTTP 200 |
 
 ## Corrigé dans la v2.10.0
 
@@ -38,7 +38,7 @@ Le canon articulé de Riva suit désormais sa transformation complète avec une 
 
 ### P0
 
-Aucun bloqueur local P0 n’a été démontré sur l’état assemblé. La publication n’est toutefois pas terminée tant que commit, push, CI et Vercel v2.10 ne sont pas réellement vérifiés.
+Aucun bloqueur P0 n’a été démontré sur l’état assemblé ou sur la gate distante finale. La première CI a exposé une assertion mobile sensible à la durée de 190 ms de la ruée ; sa lecture atomique est corrigée dans `bc0129a` et le run `32871248113` est vert.
 
 ### P1
 
@@ -54,7 +54,7 @@ Une passe audio, des tests matériels et des playtests prolongés restent néces
 
 ## Limites de preuve
 
-Les preuves actuelles sont locales : 84 tests Node, gates de build, audit npm, agent-browser Chrome, axe, console et 24 captures. Le contraste du gradient Canvas reste indéterminé par axe. Aucun résultat distant v2.10 n’est revendiqué.
+Les preuves comprennent 84 tests Node, gates de build, audit npm, agent-browser Chrome, axe, console, 24 captures, 26 parcours Chromium distants réussis, GitHub Actions vert et Vercel `READY`. Le contraste du gradient Canvas reste indéterminé par axe et les limites matérielles ci-dessus restent hors preuve.
 
 Les captures et mesures sont indexées dans [`docs/audits/v2.10.0/`](docs/audits/v2.10.0/README.md).
 

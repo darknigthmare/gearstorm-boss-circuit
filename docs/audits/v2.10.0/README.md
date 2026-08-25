@@ -79,6 +79,6 @@ Audit réalisé le 25 août 2026 sur le build public v2.9.1, puis sur la version
 - Le portrait fonctionne, mais le paysage reste recommandé pour la largeur tactique.
 - Les records ne sont pas encore segmentés par mode, difficulté et version.
 - Les 24 arènes Forge restent monocouches ; les 24 rigs utilisent quatre pièces spécialisées au-dessus de huit familles moteur partagées.
-- La publication distante v2.10.0 reste à confirmer par commit, push, GitHub Actions, Vercel Ready et contrôles HTTP publics.
+- Publication vérifiée : `b65b027` puis `bc0129a` sur `main`, GitHub Actions `32871248113` vert, Vercel `dpl_AgHpmCoLwomtZ6Xj51LcThcZdha9` `READY` et alias public HTTP 200.
 
 Les dossiers `before/` et `after/` contiennent chacun les douze états numérotés ci-dessus avec le même cadrage fonctionnel.

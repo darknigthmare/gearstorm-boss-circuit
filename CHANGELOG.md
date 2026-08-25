@@ -13,7 +13,7 @@
 - Cinq maîtrises Forge utilisent désormais leur cause exacte : cibles prioritaires de HIVE FOREMAN, diversité complète de phase 2 d’ECHO FENCER, modules propres de BREAKER ARRAY, trois vannes dans un même cycle de FLOODLINE LEVIATHAN et quatre ricochets successifs de VECTOR VAULT.
 - Correction du parcours clavier et du retour de focus : combat → pause → titre → Options → retour restitue `#settings` hors arbre `inert`.
 - Validation locale : `84/84` tests Node, `npm run qa` vert, build de `21 735 065` octets, 233 WebP pour `18 175 510` octets artistiques, audit npm sans vulnérabilité, 12 captures Chrome avant et 12 après, audit axe sans violation sur Codex desktop et combat mobile.
-- Publication distante v2.10 en attente de la gate finale : aucun commit, push, statut CI ou déploiement Vercel v2.10 n’est revendiqué par cette entrée.
+- Publication vérifiée : commits `b65b027` puis `bc0129a` poussés sur `main`, CI `32871248113` verte avec 26 parcours Chromium réussis, audit npm sans vulnérabilité, Vercel `dpl_AgHpmCoLwomtZ6Xj51LcThcZdha9` `READY` et alias public HTTP 200. La première CI a révélé une double lecture instable de la ruée tactile de 190 ms ; le second commit capture désormais l’état au moment exact où il est observé.
 
 ## 2.9.1 — Riva reprend la route
 

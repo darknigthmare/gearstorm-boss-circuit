@@ -2,9 +2,9 @@
 
 Validation locale réalisée le 25 août 2026.
 
-## Statut v2.10.0 — gates locales réussies, publication distante en attente
+## Statut v2.10.0 — validée, poussée et publiée
 
-Le candidat v2.10.0 a franchi les gates locales et l’audit Chrome décrits ci-dessous. Aucun commit, push, résultat GitHub Actions, identifiant Vercel ni contrôle HTTP public v2.10 n’est encore revendiqué : la publication distante attend la gate finale.
+La v2.10.0 a franchi les gates locales, l’audit Chrome, GitHub Actions et Vercel. Le commit applicatif `b65b027` est complété par `bc0129a`, qui stabilise l’observation CI de la ruée tactile sans modifier sa durée de jeu.
 
 | Surface v2.10 | Résultat observé |
 | --- | --- |
@@ -19,7 +19,13 @@ Le candidat v2.10.0 a franchi les gates locales et l’audit Chrome décrits ci-
 | Captures | 12 états avant correction et 12 états après correction |
 | Accessibilité automatisée | axe : 0 violation sur le Codex desktop et le combat mobile ; contraste du gradient Canvas seulement indéterminé |
 | Runtime navigateur | console, erreurs de page et erreurs réseau observées : aucune |
-| Publication GitHub / CI / Vercel | **En attente de la gate finale** |
+| GitHub Actions | Run `32871248113` : **success** ; job `97878537588` |
+| E2E distant | 26 Chromium réussis, 2 ignorés, 0 échec |
+| Artifact CI | `gearstorm-web-v2.10.0`, ID `9572258454`, 21 182 701 octets |
+| Vercel | `dpl_AgHpmCoLwomtZ6Xj51LcThcZdha9` : **READY**, commit `bc0129a` |
+| Production | `https://gearstorm-boss-circuit.vercel.app` : HTTP 200 |
+
+Le premier run `32870552995` a signalé une course temporelle dans le test tactile : la ruée de 190 ms avait bien été observée par `waitForFunction`, puis était relue après son expiration. `bc0129a` conserve le résultat observé dans la même opération ; le run suivant est intégralement vert.
 
 ## Vérifications fonctionnelles v2.10
 

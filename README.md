@@ -2,7 +2,7 @@
 
 GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables de la campagne de Cassian Voltério, puis affronte vingt-quatre profils supplémentaires dans la Forge : 30 boss jouables, 90 phases et 90 contrats de maîtrise.
 
-État courant : le candidat local v2.10.0 conserve les 30 boss, 90 phases et 90 contrats, ferme l’arc de la Couronne et renforce sauvegarde, cache, accessibilité et cohérence du canon. Sa publication distante est encore en attente.
+État courant : la v2.10.0 est publiée. Elle conserve les 30 boss, 90 phases et 90 contrats, ferme l’arc de la Couronne et renforce sauvegarde, cache, accessibilité et cohérence du canon.
 
 
 ## Jouer en local
@@ -17,7 +17,7 @@ npm start
 Ouvrir ensuite `http://127.0.0.1:8080`. Sous Windows, `LANCER_LE_JEU.bat` lance également la version locale dans le navigateur.
 
 
-La production vérifiée ci-dessous reste la v2.9.1. Pour v2.10.0, aucun commit, push, run CI ni déploiement Vercel n’est encore revendiqué.
+La production v2.10.0 est vérifiée sur GitHub Actions et Vercel ; les identifiants observés sont consignés ci-dessous et dans `QA_REPORT.md`.
 
 Le mode `file://` reste un repli jouable, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
 
@@ -36,7 +36,9 @@ Les sauvegardes contradictoires et checkpoints finaux sont normalisés, une sauv
 - Dépôt GitHub : https://github.com/darknigthmare/gearstorm-boss-circuit
 - Jeu public Vercel : https://gearstorm-boss-circuit.vercel.app
 
-La v2.9.1 est publiée depuis `main`. Le commit applicatif `8bd2b29`, la CI GitHub Actions `32789460141` et le déploiement Vercel Ready `dpl_7mKBMcfvbHcXF4mevKm4RYUNEdG5` ont été vérifiés le 25 août 2026 ; les preuves détaillées sont consignées dans `QA_REPORT.md`.
+La v2.10.0 est publiée depuis `main`. Le commit applicatif `b65b027` et le correctif de stabilité CI `bc0129a` sont poussés. Le run GitHub Actions `32871248113` est vert avec 26 parcours Chromium réussis, 2 ignorés et 0 échec ; l’audit npm ne trouve aucune vulnérabilité. Le déploiement Vercel `dpl_AgHpmCoLwomtZ6Xj51LcThcZdha9` est `READY`, rattaché à `bc0129a`, et l’alias public répond en HTTP 200.
+
+Historique : la v2.9.1 avait été vérifiée sur le commit `8bd2b29`, le run `32789460141` et le déploiement `dpl_7mKBMcfvbHcXF4mevKm4RYUNEdG5`.
 
 ## Passe v2.9.1 — rig, route et récit méta utile
 
@@ -146,7 +148,7 @@ Le CSS contient les variantes `prefers-reduced-motion` et `prefers-contrast`, de
 
 Le workflow CI Node 22.x a réussi sur la v2.9.1. Playwright a exécuté Chromium desktop et un profil mobile tactile ; Firefox et WebKit restent configurés en opt-in et n’ont pas été exécutés pour cette release.
 
-Pour v2.10.0, la validation locale compte 84/84 tests Node, `npm run qa` vert, un audit npm sans vulnérabilité et un audit agent-browser Chrome desktop/mobile sans erreur console. La publication CI/Vercel reste en attente.
+Pour v2.10.0, la validation locale compte 84/84 tests Node, `npm run qa` vert, un audit npm sans vulnérabilité et un audit agent-browser Chrome desktop/mobile sans erreur console. La CI distante ajoute 26 parcours Chromium réussis, 2 ignorés et 0 échec ; Vercel est `READY` et l’alias public répond en HTTP 200.
 
 
 Le fichier `tests/e2e/forge.spec.mjs` couvre :
