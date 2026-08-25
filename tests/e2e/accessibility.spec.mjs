@@ -380,8 +380,8 @@ test('les commandes tactiles pilotent mouvement saut tir ruee et pause', async (
 
   const dash = page.locator('[data-touch="dash"]');
   await dash.dispatchEvent('pointerdown', pointerDown);
-  await page.waitForFunction(() => window.__GEARSTORM_QA__.getRigDiagnostics().heroine.poseState?.dashing === true);
-  expect(await page.evaluate(() => window.__GEARSTORM_QA__.getRigDiagnostics().heroine.poseState.dashing)).toBe(true);
+  const dashStarted = await page.waitForFunction(() => window.__GEARSTORM_QA__.getRigDiagnostics().heroine.poseState?.dashing === true);
+  expect(await dashStarted.jsonValue()).toBe(true);
   await dash.dispatchEvent('pointerup', pointerUp);
 
   await page.locator('#touch-pause').click();
