@@ -1,10 +1,11 @@
 import vm from 'node:vm';
 
-export const APP_RELEASE = '2.10.0';
-export const SAVE_SCHEMA_VERSION = 5;
-export const SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
-export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
-export const OLDER_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
+export const APP_RELEASE = '2.11.0';
+export const SAVE_SCHEMA_VERSION = 6;
+export const SAVE_KEY = 'gearstorm_boss_circuit_save_v6';
+export const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
+export const V4_SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
+export const V3_SAVE_KEY = 'gearstorm_boss_circuit_save_v3';
 export const V2_SAVE_KEY = 'gearstorm_boss_circuit_save_v2';
 export const STORY_SCHEMA_VERSION = 1;
 export const STORY_CONTENT_VERSION = '2.10.0';
@@ -17,7 +18,7 @@ export const PHASE_COUNT = PLAYABLE_BOSS_COUNT * 3;
 export const STORY_MASTERY_CONTRACT_COUNT = 18;
 export const EXPANSION_MASTERY_CONTRACT_COUNT = 72;
 export const MASTERY_CONTRACT_COUNT = STORY_MASTERY_CONTRACT_COUNT + EXPANSION_MASTERY_CONTRACT_COUNT;
-export const DIST_BUDGET_BYTES = 24 * 1024 * 1024;
+export const DIST_BUDGET_BYTES = 56 * 1024 * 1024;
 
 export const CAMPAIGN_BOSS_IDS = Object.freeze(['rammer', 'kraken', 'drill', 'mantis', 'cyclotron', 'omega']);
 export const FORGE_BOSS_IDS = Object.freeze([
@@ -256,7 +257,34 @@ export function validateBossRosterContract(bossRosterSource) {
   };
 }
 
-export function validateApplicationContract({ game, story, expansionStory, bossRoster, html, manifest, packageJson }) {
+export function validatePerformanceRecordsContract(source) {
+  invariant(typeof source === 'string' && source.length > 8_000, 'Source performance-records.js absente ou incomplete.');
+  invariant(!/^\s*(?:import|export)\s/m.test(source), 'performance-records.js doit rester un script classique charge avant game.js.');
+  invariant(!/(?:document|localStorage)\s*(?:\.|\[)/.test(source), 'performance-records.js doit rester independant du DOM et du stockage.');
+
+  const context = vm.createContext({});
+  new vm.Script(source, { filename: 'performance-records.js' }).runInContext(context, { timeout: 1_000 });
+  const records = context.GEARSTORM_PERFORMANCE_RECORDS;
+  invariant(records && typeof records === 'object', 'globalThis.GEARSTORM_PERFORMANCE_RECORDS absent.');
+  invariant(Object.isFrozen(records), 'Le registre de records public doit etre immuable.');
+  invariant(records.API_VERSION === '1.0.0', 'API records 1.0.0 attendue.');
+  invariant(records.SAVE_VERSION === SAVE_SCHEMA_VERSION, 'Le module records doit cibler le schema de sauvegarde actif.');
+  invariant(records.RECORD_SCHEMA_VERSION === 1, 'Schema records 1 attendu.');
+  invariant(records.HISTORY_LIMIT === 20, 'Historique records borne a 20 entrees attendu.');
+  for (const helper of [
+    'makeRecordCategoryKey', 'parseRecordCategoryKey', 'sanitizeRecordBook', 'createRecordBook',
+    'recordBossAttempt', 'recordCircuitAttempt', 'appendHistory', 'getBossRecord', 'getCircuitRecord',
+    'migrateLegacyRecords', 'migrateSaveToV6',
+  ]) invariant(typeof records[helper] === 'function', 'Helper records absent : ' + helper + '.');
+
+  return {
+    performanceRecordsApiVersion: records.API_VERSION,
+    performanceRecordsSchemaVersion: records.RECORD_SCHEMA_VERSION,
+    performanceRecordsHistoryLimit: records.HISTORY_LIMIT,
+  };
+}
+
+export function validateApplicationContract({ game, story, expansionStory, bossRoster, performanceRecords, html, manifest, packageJson }) {
   invariant(packageJson?.version === APP_RELEASE, `Version application ${APP_RELEASE} attendue.`);
   invariant(typeof game === 'string' && typeof story === 'string' && typeof html === 'string', 'Sources game.js, story.js et index.html requises.');
   const storyContract = validateStoryContract(story);
@@ -264,39 +292,44 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   invariant(!hasForgeSources || (typeof expansionStory === 'string' && typeof bossRoster === 'string'), 'expansion-story.js et boss-roster.js doivent etre valides ensemble.');
   const expansionStoryContract = hasForgeSources ? validateExpansionStoryContract(expansionStory) : {};
   const bossRosterContract = hasForgeSources ? validateBossRosterContract(bossRoster) : {};
+  const performanceRecordsContract = typeof performanceRecords === 'string' ? validatePerformanceRecordsContract(performanceRecords) : {};
 
   const ids = htmlIds(html);
   for (const id of REQUIRED_UI_IDS) invariant(ids.has(id), `Contrat UI v${APP_RELEASE} : #${id} absent.`);
   const domReferences = [...game.matchAll(/getElementById\(["']([^"']+)["']\)/g)].map(match => match[1]);
   for (const id of domReferences) invariant(ids.has(id), `Contrat DOM : #${id} reference par game.js mais absent.`);
 
-  const pwaBootstrapTag = html.search(/<script\s+src=["']pwa-update-v2\.10\.0\.js["'][^>]*><\/script>/i);
+  const pwaBootstrapTag = html.search(/<script\s+src=["']pwa-update-v2\.11\.0\.js["'][^>]*><\/script>/i);
   const storyTag = html.search(/<script\s+src=["']story\.js["'][^>]*><\/script>/i);
   const expansionStoryTag = html.search(/<script\s+src=["']expansion-story\.js["'][^>]*><\/script>/i);
   const bossRosterTag = html.search(/<script\s+src=["']boss-roster\.js["'][^>]*><\/script>/i);
   const gameTag = html.search(/<script\s+src=["']game\.js["'][^>]*><\/script>/i);
+  const performanceRecordsTag = html.search(/<script\s+src=["']performance-records\.js["'][^>]*><\/script>/i);
   invariant(pwaBootstrapTag >= 0 && pwaBootstrapTag < storyTag, 'Le bootstrap PWA versionne doit etre charge avant le runtime.');
   invariant(game.includes(`__GEARSTORM_PWA_UPDATE_V${APP_RELEASE.replaceAll('.', '_')}__`), 'Le bootstrap PWA et son fallback runtime doivent partager le meme marqueur de release.');
   invariant(storyTag >= 0 && gameTag > storyTag, 'story.js doit etre charge avant game.js.');
   if (hasForgeSources) {
-    invariant(expansionStoryTag > storyTag && bossRosterTag > expansionStoryTag && gameTag > bossRosterTag, 'Ordre shell requis : story, expansion-story, boss-roster, game.');
+    invariant(expansionStoryTag > storyTag && bossRosterTag > expansionStoryTag && performanceRecordsTag > bossRosterTag && gameTag > performanceRecordsTag, 'Ordre shell requis : story, expansion-story, boss-roster, performance-records, game.');
   }
   invariant(/globalThis\.GEARSTORM_STORY/.test(game), 'Le moteur doit exiger le registre narratif global.');
+  invariant(performanceRecordsTag >= 0 && performanceRecordsTag < gameTag, 'performance-records.js doit etre charge avant game.js.');
   if (hasForgeSources) {
     invariant(/globalThis\.GEARSTORM_BOSS_ROSTER/.test(game), 'Le moteur doit charger le roster boss global.');
     invariant(/globalThis\.GEARSTORM_EXPANSION_STORY/.test(game), 'Le moteur doit charger le registre narratif Forge global.');
   }
 
+  if (typeof performanceRecords === 'string') invariant(/globalThis\.GEARSTORM_PERFORMANCE_RECORDS/.test(game), 'Le moteur doit charger le registre global des records.');
   invariant(new RegExp(`const\\s+SAVE_KEY\\s*=\\s*["']${escapeRegExp(SAVE_KEY)}["']`).test(game), `Sauvegarde v${SAVE_SCHEMA_VERSION} absente.`);
-  invariant(new RegExp(`const\\s+PREVIOUS_SAVE_KEY\\s*=\\s*["']${escapeRegExp(PREVIOUS_SAVE_KEY)}["']`).test(game), 'Cle de migration v4 absente.');
-  invariant(new RegExp(`const\\s+OLDER_SAVE_KEY\\s*=\\s*["']${escapeRegExp(OLDER_SAVE_KEY)}["']`).test(game), 'Cle de migration v3 absente.');
-  invariant(/version\s*:\s*5\b/.test(game), 'Schema de sauvegarde version 5 absent.');
-  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'campaignCleared', 'storySeen', 'mastery', 'bestForgeRush', 'forgeCompleted', 'forgeCleared', 'forgeRushSnapshot']) {
-    invariant(new RegExp(`\\b${field}\\b`).test(game), `Champ de sauvegarde v5 absent : ${field}.`);
+  invariant(new RegExp(`const\\s+PREVIOUS_SAVE_KEY\\s*=\\s*["']${escapeRegExp(PREVIOUS_SAVE_KEY)}["']`).test(game), 'Cle de migration v5 absente.');
+  invariant(new RegExp(`const\\s+V4_SAVE_KEY\\s*=\\s*["']${escapeRegExp(V4_SAVE_KEY)}["']`).test(game), 'Cle de migration v4 absente.');
+  invariant(new RegExp(`const\\s+V3_SAVE_KEY\\s*=\\s*["']${escapeRegExp(V3_SAVE_KEY)}["']`).test(game), 'Cle de migration v3 absente.');
+  invariant(/version\s*:\s*6\b/.test(game), 'Schema de sauvegarde version 6 absent.');
+  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'campaignCleared', 'storySeen', 'mastery', 'records', 'forgeCompleted', 'forgeCleared', 'forgeRushSnapshot']) {
+    invariant(new RegExp(`\\b${field}\\b`).test(game), `Champ de sauvegarde v6 absent : ${field}.`);
   }
-  invariant(/const candidates = \[SAVE_KEY, PREVIOUS_SAVE_KEY, OLDER_SAVE_KEY, V2_SAVE_KEY, LEGACY_SAVE_KEY\]/.test(game), 'La migration doit parcourir les sauvegardes v5 a legacy dans l ordre.');
+  invariant(/const candidates = \[SAVE_KEY, PREVIOUS_SAVE_KEY, V4_SAVE_KEY, V3_SAVE_KEY, V2_SAVE_KEY, LEGACY_SAVE_KEY\]/.test(game), 'La migration doit parcourir les sauvegardes v6 a legacy dans l ordre.');
   invariant(/for \(const key of candidates\)[\s\S]+localStorage\.getItem\(key\)/.test(game), 'La migration doit tenter chaque slot meme si le plus recent est corrompu.');
-  invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v5.');
+  invariant(/localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/.test(game), 'La migration doit persister la sauvegarde assainie sous la cle v6.');
 
   for (const marker of REQUIRED_GAME_SYSTEMS) {
     invariant(new RegExp(`\\b${escapeRegExp(marker)}\\b`).test(game), `Systeme v${APP_RELEASE} absent : ${marker}.`);
@@ -310,8 +343,8 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
   const shortcuts = new Set((manifest?.shortcuts || []).map(shortcut => shortcut.url));
   for (const url of ['./?mode=rush', './?mode=practice', './?mode=forge', './?mode=forgeRush']) invariant(shortcuts.has(url), `Raccourci PWA absent : ${url}.`);
 
-  invariant(html.includes('GEARSTORM: Boss Circuit v2.10.0'), 'Metadonnees HTML v2.10.0 absentes.');
-  invariant(!/GEARSTORM: Boss Circuit v2\.(?:[2-9](?:\.\d+)?)\b/.test(html), 'Metadonnee HTML encore figee sur une ancienne version.');
+  invariant(html.includes(`GEARSTORM: Boss Circuit v${APP_RELEASE}`), `Metadonnees HTML v${APP_RELEASE} absentes.`);
+  invariant(!html.includes('GEARSTORM: Boss Circuit v2.10.0'), 'Metadonnee HTML encore figee sur v2.10.0.');
   invariant(/qaAllowed[\s\S]+__GEARSTORM_QA__/.test(game), 'Surface QA locale absente ou non protegee.');
   const rigDiagnosticsBlock = game.slice(game.indexOf('function getRigDiagnostics'), game.indexOf('function drawRigDebugOverlay'));
   for (const field of ['phaseCounts', 'hitbox', 'weakPoint', 'feetLocalY', 'muzzle', 'transitionExplosionOnly']) {
@@ -331,5 +364,6 @@ export function validateApplicationContract({ game, story, expansionStory, bossR
     ...expansionStoryContract,
     ...bossRosterContract,
     masteryContracts: STORY_MASTERY_CONTRACT_COUNT + (expansionStoryContract.expansionMasteryContracts || 0),
+    ...performanceRecordsContract,
   };
 }

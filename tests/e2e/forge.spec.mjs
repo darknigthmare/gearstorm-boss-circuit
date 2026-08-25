@@ -18,16 +18,16 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
 
   const diagnostics = await page.evaluate(() => window.__GEARSTORM_QA__.getRigDiagnostics());
   const expectedAnatomy = [
-    'boot-far', 'boot-near', 'forearm-cannon-near', 'forearm-far', 'head', 'pelvis',
+    'boot-far', 'boot-near', 'cannon-near', 'forearm-far', 'forearm-near', 'head', 'pelvis',
     'shin-far', 'shin-near', 'thigh-far', 'thigh-near', 'torso', 'upper-arm-far', 'upper-arm-near'
   ];
-  expect(diagnostics.heroine.parts).toBe(15);
-  expect(diagnostics.heroine.anatomyParts).toBe(13);
+  expect(diagnostics.heroine.parts).toBe(16);
+  expect(diagnostics.heroine.anatomyParts).toBe(14);
   expect(diagnostics.heroine.effectParts).toBe(2);
   expect([...diagnostics.heroine.anatomyPartNames].sort()).toEqual(expectedAnatomy);
   expect(diagnostics.heroine.partNames).not.toContain('body-core');
   expect(diagnostics.heroine.partNames).not.toContain('firing-arm');
-  expect(diagnostics.heroine.loadedParts).toBe(15);
+  expect(diagnostics.heroine.loadedParts).toBe(16);
   expect(diagnostics.heroine.artReady).toBe(true);
   expect(diagnostics.heroine.feet).toBeCloseTo(36, 5);
   expect(diagnostics.heroine.feetLocalY).toBeCloseTo(36, 5);
@@ -47,15 +47,19 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
   expect(diagnostics.heroine.hierarchy.missingParents).toEqual([]);
   expect(diagnostics.heroine.hierarchy.roots).toEqual(['pelvis']);
   expect(diagnostics.heroine.hierarchy.reachesPelvis).toBe(true);
+  expect(diagnostics.heroine.parentLinks).toEqual(expect.arrayContaining([
+    { child: 'forearm-near', parent: 'upper-arm-near' },
+    { child: 'cannon-near', parent: 'forearm-near' },
+  ]));
   expect(diagnostics.heroine.hierarchy.chains).toEqual([
     ['pelvis', 'torso', 'head'],
     ['pelvis', 'thigh-far', 'shin-far', 'boot-far'],
     ['pelvis', 'thigh-near', 'shin-near', 'boot-near'],
     ['torso', 'upper-arm-far', 'forearm-far'],
-    ['torso', 'upper-arm-near', 'forearm-cannon-near'],
+    ['torso', 'upper-arm-near', 'forearm-near', 'cannon-near'],
   ]);
   expect(diagnostics.heroine.muzzle).toEqual({
-    part: 'forearm-cannon-near',
+    part: 'cannon-near',
     point: [149, 297],
   });
   expect(Number.isFinite(diagnostics.heroine.renderedMuzzle.x)).toBe(true);
@@ -112,11 +116,59 @@ test('le menu, la Forge et le rig de Riva restent lisibles et cohérents', async
   expect(Math.hypot(runRig.renderedMuzzle.x - idleRig.renderedMuzzle.x, runRig.renderedMuzzle.y - idleRig.renderedMuzzle.y)).toBeGreaterThan(0.1);
   expect(Math.hypot(jumpRig.renderedMuzzle.x - idleRig.renderedMuzzle.x, jumpRig.renderedMuzzle.y - idleRig.renderedMuzzle.y)).toBeGreaterThan(0.1);
 
-  const forgeOffset = await page.evaluate(() => {
-    window.__GEARSTORM_QA__.launchBoss('bastion-ricochet', { phase: 1 });
-    return window.__GEARSTORM_QA__.getRigDiagnostics().visualOffsetY;
+  const invulnerability = await page.evaluate(() => {
+    window.__GEARSTORM_QA__.protectPlayer();
+    return window.__GEARSTORM_QA__.getRigDiagnostics().heroine;
   });
-  expect(forgeOffset).toBe(28);
+  expect(invulnerability.artReady).toBe(true);
+  expect(invulnerability.renderAlpha).toBeGreaterThan(0);
+  expect(invulnerability.renderAlpha).toBeLessThan(1);
+
+  await page.evaluate(() => {
+    window.__GEARSTORM_QA__.launchBoss('bastion-ricochet', { phase: 1 });
+  });
+  await page.waitForFunction(() => {
+    const qa = window.__GEARSTORM_QA__;
+    return qa?.getState().bossId === 'bastion-ricochet' && qa?.getArtState().ready === true;
+  });
+  const forgeArtAudit = await page.evaluate(() => {
+    const art = window.__GEARSTORM_QA__.getArtState();
+    const diagnostics = window.__GEARSTORM_QA__.getRigDiagnostics();
+    const bossId = 'bastion-ricochet';
+    return {
+      art,
+      boss: diagnostics.bosses[bossId],
+      visualOffsetY: diagnostics.visualOffsetY,
+      bossAssets: art.currentAssets.filter(src => src.includes('/bosses/' + bossId + '/')),
+      arenaAssets: art.currentAssets.filter(src => src.includes('/arenas/' + bossId + '/')),
+    };
+  });
+  expect(forgeArtAudit.visualOffsetY).toBe(28);
+  expect(forgeArtAudit.art.release).toBe('2.11.0');
+  expect(forgeArtAudit.art.failed).toEqual([]);
+  expect(forgeArtAudit.boss.generatedMultipartManifest).toBe(true);
+  expect(forgeArtAudit.boss.generatedMultipartLoaded).toBe(true);
+  expect(forgeArtAudit.boss.generatedPartRoles).toHaveLength(7);
+  expect(forgeArtAudit.bossAssets).toHaveLength(7);
+  expect(forgeArtAudit.arenaAssets).toHaveLength(4);
+
+  const hierarchyAudit = await page.evaluate(() => {
+    const qa = window.__GEARSTORM_QA__;
+    const before = qa.getForgeRigVisibility();
+    const mutation = qa.setForgePartDestroyed(0);
+    const after = qa.getForgeRigVisibility();
+    return { before, mutation, after };
+  });
+  const beforeByName = Object.fromEntries(hierarchyAudit.before.entries.map(entry => [entry.name, entry]));
+  const afterByName = Object.fromEntries(hierarchyAudit.after.entries.map(entry => [entry.name, entry]));
+  expect(hierarchyAudit.mutation?.destroyed).toBe(true);
+  expect(beforeByName['appendage-left-root']).toMatchObject({ logicalSlot: 0, hidden: false, destroyed: false });
+  expect(beforeByName['appendage-left-tip']).toMatchObject({ parent: 'appendage-left-root', hidden: false });
+  expect(afterByName['appendage-left-root']).toMatchObject({ hidden: true, destroyed: true });
+  expect(afterByName['appendage-left-tip']).toMatchObject({ hidden: true });
+  expect(afterByName['appendage-right-root']).toMatchObject({ hidden: false, destroyed: false });
+  expect(afterByName['appendage-right-tip']).toMatchObject({ hidden: false });
+  expect(hierarchyAudit.after.hitboxes).toEqual(hierarchyAudit.before.hitboxes);
 });
 
 test('les 24 boss Forge ont un système propre et démarrent dans leurs trois phases', async ({ page }, testInfo) => {

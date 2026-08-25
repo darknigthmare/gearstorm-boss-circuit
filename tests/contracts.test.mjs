@@ -24,7 +24,7 @@ const [html, css, story, expansionStorySource, game, bossRosterSource, readme, d
   readFile('DESIGN.md', 'utf8'),
   readFile('package.json', 'utf8').then(JSON.parse),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
-  readFile('assets/generated/v2.10.0/asset-manifest.json', 'utf8').then(JSON.parse),
+  readFile('assets/generated/v2.11.0/asset-manifest.json', 'utf8').then(JSON.parse),
 ]);
 
 const rosterContext = {};
@@ -156,9 +156,11 @@ test('pause vers titre conserve les ouvreurs Options et Codex pour le retour foc
     getElementById: id => screens.find(screen => screen.id === id) || null,
     querySelector: selector => selector === '.screen.active' ? screens.find(screen => screen.active) || null : null,
   };
+  const pendingFrames = [];
+  const flushFrames = () => { while (pendingFrames.length) pendingFrames.shift()(); };
   const showScreen = vm.runInNewContext(`(${extractNamedFunction(game, 'showScreen')})`, {
-    document, HTMLElement: FakeElement, requestAnimationFrame: callback => callback(),
-    screenOpeners: new Map(), screens,
+    document, HTMLElement: FakeElement, requestAnimationFrame: callback => pendingFrames.push(callback),
+    screenOpeners: new Map(), screenTransitionId: 0, screens,
   });
 
   showScreen('title-screen');
@@ -166,23 +168,26 @@ test('pause vers titre conserve les ouvreurs Options et Codex pour le retour foc
   showScreen('settings-screen');
   document.activeElement = settingsBack;
   showScreen('title-screen');
+  flushFrames();
   assert.equal(document.activeElement, optionsButton);
 
   document.activeElement = codexButton;
   showScreen('codex-screen');
   document.activeElement = codexBack;
   showScreen('title-screen');
+  flushFrames();
   assert.equal(document.activeElement, codexButton);
 });
 
-test('la sauvegarde v5 migre v4 a v2 et porte les deux reprises', () => {
+test('la sauvegarde v6 migre v5 a v2, preserve l heritage et porte les deux reprises', () => {
+  assert.match(game, /gearstorm_boss_circuit_save_v6/);
   assert.match(game, /gearstorm_boss_circuit_save_v5/);
   assert.match(game, /gearstorm_boss_circuit_save_v4/);
   assert.match(game, /gearstorm_boss_circuit_save_v3/);
   assert.match(game, /gearstorm_boss_circuit_save_v2/);
-  assert.match(game, /version\s*:\s*5\b/);
-  for (const field of ['combatHints', 'codexUnlocked', 'rushSnapshot', 'forgeRushSnapshot', 'forgeCleared', 'forgeCompleted', 'campaignCleared', 'storySeen', 'mastery']) assert.match(game, new RegExp('\\b' + field + '\\b'));
-  assert.match(game, /const candidates = \[SAVE_KEY, PREVIOUS_SAVE_KEY, OLDER_SAVE_KEY, V2_SAVE_KEY, LEGACY_SAVE_KEY\]/);
+  assert.match(game, /version\s*:\s*6\b/);
+  for (const field of ['records', 'combatHints', 'codexUnlocked', 'rushSnapshot', 'forgeRushSnapshot', 'forgeCleared', 'forgeCompleted', 'campaignCleared', 'storySeen', 'mastery', 'splits']) assert.match(game, new RegExp('\\b' + field + '\\b'));
+  assert.match(game, /const candidates = \[SAVE_KEY, PREVIOUS_SAVE_KEY, V4_SAVE_KEY, V3_SAVE_KEY, V2_SAVE_KEY, LEGACY_SAVE_KEY\]/);
   assert.match(game, /for \(const key of candidates\)[\s\S]+localStorage\.getItem\(key\)/);
   assert.match(game, /localStorage\.setItem\(SAVE_KEY,\s*JSON\.stringify\(safe\)\)/);
   for (const marker of ['sanitizeRushSnapshot', 'saveRushSnapshot', 'clearRushSnapshot', 'resumeRushSnapshot', 'syncContinueRun', 'sanitizeForgeRushSnapshot', 'saveForgeRushSnapshot', 'clearForgeRushSnapshot', 'resumeForgeRushSnapshot', 'syncContinueForge']) {
@@ -190,8 +195,8 @@ test('la sauvegarde v5 migre v4 a v2 et porte les deux reprises', () => {
   }
 });
 
-test('une sauvegarde v4 valide reste chargee si sa persistance v5 depasse le quota', () => {
-  const legacy = { version: 4, unlocked: 3, completed: false };
+test('une sauvegarde v5 valide reste chargee si sa persistance v6 depasse le quota', () => {
+  const legacy = { version: 5, unlocked: 3, completed: false };
   let defaultCalls = 0;
   let writeCalls = 0;
   const localStorage = {
@@ -208,16 +213,17 @@ test('une sauvegarde v4 valide reste chargee si sa persistance v5 depasse le quo
   const loadSave = vm.runInNewContext(`(${extractNamedFunction(game, 'loadSave')})`, {
     SAVE_KEY,
     PREVIOUS_SAVE_KEY,
-    OLDER_SAVE_KEY: 'gearstorm_boss_circuit_save_v3',
+    V4_SAVE_KEY: 'gearstorm_boss_circuit_save_v4',
+    V3_SAVE_KEY: 'gearstorm_boss_circuit_save_v3',
     V2_SAVE_KEY: 'gearstorm_boss_circuit_save_v2',
     LEGACY_SAVE_KEY: 'gearstorm_boss_circuit_save',
     localStorage,
     normalizeSaveData: parsed => ({ ...parsed, normalized: true }),
-    createDefaultSave: () => { defaultCalls += 1; return { version: 5, unlocked: 1 }; },
+    createDefaultSave: () => { defaultCalls += 1; return { version: 6, unlocked: 1 }; },
   });
 
   const restored = loadSave();
-  assert.equal(restored.version, 4);
+  assert.equal(restored.version, 5);
   assert.equal(restored.unlocked, 3);
   assert.equal(restored.normalized, true);
   assert.equal(writeCalls, 1);
@@ -244,7 +250,7 @@ test('le cache raster borne les bundles boss sans expulser le rig de Riva', () =
   assert.doesNotMatch(game.slice(game.indexOf('function evictGeneratedBossBundles'), game.indexOf('function preloadGeneratedBossBundle')), /generatedArtCoreEntries\(\)/);
 });
 
-test('la passe meta v2.10 reste visible dans la Forge et les quatre tableaux narratifs', () => {
+test('la passe meta v2.11 reste visible dans la Forge et les quatre tableaux narratifs', () => {
   for (const marker of ['buildForgeCodex', 'syncForgeResultTransmission']) {
     assert.match(game, new RegExp(`\\b${marker}\\b`));
   }
@@ -252,7 +258,7 @@ test('la passe meta v2.10 reste visible dans la Forge et les quatre tableaux nar
     assert.match(html, new RegExp(`id=["']${id}["']`));
   }
   for (const filename of ['intro-broadcast', 'prologue-m0', 'campaign-ending', 'forge-ending']) {
-    assert.match(css, new RegExp(`assets/generated/v2\\.10\\.0/narrative/${filename}\\.webp`));
+    assert.match(css, new RegExp(`assets/generated/v2\\.11\\.0/narrative/${filename}\\.webp`));
   }
   const expansion = rosterContext.GEARSTORM_EXPANSION_STORY;
   assert.equal(expansion.bosses.length, 24);
@@ -281,28 +287,41 @@ test('les rigs generes et leur diagnostic QA sont explicites', () => {
   assert.match(game, /(?:QA_ALLOWED|qaAllowed)[\s\S]+127\.0\.0\.1[\s\S]+localhost/);
 });
 
-test('le rig anatomique OpenAI v2.10 de Riva garde treize pieces et un contact visuel coherent', () => {
+test('le rig anatomique OpenAI v2.11 de Riva garde quatorze pieces dont canon et avant-bras independants', () => {
   const playerRenderer = game.slice(game.indexOf('function drawGeneratedPlayer'), game.indexOf('function bossRigPose'));
   assert.match(playerRenderer, /heroineRigParts\(\)/);
   assert.match(playerRenderer, /heroRigContext/);
   assert.match(playerRenderer, /drawRigPart\(parts\[spec\.name\]/);
-  assert.match(game, /rigParts\.length === 15/);
-  assert.match(game, /anatomyParts\.length === 13/);
+  assert.match(game, /rigParts\.length === 16/);
+  assert.match(game, /anatomyParts\.length === 14/);
   assert.match(game, /const RIVA_RENDER_SCALE = 1\.10/);
   assert.match(game, /const RIVA_ROAD_LIFT = 10/);
   assert.match(game, /const RIVA_CANNON_RECOIL = 12/);
   assert.match(game, /const RIVA_FOOT_OFFSET = 3\.6/);
   assert.match(game, /spawnDust\(player\.x, GROUND - \(heroArtReady\(\) \? RIVA_ROAD_LIFT : 0\), 7\)/);
-  assert.match(game, /assets\/generated\/v2\.10\.0\/asset-manifest\.json/);
+  assert.match(game, /assets\/generated\/v2\.11\.0\/asset-manifest\.json/);
+  assert.match(game, /RIVA_CANNON_MOUNT_PART = 'forearm-near'/);
+  assert.match(game, /RIVA_CANNON_PART = 'cannon-near'/);
   assert.doesNotMatch(game, /body-core|firing-arm/);
   assert.match(game, /visualOffsetY/);
-  const shadow = game.slice(game.indexOf('function drawPlayer()'), game.indexOf('const blink', game.indexOf('function drawPlayer()')));
+  const playerRendererBlock = game.slice(game.indexOf('function playerRenderAlpha'), game.indexOf('function drawBoss'));
+  const drawPlayerStart = game.indexOf('function drawPlayer()');
+  const shadow = game.slice(
+    drawPlayerStart,
+    game.indexOf('ctx.translate(player.x, player.y)', drawPlayerStart)
+  );
   assert.match(shadow, /const shadowLift = heroArtReady\(\) \? RIVA_ROAD_LIFT : 0/);
   assert.match(shadow, /ellipse\(player\.x, GROUND - 3 - shadowLift, 28 \* shadowScale, 6 \* shadowScale/);
   assert.match(shadow, /shadowBlur = 4/);
   assert.doesNotMatch(shadow, /ctx\.stroke\(\)/);
-  assert.doesNotMatch(game, /if \(blink[^\n]+return/);
-  assert.match(game, /if \(blink\) ctx\.globalAlpha = player\.dashTime > 0 \? 0\.72 : 0\.46/);
+  assert.match(playerRendererBlock, /function playerRenderAlpha\(subject = player\)/);
+  assert.match(playerRendererBlock, /return subject\.dashTime > 0 \? 0\.72 : 0\.46/);
+  assert.match(playerRendererBlock, /ctx\.globalAlpha \*= playerRenderAlpha\(\);/);
+  assert.ok(
+    playerRendererBlock.indexOf('ctx.globalAlpha *= playerRenderAlpha();')
+      < playerRendererBlock.indexOf('drawGeneratedPlayer()'),
+    'le feedback d invulnerabilite doit envelopper le rendu OpenAI et le fallback'
+  );
 });
 
 test('le registre data-driven livre les 30 boss et les 24 contrats Forge', () => {
@@ -341,19 +360,22 @@ test('le registre data-driven livre les 30 boss et les 24 contrats Forge', () =>
     assert.deepEqual([...entry.masteryContracts].map(contract => contract.id), [...rosterContext.GEARSTORM_EXPANSION_STORY.getMasteryContracts(id)].map(contract => contract.id), id);
     assert.ok(entry.parts.some(part => part.role === 'weak-point' && part.hitbox), id);
     assert.equal(entry.artPack.status, 'generated', id);
+    assert.equal(entry.artPack.layout, 'rig-v2', id);
     assert.equal(entry.artPack.bundleId, id, id);
     assert.equal(entry.artPack.proceduralFallback, true, id);
     assert.equal(entry.arenaPack.status, 'generated', id);
-    assert.equal(entry.arenaPack.layout, 'backdrop', id);
+    assert.equal(entry.arenaPack.layout, 'parallax-4', id);
     assert.equal(entry.arenaPack.proceduralFallback, true, id);
     assert.equal(entry.codex.releaseEligible, true, id);
-    assert.deepEqual(Object.keys(artManifest.bosses[id].parts).sort(), ['appendage-left', 'appendage-right', 'chassis', 'core']);
+    assert.deepEqual(Object.keys(artManifest.bosses[id].parts).sort(), ['appendage-left-root', 'appendage-left-tip', 'appendage-right-root', 'appendage-right-tip', 'armor-shell', 'chassis', 'core']);
     assert.equal(artManifest.bosses[id].parts.core.weakCore, true, id);
-    assert.match(artManifest.arenas[id].backdrop.src, new RegExp('/arenas/' + id + '/backdrop\\.webp$'));
+    assert.equal(artManifest.arenas[id].kind, 'parallax', id);
+    assert.deepEqual(Object.keys(artManifest.arenas[id].layers).sort(), ['far', 'foreground', 'ground', 'mid']);
+    for (const layer of ['far', 'mid', 'ground', 'foreground']) assert.match(artManifest.arenas[id].layers[layer].src, new RegExp('/arenas/' + id + '/' + layer + '\\.webp$'));
   }
   assert.equal(mechanicIds.size, 24);
   assert.equal(signatureStates.size, 72);
-  assert.equal(artManifest.release, '2.10.0');
+  assert.equal(artManifest.release, '2.11.0');
 });
 
 test('les huit familles ont des boucles, telegraphes et handlers distincts', () => {
@@ -384,9 +406,20 @@ test('la Forge expose selection, lore, chrono, rang, practice et secours procedu
   for (const marker of ['installDomHooks', 'launchForgeBoss', 'getBossRoster', 'launchBoss', 'selectedPracticePhase', 'selectedPracticeCheckpoint']) {
     assert.match(game + bossRosterSource, new RegExp('\\b' + marker + '\\b'));
   }
-  assert.match(game, /entries\.length < 4/);
+  assert.match(game, /entries\.length < 7/);
   assert.match(game, /generatedMultipartManifest/);
-  assert.match(game, /generatedImage\(arena\.backdrop\)/);
+  for (const marker of ['buildForgeRigRenderState', 'generatedForgeRigVisibility', 'getForgeRigVisibility', 'setForgePartDestroyed']) {
+    assert.match(game, new RegExp('\\b' + marker + '\\b'));
+  }
+  const forgeRigBlock = game.slice(game.indexOf('function buildForgeRigRenderState'), game.indexOf('function drawGeneratedBossPreview'));
+  assert.match(forgeRigBlock, /\.sort\(\(left, right\) => \(left\[1\]\.z \|\| 0\) - \(right\[1\]\.z \|\| 0\)\)/);
+  assert.match(forgeRigBlock, /if \(logicalPartForEntry\(entry\)\?\.destroyed\) return true/);
+  assert.match(forgeRigBlock, /currentName = typeof entry\.parent === 'string' \? entry\.parent : null/);
+  assert.match(forgeRigBlock, /if \(renderState\.isHidden\(name\)\) return/);
+  assert.match(forgeRigBlock, /const x = part\.hitbox\?\.x/);
+  assert.match(game, /function drawGeneratedArena\(data, requestedLayers = \['far', 'mid', 'ground'\]\)/);
+  assert.match(game, /arena\.layers\?\.\[layerName\]/);
+  assert.match(game, /function drawGeneratedArenaForeground/);
   assert.match(game, /default: drawExpandedBoss\(\)/);
   assert.match(game, /const par = \(BOSSES\[currentBossIndex\]\.parTime \|\| 60\)/);
   assert.match(game, /EXPANSION_STORY[\s\S]+shortIntro[\s\S]+objective[\s\S]+restoration[\s\S]+journal/);
@@ -526,6 +559,8 @@ test('la sauvegarde portable reste normalisee et respecte les preferences system
   assert.match(portability, /file\.size > 1024 \* 1024/);
   assert.match(portability, /if \(!persistSave\(\)\)/);
   assert.match(portability, /save = previousSave/);
+  assert.match(portability, /Sauvegarde exportée au format JSON version 6\./);
+  assert.doesNotMatch(portability, /JSON version 5/);
   assert.doesNotMatch(portability, /innerHTML|insertAdjacentHTML/);
 });
 
@@ -581,7 +616,11 @@ test('les chronos, retry et sauvegardes suivent les garde-fous', () => {
   assert.match(game, /lastBossTime = currentBossElapsed/);
   assert.match(game, /startFight\(currentBossIndex, \{ retry: true, phase: retryPhase, checkpoint: retryCheckpoint \}\)/);
   assert.match(game, /if \(boss\.defeated\) return/);
-  assert.match(game, /Number\.isFinite\(parsed\.bestRush\)/);
+  assert.match(game, /PERFORMANCE_RECORDS\.migrateSaveToV6/);
+  assert.match(game, /PERFORMANCE_RECORDS\.recordBossAttempt/);
+  assert.match(game, /PERFORMANCE_RECORDS\.recordCircuitAttempt/);
+  assert.match(game, /activeDifficultyId = snapshot\.difficulty/);
+  assert.doesNotMatch(game, /save\.bestTimes|save\.bestRanks|save\.bestRush|save\.bestForgeRush/);
   assert.match(game, /Object\.hasOwn\(DIFFICULTIES/);
   const startRunStart = game.indexOf('function startRun');
   const startRunBlock = game.slice(startRunStart, game.indexOf('function startFight(', startRunStart));
@@ -591,6 +630,21 @@ test('les chronos, retry et sauvegardes suivent les garde-fous', () => {
   assert.match(game, /const elapsed=currentBossElapsed/);
   assert.doesNotMatch(game, /const elapsed=performance\.now/);
 });
+test('le mixage audio separe musique, effets et limite les pics', () => {
+  for (const id of ['master-volume', 'master-volume-value', 'music-volume', 'music-volume-value', 'sfx-volume', 'sfx-volume-value']) {
+    assert.match(html, new RegExp('id=["\\\']' + id + '["\\\']'));
+  }
+  assert.match(game, /musicVolume:\s*0\.68/);
+  assert.match(game, /sfxVolume:\s*0\.9/);
+  assert.match(game, /createDynamicsCompressor\(\)/);
+  assert.match(game, /MUSIC_PROFILES/);
+  assert.match(game, /boss\?\.runtime\?\.family/);
+  assert.match(game, /save\.settings\.volume \* save\.settings\.sfxVolume/);
+  assert.match(game, /save\.settings\.volume \* save\.settings\.musicVolume/);
+  assert.match(game, /linearRampToValueAtTime/);
+  assert.match(game, /audioContext\?\.state === 'running'/);
+});
+
 
 test('les raccourcis PWA sont routes sans demarrer un combat implicitement', () => {
   const urls = new Set(manifest.shortcuts.map(shortcut => shortcut.url));

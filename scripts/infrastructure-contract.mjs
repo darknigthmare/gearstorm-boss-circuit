@@ -38,7 +38,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(security.get('x-frame-options') === 'DENY', 'Protection anti-frame requise.');
   invariant(security.get('content-security-policy').includes("default-src 'self'"), 'CSP same-origin requise.');
 
-  for (const source of ['/', '/index.html', '/story.js', '/expansion-story.js', '/boss-roster.js', '/game.js', '/styles.css', '/manifest.webmanifest', '/sw.js']) {
+  for (const source of ['/', '/index.html', '/story.js', '/expansion-story.js', '/boss-roster.js', '/performance-records.js', '/game.js', '/styles.css', '/manifest.webmanifest', '/sw.js']) {
     invariant(headerValue(vercel, source, 'Cache-Control') === 'public, max-age=0, must-revalidate', `Revalidation requise : ${source}.`);
   }
   invariant(headerValue(vercel, '/sw.js', 'Service-Worker-Allowed') === '/', 'Scope du service worker absent.');
@@ -59,6 +59,7 @@ export function validateInfrastructureContract({ ci, serviceWorker, vercel, verc
   invariant(coreBlock.includes("'./expansion-story.js'"), 'Le registre narratif Forge doit faire partie du shell PWA.');
   invariant(coreBlock.includes("'./boss-roster.js'"), 'Le roster des 30 boss doit faire partie du shell PWA.');
   invariant(coreBlock.includes(`'./pwa-update-v${APP_RELEASE}.js'`), 'Le bootstrap de migration PWA doit faire partie du shell.');
+  invariant(coreBlock.includes("'./performance-records.js'"), 'Le registre de records doit faire partie du shell PWA.');
   invariant(coreBlock.includes(`assets/generated/v\${ASSET_VERSION}/asset-manifest.json`), 'Catalogue assets absent du shell PWA.');
   invariant(!/\.webp[\x60'"]/.test(coreBlock), 'Les WebP runtime ne doivent pas etre precaches.');
   const installBlock = serviceWorker.slice(serviceWorker.indexOf("self.addEventListener('install'"), serviceWorker.indexOf("self.addEventListener('activate'"));

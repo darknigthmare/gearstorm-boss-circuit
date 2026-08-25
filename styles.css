@@ -584,8 +584,8 @@ kbd {
   gap: 0.75rem;
 }
 
-#master-volume { width: 100%; accent-color: var(--cyan-strong); cursor: pointer; }
-#master-volume-value { color: var(--cyan); font-weight: 900; text-align: right; }
+.range-control input[type="range"] { width: 100%; accent-color: var(--cyan-strong); cursor: pointer; }
+.range-control output { color: var(--cyan); font-weight: 900; text-align: right; }
 
 .result-summary { color: var(--muted); line-height: 1.55; }
 
@@ -871,6 +871,8 @@ body.reduce-motion *::after {
   .boss-grid { grid-template-columns: 1fr; }
   .setting-row { align-items: flex-start; }
   .setting-row select { min-width: 145px; width: 48%; }
+  .difficulty-row { display: grid; }
+  .difficulty-row select { min-width: 0; width: 100%; }
   .volume-row { display: grid; }
   .range-control { width: 100%; grid-template-columns: 1fr 3.3rem; }
   .toggle-row input { margin-top: 0.3rem; }
@@ -2260,7 +2262,7 @@ body.high-contrast .boss-card-art {
   background:
     linear-gradient(100deg, rgba(3, 5, 13, 0.96) 0%, rgba(3, 5, 13, 0.58) 48%, rgba(3, 5, 13, 0.9) 100%),
     radial-gradient(circle at 72% 22%, rgba(126, 233, 255, 0.18), transparent 28%),
-    url("assets/generated/v2.10.0/arenas/null-crown/backdrop.webp") center / cover no-repeat,
+    url("assets/generated/v2.11.0/arenas/null-crown/far.webp") center / cover no-repeat,
     #070816;
 }
 
@@ -2355,7 +2357,7 @@ body.high-contrast .boss-card-art {
   }
 }
 
-/* Passe UI méta-diégétique v2.10.0 : quatre transmissions illustrées, résultat Forge et Codex étendu. */
+/* Passe UI méta-diégétique v2.11.0 : quatre transmissions illustrées, résultat Forge et Codex étendu. */
 .story-screen,
 .prologue-screen,
 #ending-screen,
@@ -2371,33 +2373,33 @@ body.high-contrast .boss-card-art {
 }
 
 .story-screen {
-  --narrative-art: url("assets/generated/v2.10.0/narrative/intro-broadcast.webp");
+  --narrative-art: url("assets/generated/v2.11.0/narrative/intro-broadcast.webp");
   --narrative-focus: 50% 46%;
   --narrative-banner-focus: 50% 42%;
 }
 
 .story-screen[data-narrative-scene="prologue"] {
-  --narrative-art: url("assets/generated/v2.10.0/narrative/prologue-m0.webp");
+  --narrative-art: url("assets/generated/v2.11.0/narrative/prologue-m0.webp");
   --narrative-focus: 42% 50%;
   --narrative-banner-focus: 40% 48%;
 }
 
 .prologue-screen {
-  --narrative-art: url("assets/generated/v2.10.0/narrative/prologue-m0.webp");
+  --narrative-art: url("assets/generated/v2.11.0/narrative/prologue-m0.webp");
   --narrative-focus: 42% 50%;
   --narrative-banner-focus: 40% 48%;
   justify-content: flex-end;
 }
 
 #ending-screen {
-  --narrative-art: url("assets/generated/v2.10.0/narrative/campaign-ending.webp");
+  --narrative-art: url("assets/generated/v2.11.0/narrative/campaign-ending.webp");
   --narrative-focus: 58% 46%;
   --narrative-banner-focus: 58% 42%;
   justify-content: flex-start;
 }
 
 .forge-ending-screen {
-  --narrative-art: url("assets/generated/v2.10.0/narrative/forge-ending.webp");
+  --narrative-art: url("assets/generated/v2.11.0/narrative/forge-ending.webp");
   --narrative-focus: 42% 50%;
   --narrative-banner-focus: 40% 48%;
   justify-content: flex-end;

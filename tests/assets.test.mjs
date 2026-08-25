@@ -24,7 +24,7 @@ import {
 
 const runtimePromise = validateRuntimeAssets();
 
-test('le catalogue v2.10 contient exactement les 233 assets attendus', async () => {
+test('le catalogue v2.11 contient exactement les 378 assets attendus', async () => {
   const runtime = await runtimePromise;
   assert.equal(runtime.manifest.release, ASSET_RELEASE);
   assert.equal(runtime.entries.length, EXPECTED_COUNTS.runtimeFiles);
@@ -41,7 +41,7 @@ test('le catalogue v2.10 contient exactement les 233 assets attendus', async () 
     assert.equal(runtime.manifest.arenas[bossId].visualOffsetY, 80);
   }
   for (const bossId of EXPANSION_BOSS_IDS) {
-    assert.equal(runtime.manifest.arenas[bossId].kind, 'backdrop');
+    assert.equal(runtime.manifest.arenas[bossId].kind, 'parallax');
     assert.deepEqual(Object.keys(runtime.manifest.bosses[bossId].parts), [...EXPANSION_PART_NAMES]);
   }
   assert.deepEqual(Object.keys(runtime.manifest.heroine.parts), [...RIVA_PART_NAMES]);
@@ -60,14 +60,19 @@ test('dimensions, alpha, signatures, tailles et SHA-256 sont verifies', async ()
   assert.ok(runtime.entries.every(entry => /^[a-f0-9]{64}$/.test(entry.sha256)));
 });
 
-test('les 24 arenes Forge sont uniques, opaques, 16:9 et calees sur le sol logique', async () => {
+test('les 24 arenes Forge ont quatre profondeurs uniques et restent calees sur le sol logique', async () => {
   const runtime = await runtimePromise;
-  const backdrops = EXPANSION_BOSS_IDS.map(id => runtime.manifest.arenas[id]);
-  assert.ok(backdrops.every(arena => arena.groundY === 620 && arena.visualOffsetY === 28 && arena.telegraphSafe === true));
-  assert.ok(backdrops.every(arena => arena.backdrop.width === 768 && arena.backdrop.height === 432 && arena.backdrop.alpha === false));
-  assert.equal(new Set(backdrops.map(arena => arena.backdrop.sha256)).size, EXPECTED_COUNTS.arenaBackdrops);
-  assert.equal(new Set(backdrops.map(arena => arena.backdrop.src)).size, EXPECTED_COUNTS.arenaBackdrops);
-  assert.ok(backdrops.every(arena => /^[a-f0-9]{64}$/.test(arena.source.masterSha256)));
+  const arenas = EXPANSION_BOSS_IDS.map(id => runtime.manifest.arenas[id]);
+  assert.ok(arenas.every(arena => arena.groundY === 620 && arena.visualOffsetY === 28 && arena.telegraphSafe === true));
+  assert.ok(arenas.every(arena => Object.keys(arena.layers).join(',') === 'far,mid,ground,foreground'));
+  assert.ok(arenas.every(arena => Object.values(arena.layers).every(layer => layer.width === 768 && layer.height === 432)));
+  assert.ok(arenas.every(arena => arena.layers.far.alpha === false
+    && ['mid', 'ground', 'foreground'].every(layer => arena.layers[layer].alpha === true)));
+  assert.ok(arenas.every(arena => ['far', 'mid', 'ground', 'foreground']
+    .map(layer => arena.layers[layer].speed)
+    .every((speed, index, speeds) => speed > 0 && (index === 0 || speed > speeds[index - 1]))));
+  assert.equal(new Set(arenas.flatMap(arena => Object.values(arena.layers).map(layer => layer.src))).size, 96);
+  assert.ok(arenas.every(arena => /^[a-f0-9]{64}$/.test(arena.source.masterSha256)));
 });
 
 test('les 24 boss Forge exposent des rigs multipartites complets', async () => {
@@ -75,20 +80,28 @@ test('les 24 boss Forge exposent des rigs multipartites complets', async () => {
   for (const bossId of EXPANSION_BOSS_IDS) {
     const boss = runtime.manifest.bosses[bossId];
     assert.deepEqual(Object.keys(boss.parts), [...EXPANSION_PART_NAMES]);
+    assert.equal(boss.rig.schemaVersion, 2);
     assert.deepEqual(boss.rig.canvas, { width: 418, height: 418 });
     assert.deepEqual(boss.rig.drawSize, { width: 236, height: 236 });
+    assert.match(boss.rig.motionProfile.id, /^forge-signature-\d{2}$/);
     assert.equal(boss.rig.weakCore.part, 'core');
     assert.equal(boss.parts.core.role, 'weak-core');
     assert.equal(boss.parts.core.weakCore, true);
-    assert.equal(boss.parts['appendage-left'].side, 'left');
-    assert.equal(boss.parts['appendage-right'].side, 'right');
-    assert.ok(Object.values(boss.rig.coveragePixels).every(value => value >= 64));
+    assert.equal(boss.parts['appendage-left-root'].side, 'left');
+    assert.equal(boss.parts['appendage-left-tip'].parent, 'appendage-left-root');
+    assert.equal(boss.parts['appendage-right-root'].side, 'right');
+    assert.equal(boss.parts['appendage-right-tip'].parent, 'appendage-right-root');
+    assert.equal(boss.parts['armor-shell'].parent, 'chassis');
+    assert.ok(Object.values(boss.rig.coveragePixels).every(value => value >= 32));
     assert.ok(Object.values(boss.parts).every(part => part.alpha && part.width === 418 && part.height === 418));
-    assert.ok(Object.values(boss.parts).every(part => part.pivot && part.joint && Number.isInteger(part.z)));
+    assert.ok(Object.values(boss.parts).every(part => part.pivot && part.joint && Number.isInteger(part.z) && part.motion));
+    assert.equal(new Set(Object.values(boss.parts).map(part => part.z)).size, EXPANSION_PART_NAMES.length);
+    assert.ok(Object.values(boss.parts).every(part => part.logicalSlot === null
+      || (Number.isInteger(part.logicalSlot) && part.logicalSlot >= 0 && part.logicalSlot <= 3)));
   }
 });
 
-test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion de segments', async () => {
+test('Riva utilise 14 segments anatomiques relies avec avant-bras et canon independants', async () => {
   const runtime = await runtimePromise;
   const heroine = runtime.manifest.heroine;
   assert.deepEqual(Object.keys(heroine.parts), [...RIVA_PART_NAMES]);
@@ -97,7 +110,7 @@ test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion 
   assert.equal(heroine.rig.feetLocalY, 36);
   assert.deepEqual(heroine.rig.ground, { physicalY: 620, localY: 36 });
   assert.deepEqual(heroine.rig.muzzle, {
-    part: 'forearm-cannon-near',
+    part: 'cannon-near',
     point: [149, 297],
   });
   assert.ok(heroine.rig.rootOffsetY < 0);
@@ -141,7 +154,7 @@ test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion 
   for (const [parentName, childName] of [
     ['thigh-far', 'shin-far'], ['shin-far', 'boot-far'],
     ['thigh-near', 'shin-near'], ['shin-near', 'boot-near'],
-    ['upper-arm-far', 'forearm-far'], ['upper-arm-near', 'forearm-cannon-near'],
+    ['upper-arm-far', 'forearm-far'], ['upper-arm-near', 'forearm-near'],
   ]) {
     const parent = specs.get(parentName);
     const child = specs.get(childName);
@@ -152,11 +165,34 @@ test('Riva utilise 13 masters natifs relies par un rig hierarchique sans fusion 
   const anatomy = RIVA_ANATOMY_PART_NAMES.map(name => heroine.parts[name]);
   assert.ok(anatomy.every(part => part.role === 'anatomy' && part.nativePart === true));
   assert.ok(anatomy.every(part => part.alpha && part.width === 418 && part.height === 418));
-  assert.equal(new Set(anatomy.map(part => part.source.masterFile)).size, RIVA_ANATOMY_PART_NAMES.length);
+  assert.equal(new Set(anatomy.map(part => part.source.masterFile)).size, 13);
   for (const name of RIVA_ANATOMY_PART_NAMES) {
-    assert.equal(heroine.parts[name].source.masterFile, `assets/generated/riva-v2.9-sources/${name}-openai-v1.png`);
+    const masterName = ['forearm-near', 'cannon-near'].includes(name) ? 'forearm-cannon-near' : name;
+    assert.equal(heroine.parts[name].source.masterFile, `assets/generated/riva-v2.9-sources/${masterName}-openai-v1.png`);
   }
-  for (const forbidden of ['arm-near', 'arm-far', 'legs', 'boots', 'pulse-cannon', 'body-core', 'firing-arm']) {
+  const forearm = specs.get('forearm-near');
+  const cannon = specs.get('cannon-near');
+  assert.equal(cannon.parent, 'forearm-near');
+  assert.deepEqual(cannon.joint, forearm.joint);
+  assert.deepEqual(cannon.pivot, forearm.pivot);
+  assert.equal(cannon.scale, forearm.scale);
+  assert.equal(forearm.motion, 'cannon-mount');
+  assert.equal(cannon.motion, 'cannon-recoil');
+  assert.equal(heroine.rig.nearArmSplit.source.masterFile,
+    'assets/generated/riva-v2.9-sources/forearm-cannon-near-openai-v1.png');
+  assert.equal(heroine.rig.nearArmSplit.separationReference.masterFile,
+    'assets/generated/riva-v2.11-sources/forearm-cannon-split-openai-v1.png');
+  assert.deepEqual(heroine.rig.nearArmSplit.unionBBox, [130, 104, 158, 210]);
+  assert.equal(heroine.rig.nearArmSplit.combinedCoveragePixels, 13340);
+  assert.equal(
+    forearm.coveragePixels
+      + cannon.coveragePixels,
+    heroine.rig.nearArmSplit.combinedCoveragePixels,
+  );
+  assert.match(heroine.rig.nearArmSplit.neutralCompositeSha256, /^[a-f0-9]{64}$/);
+  assert.ok(heroine.rig.nearArmSplit.splitProgress > 0
+    && heroine.rig.nearArmSplit.splitProgress < 1);
+  for (const forbidden of ['arm-near', 'arm-far', 'legs', 'boots', 'pulse-cannon', 'body-core', 'firing-arm', 'forearm-cannon-near']) {
     assert.equal(heroine.parts[forbidden], undefined);
   }
   assert.deepEqual(RIVA_EFFECT_PART_NAMES.map(name => heroine.parts[name].source.atlasCell), [7, 8]);
@@ -176,7 +212,7 @@ test('le runtime applique la hierarchie, le muzzle articule et la montee route d
   assert.match(game, /const snapshot = resolveHeroRigPose\(rigParts\);/);
   assert.match(game, /pose\.joint\[0\] \+ endpoint\.x/);
   assert.match(game, /RIVA_FOOT_OFFSET - RIVA_ROAD_LIFT/);
-  assert.match(game, /pose\.x = -animation\.recoil \* RIVA_CANNON_RECOIL;/);
+  assert.match(game, /rotateRigVector\(-animation\.recoil \* RIVA_CANNON_RECOIL, 0, -rootRotation\)/);
   assert.match(game, /spawnDust\(player\.x, GROUND - \(heroArtReady\(\) \? RIVA_ROAD_LIFT : 0\), 7\);/);
   assert.match(generator, /RIVA_HEAD_DROP_Y = 4/);
   assert.match(generator, /contract\["joint"\]\[1\] \+ \(RIVA_HEAD_DROP_Y if part == "head" else 0\)/);
@@ -191,12 +227,12 @@ test('les 4 visuels narratifs OpenAI sont opaques, 16:9 et traces', async () => 
   assert.equal(new Set(narrative.map(asset => asset.src)).size, EXPECTED_COUNTS.narrative);
   assert.equal(new Set(narrative.map(asset => asset.source.masterFile)).size, EXPECTED_COUNTS.narrative);
   for (const name of NARRATIVE_NAMES) {
-    assert.equal(runtime.manifest.narrative[name].src, `assets/generated/v2.10.0/narrative/${name}.webp`);
+    assert.equal(runtime.manifest.narrative[name].src, `assets/generated/v${ASSET_RELEASE}/narrative/${name}.webp`);
     assert.equal(runtime.manifest.narrative[name].source.masterFile, `assets/generated/narrative-v2.9-sources/${name}-openai-v1.png`);
   }
 });
 
-test('les 42 masters OpenAI sont traces mais jamais publies', async () => {
+test('les 43 masters OpenAI sont traces mais jamais publies', async () => {
   const runtime = await runtimePromise;
   assert.equal(runtime.manifest.sourceMasters.length, EXPECTED_COUNTS.masters);
   assert.equal(runtime.masterFiles.length, EXPECTED_COUNTS.masters);
@@ -204,7 +240,7 @@ test('les 42 masters OpenAI sont traces mais jamais publies', async () => {
   assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('riva-') && master.promptId.includes('v2.9')).length, 14);
   assert.equal(runtime.manifest.sourceMasters.filter(master => master.promptId?.startsWith('narrative-')).length, 4);
   assert.ok(runtime.files.includes(ASSET_MANIFEST_PATH));
-  assert.ok(runtime.entries.every(entry => entry.src.startsWith('assets/generated/v2.10.0/')));
+  assert.ok(runtime.entries.every(entry => entry.src.startsWith(`assets/generated/v${ASSET_RELEASE}/`)));
   assert.ok(runtime.entries.every(entry => entry.src.endsWith('.webp')));
   assert.ok(runtime.masterFiles.every(file => file.endsWith('.png') && !runtime.files.includes(file)));
   assert.ok(runtime.entries.every(entry => !/assets\/generated\/(?:arenas|bosses|riva|vfx|expansion-sources|forge-arena-sources|riva-v2\.9-sources|narrative-v2\.9-sources)\//.test(entry.src)));

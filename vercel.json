@@ -122,6 +122,15 @@
       ]
     },
     {
+      "source": "/performance-records.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/game.js",
       "headers": [
         {
@@ -149,6 +158,15 @@
       ]
     },
     {
+      "source": "/pwa-update-v2.11.0.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
       "headers": [
         {
@@ -159,6 +177,15 @@
     },
     {
       "source": "/assets/generated/v2.10.0/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/generated/v2.11.0/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

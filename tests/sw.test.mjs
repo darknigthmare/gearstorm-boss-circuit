@@ -114,14 +114,15 @@ test('installation PWA precache uniquement le shell et le petit catalogue', asyn
   await dispatchExtendable(worker.handlers.get('install'));
   assert.equal(worker.counters.skips, 0);
   const keys = await worker.caches.keys();
-  assert.deepEqual(keys, ['gearstorm-shell-v2.10.0']);
+  assert.deepEqual(keys, ['gearstorm-shell-v2.11.0']);
   const shell = worker.stores.get(keys[0]);
-  assert.equal(shell.entries.size, 13);
+  assert.equal(shell.entries.size, 14);
   assert.ok([...shell.entries.keys()].some(key => key.endsWith('/story.js')));
   assert.ok([...shell.entries.keys()].some(key => key.endsWith('/expansion-story.js')));
   assert.ok([...shell.entries.keys()].some(key => key.endsWith('/boss-roster.js')));
-  assert.ok([...shell.entries.keys()].some(key => key.endsWith('/pwa-update-v2.10.0.js')));
-  assert.ok([...shell.entries.keys()].some(key => key.endsWith('/assets/generated/v2.10.0/asset-manifest.json')));
+  assert.ok([...shell.entries.keys()].some(key => key.endsWith('/performance-records.js')));
+  assert.ok([...shell.entries.keys()].some(key => key.endsWith('/pwa-update-v2.11.0.js')));
+  assert.ok([...shell.entries.keys()].some(key => key.endsWith('/assets/generated/v2.11.0/asset-manifest.json')));
   assert.ok([...shell.entries.keys()].every(key => !key.endsWith('.webp')));
 });
 
@@ -143,7 +144,7 @@ test('activation supprime les anciens caches GEARSTORM seulement', async () => {
   await worker.caches.open('cache-unrelated');
   await dispatchExtendable(worker.handlers.get('activate'));
   assert.equal(worker.counters.claims, 1);
-  assert.deepEqual((await worker.caches.keys()).sort(), ['cache-unrelated', 'gearstorm-shell-v2.10.0']);
+  assert.deepEqual((await worker.caches.keys()).sort(), ['cache-unrelated', 'gearstorm-shell-v2.11.0']);
 });
 
 test('les WebP versionnes utilisent un cache-first canonique sans variantes de query', async () => {
@@ -155,13 +156,13 @@ test('les WebP versionnes utilisent un cache-first canonique sans variantes de q
     return response('image/webp', 'webp');
   };
   const handler = worker.handlers.get('fetch');
-  const base = scope + 'assets/generated/v2.10.0/arenas/rammer/far.webp';
+  const base = scope + 'assets/generated/v2.11.0/arenas/rammer/far.webp';
   const first = await dispatchFetch(handler, new Request(base + '?a=1'));
   const second = await dispatchFetch(handler, new Request(base + '?a=2'));
   assert.equal(first.body, 'webp');
   assert.equal(second.body, 'webp');
   assert.equal(fetches, 1);
-  assert.ok((await worker.caches.keys()).includes('gearstorm-runtime-v2.10.0'));
+  assert.ok((await worker.caches.keys()).includes('gearstorm-runtime-v2.11.0'));
 });
 
 test('une reponse non WebP ne pollue jamais le cache runtime', async () => {
@@ -173,7 +174,7 @@ test('une reponse non WebP ne pollue jamais le cache runtime', async () => {
     return response('image/png', 'wrong');
   };
   const handler = worker.handlers.get('fetch');
-  const url = scope + 'assets/generated/v2.10.0/vfx/not-catalogued.webp';
+  const url = scope + 'assets/generated/v2.11.0/vfx/not-catalogued.webp';
   await dispatchFetch(handler, new Request(url));
   await dispatchFetch(handler, new Request(url));
   assert.equal(fetches, 2);
@@ -191,7 +192,7 @@ test('le shell est servi immediatement puis revalide en arriere-plan', async () 
   const served = await dispatchFetch(worker.handlers.get('fetch'), new Request(url));
   assert.match(served.body, /styles\.css$/);
   assert.equal(fetches, 1);
-  const shell = worker.stores.get('gearstorm-shell-v2.10.0');
+  const shell = worker.stores.get('gearstorm-shell-v2.11.0');
   assert.equal((await shell.match(new Request(url))).body, 'fresh-css');
 });
 
@@ -201,12 +202,12 @@ test('un refus cache.put ne masque jamais les reponses reseau runtime, shell et 
   const handler = worker.handlers.get('fetch');
 
   worker.context.fetch = async () => response('image/webp', 'fresh-webp');
-  const runtimeUrl = scope + 'assets/generated/v2.10.0/arenas/rammer/far.webp';
+  const runtimeUrl = scope + 'assets/generated/v2.11.0/arenas/rammer/far.webp';
   const runtime = await dispatchFetch(handler, new Request(runtimeUrl));
   assert.equal(runtime.body, 'fresh-webp');
 
   const shellUrl = scope + 'styles.css';
-  const shell = worker.stores.get('gearstorm-shell-v2.10.0');
+  const shell = worker.stores.get('gearstorm-shell-v2.11.0');
   shell.entries.delete(new URL(shellUrl).href);
   worker.context.fetch = async () => response('text/css', 'fresh-shell');
   const shellResponse = await dispatchFetch(handler, new Request(shellUrl));

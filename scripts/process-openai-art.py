@@ -1,9 +1,9 @@
 """Build independent runtime art from the OpenAI master sheets.
 
-The deterministic post-process removes baked checker previews, crops the six
-OpenAI Forge arena atlases into 24 gameplay backdrops, and splits each existing
-OpenAI expansion boss sprite into four independently drawable rig layers. It
-never paints or invents source pixels.
+The deterministic post-process removes baked checker previews, turns the six
+OpenAI Forge arena atlases into four depth planes per arena, and partitions each
+OpenAI expansion boss into seven independently drawable rig layers. It never
+replaces the authored source pixels; transforms and masks remain reproducible.
 """
 
 from __future__ import annotations
@@ -14,14 +14,15 @@ from pathlib import Path
 from shutil import rmtree
 import json
 
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_ROOT = ROOT / "assets" / "generated"
 RIVA_SOURCE_ROOT = SOURCE_ROOT / "riva-v2.9-sources"
+RIVA_SPLIT_SOURCE_ROOT = SOURCE_ROOT / "riva-v2.11-sources"
 NARRATIVE_SOURCE_ROOT = SOURCE_ROOT / "narrative-v2.9-sources"
-ASSET_RELEASE = "v2.10.0"
+ASSET_RELEASE = "v2.11.0"
 OUTPUT_ROOT = SOURCE_ROOT / ASSET_RELEASE
 MANIFEST_PATH = OUTPUT_ROOT / "asset-manifest.json"
 
@@ -45,7 +46,7 @@ BOSS_PARTS = {
 RIVA_ANATOMY_PARTS = (
     "thigh-far", "shin-far", "boot-far", "upper-arm-far", "forearm-far",
     "pelvis", "torso", "thigh-near", "shin-near", "boot-near",
-    "upper-arm-near", "forearm-cannon-near", "head",
+    "upper-arm-near", "forearm-near", "cannon-near", "head",
 )
 RIVA_EFFECT_PARTS = ("dash-trail", "overload-halo")
 HERO_PARTS = RIVA_ANATOMY_PARTS + RIVA_EFFECT_PARTS
@@ -61,7 +62,10 @@ RIVA_PART_CONTRACTS = {
     "shin-near": {"extent": 150, "pivotFraction": (0.50, 0.12), "joint": (10, 42), "parent": "thigh-near", "side": "near", "z": 51, "motion": "leg-near"},
     "boot-near": {"extent": 112, "pivotFraction": (0.50, 0.20), "joint": (13, 80), "parent": "shin-near", "side": "near", "z": 52, "motion": "leg-near"},
     "upper-arm-near": {"extent": 128, "pivotFraction": (0.50, 0.14), "joint": (29, -48), "parent": "torso", "side": "near", "z": 60, "motion": "arm-near"},
-    "forearm-cannon-near": {"extent": 210, "pivotFraction": (0.78, 0.18), "joint": (29, -15), "parent": "upper-arm-near", "side": "near", "z": 70, "motion": "cannon-recoil"},
+    # Both layers share the original transform so their neutral composition is
+    # pixel-identical to the proven v2.10 OpenAI sprite.
+    "forearm-near": {"extent": 210, "pivotFraction": (0.78, 0.18), "joint": (29, -15), "parent": "upper-arm-near", "side": "near", "z": 70, "motion": "cannon-mount"},
+    "cannon-near": {"extent": 210, "pivotFraction": (0.78, 0.18), "joint": (29, -15), "parent": "forearm-near", "side": "near", "z": 71, "motion": "cannon-recoil"},
     "head": {"extent": 132, "pivotFraction": (0.68, 0.92), "joint": (0, -70), "parent": "torso", "side": "center", "z": 80, "motion": "head"},
 }
 RIVA_CANNON_MUZZLE_POINT = (149, 297)
@@ -79,7 +83,10 @@ VFX = (
     "warning-pulse", "dash-shockwave", "overload-bloom", "chrono-fracture",
     "explosion-small", "explosion-core", "explosion-final", "scrap-glow",
 )
-EXPANSION_PARTS = ("chassis", "core", "appendage-left", "appendage-right")
+EXPANSION_PARTS = (
+    "chassis", "armor-shell", "appendage-left-root", "appendage-left-tip",
+    "appendage-right-root", "appendage-right-tip", "core",
+)
 EXPANSION_DRAW_SIZE = {"width": 236, "height": 236}
 EXPANSION_ARENA_SHEETS = ((7, 10), (11, 14), (15, 18), (19, 22), (23, 26), (27, 30))
 EXPANSION_WEAK_CORES = {
@@ -221,6 +228,52 @@ def normalize_riva_part(image: Image.Image, contract: dict) -> tuple[Image.Image
     return canvas, {"pivot": pivot, "bbox": bbox, "coveragePixels": coverage}
 
 
+def split_riva_forearm_cannon() -> tuple[dict[str, Image.Image], dict]:
+    """Split the proven combined OpenAI sprite without changing one source pixel."""
+    source_path = RIVA_SOURCE_ROOT / "forearm-cannon-near-openai-v1.png"
+    contract = RIVA_PART_CONTRACTS["forearm-near"]
+    combined, geometry = normalize_riva_part(source(source_path), contract)
+    pivot_x, pivot_y = geometry["pivot"]
+    muzzle_x, muzzle_y = RIVA_CANNON_MUZZLE_POINT
+    axis_x, axis_y = muzzle_x - pivot_x, muzzle_y - pivot_y
+    axis_length_sq = max(1, axis_x * axis_x + axis_y * axis_y)
+    source_alpha = combined.getchannel("A").load()
+    masks = {
+        "forearm-near": Image.new("L", combined.size, 0),
+        "cannon-near": Image.new("L", combined.size, 0),
+    }
+    writers = {name: mask.load() for name, mask in masks.items()}
+    counts = {name: 0 for name in masks}
+
+    for y in range(combined.height):
+        for x in range(combined.width):
+            value = source_alpha[x, y]
+            if value <= 0:
+                continue
+            progress = ((x - pivot_x) * axis_x + (y - pivot_y) * axis_y) / axis_length_sq
+            name = "cannon-near" if progress >= 0.43 else "forearm-near"
+            writers[name][x, y] = value
+            counts[name] += 1
+
+    layers = {}
+    for name, mask in masks.items():
+        layer = combined.copy()
+        layer.putalpha(mask)
+        layers[name] = layer
+    recomposite = Image.alpha_composite(layers["forearm-near"], layers["cannon-near"])
+    if recomposite.tobytes() != combined.tobytes():
+        raise ValueError("Riva split must recompose the original pixels exactly")
+    if layers["cannon-near"].getchannel("A").getpixel(RIVA_CANNON_MUZZLE_POINT) <= 8:
+        raise ValueError("Riva cannon layer must own the declared muzzle pixel")
+    return layers, {
+        **geometry,
+        "coveragePixels": counts,
+        "combinedCoveragePixels": geometry["coveragePixels"],
+        "neutralCompositeSha256": sha256(combined.tobytes()).hexdigest(),
+        "splitProgress": 0.43,
+    }
+
+
 def normalize_narrative(image: Image.Image) -> Image.Image:
     return ImageOps.fit(image.convert("RGB"), (1280, 720), Image.Resampling.LANCZOS, centering=(0.5, 0.5))
 
@@ -330,6 +383,43 @@ def normalize_arena_backdrop(master: Image.Image, index: int) -> tuple[Image.Ima
     }
 
 
+# Forge depth planes remain derived from the approved OpenAI master.
+def vertical_depth_mask(size: tuple[int, int], start: float, end: float, feather: float, opacity: int) -> Image.Image:
+    width, height = size
+    values = []
+    for y in range(height):
+        ratio = y / max(1, height - 1)
+        if ratio < start - feather or ratio > end + feather:
+            strength = 0.0
+        elif ratio < start:
+            strength = (ratio - (start - feather)) / max(feather, 0.001)
+        elif ratio > end:
+            strength = ((end + feather) - ratio) / max(feather, 0.001)
+        else:
+            strength = 1.0
+        values.append(round(max(0.0, min(1.0, strength)) * opacity))
+    column = Image.new("L", (1, height))
+    column.putdata(values)
+    return column.resize((width, height), Image.Resampling.BILINEAR)
+
+
+def derive_forge_parallax(backdrop: Image.Image) -> dict[str, Image.Image]:
+    """Create subtle, telegraph-safe depth planes from an authored OpenAI arena."""
+    far = backdrop.convert("RGB")
+    detail = ImageEnhance.Contrast(far).enhance(1.05).filter(ImageFilter.UnsharpMask(1.2, 115, 3))
+    contracts = {
+        "mid": (0.10, 0.58, 0.13, 76),
+        "ground": (0.48, 0.91, 0.10, 104),
+        "foreground": (0.76, 1.0, 0.11, 132),
+    }
+    layers: dict[str, Image.Image] = {"far": far}
+    for name, (start, end, feather, opacity) in contracts.items():
+        layer = detail.convert("RGBA")
+        layer.putalpha(vertical_depth_mask(layer.size, start, end, feather, opacity))
+        layers[name] = layer
+    return layers
+
+
 def snap_weak_core(sprite: Image.Image, hint: tuple[float, float, float]) -> tuple[int, int, int]:
     rgba = sprite.convert("RGBA")
     pixels = rgba.load()
@@ -352,8 +442,8 @@ def snap_weak_core(sprite: Image.Image, hint: tuple[float, float, float]) -> tup
     return cx, cy, max(28, round(hint[2] * 418))
 
 
-def split_expansion_sprite(sprite: Image.Image, hint: tuple[float, float, float]) -> tuple[dict[str, Image.Image], dict]:
-    """Partition all visible pixels into semantic, independently drawable layers."""
+def split_expansion_sprite(sprite: Image.Image, hint: tuple[float, float, float], profile_index: int) -> tuple[dict[str, Image.Image], dict]:
+    """Partition every source pixel into a seven-layer mechanical rig."""
     rgba = sprite.convert("RGBA")
     alpha = rgba.getchannel("A")
     bounds = alpha.getbbox()
@@ -363,6 +453,8 @@ def split_expansion_sprite(sprite: Image.Image, hint: tuple[float, float, float]
     width, height = right - left, bottom - top
     middle_x = (left + right) / 2
     center_band = width * 0.13
+    root_band = width * 0.28
+    shell_y = top + height * 0.43
     base_y = top + height * 0.72
     core_x, core_y, core_radius = snap_weak_core(rgba, hint)
     masks = {name: Image.new("L", rgba.size, 0) for name in EXPANSION_PARTS}
@@ -377,23 +469,34 @@ def split_expansion_sprite(sprite: Image.Image, hint: tuple[float, float, float]
                 continue
             if (x - core_x) ** 2 + (y - core_y) ** 2 <= core_radius ** 2:
                 part = "core"
-            elif y >= base_y or abs(x - middle_x) <= center_band:
+            elif y >= base_y:
                 part = "chassis"
+            elif abs(x - middle_x) <= center_band:
+                part = "armor-shell" if y < shell_y else "chassis"
             elif x < middle_x:
-                part = "appendage-left"
+                part = "appendage-left-tip" if x < middle_x - root_band else "appendage-left-root"
             else:
-                part = "appendage-right"
+                part = "appendage-right-tip" if x > middle_x + root_band else "appendage-right-root"
             writers[part][x, y] = value
             counts[part] += 1
 
-    if min(counts.values()) < 64:
+    if min(counts.values()) < 32:
         raise ValueError(f"Rig partition too small: {counts}")
     layers = {}
     for name, mask in masks.items():
         layer = rgba.copy()
         layer.putalpha(mask)
         layers[name] = layer
+    recomposite = Image.new("RGBA", rgba.size, (0, 0, 0, 0))
+    for layer in layers.values():
+        recomposite = Image.alpha_composite(recomposite, layer)
+    if recomposite.getchannel("A").tobytes() != rgba.getchannel("A").tobytes():
+        raise ValueError("Expansion rig must recompose the normalized OpenAI sprite exactly")
+    tempo = round(0.82 + (profile_index % 6) * 0.09 + (profile_index // 6) * 0.035, 3)
+    amplitude = round(0.012 + (profile_index % 5) * 0.003, 3)
+
     rig = {
+        "schemaVersion": 2,
         "canvas": {"width": 418, "height": 418},
         "origin": {"x": 0.5, "y": 0.5},
         "drawSize": dict(EXPANSION_DRAW_SIZE),
@@ -401,29 +504,65 @@ def split_expansion_sprite(sprite: Image.Image, hint: tuple[float, float, float]
             "part": "core", "x": round(core_x / 417, 4), "y": round(core_y / 417, 4),
             "radius": round(core_radius / 418, 4),
         },
+        "motionProfile": {
+            "id": f"forge-signature-{profile_index + 7:02d}",
+            "tempo": tempo,
+            "amplitude": amplitude,
+            "phase": round((profile_index * 0.61803398875) % 1, 4),
+        },
         "coveragePixels": counts,
+        "neutralCompositeSha256": sha256(rgba.tobytes()).hexdigest(),
     }
     return layers, rig
 
 
 def part_metadata(name: str, rig: dict) -> dict:
     weak = rig["weakCore"]
+    profile = rig["motionProfile"]
+    roles = {
+        "chassis": "chassis", "armor-shell": "armor-shell", "core": "weak-core",
+        "appendage-left-root": "appendage-root", "appendage-left-tip": "appendage-tip",
+        "appendage-right-root": "appendage-root", "appendage-right-tip": "appendage-tip",
+    }
+    parents = {
+        "chassis": None, "armor-shell": "chassis", "core": "chassis",
+        "appendage-left-root": "chassis", "appendage-left-tip": "appendage-left-root",
+        "appendage-right-root": "chassis", "appendage-right-tip": "appendage-right-root",
+    }
+    joints = {
+        "chassis": (0.5, 0.58), "armor-shell": (0.5, 0.43), "core": (weak["x"], weak["y"]),
+        "appendage-left-root": (0.39, 0.52), "appendage-left-tip": (0.25, 0.54),
+        "appendage-right-root": (0.61, 0.52), "appendage-right-tip": (0.75, 0.54),
+    }
+    motion_types = {
+        "chassis": "sway", "armor-shell": "breath", "core": "pulse",
+        "appendage-left-root": "hinge", "appendage-left-tip": "servo",
+        "appendage-right-root": "hinge", "appendage-right-tip": "servo",
+    }
+    logical_slots = {
+        "appendage-left-root": 0, "appendage-right-root": 1,
+        "appendage-left-tip": 2, "appendage-right-tip": 3,
+    }
+    side = "left" if "-left-" in name else "right" if "-right-" in name else "center"
     metadata = {
-        "role": {"chassis": "chassis", "core": "weak-core", "appendage-left": "appendage", "appendage-right": "appendage"}[name],
-        "pivot": {"x": 0.5, "y": 0.5},
-        "joint": {"x": 0.5, "y": 0.58},
-        "z": {"chassis": 0, "appendage-left": 1, "appendage-right": 1, "core": 2}[name],
+        "role": roles[name],
+        "parent": parents[name],
+        "pivot": {"x": joints[name][0], "y": joints[name][1]},
+        "joint": {"x": joints[name][0], "y": joints[name][1]},
+        "z": EXPANSION_PARTS.index(name),
+        "side": side,
+        "logicalSlot": logical_slots.get(name),
+        "motion": {
+            "type": motion_types[name],
+            "amplitude": profile["amplitude"] * (1.35 if name.endswith("-tip") else 1),
+            "frequency": profile["tempo"] * (1.28 if name.endswith("-tip") else 1),
+            "phase": profile["phase"] + EXPANSION_PARTS.index(name) * 0.41,
+        },
         "drawSize": dict(EXPANSION_DRAW_SIZE),
+        "independentRuntimePart": True,
     }
     if name == "core":
-        metadata["joint"] = {"x": weak["x"], "y": weak["y"]}
         metadata["weakCore"] = True
-    elif name == "appendage-left":
-        metadata["joint"] = {"x": 0.38, "y": 0.52}
-        metadata["side"] = "left"
-    elif name == "appendage-right":
-        metadata["joint"] = {"x": 0.62, "y": 0.52}
-        metadata["side"] = "right"
     return metadata
 
 
@@ -438,10 +577,20 @@ def master_inventory() -> list[dict]:
         "riva-canonical-v2.9-v1",
     ))
     for part in RIVA_ANATOMY_PARTS:
+        if part in {"forearm-near", "cannon-near"}:
+            continue
         records.append(source_record(
             RIVA_SOURCE_ROOT / f"{part}-openai-v1.png",
             f"riva-{part}-v2.9-v1",
         ))
+    records.append(source_record(
+        RIVA_SOURCE_ROOT / "forearm-cannon-near-openai-v1.png",
+        "riva-forearm-cannon-near-v2.9-v1",
+    ))
+    records.append(source_record(
+        RIVA_SPLIT_SOURCE_ROOT / "forearm-cannon-split-openai-v1.png",
+        "riva-forearm-cannon-split-v2.11-v1",
+    ))
     for narrative in NARRATIVE:
         records.append(source_record(
             NARRATIVE_SOURCE_ROOT / f"{narrative}-openai-v1.png",
@@ -462,7 +611,7 @@ def main() -> None:
     if OUTPUT_ROOT.exists():
         rmtree(OUTPUT_ROOT)
     manifest: dict = {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "release": ASSET_RELEASE.removeprefix("v"),
         "generator": "OpenAI ImageGen built-in + deterministic Pillow extraction and normalization",
         "license": "Original project artwork",
@@ -497,10 +646,20 @@ def main() -> None:
         master = source(master_path)
         for cell_index, boss_id in enumerate(EXPANSION_BOSSES[first - 7:last - 6]):
             backdrop, crop_metadata = normalize_arena_backdrop(master, cell_index)
-            asset = save_runtime(backdrop, f"arenas/{boss_id}/backdrop.webp", False, quality=80)
+            depth_planes = derive_forge_parallax(backdrop)
+            layers = {}
+            for layer_name in ARENA_LAYERS:
+                layers[layer_name] = save_runtime(
+                    depth_planes[layer_name],
+                    f"arenas/{boss_id}/{layer_name}.webp",
+                    layer_name != "far",
+                    quality=80,
+                )
+            for layer_name, speed in zip(ARENA_LAYERS, (0.012, 0.038, 0.075, 0.13)):
+                layers[layer_name]["speed"] = speed
             manifest["arenas"][boss_id] = {
-                "kind": "backdrop", "viewport": {"width": 1280, "height": 720},
-                "groundY": 620, "visualOffsetY": 28, "telegraphSafe": True, "backdrop": asset,
+                "kind": "parallax", "viewport": {"width": 1280, "height": 720},
+                "groundY": 620, "visualOffsetY": 28, "telegraphSafe": True, "layers": layers,
                 "source": {
                     "masterSha256": sha256(master_path.read_bytes()).hexdigest(),
                     **crop_metadata,
@@ -516,16 +675,29 @@ def main() -> None:
         manifest["bosses"][boss] = {"parts": parts}
 
     hero_rig_parts = []
+    riva_split_layers, riva_split_contract = split_riva_forearm_cannon()
     for part in RIVA_ANATOMY_PARTS:
         contract = RIVA_PART_CONTRACTS[part]
-        master_path = RIVA_SOURCE_ROOT / f"{part}-openai-v1.png"
-        prompt_id = f"riva-{part}-v2.9-v1"
-        runtime, geometry = normalize_riva_part(source(master_path), contract)
+        split_part = part in riva_split_layers
+        if split_part:
+            master_path = RIVA_SOURCE_ROOT / "forearm-cannon-near-openai-v1.png"
+            prompt_id = "riva-forearm-cannon-near-v2.9-v1"
+            runtime = riva_split_layers[part]
+            bbox, coverage = alpha_geometry(runtime)
+            geometry = {
+                "pivot": riva_split_contract["pivot"],
+                "bbox": bbox,
+                "coveragePixels": coverage,
+            }
+        else:
+            master_path = RIVA_SOURCE_ROOT / f"{part}-openai-v1.png"
+            prompt_id = f"riva-{part}-v2.9-v1"
+            runtime, geometry = normalize_riva_part(source(master_path), contract)
         asset = save_runtime(runtime, f"heroine/riva-spark/{part}.webp", True)
         asset.update({
             "role": "anatomy",
             "nativePart": True,
-            "source": provenance_record(master_path, prompt_id),
+            "source": provenance_record(master_path, prompt_id, splitRole=part if split_part else None),
         })
         manifest["heroine"]["parts"][part] = asset
         hero_rig_parts.append({
@@ -580,7 +752,7 @@ def main() -> None:
     hero_rig_parts.sort(key=lambda part: part["z"])
     canonical_path = RIVA_SOURCE_ROOT / "riva-canonical-openai-v1.png"
     manifest["heroine"]["rig"] = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "canvas": {"width": 418, "height": 418},
         "coordinateSpace": "player-local-pixels",
         "feetLocalY": 36,
@@ -588,8 +760,22 @@ def main() -> None:
         "headDropY": RIVA_HEAD_DROP_Y,
         "ground": {"physicalY": 620, "localY": 36},
         "muzzle": {
-            "part": "forearm-cannon-near",
+            "part": "cannon-near",
             "point": list(RIVA_CANNON_MUZZLE_POINT),
+        },
+        "nearArmSplit": {
+            "source": provenance_record(
+                RIVA_SOURCE_ROOT / "forearm-cannon-near-openai-v1.png",
+                "riva-forearm-cannon-near-v2.9-v1",
+            ),
+            "separationReference": provenance_record(
+                RIVA_SPLIT_SOURCE_ROOT / "forearm-cannon-split-openai-v1.png",
+                "riva-forearm-cannon-split-v2.11-v1",
+            ),
+            "unionBBox": riva_split_contract["bbox"],
+            "combinedCoveragePixels": riva_split_contract["combinedCoveragePixels"],
+            "neutralCompositeSha256": riva_split_contract["neutralCompositeSha256"],
+            "splitProgress": riva_split_contract["splitProgress"],
         },
         "canonicalReference": provenance_record(canonical_path, "riva-canonical-v2.9-v1"),
         "renderOrder": [part["name"] for part in hero_rig_parts],
@@ -605,7 +791,7 @@ def main() -> None:
             sprite = normalize_sprite(master.crop(cell_box(master.size, 3, 2, cell_index)), 394)
             threshold = {"counterforge": 3000, "loadout-reactor": 1000, "hive-foreman": 200, "tempest-regulator": 35}.get(boss_id, 250)
             sprite = remove_alpha_islands(sprite, threshold)
-            layers, rig = split_expansion_sprite(sprite, EXPANSION_WEAK_CORES[boss_id])
+            layers, rig = split_expansion_sprite(sprite, EXPANSION_WEAK_CORES[boss_id], start + cell_index)
             parts = {}
             for part_name in EXPANSION_PARTS:
                 asset = save_runtime(layers[part_name], f"bosses/{boss_id}/{part_name}.webp", True)
@@ -650,8 +836,8 @@ def main() -> None:
     manifest["summary"] = {
         "masters": len(manifest["sourceMasters"]),
         "runtimeFiles": len(entries),
-        "arenaLayers": len(CORE_BOSSES) * len(ARENA_LAYERS),
-        "arenaBackdrops": len(EXPANSION_BOSSES),
+        "arenaLayers": len(BOSSES) * len(ARENA_LAYERS),
+        "arenaBackdrops": 0,
         "bossParts": len(CORE_BOSSES) * 9 + len(EXPANSION_BOSSES) * len(EXPANSION_PARTS),
         "heroineParts": len(manifest["heroine"]["parts"]),
         "vfx": len(manifest["vfx"]),

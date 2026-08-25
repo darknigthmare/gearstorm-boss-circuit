@@ -3,21 +3,23 @@ const { readFile, realpath, stat } = require('node:fs/promises');
 const { extname, resolve, sep } = require('node:path');
 
 const PROJECT_ROOT = resolve(__dirname);
-const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.10.0/';
+const GENERATED_RUNTIME_PREFIX = 'assets/generated/v2.11.0/';
 const PUBLIC_FILES = new Set([
   'index.html',
   'pwa-update-v2.10.0.js',
+  'pwa-update-v2.11.0.js',
   'styles.css',
   'story.js',
   'expansion-story.js',
   'boss-roster.js',
   'game.js',
+  'performance-records.js',
   'manifest.webmanifest',
   'sw.js',
   'favicon.ico',
   'robots.txt',
 ]);
-const VERSIONED_SHELL_FILES = new Set(['pwa-update-v2.10.0.js']);
+const VERSIONED_SHELL_FILES = new Set(['pwa-update-v2.10.0.js', 'pwa-update-v2.11.0.js']);
 const PUBLIC_SHELL_ASSETS = new Set([
   'assets/gearstorm-icon.svg',
   'assets/gearstorm-icon-192.png',
@@ -31,6 +33,7 @@ const REVALIDATE_FILES = new Set([
   'expansion-story.js',
   'boss-roster.js',
   'game.js',
+  'performance-records.js',
   'manifest.webmanifest',
   'sw.js',
 ]);

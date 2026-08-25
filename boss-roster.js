@@ -308,13 +308,13 @@
       artPack: {
         status: 'generated',
         bundleId: source.id,
-        layout: engine === 'legacy' ? 'multipart-9' : 'multipart-4',
+        layout: engine === 'legacy' ? 'multipart-9' : 'rig-v2',
         proceduralFallback: true
       },
       arenaPack: {
         status: 'generated',
         bundleId: source.id,
-        layout: engine === 'legacy' ? 'parallax-4' : 'backdrop',
+        layout: 'parallax-4',
         proceduralFallback: true
       },
       telegraphs: {
@@ -465,8 +465,8 @@
       if (!Array.isArray(entry.parts) || !entry.parts.some(part => part.role === 'weak-point' && part.hitbox)) errors.push('weak-point manquant: ' + entry.id);
       if (!Array.isArray(entry.phases) || entry.phases.length !== 3) errors.push('trois phases requises: ' + entry.id);
       if (entry.engine === 'expanded' && !entry.phaseFamilies.every(family => PATTERN_FAMILIES[family])) errors.push('famille inconnue: ' + entry.id);
-      if (entry.engine === 'expanded' && (!entry.artPack.proceduralFallback || entry.artPack.status !== 'generated' || entry.artPack.bundleId !== entry.id || entry.artPack.layout !== 'multipart-4')) errors.push('pack visuel expansion invalide: ' + entry.id);
-      if (entry.engine === 'expanded' && (!entry.arenaPack.proceduralFallback || entry.arenaPack.status !== 'generated' || entry.arenaPack.bundleId !== entry.id || entry.arenaPack.layout !== 'backdrop')) errors.push('pack arene expansion invalide: ' + entry.id);
+      if (entry.engine === 'expanded' && (!entry.artPack.proceduralFallback || entry.artPack.status !== 'generated' || entry.artPack.bundleId !== entry.id || entry.artPack.layout !== 'rig-v2')) errors.push('pack visuel expansion invalide: ' + entry.id);
+      if (entry.engine === 'expanded' && (!entry.arenaPack.proceduralFallback || entry.arenaPack.status !== 'generated' || entry.arenaPack.bundleId !== entry.id || entry.arenaPack.layout !== 'parallax-4')) errors.push('pack arene expansion invalide: ' + entry.id);
       if (entry.engine === 'expanded' && entry.productionStatus === 'planned') errors.push('boss expansion encore planifie: ' + entry.id);
       if (entry.engine === 'expanded' && entry.codex.releaseEligible !== true) errors.push('codex expansion non publiable: ' + entry.id);
       if (entry.engine === 'expanded' && entry.masteryContracts.length !== 3) errors.push('trois contrats Forge requis: ' + entry.id);

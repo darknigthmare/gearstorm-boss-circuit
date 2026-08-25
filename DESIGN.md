@@ -1,4 +1,4 @@
-# GEARSTORM: Boss Circuit — conception v2.10.0
+# GEARSTORM: Boss Circuit — conception v2.11.0
 
 ## Pitch
 
@@ -36,23 +36,23 @@ Chaque extension possède trois phases. Le registre attribue 24 `mechanicId` et 
 
 ENDURANCE ENGINE ajoute six manches internes. La progression de ses points de vie ne suffit pas : la phase 1 doit avoir atteint la manche 2, la phase 2 la manche 4 et la fin la manche 6. Cette barrière fait de la survie aux cycles la règle centrale du boss, même avec un build offensif puissant.
 
-Le Circuit Forge sauvegarde en v5 le combat, le choix de module ou la fin à reprendre. Un module est proposé entre les boss ; la dernière victoire ouvre la restauration des quatre anneaux et enregistre le meilleur temps. `boss-roster.js` porte les règles de combat et `expansion-story.js` les objectifs, journaux, restaurations, 24 interludes, 24 `metaLine` et 72 contrats instrumentés. Le Codex conserve ces transmissions par anneau après déverrouillage.
+Le Circuit Forge sauvegarde en v6 le combat, le choix de module ou la fin à reprendre. Un module est proposé entre les boss ; la dernière victoire ouvre la restauration des quatre anneaux et enregistre une tentative complète dans sa catégorie. `boss-roster.js` porte les règles de combat et `expansion-story.js` les objectifs, journaux, restaurations, 24 interludes, 24 `metaLine` et 72 contrats instrumentés. Le Codex conserve ces transmissions par anneau après déverrouillage.
 
-## Progression et reprise v2.10
+## Progression et reprise v2.11
 
 Onze modules couvrent cadence, noyau, ruée, tir multiple, dégâts, Surcharge, bouclier, mobilité, précision, combo et auto-réparation de phase. Ils ne persistent que pendant le Circuit en cours ; leurs limites de cumul empêchent de dépasser le niveau prévu.
 
-La sauvegarde locale reste en schéma v5. Elle conserve déblocages, meilleurs temps, rangs, maîtrise et reprises séparées de campagne et de Forge. La v2.9 conserve les deux invariants de checkpoint introduits en v2.8 :
+La sauvegarde locale utilise le schéma v6. Elle conserve déblocages, maîtrise, reprises séparées et records segmentés par version d’équilibrage, mode, difficulté et variante. Temps, rang et score gardent la tentative atomique qui les a produits ; les records v5 restent dans un héritage non classé. Les deux invariants de checkpoint restent conservés :
 
 - `currentBossRetries` survit au rechargement, afin de préserver pénalités, score et rang ;
 - `upgradeOffer` est figée au checkpoint `upgrade`, afin qu’une reprise retrouve exactement les trois choix déjà proposés.
 
-L’export produit uniquement une copie JSON v5 normalisée de l’état courant. L’import est borné à 1 Mio et repasse exclusivement par la migration/normalisation avant toute persistance. Les options rendent les deux actions et un input fichier JSON masqué ; le pipeline runtime reste tolérant si un hook manque.
+L’export produit uniquement une copie JSON v6 normalisée de l’état courant. L’import est borné à 1 Mio et repasse exclusivement par la migration/normalisation avant toute persistance. Les options rendent les deux actions et un input fichier JSON masqué ; le pipeline runtime reste tolérant si un hook manque.
 
 
-## Robustesse et causalité v2.10
+## Robustesse et causalité v2.11
 
-La normalisation de sauvegarde réconcilie campagne terminée, boss débloqués et checkpoints finaux. Une v5 illisible peut retomber sur une v4 valide ; une migration déjà chargée reste jouable même si l’écriture v5 échoue par quota.
+La normalisation de sauvegarde réconcilie campagne terminée, boss débloqués et checkpoints finaux. Une v6 illisible peut retomber successivement sur une v5, v4, v3, v2 ou legacy valide ; une migration déjà chargée reste jouable même si l’écriture v6 échoue par quota.
 
 Le cache PWA écrit en best-effort : une réponse réseau valide est rendue même si `cache.put` échoue. Le cache raster conserve au plus trois bundles de boss selon un LRU et garde les assets permanents de Riva.
 
@@ -67,22 +67,22 @@ Sur une sauvegarde neuve seulement, le runtime initialise mouvement réduit et c
 
 Les cartes déverrouillées montrent une miniature WebP décorative du boss sans remplacer le texte ni l’état accessible. Les cartes verrouillées n’exposent pas cette illustration. Sur mobile portrait, le paysage est recommandé pour conserver la largeur tactique de l’arène.
 
-## Direction artistique v2.10.0
+## Direction artistique v2.11.0
 
-Le manifeste v2.10.0, de schéma 3, référence 42 masters OpenAI et 233 WebP runtime pour 18 175 510 octets : 48 assets d’arène, 150 pièces de boss, 15 assets héroïne, 16 VFX et 4 images narratives. Il conserve dimensions, alpha, poids et SHA-256 ; les masters restent réservés à la provenance.
+Le manifeste v2.11.0, de schéma 4, référence 43 masters OpenAI et 378 WebP runtime pour 39 212 378 octets : 120 couches d’arène, 222 pièces de boss, 16 assets héroïne, 16 VFX et 4 images narratives. Il conserve dimensions, alpha, poids et SHA-256 ; les masters restent réservés à la provenance.
 
 | Famille | Masters | Runtime |
 | --- | ---: | ---: |
-| Arènes campagne / Forge | 12 | 48 |
-| Boss campagne / Forge | 10 | 150 |
-| Riva Spark | 15 | 15 |
+| Arènes campagne / Forge | 12 | 120 |
+| Boss campagne / Forge | 10 | 222 |
+| Riva Spark | 16 | 16 |
 | VFX partagés | 1 | 16 |
 | Narration | 4 | 4 |
-| **Total** | **42** | **233** |
+| **Total** | **43** | **378** |
 
-Riva utilise treize pièces anatomiques indépendantes et deux couches d’effet. L’asset proche `forearm-cannon-near` combine l’avant-bras et le canon ; aucun canon distinct n’est compté en plus. `rootOffsetY = -23.6` place les pixels utiles des bottes sur `feetLocalY = 36` ; `roadLift = 10`, `headDrop = 4` et la poussière à `y = 610` règlent la lecture de contact. Le recul vaut `12 px` local, soit `13,2 px` Canvas.
+Riva utilise quatorze pièces anatomiques indépendantes et deux couches d’effet. `forearm-near` et `cannon-near` sont séparés, avec une recomposition neutre exacte ; `rootOffsetY = -71` place le bas alpha des bottes sur `feetLocalY = 36`. `roadLift = 10`, `headDrop = 4` et la poussière à `y = 610` règlent la lecture de contact. Le recul vaut `12 px` local, soit `13,2 px` Canvas.
 
-Le sol physique reste `y = 620`. Le rendu applique `+80 px` aux six décors de campagne et `+28 px` aux backdrops Forge pour aligner les routes peintes sans déplacer la simulation. Chaque boss Forge conserve quatre pièces transparentes et un backdrop ; ses animations secondaires restent pilotées par les huit familles moteur. Le fallback Canvas demeure disponible.
+Le sol physique reste `y = 620`. Le rendu applique `+80 px` aux six décors de campagne et `+28 px` aux arènes Forge pour aligner les routes peintes sans déplacer la simulation. Chaque boss Forge possède sept pièces transparentes et chaque arène quatre couches parallaxe ; parents, pivots, joints et profils de mouvement sont déclarés par le manifeste. Le fallback Canvas demeure disponible.
 
 ## Progression narrative
 

@@ -2,24 +2,24 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 
-export const ASSET_RELEASE = '2.10.0';
+export const ASSET_RELEASE = '2.11.0';
 export const ASSET_DIRECTORY = 'v' + ASSET_RELEASE;
-export const ASSET_MANIFEST_PATH = 'assets/generated/v2.10.0/asset-manifest.json';
-export const ASSET_BUDGET_BYTES = 22 * 1024 * 1024;
+export const ASSET_MANIFEST_PATH = 'assets/generated/v2.11.0/asset-manifest.json';
+export const ASSET_BUDGET_BYTES = 48 * 1024 * 1024;
 export const EXPECTED_COUNTS = Object.freeze({
-  runtimeFiles: 233,
-  arenaLayers: 24,
-  arenaBackdrops: 24,
-  bossParts: 150,
-  heroineParts: 15,
+  runtimeFiles: 378,
+  arenaLayers: 120,
+  arenaBackdrops: 0,
+  bossParts: 222,
+  heroineParts: 16,
   vfx: 16,
   narrative: 4,
-  alpha: 199,
+  alpha: 344,
   opaque: 34,
-  masters: 42,
+  masters: 43,
 });
 export const CATEGORY_BUDGETS = Object.freeze({
-  arena: 512 * 1024,
+  arena: 1024 * 1024,
   boss: 256 * 1024,
   heroine: 256 * 1024,
   vfx: 128 * 1024,
@@ -33,11 +33,14 @@ export const EXPANSION_BOSS_IDS = Object.freeze([
   'logic-crucible', 'vector-vault', 'skyborne-battery', 'endurance-engine', 'adaptive-archivist', 'null-crown',
 ]);
 export const BOSS_IDS = Object.freeze([...CORE_BOSS_IDS, ...EXPANSION_BOSS_IDS]);
-export const EXPANSION_PART_NAMES = Object.freeze(['chassis', 'core', 'appendage-left', 'appendage-right']);
+export const EXPANSION_PART_NAMES = Object.freeze([
+  'chassis', 'armor-shell', 'appendage-left-root', 'appendage-left-tip',
+  'appendage-right-root', 'appendage-right-tip', 'core',
+]);
 export const RIVA_ANATOMY_PART_NAMES = Object.freeze([
   'thigh-far', 'shin-far', 'boot-far', 'upper-arm-far', 'forearm-far',
   'pelvis', 'torso', 'thigh-near', 'shin-near', 'boot-near',
-  'upper-arm-near', 'forearm-cannon-near', 'head',
+  'upper-arm-near', 'forearm-near', 'cannon-near', 'head',
 ]);
 export const RIVA_EFFECT_PART_NAMES = Object.freeze(['dash-trail', 'overload-halo']);
 export const RIVA_PART_NAMES = Object.freeze([...RIVA_ANATOMY_PART_NAMES, ...RIVA_EFFECT_PART_NAMES]);
@@ -45,7 +48,7 @@ export const RIVA_RENDER_ORDER = Object.freeze([
   'dash-trail',
   'thigh-far', 'shin-far', 'boot-far', 'upper-arm-far', 'forearm-far',
   'pelvis', 'torso', 'thigh-near', 'shin-near', 'boot-near',
-  'upper-arm-near', 'forearm-cannon-near', 'head',
+  'upper-arm-near', 'forearm-near', 'cannon-near', 'head',
   'overload-halo',
 ]);
 export const RIVA_ROAD_LIFT = 10;
@@ -63,14 +66,15 @@ export const RIVA_PARENT_BY_PART = Object.freeze({
   'upper-arm-far': 'torso',
   'forearm-far': 'upper-arm-far',
   'upper-arm-near': 'torso',
-  'forearm-cannon-near': 'upper-arm-near',
+  'forearm-near': 'upper-arm-near',
+  'cannon-near': 'forearm-near',
 });
 export const RIVA_KINEMATIC_CHAINS = Object.freeze([
   Object.freeze(['pelvis', 'torso', 'head']),
   Object.freeze(['pelvis', 'thigh-far', 'shin-far', 'boot-far']),
   Object.freeze(['pelvis', 'thigh-near', 'shin-near', 'boot-near']),
   Object.freeze(['torso', 'upper-arm-far', 'forearm-far']),
-  Object.freeze(['torso', 'upper-arm-near', 'forearm-cannon-near']),
+  Object.freeze(['torso', 'upper-arm-near', 'forearm-near', 'cannon-near']),
 ]);
 export const NARRATIVE_NAMES = Object.freeze(['intro-broadcast', 'prologue-m0', 'campaign-ending', 'forge-ending']);
 const ARENA_LAYERS = Object.freeze(['far', 'mid', 'ground', 'foreground']);
@@ -156,7 +160,7 @@ function validateHeroineHierarchy(parts) {
   for (const [parentName, childName] of [
     ['thigh-far', 'shin-far'], ['shin-far', 'boot-far'],
     ['thigh-near', 'shin-near'], ['shin-near', 'boot-near'],
-    ['upper-arm-far', 'forearm-far'], ['upper-arm-near', 'forearm-cannon-near'],
+    ['upper-arm-far', 'forearm-far'], ['upper-arm-near', 'forearm-near'],
   ]) {
     const parent = byName.get(parentName);
     const child = byName.get(childName);
@@ -176,7 +180,7 @@ function validateHeroineRig(heroine) {
   invariant(heroine?.id === 'riva-spark', 'Heroine riva-spark attendue');
   keysMatch(heroine.parts, RIVA_PART_NAMES, 'Pieces heroine v2.9');
   const rig = heroine.rig;
-  invariant(rig?.schemaVersion === 1, 'Riva: schema rig 1 attendu');
+  invariant(rig?.schemaVersion === 2, 'Riva: schema rig 2 attendu');
   invariant(rig?.canvas?.width === 418 && rig?.canvas?.height === 418, 'Riva: canevas rig 418x418 attendu');
   invariant(rig?.coordinateSpace === 'player-local-pixels', 'Riva: espace de coordonnees invalide');
   invariant(rig?.feetLocalY === 36, 'Riva: pieds locaux a 36 attendus');
@@ -185,11 +189,11 @@ function validateHeroineRig(heroine) {
   invariant(rig?.ground?.physicalY === 620 && rig?.ground?.localY === 36, 'Riva: contrat sol 620/36 invalide');
   invariant(rig?.muzzle && typeof rig.muzzle === 'object' && !Array.isArray(rig.muzzle),
     'Riva: muzzle articule objet attendu');
-  invariant(rig.muzzle.part === 'forearm-cannon-near', 'Riva: muzzle doit suivre le canon proche');
+  invariant(rig.muzzle.part === 'cannon-near', 'Riva: muzzle doit suivre le canon proche');
   pixelPair(rig.muzzle.point, 'Riva: point muzzle', true);
   invariant(rig.muzzle.point[0] === 149 && rig.muzzle.point[1] === 297,
     'Riva: muzzle optique [149,297] attendu');
-  invariant(Array.isArray(rig.parts) && rig.parts.length === EXPECTED_COUNTS.heroineParts, 'Riva: 15 specs rig attendues');
+  invariant(Array.isArray(rig.parts) && rig.parts.length === EXPECTED_COUNTS.heroineParts, 'Riva: 16 specs rig attendues');
   invariant(JSON.stringify(rig.renderOrder) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: renderOrder incoherent');
   invariant(JSON.stringify(rig.parts.map(part => part.name)) === JSON.stringify(RIVA_RENDER_ORDER), 'Riva: specs non triees par z');
 
@@ -211,6 +215,21 @@ function validateHeroineRig(heroine) {
     invariant(Number.isInteger(spec.coveragePixels) && spec.coveragePixels >= 64, 'Riva ' + spec.name + ': couverture insuffisante');
   }
   validateHeroineHierarchy(rig.parts);
+  const forearmNear = rig.parts.find(spec => spec.name === 'forearm-near');
+  const cannonNear = rig.parts.find(spec => spec.name === 'cannon-near');
+  invariant(JSON.stringify(forearmNear?.joint) === JSON.stringify(cannonNear?.joint),
+    'Riva: avant-bras et canon doivent partager le joint neutre');
+  invariant(JSON.stringify(forearmNear?.pivot) === JSON.stringify(cannonNear?.pivot) && forearmNear?.scale === cannonNear?.scale,
+    'Riva: avant-bras et canon doivent partager le transform neutre');
+  invariant(rig.nearArmSplit?.source?.masterFile === 'assets/generated/riva-v2.9-sources/forearm-cannon-near-openai-v1.png',
+    'Riva: source combinee de separation absente');
+  invariant(rig.nearArmSplit?.separationReference?.masterFile === 'assets/generated/riva-v2.11-sources/forearm-cannon-split-openai-v1.png',
+    'Riva: reference OpenAI de separation v2.11 absente');
+  invariant(JSON.stringify(rig.nearArmSplit?.unionBBox) === JSON.stringify([130, 104, 158, 210]),
+    'Riva: bbox neutre du bras proche modifiee');
+  invariant(rig.nearArmSplit?.combinedCoveragePixels === 13340
+    && forearmNear.coveragePixels + cannonNear.coveragePixels === 13340,
+    'Riva: couverture du bras proche non conservee');
   const head = rig.parts.find(spec => spec.name === 'head');
   const torso = rig.parts.find(spec => spec.name === 'torso');
   invariant(head?.joint?.[1] - rig.rootOffsetY === -70 + RIVA_HEAD_DROP_Y,
@@ -230,11 +249,15 @@ function validateHeroineRig(heroine) {
   for (const name of RIVA_ANATOMY_PART_NAMES) {
     const part = heroine.parts[name];
     invariant(part.role === 'anatomy' && part.nativePart === true, 'Riva ' + name + ': piece anatomique native attendue');
-    invariant(part.source?.masterFile === 'assets/generated/riva-v2.9-sources/' + name + '-openai-v1.png', 'Riva ' + name + ': master natif incorrect');
+    const splitPart = ['forearm-near', 'cannon-near'].includes(name);
+    const expectedMaster = splitPart
+      ? 'assets/generated/riva-v2.9-sources/forearm-cannon-near-openai-v1.png'
+      : 'assets/generated/riva-v2.9-sources/' + name + '-openai-v1.png';
+    invariant(part.source?.masterFile === expectedMaster, 'Riva ' + name + ': master natif incorrect');
     invariant(/^[a-f0-9]{64}$/.test(part.source?.masterSha256 || ''), 'Riva ' + name + ': hash master absent');
     anatomySources.add(part.source.masterFile);
   }
-  invariant(anatomySources.size === RIVA_ANATOMY_PART_NAMES.length, 'Riva: chaque anatomie doit venir de son propre master');
+  invariant(anatomySources.size === 13, 'Riva: 13 sources anatomiques OpenAI attendues après séparation');
 
   const effectCells = { 'dash-trail': 7, 'overload-halo': 8 };
   for (const name of RIVA_EFFECT_PART_NAMES) {
@@ -342,7 +365,7 @@ async function listFiles(directory) {
 
 function validateDimensions(entry) {
   if (entry.kind === 'arena') {
-    const expected = entry.name === 'backdrop' ? [768, 432] : [768, 512];
+    const expected = EXPANSION_BOSS_IDS.includes(entry.owner) ? [768, 432] : [768, 512];
     invariant(entry.width === expected[0] && entry.height === expected[1], entry.id + ': dimensions arene ' + expected.join('x') + ' attendues');
   } else if (entry.kind === 'boss' || entry.kind === 'heroine') {
     invariant(entry.width === 418 && entry.height === 418, entry.id + ': une piece articulee doit mesurer 418x418');
@@ -356,6 +379,7 @@ function validateDimensions(entry) {
 function validateExpansionRig(bossId, boss) {
   keysMatch(boss.parts, EXPANSION_PART_NAMES, 'Rig boss extension ' + bossId);
   const rig = boss.rig;
+  invariant(rig?.schemaVersion === 2, bossId + ': schema rig 2 attendu');
   invariant(rig?.canvas?.width === 418 && rig?.canvas?.height === 418, bossId + ': canevas rig 418x418 attendu');
   invariant(rig?.drawSize?.width === 236 && rig?.drawSize?.height === 236, bossId + ': drawSize 236x236 attendu');
   normalizedPoint(rig?.origin, bossId + ': origin');
@@ -366,18 +390,37 @@ function validateExpansionRig(bossId, boss) {
   invariant(/^[a-f0-9]{64}$/.test(rig.compositeSha256 || ''), bossId + ': hash composite rig invalide');
   invariant(Number.isInteger(rig.sourceCell) && rig.sourceCell >= 0 && rig.sourceCell < 6, bossId + ': cellule source invalide');
   keysMatch(rig.coveragePixels, EXPANSION_PART_NAMES, 'Couverture rig ' + bossId);
-  invariant(Object.values(rig.coveragePixels).every(value => Number.isInteger(value) && value >= 64), bossId + ': une piece ne couvre pas assez de pixels');
+  invariant(Object.values(rig.coveragePixels).every(value => Number.isInteger(value) && value >= 32), bossId + ': une piece ne couvre pas assez de pixels');
+  invariant(/^forge-signature-\d{2}$/.test(rig.motionProfile?.id || ''), bossId + ': signature de mouvement absente');
+  invariant(Number.isFinite(rig.motionProfile?.tempo) && Number.isFinite(rig.motionProfile?.amplitude)
+    && Number.isFinite(rig.motionProfile?.phase), bossId + ': profil de mouvement incomplet');
+  invariant(/^[a-f0-9]{64}$/.test(rig.neutralCompositeSha256 || ''), bossId + ': hash de recomposition neutre absent');
+  invariant(boss.parts.chassis.parent === null, bossId + ': chassis doit etre la racine');
 
   for (const [name, part] of Object.entries(boss.parts)) {
-    invariant(['chassis', 'weak-core', 'appendage'].includes(part.role), bossId + ':' + name + ': role invalide');
+    invariant(['chassis', 'armor-shell', 'weak-core', 'appendage-root', 'appendage-tip'].includes(part.role), bossId + ':' + name + ': role invalide');
+    invariant(part.parent === null || EXPANSION_PART_NAMES.includes(part.parent), bossId + ':' + name + ': parent invalide');
+    invariant(part.motion && ['sway', 'breath', 'hinge', 'servo', 'pulse'].includes(part.motion.type),
+      bossId + ':' + name + ': mouvement invalide');
+    invariant(part.logicalSlot === null || (Number.isInteger(part.logicalSlot) && part.logicalSlot >= 0 && part.logicalSlot <= 3),
+      bossId + ':' + name + ': liaison logique invalide');
     normalizedPoint(part.pivot, bossId + ':' + name + ': pivot');
     normalizedPoint(part.joint, bossId + ':' + name + ': joint');
-    invariant(Number.isInteger(part.z) && part.z >= 0 && part.z <= 2, bossId + ':' + name + ': z invalide');
+    invariant(Number.isInteger(part.z) && part.z >= 0 && part.z <= 6, bossId + ':' + name + ': z invalide');
     invariant(part.drawSize?.width === 236 && part.drawSize?.height === 236, bossId + ':' + name + ': drawSize invalide');
   }
   invariant(boss.parts.core.role === 'weak-core' && boss.parts.core.weakCore === true, bossId + ': couche core non marquee weakCore');
-  invariant(boss.parts['appendage-left'].side === 'left', bossId + ': appendage gauche mal declare');
-  invariant(boss.parts['appendage-right'].side === 'right', bossId + ': appendage droit mal declare');
+  invariant(boss.parts['armor-shell'].parent === 'chassis'
+    && boss.parts.core.parent === 'chassis'
+    && boss.parts['appendage-left-root'].parent === 'chassis'
+    && boss.parts['appendage-right-root'].parent === 'chassis'
+    && boss.parts['appendage-left-tip'].parent === 'appendage-left-root'
+    && boss.parts['appendage-right-tip'].parent === 'appendage-right-root',
+  bossId + ': hierarchie mecanique rompue');
+  invariant(boss.parts['appendage-left-root'].side === 'left' && boss.parts['appendage-left-tip'].side === 'left',
+    bossId + ': appendages gauches mal declares');
+  invariant(boss.parts['appendage-right-root'].side === 'right' && boss.parts['appendage-right-tip'].side === 'right',
+    bossId + ': appendages droits mal declares');
 }
 
 export async function validateRuntimeAssets(rootDirectory = process.cwd(), options = {}) {
@@ -387,7 +430,7 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   const manifestFile = resolve(root, ASSET_MANIFEST_PATH);
   const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
 
-  invariant(manifest.schemaVersion === 3, 'asset-manifest: schemaVersion 3 attendu');
+  invariant(manifest.schemaVersion === 4, 'asset-manifest: schemaVersion 4 attendu');
   invariant(manifest.release === ASSET_RELEASE, 'asset-manifest: release ' + ASSET_RELEASE + ' attendue');
   invariant(typeof manifest.generator === 'string' && manifest.generator.length > 0, 'asset-manifest: generateur absent');
   invariant(typeof manifest.license === 'string' && manifest.license.length > 0, 'asset-manifest: licence absente');
@@ -410,9 +453,15 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
 
   for (const bossId of EXPANSION_BOSS_IDS) {
     const arena = manifest.arenas[bossId];
-    invariant(arena.kind === 'backdrop', 'Arene Forge ' + bossId + ': backdrop attendu');
+    invariant(arena.kind === 'parallax', 'Arene Forge ' + bossId + ': parallax attendu');
     invariant(arena.groundY === 620 && arena.visualOffsetY === 28 && arena.telegraphSafe === true, 'Arene Forge ' + bossId + ': contrat sol/offset gameplay invalide');
-    invariant(arena.backdrop?.alpha === false, 'Arene Forge ' + bossId + ': backdrop opaque attendu');
+    keysMatch(arena.layers, ARENA_LAYERS, 'Couches Forge ' + bossId);
+    const speeds = ARENA_LAYERS.map(layer => arena.layers[layer]?.speed);
+    invariant(speeds.every((speed, index) => Number.isFinite(speed) && speed > 0 && (index === 0 || speed > speeds[index - 1])),
+      'Arene Forge ' + bossId + ': vitesses de profondeur invalides');
+    invariant(arena.layers.far.alpha === false
+      && ARENA_LAYERS.slice(1).every(layer => arena.layers[layer].alpha === true),
+      'Arene Forge ' + bossId + ': contrat alpha invalide');
     invariant(/^[a-f0-9]{64}$/.test(arena.source?.masterSha256 || ''), 'Arene Forge ' + bossId + ': provenance master invalide');
     invariant(Number.isInteger(arena.source?.atlasCell) && arena.source.atlasCell >= 0 && arena.source.atlasCell < 4, 'Arene Forge ' + bossId + ': cellule atlas invalide');
     validateExpansionRig(bossId, manifest.bosses[bossId]);
@@ -449,21 +498,24 @@ export async function validateRuntimeAssets(rootDirectory = process.cwd(), optio
   }
 
   invariant(manifest.sourceMasters.filter(master => master.file.startsWith('assets/generated/riva-v2.9-sources/')).length === 14, '14 masters Riva v2.9 attendus');
+  invariant(manifest.sourceMasters.filter(master => master.file.startsWith('assets/generated/riva-v2.11-sources/')).length === 1, '1 master Riva v2.11 attendu');
   invariant(manifest.sourceMasters.filter(master => master.file.startsWith('assets/generated/narrative-v2.9-sources/')).length === 4, '4 masters narratifs v2.9 attendus');
   for (const [name, asset] of Object.entries(manifest.heroine.parts)) {
     validateProvenance(asset, mastersByFile, 'Riva ' + name);
   }
   validateProvenance(manifest.heroine.rig.canonicalReference, mastersByFile, 'Riva canonique');
+  validateProvenance(manifest.heroine.rig.nearArmSplit.source, mastersByFile, 'Riva bras combine');
+  validateProvenance(manifest.heroine.rig.nearArmSplit.separationReference, mastersByFile, 'Riva reference separation');
   for (const [name, asset] of Object.entries(manifest.narrative)) {
     validateProvenance(asset, mastersByFile, 'Narratif ' + name);
   }
 
   const entries = flattenAssetManifest(manifest);
   invariant(entries.length === EXPECTED_COUNTS.runtimeFiles, EXPECTED_COUNTS.runtimeFiles + ' assets runtime attendus, recu ' + entries.length);
-  invariant(entries.filter(entry => entry.kind === 'arena' && entry.name !== 'backdrop').length === EXPECTED_COUNTS.arenaLayers, '24 couches arene attendues');
-  invariant(entries.filter(entry => entry.kind === 'arena' && entry.name === 'backdrop').length === EXPECTED_COUNTS.arenaBackdrops, '24 backdrops Forge attendus');
-  invariant(entries.filter(entry => entry.kind === 'boss').length === EXPECTED_COUNTS.bossParts, '150 pieces boss attendues');
-  invariant(entries.filter(entry => entry.kind === 'heroine').length === EXPECTED_COUNTS.heroineParts, '15 pieces heroine attendues');
+  invariant(entries.filter(entry => entry.kind === 'arena' && entry.name !== 'backdrop').length === EXPECTED_COUNTS.arenaLayers, EXPECTED_COUNTS.arenaLayers + ' couches arene attendues');
+  invariant(entries.filter(entry => entry.kind === 'arena' && entry.name === 'backdrop').length === EXPECTED_COUNTS.arenaBackdrops, 'aucun backdrop monolithique Forge attendu');
+  invariant(entries.filter(entry => entry.kind === 'boss').length === EXPECTED_COUNTS.bossParts, EXPECTED_COUNTS.bossParts + ' pieces boss attendues');
+  invariant(entries.filter(entry => entry.kind === 'heroine').length === EXPECTED_COUNTS.heroineParts, EXPECTED_COUNTS.heroineParts + ' pieces heroine attendues');
   invariant(entries.filter(entry => entry.kind === 'vfx').length === EXPECTED_COUNTS.vfx, '16 VFX attendus');
   invariant(entries.filter(entry => entry.kind === 'narrative').length === EXPECTED_COUNTS.narrative, '4 visuels narratifs attendus');
 

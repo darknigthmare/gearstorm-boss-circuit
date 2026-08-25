@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-const CURRENT_SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
-const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v4';
+const CURRENT_SAVE_KEY = 'gearstorm_boss_circuit_save_v6';
+const PREVIOUS_SAVE_KEY = 'gearstorm_boss_circuit_save_v5';
 
 async function waitForQa(page) {
   await page.waitForFunction(() => Boolean(window.__GEARSTORM_QA__?.ready), null, { timeout: 20_000 });
@@ -62,7 +62,8 @@ test('options, sauvegarde portable et focus clavier restent accessibles', async 
   const downloadPromise = page.waitForEvent('download');
   await exportButton.click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/^gearstorm-save-v5-\d{4}-\d{2}-\d{2}\.json$/);
+  await expect(page.locator('#toast')).toContainText('JSON version 6');
+  expect(download.suggestedFilename()).toMatch(/^gearstorm-save-v6-\d{4}-\d{2}-\d{2}\.json$/);
 
   await page.locator('#import-save-file').setInputFiles({
     name: 'gearstorm-e2e-save.json',
@@ -85,7 +86,7 @@ test('options, sauvegarde portable et focus clavier restent accessibles', async 
   await expect(page.locator('#difficulty-select')).toHaveValue('casual');
   await expect(page.locator('body')).toHaveClass(/reduce-motion/);
   await expect(page.locator('body')).toHaveClass(/high-contrast/);
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('gearstorm_boss_circuit_save_v5')).settings.difficulty)).toBe('casual');
+  await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key)).settings.difficulty, CURRENT_SAVE_KEY)).toBe('casual');
 
   await page.evaluate(() => {
     Storage.prototype.setItem = () => { throw new DOMException('Quota test', 'QuotaExceededError'); };
@@ -256,11 +257,11 @@ test('une campagne terminee normalise le dernier boss comme debloque', async ({ 
   await expect.poll(() => page.evaluate(key => JSON.parse(localStorage.getItem(key)).unlocked, CURRENT_SAVE_KEY)).toBe(6);
 });
 
-test('une sauvegarde v5 corrompue recupere la sauvegarde v4 valide', async ({ page }) => {
+test('une sauvegarde v6 corrompue recupere la sauvegarde v5 valide', async ({ page }) => {
   await page.addInitScript(({ currentKey, previousKey }) => {
-    localStorage.setItem(currentKey, '{"version":5,"unlocked":');
+    localStorage.setItem(currentKey, '{"version":6,"unlocked":');
     localStorage.setItem(previousKey, JSON.stringify({
-      version: 4,
+      version: 5,
       unlocked: 3,
       campaignCleared: ['rammer', 'kraken'],
       settings: {
@@ -342,11 +343,13 @@ test('les commandes tactiles pilotent mouvement saut tir ruee et pause', async (
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/?qa=1');
   await waitForQa(page);
-  await page.evaluate(() => {
+  const protectedRenderAlpha = await page.evaluate(() => {
     window.__GEARSTORM_QA__.launchBoss('rammer', { mode: 'practice' });
     window.__GEARSTORM_QA__.skipIntro();
     window.__GEARSTORM_QA__.protectPlayer();
+    return window.__GEARSTORM_QA__.getRigDiagnostics().heroine.renderAlpha;
   });
+  expect(protectedRenderAlpha).toBeCloseTo(0.46, 5);
   await page.waitForFunction(() => window.__GEARSTORM_QA__.getState().state === 'fight');
   await expect(page.locator('#touch-controls')).toBeVisible();
 

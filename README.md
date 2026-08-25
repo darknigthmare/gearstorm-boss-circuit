@@ -1,8 +1,8 @@
-# GEARSTORM: Boss Circuit v2.10.0
+# GEARSTORM: Boss Circuit v2.11.0
 
 GEARSTORM est un boss rush 2D original. Riva Spark traverse les six machines transformables de la campagne de Cassian Voltério, puis affronte vingt-quatre profils supplémentaires dans la Forge : 30 boss jouables, 90 phases et 90 contrats de maîtrise.
 
-État courant : la v2.10.0 est publiée. Elle conserve les 30 boss, 90 phases et 90 contrats, ferme l’arc de la Couronne et renforce sauvegarde, cache, accessibilité et cohérence du canon.
+État courant du code : v2.11.0. Elle conserve les 30 boss, 90 phases et 90 contrats, sépare les records compétitifs et déploie les nouveaux rigs et décors multicouches.
 
 
 ## Jouer en local
@@ -21,7 +21,19 @@ La production v2.10.0 est vérifiée sur GitHub Actions et Vercel ; les identifi
 
 Le mode `file://` reste un repli jouable, mais l’installation PWA, le service worker et le cache hors ligne exigent HTTP ou HTTPS.
 
+## Passe v2.11.0 — rigs indépendants, parallaxe Forge et records segmentés
+
+Riva utilise désormais quatorze pièces anatomiques : l’avant-bras proche et le canon sont deux couches indépendantes, assemblées sans modifier la silhouette neutre. Le recul suit l’axe réel du projectile et le contact des bottes reste calé sur la route.
+
+Les vingt-quatre machines Forge passent à sept pièces animées par boss. Leurs arènes utilisent quatre plans `far`, `mid`, `ground` et `foreground`, avec le premier plan rendu après les acteurs pour une profondeur lisible sans masquer les télégraphes.
+
+La sauvegarde v6 sépare les records par version d’équilibrage, mode, difficulté et variante. Temps, rang et score conservent chacun la tentative complète ; les valeurs v5 restent consultables comme héritage non classé au lieu d’être attribuées à une catégorie supposée.
+
+Le mixage synthétique suit désormais la famille et l’intensité du boss, traverse un limiteur anti-saturation et expose trois réglages persistants : volume général, musique adaptative et effets/alertes.
+
 ## Publication vérifiée
+
+La source v2.11.0 a franchi le gate local `npm run qa:ci` : 92 tests Node réussis, puis 26 parcours Chromium réussis, 2 ignorés et aucun échec. L’URL canonique reste [https://gearstorm-boss-circuit.vercel.app](https://gearstorm-boss-circuit.vercel.app). La correspondance de cet alias avec le commit v2.11.0 poussé, le run GitHub Actions et le déploiement Vercel `READY` sera renseignée après publication ; tant que ces preuves ne figurent pas ici, ce document ne présente pas la v2.11.0 comme la production active.
 
 ## Passe v2.10.0 — canon, robustesse et lecture causale
 
@@ -59,7 +71,7 @@ L'audit avant/après, les cycles course/saut et les actions tir/ruée sont archi
 - Surcharge Overdrive, ruée invulnérable, double saut et tir évolutif.
 - Trois difficultés, score, rangs, chronomètres et reprises séparées de campagne et de Forge.
 - Clavier AZERTY/QWERTY, souris, manette standard et commandes tactiles.
-- Sauvegarde locale v5 versionnée, migrée et normalisée.
+- Sauvegarde locale v6 versionnée, migrée et normalisée, avec records segmentés.
 - Audio et musique synthétiques via Web Audio, sans dépendance distante.
 - Mouvement réduit, contraste renforcé et réglage des tremblements.
 - PWA installable avec cache hors ligne et fallback Canvas.
@@ -78,7 +90,7 @@ Lorsqu’un checkpoint est sauvegardé à l’Atelier, les trois modules propos�
 
 ### Sauvegarde de secours
 
-Le runtime sait exporter la sauvegarde courante sous forme d’un fichier JSON v5 déjà normalisé. L’import refuse les fichiers de plus de 1 Mio, parse le JSON, puis fait passer les données exclusivement par la migration et la normalisation existantes avant de persister et resynchroniser progression, Codex et reprises.
+Le runtime sait exporter la sauvegarde courante sous forme d’un fichier JSON v6 déjà normalisé. L’import refuse les fichiers de plus de 1 Mio, parse le JSON, puis fait passer les données exclusivement par la migration et la normalisation existantes avant de persister et resynchroniser progression, Codex et reprises.
 
 Les contrôles `#export-save` et `#import-save` sont rendus dans les options. `#import-save-file` reste un input fichier masqué, limité au JSON et doté d’un libellé accessible ; il n’est activé qu’après l’action explicite d’import.
 
@@ -96,7 +108,7 @@ Le runtime écoute `waiting` et `updatefound`. Le bouton `#update-app` est rendu
 
 ## Circuit Forge
 
-Le Circuit Forge enchaîne les machines 07 à 30 en quatre vagues de six rencontres. La sauvegarde v5 conserve le boss courant, le checkpoint `fight`, `upgrade` ou `ending`, le temps cumulé, les pénalités, le score, la difficulté, les tentatives et le build installé. La reprise ne modifie jamais les six relais de campagne.
+Le Circuit Forge enchaîne les machines 07 à 30 en quatre vagues de six rencontres. La sauvegarde v6 conserve le boss courant, le checkpoint `fight`, `upgrade` ou `ending`, le temps cumulé, les pénalités, le score, la difficulté, les tentatives, le build installé et les records segmentés. La reprise ne modifie jamais les six relais de campagne.
 
 Les vingt-quatre profils Forge exposent vingt-quatre `mechanicId` et soixante-douze signatures d’état uniques, trois par boss. Ces signatures enrichissent huit familles moteur partagées — renvoi, leurre, modules, mimétisme, voies/verticalité, gravité/météo, posture/duo et puzzle/endgame — et ne sont pas présentées comme vingt-quatre moteurs indépendants.
 
@@ -110,24 +122,24 @@ Le Codex sépare la connaissance de la progression : une victoire de Laboratoire
 
 ## Direction artistique
 
-Le pack artistique v2.10.0 est dérivé de **42 masters originaux OpenAI** vers **233 WebP runtime**, soit **18 175 510 octets** déclarés par le manifeste :
+Le pack artistique v2.11.0 est dérivé de **43 masters originaux OpenAI** vers **378 WebP runtime**, soit **39 212 378 octets** déclarés par le manifeste :
 
 | Famille | Masters | Assets runtime |
 | --- | ---: | ---: |
 | Six décors de campagne, quatre couches de parallaxe chacun | 6 | 24 |
 | Six boss de campagne, neuf pièces articulables chacun | 6 | 54 |
-| Vingt-quatre boss Forge, quatre pièces transparentes chacun | 4 planches | 96 |
-| Vingt-quatre arènes Forge, un backdrop dédié chacune | 6 planches | 24 |
-| Riva Spark : référence canonique et pièces séparées | 15 | 15 |
+| Vingt-quatre boss Forge, sept pièces hiérarchisées chacun | 4 planches | 168 |
+| Vingt-quatre arènes Forge, quatre couches de parallaxe chacune | 6 planches | 96 |
+| Riva Spark : références et pièces séparées | 16 | 16 |
 | Effets visuels de combat | 1 | 16 |
 | Intro, prologue, fin campagne et fin Forge | 4 | 4 |
-| **Total** | **42** | **233** |
+| **Total** | **43** | **378** |
 
-Le rig de Riva n’utilise plus un corps complet fusionné : tête, torse, bassin, deux bras supérieurs, avant-bras éloigné, asset combiné avant-bras–canon proche, deux cuisses, deux tibias et deux bottes forment treize pièces anatomiques natives. Deux couches d’effet — traînée de ruée et halo de Surcharge — portent le total héroïne à quinze. Les douze liens parent–enfant forment une hiérarchie sans cycle ; la remontée de route vaut `10 px` et la hurtbox reste volontairement tolérante sur le bas du corps.
+Le rig de Riva n’utilise plus un corps complet fusionné : tête, torse, bassin, deux bras supérieurs, deux avant-bras dont `forearm-near`, le canon indépendant `cannon-near`, deux cuisses, deux tibias et deux bottes forment quatorze pièces anatomiques. Deux couches d’effet — traînée de ruée et halo de Surcharge — portent le total héroïne à seize. Les treize liens parent–enfant forment une hiérarchie sans cycle ; la remontée de route vaut `10 px` et la hurtbox reste volontairement tolérante sur le bas du corps.
 
-Les offsets visuels `+80` (campagne) et `+28` (Forge) rapprochent les routes peintes du sol physique `620` sans altérer la simulation. Chaque machine Forge garde quatre pièces et un backdrop ; les transformations secondaires restent pilotées par les huit familles communes et les arènes Forge ne sont pas revendiquées comme des décors parallaxe multicouches.
+Les offsets visuels `+80` (campagne) et `+28` (Forge) rapprochent les routes peintes du sol physique `620` sans altérer la simulation. Chaque machine Forge possède sept pièces animées ; chaque arène Forge expose quatre couches parallaxe et garde les télégraphes lisibles.
 
-Le rendu Canvas reste disponible si une image manque ou ne se décode pas. Le service worker garde le shell et le manifeste artistique, puis met les WebP utiles en cache à la demande au lieu de précacher les 233 fichiers.
+Le rendu Canvas reste disponible si une image manque ou ne se décode pas. Le service worker garde le shell et le manifeste artistique, puis met les WebP utiles en cache à la demande au lieu de précacher les 378 fichiers.
 
 ## Commandes
 
@@ -161,7 +173,7 @@ Le fichier `tests/e2e/forge.spec.mjs` couvre :
 Le fichier `tests/e2e/accessibility.spec.mjs` couvre en Chromium :
 
 - l’ouverture des options au clavier, l’ordre du focus et les cibles de 44 CSS px ;
-- le téléchargement de l’export JSON v5 et l’import d’un JSON normalisé ;
+- le téléchargement de l’export JSON v6 et l’import d’un JSON normalisé ;
 - l’initialisation mouvement réduit/contraste renforcé sur une sauvegarde neuve ;
 - la navigation de menu par Gamepad API simulée ;
 - le rechargement hors ligne d’un shell déjà installé.
@@ -196,7 +208,7 @@ Les contrôles ciblés restent `npm test`, `npm run build` et `npm run check:rel
 - `story.js` : campagne narrative des six districts.
 - `expansion-story.js` : quatre vagues Forge, journaux, objectifs et 72 contrats instrumentés.
 - `boss-roster.js` : registre des 30 machines, 24 `mechanicId`, 72 états Forge et huit familles partagées.
-- `assets/generated/v2.10.0/` : pack runtime de 233 WebP et manifeste de provenance/assemblage.
+- `assets/generated/v2.11.0/` : pack runtime de 378 WebP et manifeste de provenance/assemblage.
 - `manifest.webmanifest`, `sw.js` : installation et fonctionnement hors ligne.
 - `server.js` : serveur local à surface publique restreinte.
 - `scripts/` : build, contrats et garde-fous de release.

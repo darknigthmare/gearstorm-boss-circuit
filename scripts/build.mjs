@@ -29,13 +29,14 @@ const dist = resolve(root, 'dist');
 if (dirname(dist) !== root) throw new Error('Répertoire de build non sécurisé.');
 const validateSourceMasters = process.env.VERCEL !== '1';
 
-const publicFiles = ['index.html', 'pwa-update-v2.10.0.js', 'styles.css', 'story.js', 'expansion-story.js', 'boss-roster.js', 'game.js', 'manifest.webmanifest', 'sw.js'];
+const publicFiles = ['index.html', 'pwa-update-v2.10.0.js', 'pwa-update-v2.11.0.js', 'styles.css', 'story.js', 'expansion-story.js', 'boss-roster.js', 'performance-records.js', 'game.js', 'manifest.webmanifest', 'sw.js'];
 const shellAssets = ['gearstorm-icon.svg', 'gearstorm-icon-192.png', 'gearstorm-icon-512.png', 'gearstorm-key-art.png'];
-const [html, story, expansionStory, bossRoster, game, manifest, packageJson, runtimeAssets] = await Promise.all([
+const [html, story, expansionStory, bossRoster, performanceRecords, game, manifest, packageJson, runtimeAssets] = await Promise.all([
   readFile(resolve(root, 'index.html'), 'utf8'),
   readFile(resolve(root, 'story.js'), 'utf8'),
   readFile(resolve(root, 'expansion-story.js'), 'utf8'),
   readFile(resolve(root, 'boss-roster.js'), 'utf8'),
+  readFile(resolve(root, 'performance-records.js'), 'utf8'),
   readFile(resolve(root, 'game.js'), 'utf8'),
   readFile(resolve(root, 'manifest.webmanifest'), 'utf8').then(JSON.parse),
   readFile(resolve(root, 'package.json'), 'utf8').then(JSON.parse),
@@ -45,7 +46,7 @@ const [html, story, expansionStory, bossRoster, game, manifest, packageJson, run
 if (packageJson.version !== APP_RELEASE) {
   throw new Error(`Version package ${packageJson.version}, application ${APP_RELEASE}.`);
 }
-validateApplicationContract({ game, story, expansionStory, bossRoster, html, manifest, packageJson });
+validateApplicationContract({ game, story, expansionStory, bossRoster, performanceRecords, html, manifest, packageJson });
 for (const id of [...game.matchAll(/getElementById\('([^']+)'\)/g)].map(match => match[1])) {
   if (!html.includes(`id="${id}"`)) throw new Error(`Identifiant DOM manquant : ${id}`);
 }

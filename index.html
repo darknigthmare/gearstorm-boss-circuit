@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#080b18" />
-  <meta name="description" content="GEARSTORM: Boss Circuit v2.10.0 — Riva Spark affronte 30 machines pour rendre six districts et vingt-quatre services à ceux qui les font vivre." />
+  <meta name="description" content="GEARSTORM: Boss Circuit v2.11.0 — Riva Spark affronte 30 machines pour rendre six districts et vingt-quatre services à ceux qui les font vivre." />
   <meta name="application-name" content="GEARSTORM" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,15 +12,15 @@
   <meta name="apple-mobile-web-app-title" content="GEARSTORM" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_FR" />
-  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.10.0" />
+  <meta property="og:title" content="GEARSTORM: Boss Circuit v2.11.0" />
   <meta property="og:description" content="Riva Spark remonte la ligne fantôme M-0 et libère les six districts du Circuit." />
   <meta property="og:image" content="assets/gearstorm-key-art.png" />
   <meta property="og:image:alt" content="Riva Spark face aux machines du Circuit Voltério" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.10.0" />
+  <meta name="twitter:title" content="GEARSTORM: Boss Circuit v2.11.0" />
   <meta name="twitter:description" content="Trente machines jouables. Quatre-vingt-dix phases. Campagne narrative et Forge d’entraînement." />
   <meta name="twitter:image" content="assets/gearstorm-key-art.png" />
-  <title>GEARSTORM: Boss Circuit v2.10.0</title>
+  <title>GEARSTORM: Boss Circuit v2.11.0</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="assets/gearstorm-icon.svg" />
   <link rel="apple-touch-icon" href="assets/gearstorm-icon-192.png" />
@@ -53,7 +53,7 @@
         </figure>
         <div class="panel hero-panel">
           <div class="release-line">
-            <p class="eyebrow">PROTOCOLE MÉTA // V2.10.0</p>
+            <p class="eyebrow">PROTOCOLE MÉTA // V2.11.0</p>
             <span class="release-status"><span aria-hidden="true"></span> Le jeu sait qu’il est prêt</span>
           </div>
           <h1 id="game-title"><span>GEARSTORM</span><small>BOSS CIRCUIT</small></h1>
@@ -358,7 +358,7 @@
           </div>
           <button class="back-button" data-back="title-screen">Retour</button>
         </div>
-        <label class="setting-row">
+        <label class="setting-row difficulty-row">
           <span><strong>Difficulté</strong><small>Modifie la vitesse, la résistance et les points de vie.</small></span>
           <select id="difficulty-select">
             <option value="casual">Pilote — accessible</option>
@@ -367,10 +367,24 @@
           </select>
         </label>
         <label class="setting-row volume-row">
-          <span><strong>Volume général</strong><small>Ajuste la musique et les effets du Circuit.</small></span>
+          <span><strong>Volume général</strong><small>Plafond commun du mixage du Circuit.</small></span>
           <span class="range-control">
             <input id="master-volume" type="range" min="0" max="100" step="5" value="80" aria-describedby="master-volume-value" />
             <output id="master-volume-value" for="master-volume">80 %</output>
+          </span>
+        </label>
+        <label class="setting-row volume-row">
+          <span><strong>Musique adaptative</strong><small>Intensité musicale des phases, sans réduire les signaux de combat.</small></span>
+          <span class="range-control">
+            <input id="music-volume" type="range" min="0" max="100" step="5" value="68" aria-describedby="music-volume-value" />
+            <output id="music-volume-value" for="music-volume">68 %</output>
+          </span>
+        </label>
+        <label class="setting-row volume-row">
+          <span><strong>Effets et alertes</strong><small>Tirs, impacts, télégraphes et confirmations sonores.</small></span>
+          <span class="range-control">
+            <input id="sfx-volume" type="range" min="0" max="100" step="5" value="90" aria-describedby="sfx-volume-value" />
+            <output id="sfx-volume-value" for="sfx-volume">90 %</output>
           </span>
         </label>
         <label class="setting-row toggle-row">
@@ -588,10 +602,11 @@
     </aside>
   </main>
 
-  <script src="pwa-update-v2.10.0.js"></script>
+  <script src="pwa-update-v2.11.0.js"></script>
   <script src="story.js"></script>
   <script src="expansion-story.js"></script>
   <script src="boss-roster.js"></script>
+  <script src="performance-records.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

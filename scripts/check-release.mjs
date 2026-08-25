@@ -46,6 +46,7 @@ const [
   story,
   expansionStory,
   bossRoster,
+  performanceRecords,
   game,
   manifest,
   serviceWorker,
@@ -60,6 +61,7 @@ const [
   readFile('story.js', 'utf8'),
   readFile('expansion-story.js', 'utf8'),
   readFile('boss-roster.js', 'utf8'),
+  readFile('performance-records.js', 'utf8'),
   readFile('game.js', 'utf8'),
   readFile('manifest.webmanifest', 'utf8').then(JSON.parse),
   readFile('sw.js', 'utf8'),
@@ -73,7 +75,7 @@ assert.equal(packageJson.version, APP_RELEASE);
 assert.equal(packageLock.version, APP_RELEASE);
 assert.equal(packageLock.packages?.['']?.version, APP_RELEASE);
 assert.equal(packageLock.lockfileVersion, 3);
-validateApplicationContract({ game, story, expansionStory, bossRoster, html, manifest, packageJson });
+validateApplicationContract({ game, story, expansionStory, bossRoster, performanceRecords, html, manifest, packageJson });
 validateInfrastructureContract({ ci, serviceWorker, vercel, vercelIgnore });
 
 assert.equal(manifest.name, 'GEARSTORM: Boss Circuit');
@@ -90,10 +92,12 @@ assert.equal(keyArtScreenshot?.sizes, '1672x941');
 const shellFiles = [
   'dist/index.html',
   'dist/pwa-update-v2.10.0.js',
+  'dist/pwa-update-v2.11.0.js',
   'dist/styles.css',
   'dist/story.js',
   'dist/expansion-story.js',
   'dist/boss-roster.js',
+  'dist/performance-records.js',
   'dist/game.js',
   'dist/manifest.webmanifest',
   'dist/sw.js',
@@ -105,18 +109,19 @@ const shellFiles = [
 ];
 for (const file of shellFiles) await access(file);
 
-const [distHtml, distPwaBootstrap, distStory, distExpansionStory, distBossRoster, distGame, distManifest, distRuntime] = await Promise.all([
+const [distHtml, distPwaBootstrap, distStory, distExpansionStory, distBossRoster, distPerformanceRecords, distGame, distManifest, distRuntime] = await Promise.all([
   readFile('dist/index.html', 'utf8'),
-  readFile('dist/pwa-update-v2.10.0.js', 'utf8'),
+  readFile('dist/pwa-update-v2.11.0.js', 'utf8'),
   readFile('dist/story.js', 'utf8'),
   readFile('dist/expansion-story.js', 'utf8'),
   readFile('dist/boss-roster.js', 'utf8'),
+  readFile('dist/performance-records.js', 'utf8'),
   readFile('dist/game.js', 'utf8'),
   readFile('dist/manifest.webmanifest', 'utf8').then(JSON.parse),
   validateRuntimeAssets('dist', { validateMasters: false }),
 ]);
-validateApplicationContract({ game: distGame, story: distStory, expansionStory: distExpansionStory, bossRoster: distBossRoster, html: distHtml, manifest: distManifest, packageJson });
-assert.match(distPwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_10_0__/);
+validateApplicationContract({ game: distGame, story: distStory, expansionStory: distExpansionStory, bossRoster: distBossRoster, performanceRecords: distPerformanceRecords, html: distHtml, manifest: distManifest, packageJson });
+assert.match(distPwaBootstrap, /__GEARSTORM_PWA_UPDATE_V2_11_0__/);
 assert.match(distPwaBootstrap, /registration\.waiting/);
 assert.match(distPwaBootstrap, /SKIP_WAITING/);
 assert.match(distPwaBootstrap, /controllerchange/);
@@ -140,7 +145,9 @@ assert.deepEqual((await readdir('dist')).sort(), [
   'game.js',
   'index.html',
   'manifest.webmanifest',
+  'performance-records.js',
   'pwa-update-v2.10.0.js',
+  'pwa-update-v2.11.0.js',
   'story.js',
   'styles.css',
   'sw.js',
@@ -193,7 +200,7 @@ const actualFiles = (await listFiles('dist'))
   .sort();
 const declaredFiles = Object.keys(buildManifest.files).sort();
 assert.deepEqual(actualFiles, [...declaredFiles, 'build-manifest.json'].sort(), 'dist et build-manifest divergent.');
-assert.equal(declaredFiles.length, 9 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
+assert.equal(declaredFiles.length, 11 + 4 + 1 + EXPECTED_COUNTS.runtimeFiles);
 
 let distBytes = 0;
 for (const path of actualFiles) {

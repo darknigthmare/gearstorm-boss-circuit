@@ -1,4 +1,49 @@
-# Rapport QA — GEARSTORM: Boss Circuit 2.10.0
+# Rapport QA — GEARSTORM: Boss Circuit 2.11.0
+
+Validation locale réalisée le 25 août 2026.
+
+## Statut v2.11.0 — source validée localement, publication distante à confirmer
+
+La source v2.11.0 a franchi le gate local `npm run qa:ci`. Le push, le run GitHub Actions associé et le déploiement Vercel de cette version ne sont pas encore consignés ici : aucun identifiant distant n’est anticipé.
+
+| Surface v2.11 | Résultat observé |
+| --- | --- |
+| Vérification complète | `npm run qa:ci` réussi |
+| Tests Node | **92/92 réussis** |
+| Build | 30 boss, 90 phases, 378 WebP runtime et 90 contrats |
+| Inventaire artistique | **39 212 378 octets** déclarés et vérifiés par manifeste |
+| Taille de `dist/` | **42 968 536 octets** |
+| Audit npm | **0 vulnérabilité** |
+| Hygiène du diff | `git diff --check` propre hors avertissements de conversion CRLF |
+| E2E Chromium | **26 réussis, 2 ignorés, 0 échec** |
+| Audit visuel local | Desktop et mobile : menu, Options, Riva et Forge contrôlés ; aucune erreur console, requête échouée ou barre de défilement horizontale observée |
+| Firefox et WebKit | **25 réussis, 3 ignorés, 0 échec** ; la course de focus WebKit est corrigée et couverte par régression |
+| GitHub Actions v2.11 | À confirmer après push |
+| Vercel v2.11 | À confirmer après push sur `https://gearstorm-boss-circuit.vercel.app` |
+
+## Vérifications fonctionnelles v2.11
+
+- Riva utilise quatorze pièces anatomiques et deux effets. L’avant-bras proche et le canon sont indépendants ; le recul suit l’axe du projectile et le diagnostic conserve une erreur de visée inférieure au seuil contractuel.
+- Les bottes, l’ombre et la poussière d’atterrissage sont alignées sur la route peinte sans déplacer le sol physique, les collisions ni les télégraphes.
+- Les vingt-quatre boss Forge utilisent sept couches hiérarchiques. Détruire une pièce masque aussi ses descendants visuels sans altérer les hitboxes de gameplay.
+- Les vingt-quatre arènes Forge chargent quatre plans `far`, `mid`, `ground` et `foreground`. Le premier plan est rendu après les acteurs sans masquer les informations de combat.
+- La sauvegarde v6 sépare les records par version d’équilibrage, mode, difficulté et variante. Les records plus anciens restent consultables comme héritage non classé.
+- Les volumes général, musique et effets sont persistants et indépendants. La musique adaptative suit la famille, la phase et la santé du boss à travers un limiteur anti-saturation.
+- Le cache raster reste borné à trois bundles de boss et conserve le rig permanent de Riva ; les anciens bootstraps PWA versionnés restent immuables.
+- L’intro, le prologue, le Circuit Forge et les Archives conservent une narration méta diégétique tout en donnant au joueur les informations utiles.
+
+## Limites honnêtes v2.11
+
+- Les parcours automatisés couvrent Chromium desktop/mobile ainsi que Firefox et WebKit desktop. Le scénario service worker hors ligne reste ignoré sous le runner WebKit Windows, qui échoue avant la résolution du worker ; Firefox et Chromium le valident.
+- Aucun appareil tactile, contrôleur physique ou lecteur d’écran réel n’a été testé pour cette release.
+- Le mobile portrait reste pris en charge, mais le paysage demeure recommandé pour conserver la largeur tactique du combat.
+- Le contraste exact des gradients peints dans le Canvas ne peut pas être déterminé automatiquement par axe ; aucune violation déterministe n’a été remontée sur les éléments DOM contrôlés.
+- Les captures de l’audit visuel v2.11 sont des preuves de travail locales et ne sont pas encore archivées dans `docs/audits/v2.11.0/`.
+- La publication v2.11 ne sera considérée comme vérifiée qu’après correspondance explicite entre le commit poussé, le run GitHub Actions, le déploiement Vercel `READY` et l’alias canonique.
+
+---
+
+# Annexe historique — rapport QA v2.10.0
 
 Validation locale réalisée le 25 août 2026.
 
@@ -41,15 +86,6 @@ Le premier run `32870552995` a signalé une course temporelle dans le test tacti
 ## Cohérence narrative vérifiée
 
 La Couronne est abolie, Cassian reste détenu et M-0 devient publique, distribuée entre six équipes sans clé maîtresse. Le Circuit Forge est la suite canonique post-campagne ; le Catalogue des 30 machines est une simulation hors chronologie. Les archives proposent neuf transmissions relisibles, quatre révélations d’anneau, vingt-quatre journaux et soixante-douze voix de phase Forge.
-
-## Limites honnêtes
-
-- Aucun appareil tactile ou contrôleur physique, lecteur d’écran réel, Firefox ou WebKit n’a été testé pour cette release.
-- Le mobile portrait reste pris en charge mais le paysage demeure recommandé pour la largeur tactique.
-- Les records locaux ne sont pas segmentés par mode, difficulté et version d’équilibrage.
-- Les 24 arènes Forge restent monocouches.
-- Les 24 boss Forge conservent des rigs de quatre pièces spécialisés au-dessus de huit familles moteur partagées.
-- Le contraste exact du gradient de combat Canvas n’a pas pu être déterminé automatiquement par axe ; aucune violation déterministe n’a été remontée.
 
 Les preuves visuelles sont indexées dans [`docs/audits/v2.10.0/`](docs/audits/v2.10.0/README.md).
 

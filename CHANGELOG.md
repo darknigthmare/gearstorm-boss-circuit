@@ -1,5 +1,15 @@
 # Historique des versions
 
+## 2.11.0 — Le Circuit passe en profondeur
+
+- Séparation réelle de l’avant-bras proche et du canon de Riva en deux couches articulées, avec recomposition neutre contrôlée et recul aligné sur l’axe du projectile.
+- Conversion des vingt-quatre arènes Forge en quatre couches de parallaxe `far`, `mid`, `ground` et `foreground`.
+- Extension des vingt-quatre machines Forge à sept pièces animées et hiérarchisées, liées aux états de destruction du gameplay.
+- Nouveau lot artistique immuable `assets/generated/v2.11.0/` : 43 masters OpenAI, 378 WebP runtime et 39 212 378 octets vérifiables par manifeste.
+- Sauvegarde v6 et records atomiques segmentés par version d’équilibrage, mode, difficulté et variante ; migration v5 conservée comme héritage non classé.
+- Mixage audio adaptatif par famille de boss, limiteur anti-saturation et volumes séparés pour le général, la musique et les effets/alertes.
+- Shell PWA, serveur local, build statique, cache Vercel et artefacts CI alignés sur v2.11.0 ; les anciens bootstraps versionnés restent conservés.
+
 ## 2.10.0 — La Couronne rend les clés
 
 - Fermeture de l’arc canonique : le mandat de la Couronne est aboli, Cassian Voltério reste détenu, M-0 devient un protocole public distribué entre six équipes et aucune clé maîtresse ne subsiste.
